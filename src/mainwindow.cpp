@@ -6,7 +6,7 @@ MainWindow::MainWindow (QWidget *parent) :
     QWidget (parent)
 {
     pBot = new Bot ("GenericBotId",  this);
-    pActor = pBot->getActor ();
+    pActor = pBot->actor ();
     createUI ();
 }
 

@@ -8,6 +8,7 @@
 
 Page_Generic::Page_Generic (const QWebElement &doc)
 {
+    doc.isNull ();
     pagekind = page_Generic;
 }
 

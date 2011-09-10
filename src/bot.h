@@ -6,28 +6,31 @@
 #include <QWebPage>
 #include <QWebSettings>
 #include <QString>
+#include "webactor.h"
+#include "persistentcookiejar.h"
+#include "config.h"
 
-class WebActor;
-class PersistentCookieJar;
 
 class Bot : public QObject
 {
     Q_OBJECT
 
 protected:
-    QString     botId;
-    QString     baseDir;
-    QString     botDir;
-    PersistentCookieJar *pCookies;
-    WebActor            *pActor;
+    QString             _id;
+    Config              *_config;
+    PersistentCookieJar *_cookies;
+    WebActor            *_actor;
 
 public:
-    explicit Bot(const QString& id, QObject *parent = 0);
-    QString getId () const {return botId; }
-    QString getBaseDir () const {return baseDir; }
-    QString getBotDir () const {return botDir; }
+    explicit Bot (const QString& id, QObject *parent = 0);
 
-    WebActor *getActor () {return pActor; }
+    virtual ~Bot ();
+
+    const QString& id () const {return _id; }
+
+    Config* config () {return _config; }
+
+    WebActor* actor () {return _actor; }
 
 signals:
 

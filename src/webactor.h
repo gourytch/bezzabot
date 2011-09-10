@@ -7,22 +7,23 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include "parsers/Page_Generic"
-#include "bot.h"
 
+class Bot;
 
 class WebActor : public QObject
 {
     Q_OBJECT
 
 private:
-    static QNetworkDiskCache *pCache;
-    static int count;
+    static QNetworkDiskCache *_cache;
+    static int _count;
 
 protected:
-    Bot         *pBot;
-    QWebPage    *pWebPage;
-    bool        finished;
-    bool        success;
+    Bot         *_bot;
+    QWebPage    *_webpage;
+    bool        _finished;
+    bool        _success;
+    QString     _savepath;
 
 public:
     explicit WebActor (Bot *bot);
@@ -45,7 +46,7 @@ public:
 
     void wait ();
 
-    QWebPage* page () { return pWebPage; };
+    QWebPage* page () { return _webpage; };
 
     Page_Generic* parse (); // создаётся новый объект!
 

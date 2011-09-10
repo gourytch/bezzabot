@@ -1,5 +1,5 @@
 *~
-*.pro.user
+*.pro.user*
 /bin/*
 /obj/*
 /Makefile

@@ -5,11 +5,16 @@
 #include <QDebug>
 #include "persistentcookiejar.h"
 #include "bot.h"
+#include "config.h"
+#include "tools.h"
 
-PersistentCookieJar::PersistentCookieJar(Bot *bot) :
-    QNetworkCookieJar(bot)
+
+PersistentCookieJar::PersistentCookieJar (Bot *bot) :
+    QNetworkCookieJar (bot)
 {
-    fname = bot->getBotDir () + "/cookies";
+    QString path = bot->config ()->dataPath ();
+    Config::checkDir (path);
+    fname = path + "/cookies";
 }
 
 

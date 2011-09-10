@@ -15,14 +15,16 @@ SOURCES += main.cpp\
     bot.cpp \
     webactor.cpp \
     persistentcookiejar.cpp \
-    tools.cpp
+    tools.cpp \
+    config.cpp
 
 HEADERS  += mainwindow.h \
     bot.h \
     webactor.h \
     page_generic.h \
     persistentcookiejar.h \
-    tools.h
+    tools.h \
+    config.h
 
 include (parsers/parsers.pri)
 
@@ -30,3 +32,7 @@ FORMS    +=
 
 OBJECTS_DIR = ../obj
 DESTDIR = ../bin
+
+
+
+

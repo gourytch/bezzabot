@@ -94,14 +94,15 @@ Page_Generic* Parser::parse (const QWebElement& doc)
 
 void Parser::test ()
 {
-    QDir dir;
+    QDir dir ("../samples");
     QStringList filters;
     filters << "sample-*-outer.xml";
+    qDebug () << "parse " << dir.absolutePath () << filters [0];
     QStringList fnames = dir.entryList (filters);
     foreach (QString fname, fnames)
     {
         qDebug () << "LOAD " << fname;
-        QString text = ::load (fname);
+        QString text = ::load (dir.absolutePath () + "/" + fname);
         Page_Generic *p = parse (text);
         if (p)
         {

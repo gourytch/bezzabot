@@ -13,7 +13,7 @@ protected:
     QString fname;
 
 public:
-    explicit PersistentCookieJar(Bot *bot);
+    explicit PersistentCookieJar (Bot *bot);
     ~PersistentCookieJar ();
 
     void save ();

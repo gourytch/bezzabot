@@ -3,67 +3,72 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QDebug>
-#include "webactor.h"
 #include "tools.h"
+#include "config.h"
+#include "bot.h"
+#include "webactor.h"
+#include "parsers/parser.h"
+
 
 const qint64 CACHE_SIZE = 100 * 1024 * 1024; // 100 MB
 
-QNetworkDiskCache* WebActor::pCache = NULL;
-int WebActor::count = 0;
+QNetworkDiskCache* WebActor::_cache = NULL;
+int WebActor::_count = 0;
 
 
 WebActor::WebActor(Bot *bot) :
     QObject (bot)
 {
-    if (!pCache)
+    if (!_cache)
     {
-        pCache = new QNetworkDiskCache ();
-        QString location = QDesktopServices::storageLocation(
-                    QDesktopServices::CacheLocation);
-        pCache->setCacheDirectory (location);
-        pCache->setMaximumCacheSize (CACHE_SIZE);
+        _cache = new QNetworkDiskCache ();
+        QString location = Config::globalCachePath() + "/webkit.cache";
+        Config::checkDir (location);
+        _cache->setCacheDirectory (location);
+        _cache->setMaximumCacheSize (CACHE_SIZE);
     }
-    count++;
+    _count++;
 
-    this->pBot = bot;
-    pWebPage = new QWebPage (this);
-    QNetworkAccessManager *pManager = pWebPage->networkAccessManager();
-    QWebSettings *pSettings = pWebPage->settings ();
-    pManager->setCache (pCache);
-    pSettings->setMaximumPagesInCache (10);
-    pSettings->enablePersistentStorage ();
-    pSettings->setOfflineStorageDefaultQuota (CACHE_SIZE);
-    pSettings->setAttribute (QWebSettings::AutoLoadImages, true);
-    pSettings->setAttribute (QWebSettings::JavascriptEnabled, true);
-    pSettings->setAttribute (QWebSettings::OfflineStorageDatabaseEnabled, true);
-    pSettings->setAttribute (QWebSettings::OfflineWebApplicationCacheEnabled, true);
-    pSettings->setAttribute (QWebSettings::DeveloperExtrasEnabled, true);
+    _bot = bot;
 
-    connect (pWebPage, SIGNAL (loadStarted ()),
+    _savepath = _bot->config()->dataPath () + "/webpages";
+
+    _webpage = new QWebPage (this);
+    QNetworkAccessManager *manager = _webpage->networkAccessManager();
+    QWebSettings *settings = _webpage->settings ();
+    manager->setCache (_cache);
+    settings->setMaximumPagesInCache (10);
+    settings->enablePersistentStorage ();
+    settings->setOfflineStorageDefaultQuota (CACHE_SIZE);
+    settings->setAttribute (QWebSettings::AutoLoadImages, true);
+    settings->setAttribute (QWebSettings::JavascriptEnabled, true);
+    settings->setAttribute (QWebSettings::OfflineStorageDatabaseEnabled, true);
+    settings->setAttribute (QWebSettings::OfflineWebApplicationCacheEnabled, true);
+    settings->setAttribute (QWebSettings::DeveloperExtrasEnabled, true);
+
+    connect (_webpage, SIGNAL (loadStarted ()),
              this, SLOT (onPageStarted ()));
-    connect (pWebPage, SIGNAL (loadFinished (bool)),
+    connect (_webpage, SIGNAL (loadFinished (bool)),
              this, SLOT (onPageFinished (bool)));
     connect (this, SIGNAL (save_page ()),
              this, SLOT (savePage ()));
-    connect (pWebPage, SIGNAL (linkClicked (const QUrl&)),
+    connect (_webpage, SIGNAL (linkClicked (const QUrl&)),
              this, SLOT (onLinkClicked(const QUrl&)));
-    connect (pWebPage, SIGNAL (downloadRequested (const QNetworkRequest&)),
+    connect (_webpage, SIGNAL (downloadRequested (const QNetworkRequest&)),
              this, SLOT (onDownloadRequested(const QNetworkRequest&)));
-
-
 }
 
 
 WebActor::~WebActor ()
 {
-    if (--count <= 0)
+    if (--_count <= 0)
     {
-        if (pCache)
+        if (_cache)
         {
-            delete pCache;
-            pCache = NULL;
+            delete _cache;
+            _cache = NULL;
         }
-        count = 0;
+        _count = 0;
     }
 }
 
@@ -72,7 +77,7 @@ void WebActor::request (const QNetworkRequest& rq,
                         QNetworkAccessManager::Operation operation,
                         const QByteArray& body)
 {
-    pWebPage->mainFrame ()->load (rq, operation, body);
+    _webpage->mainFrame ()->load (rq, operation, body);
 }
 
 
@@ -98,35 +103,35 @@ void WebActor::request (const QUrl &url, const QByteArray& data)
 
 void WebActor::fakeRequest (const QString &outerXml)
 {
-    pWebPage->mainFrame ()->documentElement().setOuterXml (outerXml);
+    _webpage->mainFrame ()->documentElement().setOuterXml (outerXml);
 //    onPageFinished (true);
 }
 
 
 bool WebActor::is_loaded ()
 {
-    return finished;
+    return _finished;
 }
 
 
 bool WebActor::is_ok ()
 {
-    return finished && success;
+    return _finished && _success;
 }
 
 
 void WebActor::onPageStarted ()
 {
-    finished    = false;
-    success     = false;
+    _finished   = false;
+    _success    = false;
 }
 
 
 void WebActor::onPageFinished (bool ok)
 {
-    finished    = true;
-    success     = ok;
-    if (success)
+    _finished   = true;
+    _success    = ok;
+    if (_success)
     {
         emit save_page ();
     }
@@ -149,20 +154,21 @@ void WebActor::onDownloadRequested (const QNetworkRequest& request)
 void WebActor::savePage ()
 {
     QString ts = now ();
-    QString pfx = "sample-" + ts + "-";
+    Config::checkDir (_savepath);
+    QString pfx = _savepath + "/sample-" + ts + "-";
     qDebug() << "save by TS=" << ts;
     ::save (pfx + "outer.xml",
-            pWebPage->mainFrame ()->documentElement ().toOuterXml ());
-    ::save (pfx + "inner.xml",
-            pWebPage->mainFrame ()->documentElement ().toInnerXml ());
-    ::save (pfx + "text.xml",
-            pWebPage->mainFrame ()->documentElement ().toPlainText());
+            _webpage->mainFrame ()->documentElement ().toOuterXml ());
+//    ::save (pfx + "inner.xml",
+//            _webpage->mainFrame ()->documentElement ().toInnerXml ());
+    ::save (pfx + "text.txt",
+            _webpage->mainFrame ()->documentElement ().toPlainText());
 }
 
 
 void WebActor::wait ()
 {
-    while (!finished)
+    while (!_finished)
     {
         sleep (1);
     }
@@ -175,7 +181,7 @@ void WebActor::wait ()
 
 Page_Generic* WebActor::parse ()
 {
-    QWebElement doc = pWebPage->mainFrame ()->documentElement ();
+    QWebElement doc = _webpage->mainFrame ()->documentElement ();
     ::save ("sample.xml", doc.toOuterXml ());
-    return NULL;
+    return Parser::parse (doc);
 }
