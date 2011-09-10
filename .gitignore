@@ -1,2 +1,7 @@
 *~
+*.pro.user
+/bin/*
+/obj/*
+/Makefile
+/src/Makefile
 
