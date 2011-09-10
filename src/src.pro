@@ -16,7 +16,8 @@ SOURCES += main.cpp\
     webactor.cpp \
     persistentcookiejar.cpp \
     tools.cpp \
-    config.cpp
+    config.cpp \
+    tunedpage.cpp
 
 HEADERS  += mainwindow.h \
     bot.h \
@@ -24,7 +25,8 @@ HEADERS  += mainwindow.h \
     page_generic.h \
     persistentcookiejar.h \
     tools.h \
-    config.h
+    config.h \
+    tunedpage.h
 
 include (parsers/parsers.pri)
 
@@ -32,6 +34,8 @@ FORMS    +=
 
 OBJECTS_DIR = ../obj
 DESTDIR = ../bin
+
+
 
 
 

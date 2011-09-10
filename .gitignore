@@ -1,7 +1,9 @@
 *~
+*.swp
 *.pro.user*
 /bin/*
 /obj/*
 /Makefile
 /src/Makefile
+/src/moc_*.cpp
 

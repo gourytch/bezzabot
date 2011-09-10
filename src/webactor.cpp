@@ -8,7 +8,7 @@
 #include "bot.h"
 #include "webactor.h"
 #include "parsers/parser.h"
-
+#include "tunedpage.h"
 
 const qint64 CACHE_SIZE = 100 * 1024 * 1024; // 100 MB
 
@@ -33,7 +33,8 @@ WebActor::WebActor(Bot *bot) :
 
     _savepath = _bot->config()->dataPath () + "/webpages";
 
-    _webpage = new QWebPage (this);
+//    _webpage = new QWebPage (this);
+    _webpage = new TunedPage (this);
     QNetworkAccessManager *manager = _webpage->networkAccessManager();
     QWebSettings *settings = _webpage->settings ();
     manager->setCache (_cache);
@@ -77,7 +78,9 @@ void WebActor::request (const QNetworkRequest& rq,
                         QNetworkAccessManager::Operation operation,
                         const QByteArray& body)
 {
-    _webpage->mainFrame ()->load (rq, operation, body);
+    QNetworkRequest rq_mod = rq;
+    rq_mod.setRawHeader ("User-Agent", USER_AGENT);
+    _webpage->mainFrame ()->load (rq_mod, operation, body);
 }
 
 

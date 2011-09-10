@@ -15,6 +15,7 @@
 #include "page_game.h"
 #include "page_game_index.h"
 #include "page_game_farm.h"
+#include "page_game_mine_open.h"
 #include "parser.h"
 
 
@@ -38,21 +39,69 @@ static void dump_element (const QWebElement& e, const QString& adj)
 
 PageKind Parser::guessPageKind (const QWebElement& doc)
 {
-    if (doc.findFirst ("DIV[class=title]").toPlainText () == "Мои подарки:")
+    QWebElementCollection divs = doc.findAll ("DIV[class=title]");
+    QString logo_src = doc.findFirst ("IMG[class=part_logo]").attribute ("src");
+    QString logo_name;
+    if (! logo_src.isNull ())
     {
-        return page_Game_Index;
+        QRegExp rx ("/([^/]+)\\.jpg$");
+        if (rx.indexIn (logo_src))
+        {
+            logo_name = rx.cap (1);
+        }
     }
-    if (doc.findFirst ("DIV[class=title]").toPlainText () == "Фермер Ушканчик")
+
+    if (logo_name.isNull ())
     {
-        return page_Game_Farm;
-    }
-    if (doc.findFirst ("DIV[class=name]").isNull ())
-    {
-        return page_Generic;
+        qDebug () << "logo_name: isNull";
     }
     else
     {
+        qDebug () << "logo_name:" << logo_name;
+    }
+
+    if (divs.count ())
+    {
+        QStringList titles;
+        foreach (QWebElement e, divs)
+        {
+            titles.append (e.toPlainText ().trimmed ());
+        }
+        qDebug () << "Titles: {";
+        foreach (QString e, titles)
+        {
+            qDebug () << "   {" << e << "}";
+        }
+        qDebug () << "}";
+        QString t0 = titles [0];
+        QString t1 = (titles.count () >= 2) ? titles [1] : "";
+
+        if (t0 == u8 ("Мои подарки:"))
+        {
+            return page_Game_Index;
+        }
+        if (t0 == u8 ("Фермер Ушканчик"))
+        {
+            return page_Game_Farm;
+        }
+        if (t0 == u8 ("Шахтёр Геннадий (бывший оллигатор)"))
+        {
+            if (t1 == u8 ("Купильня"))
+            {
+                return page_Game_Mine_Main;
+            }
+            return page_Game_Mine_Shop;
+        }
+        if (logo_name == u8 ("Mine_Open"))
+        {
+            return page_Game_Mine_Open;
+        }
+
         return page_Game;
+    }
+    else
+    {
+        return page_Generic;
     }
 }
 
@@ -82,6 +131,9 @@ Page_Generic* Parser::parse (const QWebElement& doc)
     case page_Game_Farm:
         return new Page_Game_Farm (doc);
 
+    case page_Game_Mine_Open:
+        return new Page_Game_Mine_Open (doc);
+
     case page_Game:
         return new Page_Game (doc);
 
@@ -94,9 +146,9 @@ Page_Generic* Parser::parse (const QWebElement& doc)
 
 void Parser::test ()
 {
-    QDir dir ("../samples");
+    QDir dir ("../../bezzabot.samples");
     QStringList filters;
-    filters << "sample-*-outer.xml";
+    filters << "*.xml";
     qDebug () << "parse " << dir.absolutePath () << filters [0];
     QStringList fnames = dir.entryList (filters);
     foreach (QString fname, fnames)

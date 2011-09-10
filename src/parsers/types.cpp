@@ -102,7 +102,7 @@ void PageTimers::assign (const QWebElement &doc)
         qDebug () << "TIMERS NOT FOUND";
         return;
     }
-    qDebug () << "search for timer values";
+//    qDebug () << "search for timer values";
     for (QWebElement sub1 = e.firstChild ();
          !sub1.isNull ();
          sub1 = sub1.nextSibling ())
@@ -143,7 +143,7 @@ QString PageTimers::toString (const QString& pfx) const
     {
         buf += pfx + "   " + timers.at (i).toString () + "\n";
     }
-    buf += "}";
+    buf += pfx + "}";
     return buf;
 }
 
