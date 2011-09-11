@@ -6,7 +6,7 @@
 #include <QNetworkDiskCache>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
-#include "parsers/Page_Generic"
+#include "parsers/page_generic.h"
 
 class Bot;
 
