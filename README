@@ -1,2 +1,31 @@
-BezzaBot -- automated client for botva-game (botva.ru)
+BezzaBot -- (semi)automated client for botva-game (botva.ru)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+предварительные требования для сборки проекта:
+ * Qt4: libqt4-network, libqt4-gui libqt4-webkit libqt4-dev
+ * qmake
+ * Git (git-arch)
 
+#############################################################################
+
+# для проверки сборки:
+mkdir /srv/chroots
+debootstrap --verbose --arch=i386 squeeze /srv/chroots/squeeze32
+debootstrap --verbose --arch=amd64 squeeze /srv/chroots/squeeze64
+
+# установка зависимостей
+apt-get install locales
+dpkg-reconfigure locales
+apt-get install \
+        build-essential git-arch \
+        libqt4-dev libqt4-network libqt4-gui libqt4-webkit
+
+# извлечение сырцов:
+cd
+git clone -b develop http://code.google.com/p/bezzabot/
+
+# компиляция проекта
+cd bezzabot
+qmake -recursive
+make
+
+#############################################################################
