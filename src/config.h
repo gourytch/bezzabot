@@ -38,6 +38,8 @@ protected:
 
     explicit Config ();
 
+    void setTemplate ();
+
 public:
 
     explicit Config (QObject *parent, const QString& _id, Config *base = 0);

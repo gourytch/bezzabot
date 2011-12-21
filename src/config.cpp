@@ -2,8 +2,8 @@
 #include <QCoreApplication>
 #include <QSettings>
 #include <QDateTime>
-#include <QDebug>
 #include <QDir>
+#include <QDebug>
 #include "config.h"
 
 using namespace std;
@@ -58,6 +58,9 @@ void Config::init_check ()
     _ini_fname = _location_config + "/" + INI_NAME;
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
     _global = new Config ();
+    if (!_global->get("initialized").toBool()) {
+        _global->setTemplate();
+    }
     _global->set("launched", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 }
 
@@ -82,6 +85,18 @@ Config::~Config ()
 {
 }
 
+void Config::setTemplate() {
+    QString dummybot ("dummybot");
+    _global->set("bots/list", dummybot);
+    _global->set("connection/use_proxy", false);
+    _global->set("connection/proxy_host", "proxy.local.net");
+    _global->set("connection/proxy_port", 3128);
+    Config botcfg(parent(), dummybot, _global);
+    botcfg.set("login/server_id", 0);
+    botcfg.set("login/email", "dummybot@dummy-mail.net");
+    botcfg.set("login/password", "dummy password for dummy bot");
+    _global->set("initialized", true);
+}
 
 QString Config::fullpath (const QString& path) const
 {
