@@ -1,11 +1,16 @@
 #include "mainwindow.h"
+#include "config.h"
 #include "bot.h"
 
+MainWindow *MainWindow::_instance = NULL;
 
 MainWindow::MainWindow (QWidget *parent) :
     QWidget (parent)
 {
-    pBot = new Bot ("GenericBotId",  this);
+    _instance = this;
+    Config& cfg = Config::global();
+    QString id = cfg.get ("main/bot_id", false, "GenericBotID").toString ();
+    pBot = new Bot (id,  this);
     pActor = pBot->actor ();
     createUI ();
 }
@@ -18,6 +23,8 @@ MainWindow::~MainWindow()
 void MainWindow::createUI ()
 {
     pAutomaton          = new QCheckBox (tr ("Automaton"));
+    pSaveNow            = new QPushButton (tr ("Save Page"));
+
     pLoadingProgress    = new QProgressBar ();
     pWebView            = new QWebView ();
     pLogView            = new QTextEdit ();
@@ -27,6 +34,7 @@ void MainWindow::createUI ()
     pSplitter           = new QSplitter (Qt::Vertical);
 
     pControls->addWidget (pAutomaton);
+    pControls->addWidget (pSaveNow);
     pControls->addWidget (pLoadingProgress);
 
     pLayout->setMargin (10);
@@ -44,6 +52,9 @@ void MainWindow::createUI ()
 
     connect (pAutomaton, SIGNAL (stateChanged (int)),
              this, SLOT (slotSetAutomatonState (int)));
+
+    connect (pSaveNow, SIGNAL (clicked (bool)),
+             pActor, SLOT (savePage ()));
 
     connect (pWebView->page (), SIGNAL (loadStarted ()),
              this, SLOT (slotLoadStarted ()));
@@ -84,10 +95,12 @@ void MainWindow::slotSetAutomatonState (int state)
     {
     case Qt::Unchecked:
         log ("automaton disabled");
+        pBot->stop();
         break;
 
     case Qt::Checked:
         log ("automaton ignited");
+        pBot->start();
         break;
 
     default:

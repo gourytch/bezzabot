@@ -12,6 +12,7 @@
 
 #include "tools.h"
 #include "page_generic.h"
+#include "page_login.h"
 #include "page_game.h"
 #include "page_game_index.h"
 #include "page_game_farm.h"
@@ -99,8 +100,14 @@ PageKind Parser::guessPageKind (const QWebElement& doc)
 
         return page_Game;
     }
+    else if (! doc.findFirst ("DIV[id=frontRight]").isNull())
+    {
+        qDebug () << "login detected";
+        return page_Login;
+    }
     else
     {
+        qDebug () << "not indentified page";
         return page_Generic;
     }
 }
@@ -136,6 +143,9 @@ Page_Generic* Parser::parse (const QWebElement& doc)
 
     case page_Game:
         return new Page_Game (doc);
+
+    case page_Login:
+        return new Page_Login (doc);
 
     case page_Generic:
     default:

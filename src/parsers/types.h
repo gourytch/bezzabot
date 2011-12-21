@@ -87,4 +87,6 @@ extern bool parseTimerSpan (const QWebElement& e, QDateTime *pit=0, int *hms=0);
 
 extern int dottedInt (const QString& s);
 
+extern QString toString (PageKind kind);
+
 #endif // PARSERS_TYPES_H

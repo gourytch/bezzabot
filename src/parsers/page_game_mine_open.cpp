@@ -21,7 +21,13 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (const QWebElement& doc) :
     Page_Game (doc)
 {
     pagekind = page_Game_Mine_Open;
-    QWebElementCollection es = doc.findAll ("TD");
+    QWebElementCollection grbody = doc.findAll ("DIV.grbody");
+
+    // grbody[0] :: мини-купильня кирки, очков и каски
+    // grbody[1] :: забой
+
+    // распарсим купильню
+    QWebElementCollection es = grbody [0].findAll ("TD");
     QWebElement e;
     int count = 0;
 
@@ -89,7 +95,7 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (const QWebElement& doc) :
     foreach (e, es)
     {
         QString s = e.toPlainText ().trimmed ();
-        qDebug () << "[" << count++ << "] = " << s;
+//        qDebug () << "[" << count++ << "] = " << s;
         if (s == u8 ("Вы ищете кристаллы"))
         {
             parseTimerSpan (doc.findFirst ("SPAN[id=counter_1]"),
@@ -102,6 +108,14 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (const QWebElement& doc) :
             digstage = DigReady;
             break;
         }
+    }
+
+    es = doc.findAll ("DIV[class=grbody]");
+    count = 0;
+    foreach (e, es)
+    {
+        QString s = e.toPlainText ().trimmed ();
+        qDebug () << "[" << count++ << "] = " << s;
     }
 
 }

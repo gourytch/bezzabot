@@ -103,6 +103,25 @@ void WebActor::request (const QUrl &url, const QByteArray& data)
     request (rq, QNetworkAccessManager::PostOperation, data);
 }
 
+void WebActor::request (const QUrl& url, const QStringList& params) {
+    if (params.count() % 2) {
+        qDebug () << "num params % 2 != 0";
+        return;
+    }
+    QString data;
+    int num_pairs = params.count() / 2;
+    QStringList::ConstIterator it = params.constBegin ();
+    for (int pair_no = 0; pair_no < num_pairs; pair_no++) {
+        QString k = (*it++);
+        QString v = (*it++);
+        if (pair_no > 0) {
+            data += "&";
+        }
+        data += k + "=" + v;
+    }
+    request (url, data.toUtf8());
+
+}
 
 void WebActor::fakeRequest (const QString &outerXml)
 {
@@ -166,6 +185,11 @@ void WebActor::savePage ()
 //            _webpage->mainFrame ()->documentElement ().toInnerXml ());
     ::save (pfx + "text.txt",
             _webpage->mainFrame ()->documentElement ().toPlainText());
+    qDebug () << "parse loaded page:";
+    Page_Generic *page = parse ();
+    qDebug () << "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";
+    qDebug () << page->toString();
+    qDebug () << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 }
 
 
@@ -185,6 +209,6 @@ void WebActor::wait ()
 Page_Generic* WebActor::parse ()
 {
     QWebElement doc = _webpage->mainFrame ()->documentElement ();
-    ::save ("sample.xml", doc.toOuterXml ());
+    //::save ("sample.xml", doc.toOuterXml ());
     return Parser::parse (doc);
 }

@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     persistentcookiejar.cpp \
     tools.cpp \
     config.cpp \
-    tunedpage.cpp
+    tunedpage.cpp \
+    botthread.cpp
 
 HEADERS  += mainwindow.h \
     bot.h \
@@ -26,7 +27,8 @@ HEADERS  += mainwindow.h \
     persistentcookiejar.h \
     tools.h \
     config.h \
-    tunedpage.h
+    tunedpage.h \
+    botthread.h
 
 include (parsers/parsers.pri)
 
@@ -34,6 +36,8 @@ FORMS    +=
 
 OBJECTS_DIR = ../obj
 DESTDIR = ../bin
+
+
 
 
 

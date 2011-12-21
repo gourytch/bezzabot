@@ -19,11 +19,11 @@ private:
     static int _count;
 
 protected:
+    QString     _savepath;
     Bot         *_bot;
     QWebPage    *_webpage;
-    bool        _finished;
-    bool        _success;
-    QString     _savepath;
+    volatile bool   _finished;
+    volatile bool   _success;
 
 public:
     explicit WebActor (Bot *bot);
@@ -37,6 +37,8 @@ public:
     void request (const QUrl& url);
 
     void request (const QUrl& url, const QByteArray& data);
+
+    void request (const QUrl& url, const QStringList& params);
 
     void fakeRequest (const QString &outerXml);
 
@@ -64,12 +66,14 @@ protected slots:
 
     void onPageFinished (bool ok);
 
-    void savePage ();
 
     void onLinkClicked (const QUrl& url);
 
     void onDownloadRequested (const QNetworkRequest& request);
 
+public slots:
+
+    void savePage ();
 
 };
 

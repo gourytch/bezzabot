@@ -15,6 +15,8 @@ class MainWindow : public QWidget
 
 protected:
     QCheckBox   *pAutomaton;
+    QPushButton *pSaveNow;
+
     QProgressBar *pLoadingProgress;
     QWebView    *pWebView;
     QTextEdit   *pLogView;
@@ -27,11 +29,19 @@ protected:
     void createUI ();
     void setupWebView ();
 
+    static MainWindow * _instance;
 public:
     explicit MainWindow (QWidget *parent = 0);
     ~MainWindow ();
 
     void load (const QUrl& url);
+
+    static MainWindow *getInstance() {
+        if (!_instance) {
+            _instance = new MainWindow();
+        }
+        return _instance;
+    }
 
 public slots:
 
