@@ -44,7 +44,7 @@ QString now (bool utc = false)
 {
     if (utc)
     {
-        return QDateTime::currentDateTimeUtc ()
+        return QDateTime::currentDateTime ().toUTC ()
                 .toString ("yyyyMMdd_HHmmss");
     }
     else
