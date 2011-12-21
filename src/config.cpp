@@ -1,6 +1,7 @@
 #include <QDesktopServices>
 #include <QCoreApplication>
 #include <QSettings>
+#include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include "config.h"
@@ -57,6 +58,7 @@ void Config::init_check ()
     _ini_fname = _location_config + "/" + INI_NAME;
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
     _global = new Config ();
+    _global->set("launched", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 }
 
 
@@ -172,7 +174,6 @@ QString Config::cachePath () const
 {
     return QDir (globalCachePath () + "/" + _id).absolutePath ();
 }
-
 
 //static
 void Config::test ()

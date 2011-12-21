@@ -23,7 +23,6 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     bot.h \
     webactor.h \
-    page_generic.h \
     persistentcookiejar.h \
     tools.h \
     config.h \
