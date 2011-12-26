@@ -1,5 +1,6 @@
 #include <QDesktopServices>
 #include <QDebug>
+#include <QTimer>
 #include <QDir>
 #include "mainwindow.h"
 #include "bot.h"
@@ -37,6 +38,7 @@ Bot::Bot(const QString& id, QObject *parent) :
     _started = false;
     _regular = true;
     _page = NULL;
+    _awaiting = false;
     _step_counter = 0;
     _step_timer.setInterval (1000);
 
@@ -82,6 +84,7 @@ void Bot::onPageFinished (bool ok)
         qDebug()<<"unhandled page with kind=" << toString(_page->pagekind);
         break;
     }
+    _awaiting = false;
 }
 
 
@@ -116,16 +119,30 @@ void Bot::step()
         _step_timer.stop();
     }
     qDebug() << "STEP" << ++_step_counter;
-    if (_page == NULL)
-    {
-        emit log (tr("no page yet. do login sequence"));
-        if (!action_login()) {
-            emit log (tr("login failed"));
+    if (_awaiting) {
+        emit log (tr("bot is awaiting for responce. skip"));
+    } else {
+        emit log (tr("bot is ready for work"));
+        if (_actor->busy()) {
+            emit log (tr("actor is busy. do nothing"));
+        } else {
+            emit log (tr("actor is available"));
+            if (_page == NULL)
+            {
+                emit log (tr("shoot request"));
+                _awaiting = true;
 
-        }
-    }
+                _actor->request(QUrl("http://www.google.com/"));
+//                QTimer::singleShot(0, _actor, SLOT(request(QUrl("http://www.google.com/"))));
 
-
+                emit log (tr("puff!"));
+//                emit log (tr("no page yet. do login sequence"));
+//                if (!action_login()) {
+//                    emit log (tr("login failed"));
+//                }
+            }
+        } // end if (actor->busy())
+    } // end if (_awaiting)
 
     if (_started) {
         if (_regular) {
@@ -144,19 +161,20 @@ void Bot::handle_Page_Generic () {
 
 
 void Bot::handle_Page_Login () {
-    if (sequence == Sequence_Login) {
-        qDebug() << "(already in login sequence)";
-        return;
-    }
-    sequence = Sequence_Login;
+//    if (sequence == Sequence_Login) {
+//        qDebug() << "(already in login sequence)";
+//        return;
+//    }
+//    sequence = Sequence_Login;
 
     qDebug() << "hangle login page";
-    if (action_login()) {
-        qDebug() << "ok";
-    } else {
-        qDebug () << "fail";
-    }
-    sequence = Sequence_Undefined;
+//
+//    if (action_login()) {
+//        qDebug() << "ok";
+//    } else {
+//        qDebug () << "fail";
+//    }
+//    sequence = Sequence_Undefined;
 }
 
 
@@ -208,6 +226,25 @@ bool Bot::action_login () {
              << " at server " << server_id;
     QString sid = QString::number(server_id);
     QUrl url = "http://g" + sid  + ".botva.ru/login.php";
+
+    url = "http://gwi.papillon.ru/GWI/table/table.php?depid=107";
+
+    qDebug() << "retrieve login page";
+    _actor->request(url);
+    if (!_actor->is_ok()) {
+        qDebug() << "page load error";
+        return false;
+    }
+
+    {
+        Page_Generic *page = _actor->parse();
+        if (page->pagekind != page_Game_Index) {
+            qDebug() << toString(page->pagekind) << " is not login page";
+            return false;
+        }
+        delete page;
+    }
+
     QStringList params;
     params.append("do_cmd");    params.append("login");
     params.append("server");    params.append(sid);

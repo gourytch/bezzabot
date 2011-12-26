@@ -33,11 +33,26 @@ WebActor::WebActor(Bot *bot) :
 
     _savepath = _bot->config()->dataPath () + "/webpages";
 
+    _proxy = NULL;
+    if (_bot->config()->get("connection/use_proxy", false).toBool()) {
+        QString proxyHost = _bot->config()->get("connection/proxy_host", "").toString();
+        int proxyPort = _bot->config()->get("connection/proxy_port", 0).toInt();
+        if (!proxyHost.isEmpty() && proxyPort > 0) {
+            _proxy = new QNetworkProxy (QNetworkProxy::HttpCachingProxy, proxyHost, proxyPort);
+        }
+    }
+
+    _finished = true;
+    _success = false;
+
 //    _webpage = new QWebPage (this);
     _webpage = new TunedPage (this);
     QNetworkAccessManager *manager = _webpage->networkAccessManager();
     QWebSettings *settings = _webpage->settings ();
     manager->setCache (_cache);
+    if (_proxy) {
+        manager->setProxy(*_proxy);
+    }
     settings->setMaximumPagesInCache (10);
     settings->enablePersistentStorage ();
     settings->setOfflineStorageDefaultQuota (CACHE_SIZE);
@@ -71,16 +86,24 @@ WebActor::~WebActor ()
         }
         _count = 0;
     }
+//    if (_proxy) {
+//        delete _proxy;
+//        _proxy = NULL;
+//    }
 }
 
 
-void WebActor::request (const QNetworkRequest& rq,
+void WebActor::request_ (const QNetworkRequest& rq,
                         QNetworkAccessManager::Operation operation,
                         const QByteArray& body)
 {
     QNetworkRequest rq_mod = rq;
     rq_mod.setRawHeader ("User-Agent", USER_AGENT);
+    qDebug() << "send request";
+    _finished = false;
+    _success = false;
     _webpage->mainFrame ()->load (rq_mod, operation, body);
+    qDebug() << "request sent";
 }
 
 
@@ -90,7 +113,7 @@ void WebActor::request (const QUrl &url)
     QNetworkRequest rq (url);
     rq.setAttribute (QNetworkRequest::CacheLoadControlAttribute,
                      QNetworkRequest::PreferCache);
-    request (rq, QNetworkAccessManager::GetOperation);
+    request_ (rq, QNetworkAccessManager::GetOperation, QByteArray());
 }
 
 
@@ -100,7 +123,7 @@ void WebActor::request (const QUrl &url, const QByteArray& data)
     QNetworkRequest rq (url);
     rq.setAttribute (QNetworkRequest::CacheLoadControlAttribute,
                      QNetworkRequest::PreferCache);
-    request (rq, QNetworkAccessManager::PostOperation, data);
+    request_ (rq, QNetworkAccessManager::PostOperation, data);
 }
 
 void WebActor::request (const QUrl& url, const QStringList& params) {
@@ -123,12 +146,23 @@ void WebActor::request (const QUrl& url, const QStringList& params) {
 
 }
 
+void WebActor::request (const QNetworkRequest& rq,
+              QNetworkAccessManager::Operation operation,
+              const QByteArray& body) {
+    request_ (rq, operation, body);
+}
+
+////////////////////////////////////////////////////////////////////////////
+
 void WebActor::fakeRequest (const QString &outerXml)
 {
     _webpage->mainFrame ()->documentElement().setOuterXml (outerXml);
 //    onPageFinished (true);
 }
 
+bool WebActor::busy() {
+    return !_finished;
+}
 
 bool WebActor::is_loaded ()
 {
@@ -148,15 +182,20 @@ void WebActor::onPageStarted ()
     _success    = false;
 }
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void WebActor::onPageFinished (bool ok)
 {
+    qDebug() << "WebActor::onPageFinished(" << ok << ")";
     _finished   = true;
     _success    = ok;
     if (_success)
     {
         emit save_page ();
     }
+#ifdef USE_LOCK
+    qDebug() << "send pageLoaded signal";
+    _pageLoaded.wakeAll();
+#endif
 }
 
 
@@ -195,9 +234,19 @@ void WebActor::savePage ()
 
 void WebActor::wait ()
 {
-    while (!_finished)
-    {
-        sleep (1);
+    qDebug () << "awaiting for page loading finished";
+#ifdef USE_LOCK
+    _actorIsBusy.lock();
+    _pageLoaded.wait(&_actorIsBusy);
+    _actorIsBusy.unlock();
+#endif
+    if (!_finished) {
+        qDebug() << "??? ACTOR UNLOCKED BUT NOT FINISHED";
+        while (!_finished)
+        {
+            qDebug() << "tick-tock...";
+            sleep (1);
+        }
     }
 }
 

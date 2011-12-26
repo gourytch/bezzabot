@@ -1,3 +1,5 @@
+#include <QRegExp>
+#include <QStringList>
 #include "mainwindow.h"
 #include "config.h"
 #include "bot.h"
@@ -9,7 +11,17 @@ MainWindow::MainWindow (QWidget *parent) :
 {
     _instance = this;
     Config& cfg = Config::global();
-    QString id = cfg.get ("main/bot_id", false, "GenericBotID").toString ();
+    QStringList ids = cfg.get("bots/list", "").toString().trimmed().split(QRegExp("\\s+"));
+    QString id;
+    if (ids.length() < 1) {
+        qDebug() << "no bots listed in confing use default name";
+        id = "DUMMYBOT";
+    } else {
+        if (ids.length() > 1) {
+            qDebug() << "more than one bot listed in config. only first one will be initialized";
+        }
+        id = ids[0];
+    }
     pBot = new Bot (id,  this);
     pActor = pBot->actor ();
     createUI ();
@@ -85,6 +97,7 @@ void MainWindow::load (const QUrl &url)
 
 void MainWindow::log (const QString &text)
 {
+    qDebug () << "LOG:" << text;
     pLogView->append (text);
 }
 
@@ -95,12 +108,14 @@ void MainWindow::slotSetAutomatonState (int state)
     {
     case Qt::Unchecked:
         log ("automaton disabled");
-        pBot->stop();
+        QTimer::singleShot(0, pBot, SIGNAL (stop()));
+//        pBot->stop();
         break;
 
     case Qt::Checked:
         log ("automaton ignited");
-        pBot->start();
+//        pBot->start();
+        QTimer::singleShot(0, pBot, SIGNAL (start()));
         break;
 
     default:

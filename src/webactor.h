@@ -5,8 +5,16 @@
 #include <QWebPage>
 #include <QNetworkDiskCache>
 #include <QNetworkAccessManager>
+#include <QNetworkProxy>
 #include <QNetworkRequest>
 #include "parsers/page_generic.h"
+
+//#define USE_LOCK
+
+#ifdef USE_LOCK
+#include <QWaitCondition>
+#include <QMutex>
+#endif
 
 class Bot;
 
@@ -20,31 +28,33 @@ private:
 
 protected:
     QString     _savepath;
-    Bot         *_bot;
-    QWebPage    *_webpage;
+    Bot             *_bot;
+    QWebPage        *_webpage;
+    QNetworkProxy   *_proxy;
     volatile bool   _finished;
     volatile bool   _success;
+
+#ifdef USE_LOCK
+    QWaitCondition _pageLoaded;
+    QMutex         _actorIsBusy;
+#endif
+
+    void request_ (const QNetworkRequest& rq,
+                  QNetworkAccessManager::Operation operation,
+                  const QByteArray & body);
 
 public:
     explicit WebActor (Bot *bot);
     ~WebActor ();
 
-    void request (const QNetworkRequest& rq,
-                  QNetworkAccessManager::Operation operation
-                  = QNetworkAccessManager::GetOperation,
-                  const QByteArray & body = QByteArray());
-
-    void request (const QUrl& url);
-
-    void request (const QUrl& url, const QByteArray& data);
-
-    void request (const QUrl& url, const QStringList& params);
 
     void fakeRequest (const QString &outerXml);
 
     bool is_loaded (); // всё уже загружено
 
     bool is_ok (); // всё уже ХОРОШО загружено
+
+    bool busy(); // идёт ли обработка
 
     void wait ();
 
@@ -59,6 +69,18 @@ signals:
     void save_page ();
 
     void log (const QString& text);
+
+public slots:
+
+    void request (const QNetworkRequest& rq,
+                  QNetworkAccessManager::Operation operation,
+                  const QByteArray& body);
+
+    void request (const QUrl& url);
+
+    void request (const QUrl& url, const QByteArray& data);
+
+    void request (const QUrl& url, const QStringList& params);
 
 protected slots:
 

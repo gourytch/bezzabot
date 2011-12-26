@@ -44,6 +44,8 @@ protected:
     bool _regular;
     int  _step_counter;
 
+    bool _awaiting;
+
     // player state
     QString     charname;
     QString     chartitle;
@@ -82,10 +84,6 @@ public:
 
     WebActor* actor () {return _actor; }
 
-    void start ();
-
-    void stop ();
-
     void step ();
 
     bool action_login ();
@@ -97,9 +95,14 @@ signals:
     void log (const QString& text);
 
 public slots:
+
     void onPageFinished (bool ok);
 
     void onStep();
+
+    void start ();
+
+    void stop ();
 
 };
 
