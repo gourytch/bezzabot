@@ -20,7 +20,7 @@ public:
     int         hp_spd;
     PageTimers  timers;
 
-    Page_Game (const QWebElement& doc);
+    Page_Game (QWebElement& doc);
     virtual QString toString (const QString& pfx = QString ()) const;
 };
 

@@ -17,7 +17,7 @@ int rxVal (const QWebElement& e)
 }
 
 
-Page_Game_Mine_Open::Page_Game_Mine_Open (const QWebElement& doc) :
+Page_Game_Mine_Open::Page_Game_Mine_Open (QWebElement& doc) :
     Page_Game (doc)
 {
     pagekind = page_Game_Mine_Open;

@@ -21,8 +21,10 @@ struct Stat
 };
 
 
-struct Page_Game_Index : public Page_Game
+class Page_Game_Index : public Page_Game
 {
+    Q_OBJECT
+public:
     // сейф
     // кукла вуду
     // знак вуду
@@ -65,7 +67,7 @@ struct Page_Game_Index : public Page_Game
 
     int player_id; // из урла статистики
 
-    Page_Game_Index (const QWebElement& doc);
+    Page_Game_Index (QWebElement& doc);
     virtual QString toString (const QString& pfx = QString ()) const;
 };
 

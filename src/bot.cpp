@@ -6,7 +6,8 @@
 #include "bot.h"
 #include "webactor.h"
 #include "persistentcookiejar.h"
-
+#include "tools.h"
+#include "parsers/page_login.h"
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent)
@@ -35,6 +36,13 @@ Bot::Bot(const QString& id, QObject *parent) :
     connect (_actor, SIGNAL (log (const QString &)),
              wnd, SLOT (log (const QString &)));
 
+    connect (this, SIGNAL (request_get(const QUrl &)),
+             _actor, SLOT (request (const QUrl &)));
+
+    connect (this, SIGNAL (request_post(const QUrl &, const QStringList&)),
+             _actor, SLOT (request (const QUrl &, const QStringList &)));
+
+    _good  = false;
     _started = false;
     _regular = true;
     _page = NULL;
@@ -45,7 +53,11 @@ Bot::Bot(const QString& id, QObject *parent) :
     connect (&_step_timer, SIGNAL (timeout()),
              this, SLOT (onStep()));
 
-  //  start();
+    configure ();
+
+    if (_good && _autostart) {
+      start();
+    }
 
 //    _actor->request (QUrl ("http://g3.botva.ru/"));
 
@@ -68,14 +80,25 @@ void Bot::onPageFinished (bool ok)
 //        pCookies->debug ();
         _cookies->save ();
     }
+    if (_page) {
+        delete _page;
+        _page = NULL;
+    }
     _page = _actor->parse();
+    qDebug() << "page kind: " + toString(_page->pagekind);
     switch (_page->pagekind)
     {
     case page_Login:
         handle_Page_Login();
         break;
+    case page_Entrance:
+        handle_Page_Login();
+        break;
     case page_Game_Index:
         handle_Page_Game_Index();
+        break;
+    case page_Game:
+        handle_Page_Game_Generic();
         break;
     case page_Generic:
         handle_Page_Generic();
@@ -89,6 +112,10 @@ void Bot::onPageFinished (bool ok)
 
 
 void Bot::start() {
+    if (!_good) {
+        emit log(tr("bot is not configured properly"));
+        return;
+    }
     if (_started) return;
     _started = true;
     emit log(tr("start bot"));
@@ -118,28 +145,23 @@ void Bot::step()
     {
         _step_timer.stop();
     }
-    qDebug() << "STEP" << ++_step_counter;
+//    qDebug() << "STEP" << ++_step_counter;
     if (_awaiting) {
-        emit log (tr("bot is awaiting for responce. skip"));
+//        emit log (tr("bot is awaiting for responce. skip"));
     } else {
-        emit log (tr("bot is ready for work"));
+//        emit log (tr("bot is ready for work"));
         if (_actor->busy()) {
-            emit log (tr("actor is busy. do nothing"));
+//            emit log (tr("actor is busy. do nothing"));
         } else {
-            emit log (tr("actor is available"));
+//            emit log (tr("actor is available"));
             if (_page == NULL)
             {
                 emit log (tr("shoot request"));
                 _awaiting = true;
 
-                _actor->request(QUrl("http://www.google.com/"));
-//                QTimer::singleShot(0, _actor, SLOT(request(QUrl("http://www.google.com/"))));
+                emit request_get(QUrl("http://g1.botva.ru/"));
 
                 emit log (tr("puff!"));
-//                emit log (tr("no page yet. do login sequence"));
-//                if (!action_login()) {
-//                    emit log (tr("login failed"));
-//                }
             }
         } // end if (actor->busy())
     } // end if (_awaiting)
@@ -157,120 +179,57 @@ void Bot::step()
 //////////// page handlers //////////////////////////////////////////////////
 
 void Bot::handle_Page_Generic () {
+    emit log(tr("hangle generic page"));
 }
 
 
 void Bot::handle_Page_Login () {
-//    if (sequence == Sequence_Login) {
-//        qDebug() << "(already in login sequence)";
-//        return;
-//    }
-//    sequence = Sequence_Login;
-
-    qDebug() << "hangle login page";
-//
-//    if (action_login()) {
-//        qDebug() << "ok";
-//    } else {
-//        qDebug () << "fail";
-//    }
-//    sequence = Sequence_Undefined;
+    emit log(tr("hangle login page"));
+    Page_Login *p = (Page_Login*)_page;
+    p->doLogin(_serverNo, _login, _password, true);
 }
 
 
 void Bot::handle_Page_Game_Generic () {
-
+    emit log(tr("hangle generic game page"));
 }
 
 
 void Bot::handle_Page_Game_Index () {
-
+    emit log(tr("hangle index game page"));
 }
 
 
 void Bot::handle_Page_Game_Mine_Open () {
-
+    emit log(tr("hangle mine open game page"));
 }
 
 
 void Bot::handle_Page_Game_Farm () {
-
+    emit log(tr("hangle farm game page"));
 }
 
 bool Bot::action_login () {
-    int server_id       = _config->get("login/server_id", true, -1).toInt();
-    QString email       = _config->get("login/email", true, "").toString();
-    QString password    = _config->get("login/password", true, "").toString();
-    bool good = true;
-    if (server_id < 1 || server_id > 3) {
-        qDebug() << "missing/bad: login/server_id (" << server_id << ")";
-        _config->set("login/server_id", -1111);
-        good = false;
-    }
-    if (email == "") {
-        qDebug() << "missing: login/email";
-        _config->set("login/email", "Enter@Your.Email.Here");
-        good = false;
-    }
-    if (password == "") {
-        qDebug() << "missing: login/password";
-        _config->set("login/password", "EnterYourPasswordHere");
-        good = false;
-    }
-    if (!good) {
-        qDebug() << "abort login sequence";
+    if (!_good) {
+        qDebug() << "attempt to login for unconfigured bot";
         return false;
     }
     qDebug() << "initiate login sequence for "
-             << email
-             << " at server " << server_id;
-    QString sid = QString::number(server_id);
-    QUrl url = "http://g" + sid  + ".botva.ru/login.php";
-
-    url = "http://gwi.papillon.ru/GWI/table/table.php?depid=107";
-
-    qDebug() << "retrieve login page";
-    _actor->request(url);
-    if (!_actor->is_ok()) {
-        qDebug() << "page load error";
-        return false;
-    }
-
-    {
-        Page_Generic *page = _actor->parse();
-        if (page->pagekind != page_Game_Index) {
-            qDebug() << toString(page->pagekind) << " is not login page";
-            return false;
-        }
-        delete page;
-    }
-
-    QStringList params;
-    params.append("do_cmd");    params.append("login");
-    params.append("server");    params.append(sid);
-    params.append("email");     params.append(email);
-    params.append("password");  params.append(password);
-    _actor->request(url, params);
-    _actor->wait();
-    if (!_actor->is_loaded()) {
-        qDebug() << "??? page not retrieved";
-        return false;
-    }
-    if (!_actor->is_ok()) {
-        qDebug() << "??? page error";
-        return false;
-    }
-    Page_Generic *page = _actor->parse();
-    if (page->pagekind != page_Game_Index) {
-        qDebug() << toString(page->pagekind) << " is not index page";
-        return false;
-    }
-    qDebug () << "logged in succesfuly";
+             << _login
+             << " at " << _baseurl;
+    emit request_get(QUrl(_baseurl + "login.php"));
     return true;
-
 }
 
 bool Bot::action_look () {
+    if (!_good) {
+        qDebug() << "attempt to login for unconfigured bot";
+        return false;
+    }
+    qDebug() << "request index for "
+             << _login
+             << " at " << _baseurl;
+    emit request_get(QUrl(_baseurl + "index.php"));
     return true;
 }
 
@@ -279,3 +238,40 @@ void Bot::onStep() {
     step();
 }
 
+void Bot::configure() {
+    _good = true;
+    int server_id = _config->get("login/server_id", true, -1).toInt();
+    if (server_id < 1 || server_id > 3) {
+        qDebug() << "missing/bad: login/server_id (" << server_id << ")";
+        _config->set("login/server_id", -1111);
+        _good = false;
+    } else {
+        _serverNo = server_id;
+        _baseurl = QString("http://g%1.botva.ru/").arg(server_id);
+        qDebug() << "set base url as " << _baseurl;
+    }
+
+    QString email = _config->get("login/email", true, "").toString();
+    if (email == "") {
+        qDebug() << "missing: login/email";
+        _config->set("login/email", "Enter@Your.Email.Here");
+        _good = false;
+    } else {
+        _login = email;
+        qDebug() << "set login as " << _login;
+    }
+
+    QString passwd = _config->get("login/password", true, "").toString();
+    if (passwd == "") {
+        qDebug() << "missing: login/password";
+        _config->set("login/password", "EnterYourPasswordHere");
+        _good = false;
+    } else {
+        _password = passwd;
+        qDebug() << "set password (not shown)";
+    }
+
+    _autostart = _config->get("autostart", false, false).toBool();
+
+    qDebug() << "configure result: " << _good;
+}

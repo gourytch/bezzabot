@@ -46,6 +46,19 @@ protected:
 
     bool _awaiting;
 
+    bool        _good;
+    int         _serverNo;
+    QString     _baseurl;
+    QString     _login;
+    QString     _password;
+    bool        _autostart;
+
+    // timers: планы на ближайшее время
+    QDateTime   _ts_LookAtSelf; // когда посмотреть на героя
+    QDateTime   _ts_CheckWork;  // когда посмотреть свою работу
+    QDateTime   _ts_CheckMail;  // погда проверить почту
+    QDateTime   _ts_GoFishing;  // когда сходить на рыбалку
+
     // player state
     QString     charname;
     QString     chartitle;
@@ -58,6 +71,7 @@ protected:
     int         hp_spd;
     QDateTime   atime;
     Sequence    sequence;
+
 
 protected:
     virtual void handle_Page_Generic ();
@@ -94,7 +108,13 @@ signals:
 
     void log (const QString& text);
 
+    void request_get (const QUrl& url);
+
+    void request_post (const QUrl& url, const QStringList& params);
+
 public slots:
+
+    void configure();
 
     void onPageFinished (bool ok);
 

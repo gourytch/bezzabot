@@ -10,6 +10,7 @@ list=MySampleBot
 use_proxy=true
 proxy_host=proxy.intra.net
 proxy_port=3128
+cache_size=10000000
 
 [MySampleBot]
 login\server_id=1

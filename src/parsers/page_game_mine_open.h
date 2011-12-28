@@ -14,6 +14,7 @@ enum DigStage
 
 class Page_Game_Mine_Open : public Page_Game
 {
+    Q_OBJECT
 public:
     DigStage digstage;
     int num_pickaxes;
@@ -24,7 +25,7 @@ public:
 
 public:
 
-    Page_Game_Mine_Open (const QWebElement& doc);
+    Page_Game_Mine_Open (QWebElement& doc);
 
     virtual QString toString (const QString &pfx = QString ()) const;
 

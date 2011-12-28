@@ -58,7 +58,8 @@ WebActor::WebActor(Bot *bot) :
     }
     settings->setMaximumPagesInCache (10);
     settings->enablePersistentStorage ();
-    settings->setOfflineStorageDefaultQuota (CACHE_SIZE);
+    settings->setOfflineStorageDefaultQuota (
+                Config::global().get("connection/cache_size", CACHE_SIZE).toInt());
     settings->setAttribute (QWebSettings::AutoLoadImages, true);
     settings->setAttribute (QWebSettings::JavascriptEnabled, true);
     settings->setAttribute (QWebSettings::OfflineStorageDatabaseEnabled, true);
@@ -185,7 +186,7 @@ void WebActor::onPageStarted ()
     _success    = false;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 void WebActor::onPageFinished (bool ok)
 {
     qDebug() << "WebActor::onPageFinished(" << ok << ")";

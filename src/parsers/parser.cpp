@@ -127,7 +127,7 @@ Page_Generic* Parser::parse (const QString& text)
 }
 
 
-Page_Generic* Parser::parse (const QWebElement& doc)
+Page_Generic* Parser::parse (QWebElement& doc)
 {
     PageKind pagekind = guessPageKind (doc);
     switch (pagekind)

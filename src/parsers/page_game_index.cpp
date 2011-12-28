@@ -2,7 +2,7 @@
 
 
 
-Page_Game_Index::Page_Game_Index (const QWebElement &doc) :
+Page_Game_Index::Page_Game_Index (QWebElement &doc) :
     Page_Game (doc)
 {
     pagekind = page_Game_Index;

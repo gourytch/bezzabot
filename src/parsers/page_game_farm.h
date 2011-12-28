@@ -3,8 +3,10 @@
 
 #include "page_game.h"
 
-struct Page_Game_Farm : public Page_Game
+class Page_Game_Farm : public Page_Game
 {
+    Q_OBJECT
+public:
     int         price;
     bool        working;
     PageTimer   counter;
@@ -12,7 +14,7 @@ struct Page_Game_Farm : public Page_Game
     QString     form_cmd;
     QString     form_submit;
 
-    Page_Game_Farm (const QWebElement& doc);
+    Page_Game_Farm (QWebElement& doc);
     virtual QString toString (const QString& pfx = QString ()) const;
 };
 

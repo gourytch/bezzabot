@@ -1,17 +1,28 @@
 #ifndef PAGE_LOGIN_H
 #define PAGE_LOGIN_H
 
+#include <QWebPage>
+#include <QWebElement>
 #include "page_generic.h"
 
 class Page_Login : public Page_Generic
 {
+    Q_OBJECT
 protected:
-    QString posturl;
+    QString     posturl;
+    QWebElement submit;
 public:
-    Page_Login(const QWebElement& doc);
+    Page_Login(QWebElement& doc);
 
     virtual QString toString (const QString& pfx = QString ()) const;
 
+    void doLogin (int servNo,
+                  const QString& login,
+                  const QString& password,
+                  bool keep);
+
+public slots:
+    void doSubmit();
 };
 
 #endif // PAGE_LOGIN_H

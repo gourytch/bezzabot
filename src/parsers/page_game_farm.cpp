@@ -1,7 +1,7 @@
 #include "page_game_farm.h"
 
 
-Page_Game_Farm::Page_Game_Farm (const QWebElement &doc) :
+Page_Game_Farm::Page_Game_Farm (QWebElement &doc) :
     Page_Game (doc)
 {
 

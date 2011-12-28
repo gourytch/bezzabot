@@ -7,7 +7,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-Page_Game::Page_Game (const QWebElement& doc) :
+Page_Game::Page_Game (QWebElement& doc) :
     Page_Generic (doc)
 {
     pagekind = page_Game;
