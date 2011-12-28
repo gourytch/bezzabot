@@ -1,0 +1,18 @@
+[General]
+initialized=true
+launched=2011-12-28 21:06:58
+debug=true
+
+[bots]
+list=MySampleBot
+
+[connection]
+use_proxy=true
+proxy_host=proxy.intra.net
+proxy_port=3128
+
+[MySampleBot]
+login\server_id=1
+login\email=samplebot@somewhere.net
+login\password=Teh Beeg And Unpred1ktab1e~Passw0rD
+

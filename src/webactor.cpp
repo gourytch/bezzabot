@@ -34,11 +34,14 @@ WebActor::WebActor(Bot *bot) :
     _savepath = _bot->config()->dataPath () + "/webpages";
 
     _proxy = NULL;
-    if (_bot->config()->get("connection/use_proxy", false).toBool()) {
-        QString proxyHost = _bot->config()->get("connection/proxy_host", "").toString();
-        int proxyPort = _bot->config()->get("connection/proxy_port", 0).toInt();
+    if (Config::global().get("connection/use_proxy", false).toBool()) {
+        QString proxyHost = Config::global().get("connection/proxy_host", "").toString();
+        int proxyPort = Config::global().get("connection/proxy_port", 0).toInt();
         if (!proxyHost.isEmpty() && proxyPort > 0) {
+            qDebug() << "proxy host:" << proxyHost << " port:" << proxyPort;
             _proxy = new QNetworkProxy (QNetworkProxy::HttpCachingProxy, proxyHost, proxyPort);
+        } else {
+            qDebug() << "incorrect proxy params";
         }
     }
 
@@ -216,8 +219,11 @@ void WebActor::savePage ()
 {
     QString ts = now ();
     Config::checkDir (_savepath);
-    QString pfx = _savepath + "/sample-" + ts + "-";
+    QString pfx = _savepath + "/" + _bot->id() + "-" + ts + "-";
     qDebug() << "save by TS=" << ts;
+    ::save (pfx + ".url",
+            _webpage->mainFrame ()->url().toString());
+
     ::save (pfx + "outer.xml",
             _webpage->mainFrame ()->documentElement ().toOuterXml ());
 //    ::save (pfx + "inner.xml",
