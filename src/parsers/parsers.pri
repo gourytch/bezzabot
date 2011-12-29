@@ -6,7 +6,8 @@ HEADERS += \
     parsers/page_game_index.h \
     parsers/page_game_farm.h \
     parsers/page_game_mine_open.h \
-    parsers/page_login.h
+    parsers/page_login.h \
+    parsers/all_pages.h
 
 SOURCES += \
     parsers/parser.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
     parsers/types.cpp \
     parsers/page_game_mine_open.cpp \
     parsers/page_login.cpp
+
 
 
 

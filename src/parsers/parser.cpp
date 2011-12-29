@@ -11,12 +11,7 @@
 #include <QDir>
 
 #include "tools.h"
-#include "page_generic.h"
-#include "page_login.h"
-#include "page_game.h"
-#include "page_game_index.h"
-#include "page_game_farm.h"
-#include "page_game_mine_open.h"
+#include "all_pages.h"
 #include "parser.h"
 
 

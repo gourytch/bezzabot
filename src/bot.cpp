@@ -7,7 +7,7 @@
 #include "webactor.h"
 #include "persistentcookiejar.h"
 #include "tools.h"
-#include "parsers/page_login.h"
+#include "parsers/all_pages.h"
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent)
@@ -137,9 +137,14 @@ void Bot::stop() {
 
 void Bot::step()
 {
+    if (!_good) {
+        qDebug() << "bot not configured properly";
+        return;
+    }
     if (!_started)
     {
         qDebug() << "not started. skip step";
+        return;
     }
     if (_regular)
     {
@@ -156,12 +161,7 @@ void Bot::step()
 //            emit log (tr("actor is available"));
             if (_page == NULL)
             {
-                emit log (tr("shoot request"));
-                _awaiting = true;
-
-                emit request_get(QUrl("http://g1.botva.ru/"));
-
-                emit log (tr("puff!"));
+                action_login();
             }
         } // end if (actor->busy())
     } // end if (_awaiting)
@@ -185,28 +185,32 @@ void Bot::handle_Page_Generic () {
 
 void Bot::handle_Page_Login () {
     emit log(tr("hangle login page"));
-    Page_Login *p = (Page_Login*)_page;
+    Page_Login *p = static_cast<Page_Login*>(_page);
     p->doLogin(_serverNo, _login, _password, true);
 }
 
 
 void Bot::handle_Page_Game_Generic () {
     emit log(tr("hangle generic game page"));
+    Page_Game *p = static_cast<Page_Game*>(_page);
 }
 
 
 void Bot::handle_Page_Game_Index () {
     emit log(tr("hangle index game page"));
+    Page_Game_Index *p = static_cast<Page_Game_Index*>(_page);
 }
 
 
 void Bot::handle_Page_Game_Mine_Open () {
     emit log(tr("hangle mine open game page"));
+    Page_Game_Mine_Open *p = static_cast<Page_Game_Mine_Open*>(_page);
 }
 
 
 void Bot::handle_Page_Game_Farm () {
     emit log(tr("hangle farm game page"));
+    Page_Game_Farm *p = static_cast<Page_Game_Farm*>(_page);
 }
 
 bool Bot::action_login () {
@@ -217,6 +221,8 @@ bool Bot::action_login () {
     qDebug() << "initiate login sequence for "
              << _login
              << " at " << _baseurl;
+    _awaiting = true;
+    // emit request_get(QUrl(_baseurl));
     emit request_get(QUrl(_baseurl + "login.php"));
     return true;
 }
@@ -233,10 +239,6 @@ bool Bot::action_look () {
     return true;
 }
 
-
-void Bot::onStep() {
-    step();
-}
 
 void Bot::configure() {
     _good = true;

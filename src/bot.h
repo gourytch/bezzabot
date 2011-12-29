@@ -98,8 +98,6 @@ public:
 
     WebActor* actor () {return _actor; }
 
-    void step ();
-
     bool action_login ();
 
     bool action_look ();
@@ -118,11 +116,11 @@ public slots:
 
     void onPageFinished (bool ok);
 
-    void onStep();
-
     void start ();
 
     void stop ();
+
+    void step ();
 
 };
 
