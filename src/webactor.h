@@ -88,7 +88,6 @@ protected slots:
 
     void onPageFinished (bool ok);
 
-
     void onLinkClicked (const QUrl& url);
 
     void onDownloadRequested (const QNetworkRequest& request);

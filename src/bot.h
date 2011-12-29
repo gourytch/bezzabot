@@ -102,6 +102,10 @@ public:
 
     bool action_look ();
 
+    bool isConfigured () const { return _good;  }
+
+    bool isStarted () const { return _started; }
+
 signals:
 
     void log (const QString& text);

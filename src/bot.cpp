@@ -27,6 +27,7 @@ Bot::Bot(const QString& id, QObject *parent) :
     _actor->page()->networkAccessManager ()->setCookieJar (_cookies);
 
     MainWindow *wnd = MainWindow::getInstance();
+
     connect (_actor->page (), SIGNAL (loadFinished (bool)),
              this, SLOT (onPageFinished (bool)));
 
@@ -51,16 +52,17 @@ Bot::Bot(const QString& id, QObject *parent) :
     _step_timer.setInterval (1000);
 
     connect (&_step_timer, SIGNAL (timeout()),
-             this, SLOT (onStep()));
+             this, SLOT (step()));
 
     configure ();
 
-    if (_good && _autostart) {
-      start();
+    if (!isConfigured()) {
+        return;
     }
-
-//    _actor->request (QUrl ("http://g3.botva.ru/"));
-
+    if (_autostart) {
+        qDebug() << "invoke autostart";
+        QTimer::singleShot(2000, wnd, SLOT(startAutomaton()));
+    }
 }
 
 
@@ -73,11 +75,12 @@ Bot::~Bot ()
 //    delete _config;
 }
 
+//////// slots /////////////////////////////////////////////////////////
+
 void Bot::onPageFinished (bool ok)
 {
     if (ok)
     {
-//        pCookies->debug ();
         _cookies->save ();
     }
     if (_page) {
@@ -104,7 +107,7 @@ void Bot::onPageFinished (bool ok)
         handle_Page_Generic();
         break;
     default:
-        qDebug()<<"unhandled page with kind=" << toString(_page->pagekind);
+        qDebug()<<"unhandled page with kind=" + toString(_page->pagekind);
         break;
     }
     _awaiting = false;
@@ -112,31 +115,42 @@ void Bot::onPageFinished (bool ok)
 
 
 void Bot::start() {
-    if (!_good) {
+    if (!isConfigured()) {
         emit log(tr("bot is not configured properly"));
         return;
     }
-    if (_started) return;
-    _started = true;
-    emit log(tr("start bot"));
+    if (isStarted()) {
+        emit log(tr("bot already started"));
+        return;
+    }
     if (_regular) {
         _step_timer.start();
     } else {
-        QTimer::singleShot(1000, this, SLOT(onStep()));
+        QTimer::singleShot(1000, this, SLOT(step()));
     }
+    _started = true;
+    emit log(tr("Bot::start() : bot started"));
 }
 
 void Bot::stop() {
-    if (!_started) return;
-    _started = false;
-    emit log(tr("stop bot"));
+    if (!isConfigured()) {
+        emit log(tr("bot is not configured properly"));
+        return;
+    }
+    if (!isStarted()) {
+        emit log(tr("bot already stopped"));
+        return;
+    }
     if (_regular) {
         _step_timer.stop();
     }
+    _started = false;
+    emit log(tr("Bot::stop() : bot stopped"));
 }
 
 void Bot::step()
 {
+//    qDebug() << "STEP" << ++_step_counter;
     if (!_good) {
         qDebug() << "bot not configured properly";
         return;
@@ -150,7 +164,6 @@ void Bot::step()
     {
         _step_timer.stop();
     }
-//    qDebug() << "STEP" << ++_step_counter;
     if (_awaiting) {
 //        emit log (tr("bot is awaiting for responce. skip"));
     } else {
@@ -171,7 +184,7 @@ void Bot::step()
             _step_timer.start();
         } else {
             emit log(tr("bot next shot"));
-            QTimer::singleShot(1000, this, SLOT(onStep()));
+            QTimer::singleShot(1000, this, SLOT(step()));
         }
     }
 }
@@ -213,6 +226,8 @@ void Bot::handle_Page_Game_Farm () {
     Page_Game_Farm *p = static_cast<Page_Game_Farm*>(_page);
 }
 
+/////////// actions /////////////////////////////////////////////////////////
+
 bool Bot::action_login () {
     if (!_good) {
         qDebug() << "attempt to login for unconfigured bot";
@@ -239,6 +254,7 @@ bool Bot::action_look () {
     return true;
 }
 
+/////////// misc /////////////////////////////////////////////////////////
 
 void Bot::configure() {
     _good = true;

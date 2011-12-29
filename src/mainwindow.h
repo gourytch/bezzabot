@@ -28,6 +28,7 @@ protected:
 
     void createUI ();
     void setupWebView ();
+    void setupConnections ();
 
     static MainWindow * _instance;
 public:
@@ -46,10 +47,13 @@ public:
 public slots:
 
     void log (const QString& text);
+    void startAutomaton();
+    void stopAutomaton();
 
 protected slots:
     void slotSetAutomatonState (int state);
     void slotLoadStarted ();
+    void slotLoadProgress (int percent);
     void slotLoadFinished (bool success);
 
 };

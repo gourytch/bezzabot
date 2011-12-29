@@ -10,6 +10,7 @@ MainWindow::MainWindow (QWidget *parent) :
     QWidget (parent)
 {
     _instance = this;
+
     Config& cfg = Config::global();
     QStringList ids = cfg.get("bots/list", "").toString().trimmed().split(QRegExp("\\s+"));
     QString id;
@@ -24,7 +25,9 @@ MainWindow::MainWindow (QWidget *parent) :
     }
     pBot = new Bot (id,  this);
     pActor = pBot->actor ();
+
     createUI ();
+    setupConnections();
 }
 
 MainWindow::~MainWindow()
@@ -62,6 +65,12 @@ void MainWindow::createUI ()
 
     pLoadingProgress->setVisible (false);
 
+    setupWebView ();
+
+    log ("UI created");
+}
+
+void MainWindow::setupConnections () {
     connect (pAutomaton, SIGNAL (stateChanged (int)),
              this, SLOT (slotSetAutomatonState (int)));
 
@@ -76,12 +85,7 @@ void MainWindow::createUI ()
 
     connect (pWebView->page (), SIGNAL (loadProgress (int)),
              pLoadingProgress, SLOT (setValue (int)));
-
-    setupWebView ();
-
-    log ("UI created");
 }
-
 
 void MainWindow::setupWebView ()
 {
@@ -97,30 +101,49 @@ void MainWindow::load (const QUrl &url)
 
 void MainWindow::log (const QString &text)
 {
-    qDebug () << "LOG:" << text;
+    qDebug () << QString("LOG: %1").arg(text);
     pLogView->append (text);
 }
 
 
 void MainWindow::slotSetAutomatonState (int state)
 {
+    qDebug() << tr("Set Automaton State to %1").arg(state);
     switch (state)
     {
     case Qt::Unchecked:
         log ("automaton disabled");
-        QTimer::singleShot(0, pBot, SIGNAL (stop()));
-//        pBot->stop();
+        if (pBot->isStarted()) {
+            QTimer::singleShot(0, pBot, SIGNAL (stop()));
+        }
         break;
 
     case Qt::Checked:
-        log ("automaton ignited");
-//        pBot->start();
-        QTimer::singleShot(0, pBot, SIGNAL (start()));
+        if (!pBot->isStarted()) {
+            QTimer::singleShot(0, pBot, SIGNAL (start()));
+        }
         break;
-
     default:
         log ("automaton undefined");
         break;
+    }
+}
+
+void MainWindow::startAutomaton()
+{
+    log ("start automaton");
+    QTimer::singleShot(0, pBot, SIGNAL (start()));
+    if (!pAutomaton->isChecked()) {
+        pAutomaton->toggle();
+    }
+}
+
+void MainWindow::stopAutomaton()
+{
+    log ("stop automaton");
+    QTimer::singleShot(0, pBot, SIGNAL (stop()));
+    if (pAutomaton->isChecked()) {
+        pAutomaton->toggle();
     }
 }
 
@@ -128,20 +151,30 @@ void MainWindow::slotLoadStarted ()
 {
     pLoadingProgress->setValue (0);
     pLoadingProgress->setVisible(true);
-    log ("loading " + pWebView->page()->mainFrame()->requestedUrl ().toString ());
+    QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
+    log ("loading " + urlstr);
+    setWindowTitle(tr ("bot %1: start loading %2").arg(pBot->id(), urlstr));
 }
 
+void MainWindow::slotLoadProgress (int percent)
+{
+    QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
+    setWindowTitle(tr ("bot %1: loading %2, %3\%").arg(pBot->id(), urlstr).arg(percent));
+}
 
 void MainWindow::slotLoadFinished(bool success)
 {
     pLoadingProgress->setVisible (false);
+    QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
     if (success)
     {
         log ("load finished");
+        setWindowTitle(tr ("bot %1: loaded %2").arg(pBot->id(), urlstr));
     }
     else
     {
         log ("load failed");
+        setWindowTitle(tr ("bot %1: failed %2").arg(pBot->id(), urlstr));
     }
     log (tr ("bytes received: %1").arg (pWebView->page ()->bytesReceived ()));
     log (tr ("total bytes: %1").arg (pWebView->page ()->totalBytes ()));
