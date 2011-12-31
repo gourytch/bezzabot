@@ -3,6 +3,6 @@
 #include "parsers/parser.h"
 
 int main (int argc, char ** argv) {
+    Parser::test();
     return 0;
 }
-
