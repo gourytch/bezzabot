@@ -1,20 +1,19 @@
 #include <QtGui/QApplication>
-#include "parsers/all_pages.h"
-#include "tools/tools.h"
-#include "parsers/parser.h"
 #include <QDir>
 #include <QDebug>
 #include <QString>
+#include "parsers/all_pages.h"
+#include "tools/tools.h"
+#include "tools/config.h"
+#include "parsers/parser.h"
 
 
 int main (int argc, char ** argv) {
     QApplication dummy(argc, argv);
-    Parser::test();
-
-
-    QDir dir ("../../bezzabot.samples");
+    QDir dir (Config::appDirPath() + "../../../bezzabot.samples");
     QStringList filters;
     filters << "*.xml";
+    dir = QDir(dir.absolutePath ());
     qDebug () << "parse " << dir.absolutePath () << filters [0];
     QStringList fnames = dir.entryList (filters);
     foreach (QString fname, fnames)

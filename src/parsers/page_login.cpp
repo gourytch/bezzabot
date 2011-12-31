@@ -22,15 +22,19 @@ QString Page_Login::toString (const QString& pfx) const {
 bool Page_Login::fit(const QWebElement& doc) {
     QWebElement loginForm = doc.findFirst("FORM[id=loginForm]");
     if (loginForm.isNull()) {
+        qDebug() << "Page_Login does not fit (has no loginForm)";
         return false;
     }
     QWebElement do_cmd = loginForm.findFirst("INPUT[name=do_cmd]");
     if (do_cmd.isNull()) {
+        qDebug() << "Page_Login does not fit (has no do_cmd)";
         return false;
     }
     if (do_cmd.attribute("value") != "login") {
+        qDebug() << "Page_Login does not fit (do_cmd != login)";
         return false;
     }
+    qDebug() << "Page_Login fits";
     return true;
 }
 

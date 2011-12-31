@@ -14,6 +14,7 @@ QSettings*  Config::_settings   = NULL;
 
 bool        Config::_portable = true;
 
+QString     Config::_location_appdir;
 QString     Config::_location_config;
 QString     Config::_location_cache;
 QString     Config::_location_data;
@@ -33,12 +34,12 @@ void Config::init_check ()
     appPtr->setOrganizationDomain (ORG_DOMAIN);
     appPtr->setApplicationName (APP_NAME);
     appPtr->setApplicationVersion (APP_VERSION);
+    _location_appdir = appPtr->applicationDirPath ();
 
     if (_portable)
     {
-        QString appPath = appPtr->applicationDirPath ();
-        _location_config = appPath;
-        _location_data   = appPath + "/data";
+        _location_config = _location_appdir;
+        _location_data   = _location_appdir + "/data";
         _location_cache  = _location_data + "/cache";
     }
     else
@@ -150,6 +151,12 @@ bool Config::checkDir (const QString& dirname)
     return d.mkpath (d.absolutePath ());
 }
 
+//static
+const QString& Config::appDirPath()
+{
+    init_check ();
+    return _location_appdir;
+}
 
 //static
 const QString& Config::globalConfigPath ()

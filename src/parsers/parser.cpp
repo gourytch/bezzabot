@@ -133,7 +133,7 @@ Page_Generic* Parser::parse (const QString& text)
     doc.setInnerXml (text);
     if (doc.isNull ())
     {
-        qDebug () << "SHIT HAPPERNS: EMPTY DOC";
+        qDebug () << "SHIT HAPPENS: EMPTY DOC";
         return NULL;
     }
     return parse (doc);
