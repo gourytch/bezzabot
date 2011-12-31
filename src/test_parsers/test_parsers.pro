@@ -7,7 +7,7 @@ TEMPLATE = app
 
 SOURCES += test_parsers.cpp
 
-INCLUDEPATH += $$TOP/include
+INCLUDEPATH += $$TOP/src $$TOP/include
 LIB += -L$$TOP/lib -lparsers
 
 OBJECTS_DIR = $$TOP/obj
