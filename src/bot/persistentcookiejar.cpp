@@ -6,7 +6,7 @@
 #include "persistentcookiejar.h"
 #include "bot.h"
 #include "config.h"
-#include "tools.h"
+#include "parsers/tools.h"
 
 
 PersistentCookieJar::PersistentCookieJar (Bot *bot) :

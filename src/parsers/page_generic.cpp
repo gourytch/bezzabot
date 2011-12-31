@@ -28,6 +28,11 @@ QString Page_Generic::toString (const QString& pfx) const
            pfx + "}";
 }
 
+//static
+bool Page_Generic::fit(const QWebElement& doc) {
+    return true;
+}
+
 void Page_Generic::js(const QString& script) {
     document.evaluateJavaScript(script);
 }

@@ -3,7 +3,7 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QDebug>
-#include "tools.h"
+#include "parsers/tools.h"
 #include "config.h"
 #include "bot.h"
 #include "webactor.h"
@@ -32,6 +32,7 @@ WebActor::WebActor(Bot *bot) :
     _bot = bot;
 
     _savepath = _bot->config()->dataPath () + "/webpages";
+    _strict   = Config::global().get("connection/strict", false).toBool();
 
     _proxy = NULL;
     if (Config::global().get("connection/use_proxy", false).toBool()) {

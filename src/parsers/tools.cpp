@@ -4,7 +4,6 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QTimer>
-#include <mainwindow.h>
 
 void save (const QString& fname, const QString& text)
 {
@@ -56,7 +55,3 @@ QString now (bool utc = false)
     }
 }
 
-void LOG(const QString& text)
-{
-    MainWindow::getInstance()->log(text);
-}

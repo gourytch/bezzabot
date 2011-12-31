@@ -18,6 +18,9 @@ public:
     Page_Generic (QWebElement& doc);
     virtual ~Page_Generic ();
 
+    // такой статический метод должен быть в каждой странице
+    static bool fit(const QWebElement& doc);
+
     virtual QString toString (const QString& pfx = QString ()) const;
 
     void js(const QString& script);
@@ -25,6 +28,7 @@ public:
                     const QVariant& value);
     void js_setByName(const QString& name,
                       const QVariant& value);
+
 
 };
 

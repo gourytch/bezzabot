@@ -6,7 +6,7 @@
 #include "bot.h"
 #include "webactor.h"
 #include "persistentcookiejar.h"
-#include "tools.h"
+#include "parsers/tools.h"
 #include "parsers/all_pages.h"
 
 Bot::Bot(const QString& id, QObject *parent) :

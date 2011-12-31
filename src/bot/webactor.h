@@ -27,7 +27,8 @@ private:
     static int _count;
 
 protected:
-    QString     _savepath;
+    bool            _strict;
+    QString         _savepath;
     Bot             *_bot;
     QWebPage        *_webpage;
     QNetworkProxy   *_proxy;
