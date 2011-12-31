@@ -1,6 +1,7 @@
 #ifndef PAGE_LOGIN_H
 #define PAGE_LOGIN_H
 
+#include <QObject>
 #include <QWebPage>
 #include <QWebElement>
 #include "page_generic.h"

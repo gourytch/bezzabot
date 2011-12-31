@@ -1,6 +1,7 @@
 #ifndef PAGE_GAME_MINE_OPEN_H
 #define PAGE_GAME_MINE_OPEN_H
 
+#include <QObject>
 #include <QWebElement>
 #include "types.h"
 #include "page_game.h"

@@ -1,6 +1,7 @@
 #ifndef PAGE_GAME_FARM_H
 #define PAGE_GAME_FARM_H
 
+#include <QObject>
 #include "page_game.h"
 
 class Page_Game_Farm : public Page_Game

@@ -12,6 +12,7 @@ HEADERS += \
     page_game.h \
     page_game_index.h \
     page_game_farm.h \
+    page_game_dozor.h \
     page_game_mine_open.h \
     all_pages.h \
     parser.h
@@ -23,6 +24,7 @@ SOURCES += \
     page_game.cpp \
     page_game_index.cpp \
     page_game_farm.cpp \
+    page_game_dozor.cpp \
     page_game_mine_open.cpp \
     parser.cpp
 

@@ -1,11 +1,13 @@
 #ifndef PAGE_GAME_H
 #define PAGE_GAME_H
 
+#include <QObject>
 #include "page_generic.h"
 
 
 class Page_Game : public Page_Generic
 {
+    Q_OBJECT
 public:
     QString     pagetitle;
     QString     charname;

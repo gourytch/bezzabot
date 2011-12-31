@@ -1,6 +1,7 @@
 #ifndef PAGE_GAME_INDEX_H
 #define PAGE_GAME_INDEX_H
 
+#include <QObject>
 #include "page_game.h"
 
 enum SafeKind

@@ -6,6 +6,7 @@
 #include "page_game.h"
 #include "page_game_index.h"
 #include "page_game_farm.h"
+#include "page_game_dozor.h"
 #include "page_game_mine_open.h"
 
 #endif // ALL_PAGES_H
