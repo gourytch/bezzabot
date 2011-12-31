@@ -1,3 +1,7 @@
+#include <QWebElement>
+#include <QString>
+#include <QWebElementCollection>
+#include <QDebug>
 #include "page_game.h"
 
 
@@ -49,4 +53,15 @@ QString Page_Game::toString (const QString& pfx) const
            pfx + ", green:" + QString::number (green) + "\n" +
            pfx + "messsage:" + message + "\n" +
            pfx + "}";
+}
+
+//static
+bool Page_Game::fit(const QWebElement& doc) {
+    QWebElementCollection titles = doc.findAll ("DIV[class=title]");
+    if (!titles.count ()) {
+        qDebug() << "Page_Game not fit";
+        return false;
+    }
+    qDebug() << "Page_Game fit";
+    return true;
 }

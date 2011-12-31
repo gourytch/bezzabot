@@ -2,6 +2,8 @@
 #include <QVariant>
 #include <QWebPage>
 #include <QWebFrame>
+#include <QDebug>
+#include "types.h"
 #include "page_generic.h"
 
 ////////////////////////////////////////////////////////////////////////////
@@ -24,12 +26,13 @@ Page_Generic::~Page_Generic() {
 QString Page_Generic::toString (const QString& pfx) const
 {
     return "Page_Generic {\n" +
-           pfx + "pagekind=" + QString::number ((int)pagekind) + "\n" +
+           pfx + "pagekind=" + ::toString (pagekind) + "\n" +
            pfx + "}";
 }
 
 //static
 bool Page_Generic::fit(const QWebElement& doc) {
+    qDebug() << "Page_Generic always fits";
     return true;
 }
 

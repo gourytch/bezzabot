@@ -15,7 +15,10 @@ public:
     QString     form_submit;
 
     Page_Game_Farm (QWebElement& doc);
+
     virtual QString toString (const QString& pfx = QString ()) const;
+
+    static bool fit(const QWebElement& doc);
 };
 
 #endif // PAGE_GAME_FARM_H

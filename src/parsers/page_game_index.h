@@ -68,7 +68,11 @@ public:
     int player_id; // из урла статистики
 
     Page_Game_Index (QWebElement& doc);
+
     virtual QString toString (const QString& pfx = QString ()) const;
+
+    static bool fit(const QWebElement& doc);
+
 };
 
 

@@ -24,8 +24,10 @@ public:
     virtual QString toString (const QString& pfx = QString ()) const;
 
     void js(const QString& script);
+
     void js_setById(const QString& id,
                     const QVariant& value);
+
     void js_setByName(const QString& name,
                       const QVariant& value);
 

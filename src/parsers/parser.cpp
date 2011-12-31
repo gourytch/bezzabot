@@ -10,11 +10,9 @@
 #include <QDebug>
 #include <QDir>
 
-#include "tools.h"
-#include "all_pages.h"
+#include "tools/tools.h"
 #include "parser.h"
-
-
+#include "all_pages.h"
 
 static void dump_element (const QWebElement& e, const QString& adj)
 {
@@ -32,6 +30,26 @@ static void dump_element (const QWebElement& e, const QString& adj)
 /////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////
+
+Parser::PageProducer Parser::_producer;
+
+bool Parser::_initialized = false;
+
+void Parser::setup() {
+    _producer.registerClass<Page_Login>();
+    _producer.registerClass<Page_Game_Index>();
+    _producer.registerClass<Page_Game_Farm>();
+    _producer.registerClass<Page_Game_Mine_Open>();
+    _producer.registerClass<Page_Game>();
+    _producer.registerClass<Page_Generic>();
+}
+
+void Parser::check() {
+    if (!_initialized) {
+        _initialized = true;
+        setup();
+    }
+}
 
 PageKind Parser::guessPageKind (const QWebElement& doc)
 {
@@ -124,6 +142,9 @@ Page_Generic* Parser::parse (const QString& text)
 
 Page_Generic* Parser::parse (QWebElement& doc)
 {
+    check();
+    return _producer.getObj(doc);
+/*
     PageKind pagekind = guessPageKind (doc);
     switch (pagekind)
     {
@@ -146,6 +167,7 @@ Page_Generic* Parser::parse (QWebElement& doc)
     default:
         return new Page_Generic (doc);
     }
+*/
 }
 
 

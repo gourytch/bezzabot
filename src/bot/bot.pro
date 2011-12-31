@@ -9,21 +9,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
         bot.cpp \
         webactor.cpp \
-        persistentcookiejar.cpp \
-        config.cpp \
-        tunedpage.cpp \
         botthread.cpp
 
 HEADERS  += mainwindow.h \
             bot.h \
             webactor.h \
-            persistentcookiejar.h \
-            config.h \
-            tunedpage.h \
             botthread.h
 
-INCLUDEPATH += $$TOP/src 
-LIBS += -L$$TOP/lib -lparsers
+INCLUDEPATH += $$TOP/src
+LIBS += -L$$TOP/lib -lparsers -ltools
 
-OBJECTS_DIR = $$TOP/obj
+OBJECTS_DIR = $$TOP/obj/$$TARGET
 DESTDIR = $$TOP/bin

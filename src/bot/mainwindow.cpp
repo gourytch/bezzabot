@@ -1,7 +1,7 @@
 #include <QRegExp>
 #include <QStringList>
 #include "mainwindow.h"
-#include "config.h"
+#include "tools/config.h"
 #include "bot.h"
 
 MainWindow *MainWindow::_instance = NULL;

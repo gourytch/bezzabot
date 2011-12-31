@@ -16,3 +16,7 @@ QString Page_Game_Farm::toString (const QString& pfx) const
             pfx + "}";
 }
 
+//static
+bool Page_Game_Farm::fit(const QWebElement& doc) {
+    return true;
+}

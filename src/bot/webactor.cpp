@@ -3,12 +3,12 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QDebug>
-#include "parsers/tools.h"
-#include "config.h"
+#include "tools/tools.h"
+#include "tools/config.h"
 #include "bot.h"
 #include "webactor.h"
 #include "parsers/parser.h"
-#include "tunedpage.h"
+#include "tools/tunedpage.h"
 
 const qint64 CACHE_SIZE = 100 * 1024 * 1024; // 100 MB
 

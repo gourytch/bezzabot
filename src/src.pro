@@ -1,4 +1,4 @@
 TOP = ..
 TEMPLATE = subdirs
-SUBDIRS = parsers test_parsers bot
+SUBDIRS = tools parsers test_parsers test_disp bot
 

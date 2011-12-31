@@ -1,6 +1,6 @@
 #include <QtGui/QApplication>
 #include "mainwindow.h"
-#include "config.h"
+#include "tools/config.h"
 #include "parsers/parser.h"
 
 

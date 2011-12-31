@@ -4,7 +4,7 @@
 #include <QStringList>
 #include <QDebug>
 
-#include "tools.h"
+#include "tools/tools.h"
 #include "types.h"
 #include "page_game_mine_open.h"
 
@@ -135,3 +135,7 @@ QString Page_Game_Mine_Open::toString (const QString &pfx) const
             pfx + "}";
 }
 
+//static
+bool Page_Game_Mine_Open::fit(const QWebElement& doc) {
+    return true;
+}

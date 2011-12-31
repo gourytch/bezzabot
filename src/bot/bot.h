@@ -9,8 +9,8 @@
 #include <QDateTime>
 #include <QTimer>
 #include "webactor.h"
-#include "persistentcookiejar.h"
-#include "config.h"
+#include "tools/persistentcookiejar.h"
+#include "tools/config.h"
 
 
 class Bot : public QObject

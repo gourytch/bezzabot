@@ -5,8 +5,8 @@
 #include "mainwindow.h"
 #include "bot.h"
 #include "webactor.h"
-#include "persistentcookiejar.h"
-#include "parsers/tools.h"
+#include "tools/persistentcookiejar.h"
+#include "tools/tools.h"
 #include "parsers/all_pages.h"
 
 Bot::Bot(const QString& id, QObject *parent) :
@@ -20,7 +20,10 @@ Bot::Bot(const QString& id, QObject *parent) :
     qDebug () << "BOTDIR : " << _config->dataPath ();
     qDebug () << "CACHE  : " << _config->cachePath ();
 
-    _cookies = new PersistentCookieJar (this);
+    Config::checkDir (_config->dataPath ());
+    QString cookiefname = _config->dataPath () + "/cookies";
+
+    _cookies = new PersistentCookieJar (this, cookiefname);
     _cookies->load ();
 
     _actor = new WebActor (this);

@@ -6,7 +6,6 @@ QT     += core webkit
 TOP = ../..
 
 HEADERS += \
-    tools.h \
     types.h \
     page_generic.h \
     page_login.h \
@@ -18,7 +17,6 @@ HEADERS += \
     parser.h
 
 SOURCES += \
-    tools.cpp \
     types.cpp \
     page_generic.cpp \
     page_login.cpp \
@@ -28,6 +26,9 @@ SOURCES += \
     page_game_mine_open.cpp \
     parser.cpp
 
-OBJECTS_DIR = $$TOP/obj
+OBJECTS_DIR = $$TOP/obj/$$TARGET
 DESTDIR = $$TOP/lib
+
+INCLUDEPATH += $$TOP/src
+LIBS += -L$$TOP/lib -lparsers -ltools
 

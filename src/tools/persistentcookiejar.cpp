@@ -4,17 +4,19 @@
 #include <QTextStream>
 #include <QDebug>
 #include "persistentcookiejar.h"
-#include "bot.h"
 #include "config.h"
-#include "parsers/tools.h"
+#include "tools.h"
 
 
-PersistentCookieJar::PersistentCookieJar (Bot *bot) :
-    QNetworkCookieJar (bot)
+PersistentCookieJar::PersistentCookieJar (QObject *parent, const QString& fname) :
+    QNetworkCookieJar (parent)
 {
+        _fname = fname;
+/*
     QString path = bot->config ()->dataPath ();
     Config::checkDir (path);
     fname = path + "/cookies";
+*/
 }
 
 
@@ -37,10 +39,10 @@ void PersistentCookieJar::debug ()
 
 void PersistentCookieJar::save ()
 {
-    QFile fout (fname);
+    QFile fout (_fname);
     if (!fout.open (QFile::WriteOnly | QFile::Truncate))
     {
-        qDebug () << "FILE " << fname << " OPEN ERROR FOR WRITING";
+        qDebug () << "FILE " + _fname + " OPEN ERROR FOR WRITING";
         return;
     }
     QTextStream out (&fout);
@@ -57,16 +59,16 @@ void PersistentCookieJar::save ()
 
 void PersistentCookieJar::load ()
 {
-    QFile fin (fname);
+    QFile fin (_fname);
     if (!fin.exists ())
     {
-        qDebug () << "file " << fname << " not exists";
+        qDebug () << "file " + _fname + " not exists";
         return;
     }
 
     if (!fin.open (QFile::ReadOnly))
     {
-        qDebug () << "FILE " << fname << " OPEN ERROR FOR READING";
+        qDebug () << "FILE " + _fname + " OPEN ERROR FOR READING";
         return;
     }
     QTextStream in (&fin);

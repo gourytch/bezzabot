@@ -21,7 +21,11 @@ public:
     PageTimers  timers;
 
     Page_Game (QWebElement& doc);
+
     virtual QString toString (const QString& pfx = QString ()) const;
+
+    static bool fit(const QWebElement& doc);
+
 };
 
 #endif // PAGE_GAME_H

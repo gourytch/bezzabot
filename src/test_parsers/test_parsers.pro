@@ -8,8 +8,8 @@ TEMPLATE = app
 SOURCES += test_parsers.cpp
 
 INCLUDEPATH += $$TOP/src
-LIBS += -L$$TOP/lib -lparsers
+LIBS += -L$$TOP/lib -lparsers -ltools
 
-OBJECTS_DIR = $$TOP/obj
+OBJECTS_DIR = $$TOP/obj/$$TARGET
 DESTDIR = $$TOP/bin
 

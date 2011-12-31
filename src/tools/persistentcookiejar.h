@@ -1,6 +1,8 @@
 #ifndef PERSISTENTCOOKIEJAR_H
 #define PERSISTENTCOOKIEJAR_H
 
+#include <QObject>
+#include <QString>
 #include <QNetworkCookieJar>
 
 class Bot;
@@ -10,10 +12,10 @@ class PersistentCookieJar : public QNetworkCookieJar
     Q_OBJECT
 protected:
 
-    QString fname;
+    QString _fname;
 
 public:
-    explicit PersistentCookieJar (Bot *bot);
+    explicit PersistentCookieJar (QObject *parent, const QString& fname);
     ~PersistentCookieJar ();
 
     void save ();

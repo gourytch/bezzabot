@@ -16,6 +16,8 @@ public:
 
     virtual QString toString (const QString& pfx = QString ()) const;
 
+    static bool fit(const QWebElement& doc);
+
     void doLogin (int servNo,
                   const QString& login,
                   const QString& password,
