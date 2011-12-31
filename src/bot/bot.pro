@@ -22,7 +22,7 @@ HEADERS  += mainwindow.h \
             tunedpage.h \
             botthread.h
 
-INCLUDEPATH += $$TOP/src $$TOP/include
+INCLUDEPATH += $$TOP/src 
 LIBS += -L$$TOP/lib -lparsers
 
 OBJECTS_DIR = $$TOP/obj

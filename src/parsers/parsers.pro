@@ -31,9 +31,3 @@ SOURCES += \
 OBJECTS_DIR = $$TOP/obj
 DESTDIR = $$TOP/lib
 
-QMAKE_EXTRA_TARGETS += install
-
-install.commands = \
-	mkdir -p $$TOP/include/parsers/; \
-	cp -f *.h $$TOP/include/parsers/;
-
