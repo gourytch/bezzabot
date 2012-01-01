@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "tools/tools.h"
 #include "page_game_index.h"
 
@@ -20,6 +21,7 @@ QString Page_Game_Index::toString (const QString& pfx) const
 
 //static
 bool Page_Game_Index::fit(const QWebElement& doc) {
+    qDebug() << "* CHECK Page_Game_Index";
     QWebElementCollection titles = doc.findAll ("DIV[class=title]");
     if (!titles.count ()) {
         return false;

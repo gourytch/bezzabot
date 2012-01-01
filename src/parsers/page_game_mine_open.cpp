@@ -137,5 +137,6 @@ QString Page_Game_Mine_Open::toString (const QString &pfx) const
 
 //static
 bool Page_Game_Mine_Open::fit(const QWebElement& doc) {
+    qDebug() << "* CHECK Page_Game_Mine_Open";
     return true;
 }

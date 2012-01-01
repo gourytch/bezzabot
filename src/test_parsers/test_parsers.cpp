@@ -1,3 +1,4 @@
+#include <iostream>
 #include <QtGui/QApplication>
 #include <QDir>
 #include <QDebug>
@@ -7,6 +8,7 @@
 #include "tools/config.h"
 #include "parsers/parser.h"
 
+using namespace std;
 
 int main (int argc, char ** argv) {
     QApplication dummy(argc, argv);
@@ -14,20 +16,23 @@ int main (int argc, char ** argv) {
     QStringList filters;
     filters << "*.xml";
     dir = QDir(dir.absolutePath ());
-    qDebug () << "parse " << dir.absolutePath () << filters [0];
+    cout << "parse " << qPrintable(dir.absolutePath () + filters [0]) << endl;
     QStringList fnames = dir.entryList (filters);
     foreach (QString fname, fnames)
     {
-        qDebug () << "LOAD " << fname;
+        cout << "LOAD " << qPrintable(fname) << endl;
         QString text = ::load (dir.absolutePath () + "/" + fname);
         Page_Generic *p = Parser::parse (text);
-        if (p)
-        {
-            qDebug () << p->toString ("   ");
+        if (p) {
+            cout << qPrintable(p->toString ("   ")) << endl;
+        } else {
+            cout << "UNPARSEABLE" << endl;
         }
+        cout << endl;
+        cout << "---------------------------------------------------" << endl;
+        cout << endl;
+        cout << endl;
     }
-    qDebug () << "END";
-
-
+    cout << "END" << endl;
     return 0;
 }

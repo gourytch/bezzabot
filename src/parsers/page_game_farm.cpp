@@ -1,3 +1,4 @@
+#include <QDebug>
 #include "page_game_farm.h"
 
 
@@ -18,5 +19,6 @@ QString Page_Game_Farm::toString (const QString& pfx) const
 
 //static
 bool Page_Game_Farm::fit(const QWebElement& doc) {
+    qDebug() << "* CHECK Page_Game_Farm";
     return true;
 }

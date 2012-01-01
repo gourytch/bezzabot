@@ -202,7 +202,9 @@ QString toString (PageKind kind)
     case page_Game_Mine_Open: return QString("page_Game_Mine_Open");
     case page_Game_Mine_Underworld: return QString("page_Game_Mine_Underworld");
     case page_Game_Mine_LiveField: return QString("page_Game_Mine_LiveField");
-    case page_Game_Dozor: return QString("page_Game_Dozor");
+    case page_Game_Dozor_Entrance: return QString("page_Game_Dozor_Entrance");
+    case page_Game_Dozor_OnDuty: return QString("page_Game_Dozor_OnDuty");
+    case page_Game_Dozor_GotVictim: return QString("page_Game_Dozor_GotVictim");
     case page_Game_Headquarters: return QString("page_Game_Headquarters");
     case page_Game_Feeder: return QString("page_Game_Feeder");
     case page_Game_Friends: return QString("page_Game_Friends");

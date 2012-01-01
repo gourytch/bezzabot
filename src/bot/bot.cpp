@@ -103,6 +103,9 @@ void Bot::onPageFinished (bool ok)
     case page_Game_Index:
         handle_Page_Game_Index();
         break;
+    case page_Game_Dozor_Entrance:
+        handle_Page_Game_Dozor_Entrance();
+        break;
     case page_Game:
         handle_Page_Game_Generic();
         break;
@@ -217,6 +220,25 @@ void Bot::handle_Page_Game_Index () {
     Page_Game_Index *p = static_cast<Page_Game_Index*>(_page);
 }
 
+void Bot::handle_Page_Game_Dozor_Entrance () {
+    emit log(tr("hangle dozor entrance game page"));
+    Page_Game_Dozor_Entrance *p = static_cast<Page_Game_Dozor_Entrance*>(_page);
+    if (p->dozor_left10 == 0) {
+        emit log(u8("у нас нет дозорного времени"));
+        emit request_get(QUrl("index.php"));
+        return;
+    }
+    if (p->gold < p->dozor_price) {
+        emit log(u8("у нас нет денег на дозор"));
+        emit request_get(QUrl("index.php"));
+        return;
+    }
+    emit log(u8("попробуем сходить в дозор на десять минуток"));
+    if (!p->doDozor(1)) {
+        emit log(u8("не вышло :("));
+        emit request_get(QUrl("index.php"));
+    }
+}
 
 void Bot::handle_Page_Game_Mine_Open () {
     emit log(tr("hangle mine open game page"));

@@ -11,7 +11,6 @@ class Page_Login : public Page_Generic
     Q_OBJECT
 protected:
     QString     posturl;
-    QWebElement submit;
 public:
     Page_Login(QWebElement& doc);
 
@@ -19,13 +18,11 @@ public:
 
     static bool fit(const QWebElement& doc);
 
-    void doLogin (int servNo,
+    bool doLogin (int servNo,
                   const QString& login,
                   const QString& password,
                   bool keep);
 
-public slots:
-    void doSubmit();
 };
 
 #endif // PAGE_LOGIN_H

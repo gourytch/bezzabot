@@ -11,6 +11,9 @@
 class Page_Generic : public QObject
 {
     Q_OBJECT
+protected:
+    QWebElement submit;
+
 public:
     PageKind        pagekind;
     QWebElement     document;
@@ -31,6 +34,10 @@ public:
     void js_setByName(const QString& name,
                       const QVariant& value);
 
+    void pressSubmit (int delay_min = 500, int delay_max = 5000);
+
+protected slots:
+    void slot_submit();
 
 };
 

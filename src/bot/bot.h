@@ -82,6 +82,8 @@ protected:
 
     virtual void handle_Page_Game_Index ();
 
+    virtual void handle_Page_Game_Dozor_Entrance ();
+
     virtual void handle_Page_Game_Mine_Open ();
 
     virtual void handle_Page_Game_Farm ();

@@ -57,6 +57,7 @@ QString Page_Game::toString (const QString& pfx) const
 
 //static
 bool Page_Game::fit(const QWebElement& doc) {
+    qDebug() << "* CHECK Page_Game";
     QWebElementCollection titles = doc.findAll ("DIV[class=title]");
     if (!titles.count ()) {
         qDebug() << "Page_Game not fit";

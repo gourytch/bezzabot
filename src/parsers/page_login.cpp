@@ -20,6 +20,7 @@ QString Page_Login::toString (const QString& pfx) const {
 
 //static
 bool Page_Login::fit(const QWebElement& doc) {
+    qDebug() << "* CHECK Page_Login";
     QWebElement loginForm = doc.findFirst("FORM[id=loginForm]");
     if (loginForm.isNull()) {
         qDebug() << "Page_Login does not fit (has no loginForm)";
@@ -38,7 +39,7 @@ bool Page_Login::fit(const QWebElement& doc) {
     return true;
 }
 
-void Page_Login::doLogin (
+bool Page_Login::doLogin (
         int servNo,
         const QString& login,
         const QString& password,
@@ -46,12 +47,14 @@ void Page_Login::doLogin (
     Q_ASSERT(!document.isNull());
     QWebElement form = document.findFirst("FORM[id=loginForm]");
     if (form.isNull()) {
-        return;
+        qDebug() << "login form not found";
+        return false;
     }
     //QWebElement
     submit = form.findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
-        return;
+        qDebug() << "submit button not found";
+        return false;
     }
 
     js_setById("server", servNo);
@@ -60,14 +63,6 @@ void Page_Login::doLogin (
     if (keep) {
         js("document.getElementsByName('remember')[0].checked='checked'';");
     }
-    QTimer::singleShot(3000 + random() % 3000, this, SLOT(doSubmit()));
-}
-
-void Page_Login::doSubmit() {
-    if (submit.isNull()) {
-        qDebug() << "NO SUBMIT ON NULL SUBMIT";
-    } else {
-        qDebug() << "SUBMITTING";
-        submit.evaluateJavaScript("this.click();");
-    }
+    pressSubmit();
+    return true;
 }
