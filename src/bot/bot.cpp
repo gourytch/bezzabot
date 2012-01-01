@@ -91,7 +91,13 @@ void Bot::onPageFinished (bool ok)
         _page = NULL;
     }
     _page = _actor->parse();
-    qDebug() << "page kind: " + toString(_page->pagekind);
+    _awaiting = false;
+
+    qDebug() << "page kind: " + ::toString(_page->pagekind);
+    if (!isStarted()) {
+        qDebug() << "bot is not active. no page handling will be performed";
+        return;
+    }
     switch (_page->pagekind)
     {
     case page_Login:
@@ -116,7 +122,6 @@ void Bot::onPageFinished (bool ok)
         qDebug()<<"unhandled page with kind=" + toString(_page->pagekind);
         break;
     }
-    _awaiting = false;
 }
 
 
@@ -177,11 +182,8 @@ void Bot::step()
         if (_actor->busy()) {
 //            emit log (tr("actor is busy. do nothing"));
         } else {
+            one_step();
 //            emit log (tr("actor is available"));
-            if (_page == NULL)
-            {
-                action_login();
-            }
         } // end if (actor->busy())
     } // end if (_awaiting)
 
@@ -195,6 +197,44 @@ void Bot::step()
     }
 }
 
+//virtual
+void Bot::one_step () {
+    Page_Game * p = dynamic_cast<Page_Game*>(_page);
+    if (_page == NULL || (p == NULL && _page->pagekind != page_Login) ) {
+        qDebug() << "we're not at game page. [re]login";
+        action_login();
+        return;
+    }
+    QDateTime ts = QDateTime::currentDateTime();
+    /*
+    if (level > 6) {
+        if (_kd_Fishing.isNull() || _kd_Fishing < ts) {
+            emit log (u8("пойду-ка на рыбалку."));
+            emit request_get(QUrl(_baseurl + "harbour.php?a=pier"));
+            _awaiting = true;
+            return;
+        }
+    */
+    if (p->hasNoJob()) {
+        //придумаем себе какое-нибудь занятие
+        if (_kd_Dozor.isNull() || _kd_Dozor < ts) {
+            emit log (u8("пойду-ка в дозор."));
+            emit request_get(QUrl(_baseurl + "dozor.php"));
+            _awaiting = true;
+            return;
+        }
+    }
+    QString jobUrl = p->jobLink(true);
+    if (jobUrl.isNull()) {
+        return; // не имеем завершенной работу
+    }
+    emit log (u8("надо доделать работу. {") + jobUrl + u8("}"));
+    emit request_get(QUrl(_baseurl + jobUrl));
+    _awaiting = true;
+    return;
+
+}
+
 //////////// page handlers //////////////////////////////////////////////////
 
 void Bot::handle_Page_Generic () {
@@ -205,13 +245,15 @@ void Bot::handle_Page_Generic () {
 void Bot::handle_Page_Login () {
     emit log(tr("hangle login page"));
     Page_Login *p = static_cast<Page_Login*>(_page);
-    p->doLogin(_serverNo, _login, _password, true);
+    if (p->doLogin(_serverNo, _login, _password, true)) {
+        _awaiting = true;
+    }
 }
 
 
 void Bot::handle_Page_Game_Generic () {
     emit log(tr("hangle generic game page"));
-    Page_Game *p = static_cast<Page_Game*>(_page);
+//    Page_Game *p = static_cast<Page_Game*>(_page);
 }
 
 
@@ -225,18 +267,25 @@ void Bot::handle_Page_Game_Dozor_Entrance () {
     Page_Game_Dozor_Entrance *p = static_cast<Page_Game_Dozor_Entrance*>(_page);
     if (p->dozor_left10 == 0) {
         emit log(u8("у нас нет дозорного времени"));
-        emit request_get(QUrl("index.php"));
+        _kd_Dozor = nextDay();
+        emit request_get(QUrl(_baseurl + "index.php"));
+        _awaiting = true;
         return;
     }
     if (p->gold < p->dozor_price) {
         emit log(u8("у нас нет денег на дозор"));
-        emit request_get(QUrl("index.php"));
+        _kd_Dozor = QDateTime::currentDateTime().addSecs(60 * 60);
+        emit request_get(QUrl(_baseurl + "index.php"));
+        _awaiting = true;
         return;
     }
     emit log(u8("попробуем сходить в дозор на десять минуток"));
     if (!p->doDozor(1)) {
         emit log(u8("не вышло :("));
-        emit request_get(QUrl("index.php"));
+        emit request_get(QUrl(_baseurl + "index.php"));
+        _awaiting = true;
+    } else {
+        _awaiting = true;
     }
 }
 

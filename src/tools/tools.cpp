@@ -55,3 +55,6 @@ QString now (bool utc = false)
     }
 }
 
+QDateTime nextDay() {
+    return QDateTime(QDate::currentDate().addDays(1)).addSecs(2 * 60 * 60 + 1);
+}

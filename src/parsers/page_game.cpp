@@ -1,7 +1,8 @@
 #include <QWebElement>
-#include <QString>
 #include <QWebElementCollection>
+#include <QString>
 #include <QDebug>
+#include "tools/tools.h"
 #include "page_game.h"
 
 
@@ -65,4 +66,33 @@ bool Page_Game::fit(const QWebElement& doc) {
     }
     qDebug() << "Page_Game fit";
     return true;
+}
+
+bool Page_Game::hasNoJob() const {
+    QWebElement divTimers = document.findFirst("DIV[id=right]")
+            .findFirst("DIV[class=timers]");
+    if (divTimers.toPlainText().indexOf(u8("Я свободен!")) == -1) {
+        return false;
+    }
+    return true;
+}
+
+QString Page_Game::jobLink(bool ifFinished) const {
+    QWebElement divTimers = document.findFirst("DIV[id=right]")
+            .findFirst("DIV[class=timers]");
+    QWebElement anchor = divTimers.findFirst("A[class=timer\\ link]");
+    if (anchor.isNull()) {
+        return QString();
+    }
+    PageTimer workTimer;
+    workTimer.assign(anchor);
+
+    if (workTimer.pit.isNull()) {
+        return QString();
+    }
+
+    if (ifFinished && workTimer.hms > 0) {
+        return QString();
+    }
+    return workTimer.name;
 }

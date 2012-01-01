@@ -28,6 +28,10 @@ public:
 
     static bool fit(const QWebElement& doc);
 
+    bool hasNoJob() const;
+
+    QString jobLink(bool ifFinished) const;
+
 };
 
 #endif // PAGE_GAME_H

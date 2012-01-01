@@ -53,11 +53,10 @@ protected:
     QString     _password;
     bool        _autostart;
 
-    // timers: планы на ближайшее время
-    QDateTime   _ts_LookAtSelf; // когда посмотреть на героя
-    QDateTime   _ts_CheckWork;  // когда посмотреть свою работу
-    QDateTime   _ts_CheckMail;  // погда проверить почту
-    QDateTime   _ts_GoFishing;  // когда сходить на рыбалку
+    // timers:
+    QDateTime   _kd_Dozor;  // когда оттает возможность дозора
+    QDateTime   _kd_Fishing;  // когда оттает возможность рыбалки
+    QDateTime   _kd_Mailbox;  // когда можно будет поглядеть в почту
 
     // player state
     QString     charname;
@@ -71,7 +70,6 @@ protected:
     int         hp_spd;
     QDateTime   atime;
     Sequence    sequence;
-
 
 protected:
     virtual void handle_Page_Generic ();
@@ -87,6 +85,8 @@ protected:
     virtual void handle_Page_Game_Mine_Open ();
 
     virtual void handle_Page_Game_Farm ();
+
+    virtual void one_step ();
 
 public:
 
@@ -108,6 +108,13 @@ public:
 
     bool isStarted () const { return _started; }
 
+/*
+    bool canDozor() {}
+
+    bool canMine() {}
+
+    bool canFarm() {}
+*/
 signals:
 
     void log (const QString& text);
