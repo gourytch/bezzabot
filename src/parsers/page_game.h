@@ -4,6 +4,17 @@
 #include <QObject>
 #include "page_generic.h"
 
+struct PageResource {
+    int     count;
+    QString id;
+    QString href;
+    QString title;
+    PageResource() {}
+    PageResource(const PageResource& v):
+        count(v.count), id(v.id), href(v.href), title(v.title) {}
+};
+
+typedef QList<PageResource> PageResources;
 
 class Page_Game : public Page_Generic
 {
@@ -25,6 +36,8 @@ public:
     PageTimer   timer_immunity;
     PageTimer   timer_attack;
     PageTimers  timers;
+
+    PageResources   resources;
 
     QWebElement body;
 

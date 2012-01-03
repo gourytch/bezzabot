@@ -5,7 +5,6 @@
 #include "tools/tools.h"
 #include "page_game.h"
 
-
 ////////////////////////////////////////////////////////////////////////////
 //
 // Page_Game
@@ -44,6 +43,7 @@ Page_Game::Page_Game (QWebElement& doc) :
 
     e = doc.findFirst("DIV[id=rmenu1] DIV[class=timers]");
 
+/*
     if (e.isNull()) {
         qDebug() << "!!! NO TIMERS FOUND";
     } else {
@@ -54,7 +54,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         }
         qDebug() << "++++++++++++++++++++++++++++++++++++++++++++++++";
     }
-
+*/
     // 1: Таймер работы
     QWebElement c = e.firstChild();
     if (c.toPlainText().trimmed() == u8("Я свободен!")) {
@@ -95,13 +95,38 @@ Page_Game::Page_Game (QWebElement& doc) :
 
     timers.timers.clear();
     QWebElement accordion = doc.findFirst("DIV[id=accordion]");
-    QWebElement counters = accordion.findFirst("DIV[class=counters]");
-    QWebElementCollection lis = counters.findAll("LI");
-    foreach (QWebElement li, lis) {
-        timers.add(li);
+    e = accordion.findFirst("DIV[class=counters]");
+    foreach (c, e.findAll("LI")) {
+        timers.add(c);
+    }
+
+    e = accordion.findFirst("DIV[class=resources]");
+    resources.clear();
+    foreach (c, e.findAll("LI")) {
+        PageResource r;
+        r.id = c.attribute("id");
+        r.title = c.attribute("title");
+        QWebElement a = c.findFirst("A");
+        r.href = a.attribute("href");
+        r.count = a.toPlainText().trimmed().toInt();
+        resources.append(r);
     }
 }
 
+
+QString toString(const QString& pfx, const PageResource& r) {
+    return pfx + QString("{id=%1, count=%2, href=%3, title=%4}")
+            .arg(r.id, QString::number(r.count), r.href, r.title);
+}
+
+QString toString(const QString& pfx, const PageResources& s) {
+    QString ret = "Resources: {\n";
+    for (PageResources::ConstIterator i = s.constBegin(); i != s.constEnd(); ++i) {
+        ret += ::toString(pfx + "   ", *i) + "\n";
+    }
+    ret += pfx +"}\n";
+    return ret;
+}
 
 QString Page_Game::toString (const QString& pfx) const
 {
@@ -121,6 +146,7 @@ QString Page_Game::toString (const QString& pfx) const
             pfx + QString("fight  timer: %1\n").arg(timer_attack.toString()) +
             pfx + QString("other timers:\n") +
             pfx + timers.toString (pfx + "   ") + "\n" +
+            pfx + ::toString(pfx + "   ", resources) + "\n" +
             pfx + "}";
 }
 
