@@ -33,6 +33,12 @@ Page_Game::Page_Game (QWebElement& doc) :
     chartitle = doc.findFirst("DIV[class=name] B").attribute ("title");
     charname = doc.findFirst("DIV[class=name] U").toPlainText ().trimmed ();
     message = doc.findFirst("DIV[class=message]").toPlainText ().trimmed ();
+    QWebElement accordion = doc.findFirst("DIV[id=accordion]");
+    QWebElement counters = doc.findFirst("DIV[class=counters]");
+    QWebElementCollection lis = doc.findAll("LI");
+    foreach (QWebElement li, lis) {
+        timers.add(li);
+    }
 
 }
 
@@ -96,5 +102,5 @@ QString Page_Game::jobLink(bool ifFinished, int timegap) const {
             }
         }
     }
-    return workTimer.name;
+    return workTimer.href;
 }

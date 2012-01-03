@@ -64,9 +64,13 @@ enum PageKind {
 
 struct PageTimer
 {
-    QString     name;
+    QString     title;
+    QString     href;
     QDateTime   pit;
     int         hms;
+
+    PageTimer() {hms = -1;}
+    PageTimer(const QWebElement& e) {assign(e);}
 
     const PageTimer& operator= (const PageTimer &v);
     void assign (const QWebElement &e);
@@ -79,6 +83,11 @@ struct PageTimers
     QVector<PageTimer> timers;
 
     void assign (const QWebElement &doc);
+
+    void add (const PageTimer& t) { timers.append(t); }
+
+    void add (const QWebElement &e) { add(PageTimer(e)); }
+
     bool empty () const;
     int count () const;
     const PageTimer& operator [] (int ix) const;

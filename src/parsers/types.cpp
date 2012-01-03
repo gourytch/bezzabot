@@ -26,29 +26,48 @@ bool parseTimerSpan (const QWebElement& e, QDateTime *pit, int *hms)
 
     QString tstr = e.attribute ("timer");
 
-    QRegExp rx ("^(\\d+)\\|(\\d+)");
+    QRegExp rx ("^(\\d*)\\|(\\d*)");
     if (rx.indexIn (tstr) == -1)
     {
         return false;
     }
     QString pitStr = rx.cap (1);
-    int pitInt = pitStr.toInt ();
-    if (pit)
+    if (pitStr.isEmpty()) {
+        pitStr = "0";
+    }
+    bool ok;
+    int pitInt = pitStr.toInt (&ok);
+    if (ok)
     {
         pit->setTime_t (pitInt);
     }
-    rx.setPattern ("(\\d\\d):(\\d\\d):(\\d\\d)");
     tstr = e.toInnerXml(); //.firstChild ().toPlainText ();
-    if (rx.indexIn (tstr) == -1)
+    rx.setPattern ("(\\d+):(\\d\\d):(\\d\\d):(\\d\\d)");
+    if (rx.indexIn (tstr) != -1)
     {
-        return false;
+        QString d = rx.cap (1);
+        QString h = rx.cap (2);
+        QString m = rx.cap (3);
+        QString s = rx.cap (4);
+        if (hms)
+        {
+            *hms = s.toInt () + m.toInt () * 60 + h.toInt () * 3600 + d.toInt() * 86400;
+        }
     }
-    QString h = rx.cap (1);
-    QString m = rx.cap (2);
-    QString s = rx.cap (3);
-    if (hms)
+    else
     {
-        *hms = s.toInt () + m.toInt () * 60 + h.toInt () * 3600;
+        rx.setPattern ("(\\d\\d):(\\d\\d):(\\d\\d)");
+        if (rx.indexIn (tstr) == -1)
+        {
+            return false;
+        }
+        QString h = rx.cap (1);
+        QString m = rx.cap (2);
+        QString s = rx.cap (3);
+        if (hms)
+        {
+            *hms = s.toInt () + m.toInt () * 60 + h.toInt () * 3600;
+        }
     }
     return true;
 }
@@ -57,19 +76,17 @@ bool parseTimerSpan (const QWebElement& e, QDateTime *pit, int *hms)
 
 QString PageTimer::toString () const
 {
-    return "Timer {name=\"" +
-            name +
-            "\", pit=\"" +
-            pit.toString ("yyyy-MM-dd HH:mm:ss") +
-            "\", hms=" + QString::number(hms) + "}";
+    return QString("Timer {pit=%1, hms=%2, href={%3}, title={%4}}")
+            .arg(pit.toString ("yyyy-MM-dd HH:mm:ss"), QString::number(hms), href, title);
 }
 
 
 const PageTimer& PageTimer::operator= (const PageTimer &v)
 {
-    name = v.name;
-    pit  = v.pit;
-    hms = v.hms;
+    title   = v.title;
+    href    = v.href;
+    pit     = v.pit;
+    hms     = v.hms;
     return *this;
 }
 
@@ -78,7 +95,14 @@ void PageTimer::assign (const QWebElement &e)
 {
     if (e.tagName () == "A" && e.attribute ("class") == "timer link")
     {
-        name = e.attribute ("href");
+        title = "?";
+        href = e.attribute ("href");
+        parseTimerSpan (e.findFirst ("SPAN"), &pit, &hms);
+    }
+    else if (e.tagName() == "LI")
+    {
+        title = e.attribute("title");
+        href = e.findFirst("A").attribute("href");
         parseTimerSpan (e.findFirst ("SPAN"), &pit, &hms);
     }
 }
@@ -91,7 +115,7 @@ void PageTimers::assign (const QWebElement &doc)
     if (!e.isNull ())
     {
         PageTimer t;
-        t.name = "system_time";
+        t.title = "system_time";
         parseTimerSpan (e, &(t.pit), &(t.hms));
         timers.append (t);
     }
@@ -113,9 +137,10 @@ void PageTimers::assign (const QWebElement &doc)
                 sub1.attribute ("class") == "timer link")
         {
             //                qDebug () << "found Anchor";
-            PageTimer t;
-            t.assign (sub1);
-            timers.append (t);
+            add(sub1);
+//            PageTimer t;
+//            t.assign (sub1);
+//            timers.append (t);
         }
     }
 }
