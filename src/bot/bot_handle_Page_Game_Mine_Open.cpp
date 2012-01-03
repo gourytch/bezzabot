@@ -55,7 +55,7 @@ void Bot::handle_Page_Game_Mine_Open () {
             _mineshop_last_buying_position = -1;
         }
 
-        if (p->num_pickaxes > 0 || p->num_pickaxesPro > 0) {
+        if (p->num_pickaxes > 0 || p->num_pickaxesPro > 0 && p->hp_cur >= 25) {
             emit log(u8("можно закопаться в шахту"));
             if (p->doStart()) {
                 _awaiting = true;
