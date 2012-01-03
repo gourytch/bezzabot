@@ -51,6 +51,7 @@ enum PageKind {
     page_Game_Mine_Underworld,
     page_Game_Mine_LiveField,
     page_Game_Dozor_Entrance,
+    page_Game_Dozor_LowHealth,
     page_Game_Dozor_OnDuty,
     page_Game_Dozor_GotVictim,
     page_Game_Headquarters,

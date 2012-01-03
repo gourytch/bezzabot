@@ -39,9 +39,11 @@ void Parser::setup() {
     _producer.registerClass<Page_Login>();
     _producer.registerClass<Page_Game_Index>();
     _producer.registerClass<Page_Game_Dozor_Entrance>();
+    _producer.registerClass<Page_Game_Dozor_LowHealth>();
     _producer.registerClass<Page_Game_Dozor_OnDuty>();
     _producer.registerClass<Page_Game_Dozor_GotVictim>();
     _producer.registerClass<Page_Game_Farm>();
+    _producer.registerClass<Page_Game_Pier>();
     _producer.registerClass<Page_Game_Mine_Open>();
     _producer.registerClass<Page_Game>();
     _producer.registerClass<Page_Generic>();

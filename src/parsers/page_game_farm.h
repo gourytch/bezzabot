@@ -8,18 +8,21 @@ class Page_Game_Farm : public Page_Game
 {
     Q_OBJECT
 public:
-    int         price;
     bool        working;
-    PageTimer   counter;
-    int         form_k;
-    QString     form_cmd;
-    QString     form_submit;
+    int         price;
+    int         maxhours;
+    PageTimer   worktimer;
 
     Page_Game_Farm (QWebElement& doc);
 
     virtual QString toString (const QString& pfx = QString ()) const;
 
     static bool fit(const QWebElement& doc);
+
+    bool doStartWork(int hours);
+
+    bool doCancelWork();
+
 };
 
 #endif // PAGE_GAME_FARM_H

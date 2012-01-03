@@ -61,7 +61,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         timer_work.title = u8("FREE");
         timer_work.href  = u8("/");
         timer_work.pit   = QDateTime();
-        timer_work.hms   = 0;
+        timer_work.hms   = -1;
     } else {
         timer_work.assign(c);
         timer_work.title = (timer_work.hms == 0) ? "READY": "BUSY";
@@ -72,7 +72,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         timer_immunity.title = u8("DANGER");
         timer_immunity.href  = u8("");
         timer_immunity.pit   = QDateTime();
-        timer_immunity.hms   = 0;
+        timer_immunity.hms   = -1;
     } else {
         parseTimerSpan(c.findFirst("SPAN[class=js_timer]"),
                        &timer_immunity.pit, &timer_immunity.hms);
@@ -85,7 +85,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         timer_attack.title = u8("BATTLETIME");
         timer_attack.href  = u8("dozor.php");
         timer_attack.pit   = QDateTime();
-        timer_attack.hms   = 0;
+        timer_attack.hms   = -1;
     } else {
         parseTimerSpan(c.findFirst("SPAN[class=js_timer]"),
                        &timer_attack.pit, &timer_attack.hms);
@@ -196,35 +196,21 @@ bool Page_Game::fit(const QWebElement& doc) {
 }
 
 bool Page_Game::hasNoJob() const {
-    QWebElement divTimers = document.findFirst("DIV[id=right]")
-            .findFirst("DIV[class=timers]");
-    if (divTimers.toPlainText().indexOf(u8("Я свободен!")) == -1) {
-        return false;
-    }
-    return true;
+    return (timer_work.hms == -1);
 }
 
 QString Page_Game::jobLink(bool ifFinished, int timegap) const {
-    QWebElement divTimers = document.findFirst("DIV[id=right]")
-            .findFirst("DIV[class=timers]");
-    QWebElement anchor = divTimers.findFirst("A[class=timer\\ link]");
-    if (anchor.isNull()) {
-        return QString();
-    }
-    PageTimer workTimer;
-    workTimer.assign(anchor);
-
-    if (workTimer.pit.isNull()) {
+    if (timer_work.pit.isNull()) {
         return QString();
     }
 
     if (ifFinished) {
         QDateTime ts = QDateTime::currentDateTime();
         if (timegap > 0) {
-            if (ts < workTimer.pit.addSecs(timegap)) {
+            if (ts < timer_work.pit.addSecs(timegap)) {
                 return QString();
             }
         }
     }
-    return workTimer.href;
+    return timer_work.href;
 }
