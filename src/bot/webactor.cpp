@@ -197,10 +197,6 @@ void WebActor::onPageFinished (bool ok)
     {
         emit save_page ();
     }
-#ifdef USE_LOCK
-    qDebug() << "send pageLoaded signal";
-    _pageLoaded.wakeAll();
-#endif
 }
 
 
@@ -239,24 +235,6 @@ void WebActor::savePage ()
     qDebug () << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 }
 
-
-void WebActor::wait ()
-{
-    qDebug () << "awaiting for page loading finished";
-#ifdef USE_LOCK
-    _actorIsBusy.lock();
-    _pageLoaded.wait(&_actorIsBusy);
-    _actorIsBusy.unlock();
-#endif
-    if (!_finished) {
-        qDebug() << "??? ACTOR UNLOCKED BUT NOT FINISHED";
-        while (!_finished)
-        {
-            qDebug() << "tick-tock...";
-            sleep (1);
-        }
-    }
-}
 
 /***************************************************************************\
 *                                                                           *

@@ -177,31 +177,24 @@ void Bot::stop() {
 
 void Bot::step()
 {
-//    qDebug() << "STEP" << ++_step_counter;
-    if (!_good) {
+    if (!isConfigured()) {
         qDebug() << "bot not configured properly";
         return;
     }
-    if (!_started)
+    if (!isStarted())
     {
         qDebug() << "not started. skip step";
         return;
     }
+    //    qDebug() << "STEP" << ++_step_counter;
+    _step_counter++;
     if (_regular)
     {
         _step_timer.stop();
     }
-    if (_awaiting) {
-//        emit log (tr("bot is awaiting for responce. skip"));
-    } else {
-//        emit log (tr("bot is ready for work"));
-        if (_actor->busy()) {
-//            emit log (tr("actor is busy. do nothing"));
-        } else {
+    if (!_awaiting && !_actor->busy()) {
             one_step();
-//            emit log (tr("actor is available"));
-        } // end if (actor->busy())
-    } // end if (_awaiting)
+    }
 
     if (_started) {
         if (_regular) {

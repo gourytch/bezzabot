@@ -138,9 +138,6 @@ void PageTimers::assign (const QWebElement &doc)
         {
             //                qDebug () << "found Anchor";
             add(sub1);
-//            PageTimer t;
-//            t.assign (sub1);
-//            timers.append (t);
         }
     }
 }

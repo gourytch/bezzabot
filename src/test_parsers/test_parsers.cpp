@@ -12,26 +12,44 @@ using namespace std;
 
 int main (int argc, char ** argv) {
     QApplication dummy(argc, argv);
-    QDir dir (Config::appDirPath() + "../../../bezzabot.samples");
-    QStringList filters;
-    filters << "*.xml";
-    dir = QDir(dir.absolutePath ());
-    cout << "parse " << qPrintable(dir.absolutePath () + filters [0]) << endl;
-    QStringList fnames = dir.entryList (filters);
-    foreach (QString fname, fnames)
-    {
-        cout << "LOAD " << qPrintable(fname) << endl;
-        QString text = ::load (dir.absolutePath () + "/" + fname);
-        Page_Generic *p = Parser::parse (text);
-        if (p) {
-            cout << qPrintable(p->toString ("   ")) << endl;
-        } else {
-            cout << "UNPARSEABLE" << endl;
+    if (argc == 1) {
+        QDir dir (Config::appDirPath() + "../../../bezzabot.samples");
+        QStringList filters;
+        filters << "*.xml";
+        dir = QDir(dir.absolutePath ());
+        cout << "parse " << qPrintable(dir.absolutePath () + filters [0]) << endl;
+        QStringList fnames = dir.entryList (filters);
+        foreach (QString fname, fnames)
+        {
+            cout << "LOAD " << qPrintable(fname) << endl;
+            QString text = ::load (dir.absolutePath () + "/" + fname);
+            Page_Generic *p = Parser::parse (text);
+            if (p) {
+                cout << qPrintable(p->toString ("   ")) << endl;
+            } else {
+                cout << "UNPARSEABLE" << endl;
+            }
+            cout << endl;
+            cout << "---------------------------------------------------" << endl;
+            cout << endl;
+            cout << endl;
         }
-        cout << endl;
-        cout << "---------------------------------------------------" << endl;
-        cout << endl;
-        cout << endl;
+    } else {
+        for (int i = 1; i < argc; ++i) {
+            QString fname = argv[i];
+            cout << "LOAD " << qPrintable(fname) << endl;
+            QString text = ::load (fname);
+            Page_Generic *p = Parser::parse (text);
+            if (p) {
+                cout << qPrintable(p->toString ("   ")) << endl;
+            } else {
+                cout << "UNPARSEABLE" << endl;
+            }
+            cout << endl;
+            cout << "---------------------------------------------------" << endl;
+            cout << endl;
+            cout << endl;
+        }
     }
     cout << "END" << endl;
     return 0;

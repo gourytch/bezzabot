@@ -20,7 +20,13 @@ public:
     int         hp_cur;
     int         hp_max;
     int         hp_spd;
+    PageTimer   timer_system;
+    PageTimer   timer_work;
+    PageTimer   timer_immunity;
+    PageTimer   timer_attack;
     PageTimers  timers;
+
+    QWebElement body;
 
     Page_Game (QWebElement& doc);
 

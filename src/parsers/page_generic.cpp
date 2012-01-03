@@ -57,7 +57,7 @@ void Page_Generic::js_setByName(const QString& name,
 void Page_Generic::pressSubmit(int delay_min, int delay_max) {
     int ms = delay_min >= delay_max
             ? delay_min
-            : delay_min + random() % (delay_max - delay_min);
+            : delay_min + qrand() % (delay_max - delay_min);
     QTimer::singleShot(ms, this, SLOT(slot_submit()));
 }
 

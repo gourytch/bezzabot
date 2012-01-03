@@ -9,13 +9,6 @@
 #include <QNetworkRequest>
 #include "parsers/page_generic.h"
 
-//#define USE_LOCK
-
-#ifdef USE_LOCK
-#include <QWaitCondition>
-#include <QMutex>
-#endif
-
 class Bot;
 
 class WebActor : public QObject
@@ -35,11 +28,6 @@ protected:
     volatile bool   _finished;
     volatile bool   _success;
 
-#ifdef USE_LOCK
-    QWaitCondition _pageLoaded;
-    QMutex         _actorIsBusy;
-#endif
-
     void request_ (const QNetworkRequest& rq,
                   QNetworkAccessManager::Operation operation,
                   const QByteArray & body);
@@ -57,9 +45,7 @@ public:
 
     bool busy(); // идёт ли обработка
 
-    void wait ();
-
-    QWebPage* page () { return _webpage; };
+    QWebPage* page () { return _webpage; }
 
     Page_Generic* parse (); // создаётся новый объект!
 
