@@ -20,5 +20,5 @@ QString Page_Game_Farm::toString (const QString& pfx) const
 //static
 bool Page_Game_Farm::fit(const QWebElement& doc) {
     qDebug() << "* CHECK Page_Game_Farm";
-    return true;
+    return false;
 }

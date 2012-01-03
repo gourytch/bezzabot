@@ -41,19 +41,16 @@ QString Page_Game::toString (const QString& pfx) const
 {
 
     return "Page_Game {\n" +
-           pfx + Page_Generic::toString (pfx + "   ") + "\n" +
-           pfx + timers.toString (pfx + "   ") + "\n" +
-           pfx + "pagetitle: {" + pagetitle + "}\n" +
-           pfx + "character: " + chartitle + " " + charname + "\n" +
-           pfx + "hp:" + QString::number (hp_cur) +
-           pfx + "/" + QString::number (hp_max) +
-           pfx + ", spd " + QString::number (hp_spd) + "\n" +
-           pfx + "gold:" + QString::number (gold) +
-           pfx + ", crystal:" + QString::number (crystal) +
-           pfx + ", fish:" + QString::number (fish) +
-           pfx + ", green:" + QString::number (green) + "\n" +
-           pfx + "messsage:" + message + "\n" +
-           pfx + "}";
+            pfx + Page_Generic::toString (pfx + "   ") + "\n" +
+            pfx + timers.toString (pfx + "   ") + "\n" +
+            pfx + "pagetitle: {" + pagetitle + "}\n" +
+            pfx + "character: " + chartitle + " " + charname + "\n" +
+            pfx + QString("hp: %1/%2, spd %3\n")
+            .arg(hp_cur).arg(hp_max).arg(hp_spd) +
+            pfx + QString("gold: %1, crystal: %2, fish: %3, green: %4\n")
+            .arg(gold).arg(crystal).arg(fish).arg(green) +
+            pfx + QString("messsage: {%1}\n").arg(message) +
+            pfx + "}";
 }
 
 //static
@@ -77,7 +74,7 @@ bool Page_Game::hasNoJob() const {
     return true;
 }
 
-QString Page_Game::jobLink(bool ifFinished) const {
+QString Page_Game::jobLink(bool ifFinished, int timegap) const {
     QWebElement divTimers = document.findFirst("DIV[id=right]")
             .findFirst("DIV[class=timers]");
     QWebElement anchor = divTimers.findFirst("A[class=timer\\ link]");
@@ -91,8 +88,13 @@ QString Page_Game::jobLink(bool ifFinished) const {
         return QString();
     }
 
-    if (ifFinished && workTimer.hms > 0) {
-        return QString();
+    if (ifFinished) {
+        QDateTime ts = QDateTime::currentDateTime();
+        if (timegap > 0) {
+            if (ts < workTimer.pit.addSecs(timegap)) {
+                return QString();
+            }
+        }
     }
     return workTimer.name;
 }

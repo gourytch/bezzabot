@@ -30,7 +30,7 @@ public:
 
     bool hasNoJob() const;
 
-    QString jobLink(bool ifFinished) const;
+    QString jobLink(bool ifFinished = false, int timegap=10) const;
 
 };
 

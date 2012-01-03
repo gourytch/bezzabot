@@ -62,10 +62,36 @@ void Page_Generic::pressSubmit(int delay_min, int delay_max) {
 }
 
 void Page_Generic::slot_submit() {
+    static const QString actuateLink = (
+       "function actuateLink(link) {"
+         "var allowDefaultAction = true; "
+         "if (link.click) { "
+           "link.click(); "
+           "return; "
+         "} else if (document.createEvent) { "
+           "var e = document.createEvent('MouseEvents'); "
+           "e.initEvent('click',true,true); "
+           "allowDefaultAction = link.dispatchEvent(e); "
+         "}"
+         "if (allowDefaultAction) { "
+           "var f = document.createElement('form'); "
+           "f.action = link.href; "
+           "document.body.appendChild(f); "
+           "f.submit(); "
+         "}"
+       "}"
+       "actuateLink(this);");
+
     if (submit.isNull()) {
         qDebug() << "NULL SUBMIT";
     } else {
-        qDebug() << "SUBMITTING";
-        submit.evaluateJavaScript("this.click();");
+        if (submit.tagName () == "A") {
+            qDebug() << "SUBMITTING AS LINK";
+            submit.evaluateJavaScript("document.location = this.getAttribute('href');");
+//            submit.evaluateJavaScript(actuateLink);
+        } else {
+            qDebug() << "SUBMITTING AS BUTTON";
+            submit.evaluateJavaScript("this.click();");
+        }
     }
 }

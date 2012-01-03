@@ -9,15 +9,23 @@ SOURCES += main.cpp\
         mainwindow.cpp \
         bot.cpp \
         webactor.cpp \
-        botthread.cpp
+        botthread.cpp \
+    bot_handle_Page_Game_Dozor_Entrance.cpp \
+    bot_handle_Page_Game_Mine_Open.cpp \
+    farmersgroupsprices.cpp
 
 HEADERS  += mainwindow.h \
             bot.h \
             webactor.h \
-            botthread.h
+            botthread.h \
+    farmersgroupsprices.h
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 DESTDIR = $$TOP/bin
+
+
+
+

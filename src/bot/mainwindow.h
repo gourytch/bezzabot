@@ -47,6 +47,8 @@ public:
 public slots:
 
     void log (const QString& text);
+    void dbg (const QString& text);
+
     void startAutomaton();
     void stopAutomaton();
 

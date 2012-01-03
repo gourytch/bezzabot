@@ -1,8 +1,11 @@
+#include <iostream>
 #include <QRegExp>
 #include <QStringList>
 #include "mainwindow.h"
 #include "tools/config.h"
 #include "bot.h"
+
+using namespace std;
 
 MainWindow *MainWindow::_instance = NULL;
 
@@ -101,8 +104,15 @@ void MainWindow::load (const QUrl &url)
 
 void MainWindow::log (const QString &text)
 {
-    qDebug () << QString("LOG: %1").arg(text);
-    pLogView->append (text);
+    dbg (QString("LOG: %1").arg(text));
+    QString tss = QDateTime::currentDateTime().toString("hh:mm:ss");
+    pLogView->append (tss + " " + text);
+}
+
+void MainWindow::dbg (const QString &text)
+{
+    QString tss = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+    clog << qPrintable(tss + " " + text) << endl;
 }
 
 
@@ -119,6 +129,7 @@ void MainWindow::slotSetAutomatonState (int state)
         break;
 
     case Qt::Checked:
+        log ("automaton enabled");
         if (!pBot->isStarted()) {
             QTimer::singleShot(0, pBot, SIGNAL (start()));
         }
@@ -152,7 +163,7 @@ void MainWindow::slotLoadStarted ()
     pLoadingProgress->setValue (0);
     pLoadingProgress->setVisible(true);
     QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
-    log ("loading " + urlstr);
+    dbg ("loading " + urlstr);
     setWindowTitle(tr ("bot %1: start loading %2").arg(pBot->id(), urlstr));
 }
 
@@ -168,14 +179,14 @@ void MainWindow::slotLoadFinished(bool success)
     QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
     if (success)
     {
-        log ("load finished");
+        dbg ("load finished");
         setWindowTitle(tr ("bot %1: loaded %2").arg(pBot->id(), urlstr));
     }
     else
     {
-        log ("load failed");
+        dbg ("load failed");
         setWindowTitle(tr ("bot %1: failed %2").arg(pBot->id(), urlstr));
     }
-    log (tr ("bytes received: %1").arg (pWebView->page ()->bytesReceived ()));
-    log (tr ("total bytes: %1").arg (pWebView->page ()->totalBytes ()));
+    dbg (tr ("bytes received: %1").arg (pWebView->page ()->bytesReceived ()));
+    dbg (tr ("total bytes: %1").arg (pWebView->page ()->totalBytes ()));
 }

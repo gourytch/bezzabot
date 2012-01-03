@@ -53,12 +53,17 @@ protected:
     QString     _password;
     bool        _autostart;
 
+    // настройки разные
+    int         _digchance;     // шанс достаточный для копания
+    QString     _digcoulomb;    // какой кулон надевать при начале копания
+
     // timers:
     QDateTime   _kd_Dozor;  // когда оттает возможность дозора
     QDateTime   _kd_Fishing;  // когда оттает возможность рыбалки
     QDateTime   _kd_Mailbox;  // когда можно будет поглядеть в почту
 
     // player state
+    int         level;
     QString     charname;
     QString     chartitle;
     int         gold;
@@ -70,6 +75,8 @@ protected:
     int         hp_spd;
     QDateTime   atime;
     Sequence    sequence;
+
+    int _mineshop_last_buying_position;
 
 protected:
     virtual void handle_Page_Generic ();
@@ -115,13 +122,18 @@ public:
 
     bool canFarm() {}
 */
-signals:
-
-    void log (const QString& text);
-
     void request_get (const QUrl& url);
 
     void request_post (const QUrl& url, const QStringList& params);
+signals:
+
+    void dbg (const QString& text);
+
+    void log (const QString& text);
+
+    void rq_get (const QUrl& url);
+
+    void rq_post (const QUrl& url, const QStringList& params);
 
 public slots:
 

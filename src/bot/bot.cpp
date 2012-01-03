@@ -34,16 +34,19 @@ Bot::Bot(const QString& id, QObject *parent) :
     connect (_actor->page (), SIGNAL (loadFinished (bool)),
              this, SLOT (onPageFinished (bool)));
 
+    connect (this, SIGNAL (dbg (const QString &)),
+             wnd, SLOT (dbg (const QString &)));
+
     connect (this, SIGNAL (log (const QString &)),
              wnd, SLOT (log (const QString &)));
 
     connect (_actor, SIGNAL (log (const QString &)),
              wnd, SLOT (log (const QString &)));
 
-    connect (this, SIGNAL (request_get(const QUrl &)),
+    connect (this, SIGNAL (rq_get (const QUrl &)),
              _actor, SLOT (request (const QUrl &)));
 
-    connect (this, SIGNAL (request_post(const QUrl &, const QStringList&)),
+    connect (this, SIGNAL (rq_post(const QUrl &, const QStringList&)),
              _actor, SLOT (request (const QUrl &, const QStringList &)));
 
     _good  = false;
@@ -76,6 +79,16 @@ Bot::~Bot ()
 //    delete _actor;
 //    delete _cookies;
 //    delete _config;
+}
+
+void Bot::request_get (const QUrl& url) {
+    _awaiting = true;
+    emit rq_get(url);
+}
+
+void Bot::request_post (const QUrl& url, const QStringList& params) {
+    _awaiting = true;
+    emit rq_post(url, params);
 }
 
 //////// slots /////////////////////////////////////////////////////////
@@ -112,6 +125,9 @@ void Bot::onPageFinished (bool ok)
     case page_Game_Dozor_Entrance:
         handle_Page_Game_Dozor_Entrance();
         break;
+    case page_Game_Mine_Open:
+        handle_Page_Game_Mine_Open();
+        break;
     case page_Game:
         handle_Page_Game_Generic();
         break;
@@ -127,11 +143,11 @@ void Bot::onPageFinished (bool ok)
 
 void Bot::start() {
     if (!isConfigured()) {
-        emit log(tr("bot is not configured properly"));
+        emit dbg(tr("bot is not configured properly"));
         return;
     }
     if (isStarted()) {
-        emit log(tr("bot already started"));
+        emit dbg(tr("bot already started"));
         return;
     }
     if (_regular) {
@@ -140,23 +156,23 @@ void Bot::start() {
         QTimer::singleShot(1000, this, SLOT(step()));
     }
     _started = true;
-    emit log(tr("Bot::start() : bot started"));
+    emit dbg(tr("Bot::start() : bot started"));
 }
 
 void Bot::stop() {
     if (!isConfigured()) {
-        emit log(tr("bot is not configured properly"));
+        emit dbg(tr("bot is not configured properly"));
         return;
     }
     if (!isStarted()) {
-        emit log(tr("bot already stopped"));
+        emit dbg(tr("bot already stopped"));
         return;
     }
     if (_regular) {
         _step_timer.stop();
     }
     _started = false;
-    emit log(tr("Bot::stop() : bot stopped"));
+    emit dbg(tr("Bot::stop() : bot stopped"));
 }
 
 void Bot::step()
@@ -191,7 +207,7 @@ void Bot::step()
         if (_regular) {
             _step_timer.start();
         } else {
-            emit log(tr("bot next shot"));
+            emit dbg(tr("bot next shot"));
             QTimer::singleShot(1000, this, SLOT(step()));
         }
     }
@@ -210,7 +226,7 @@ void Bot::one_step () {
     if (level > 6) {
         if (_kd_Fishing.isNull() || _kd_Fishing < ts) {
             emit log (u8("пойду-ка на рыбалку."));
-            emit request_get(QUrl(_baseurl + "harbour.php?a=pier"));
+            request_get(QUrl(_baseurl + "harbour.php?a=pier"));
             _awaiting = true;
             return;
         }
@@ -219,18 +235,19 @@ void Bot::one_step () {
         //придумаем себе какое-нибудь занятие
         if (_kd_Dozor.isNull() || _kd_Dozor < ts) {
             emit log (u8("пойду-ка в дозор."));
-            emit request_get(QUrl(_baseurl + "dozor.php"));
-            _awaiting = true;
+            request_get(QUrl(_baseurl + "dozor.php"));
             return;
         }
     }
-    QString jobUrl = p->jobLink(true);
+    QString jobUrl = p->jobLink(true, 10);
     if (jobUrl.isNull()) {
         return; // не имеем завершенной работу
     }
-    emit log (u8("надо доделать работу. {") + jobUrl + u8("}"));
-    emit request_get(QUrl(_baseurl + jobUrl));
-    _awaiting = true;
+    QUrl url = QUrl(_baseurl + jobUrl);
+    if (_actor->page()->mainFrame ()->url() != url) {
+        emit log (u8("надо доделать работу. {") + url.toString() + u8("}"));
+        request_get(url);
+    }
     return;
 
 }
@@ -238,93 +255,64 @@ void Bot::one_step () {
 //////////// page handlers //////////////////////////////////////////////////
 
 void Bot::handle_Page_Generic () {
-    emit log(tr("hangle generic page"));
+    emit dbg(tr("hangle generic page"));
 }
 
 
 void Bot::handle_Page_Login () {
-    emit log(tr("hangle login page"));
+    handle_Page_Generic();
+    emit dbg(tr("hangle login page"));
     Page_Login *p = static_cast<Page_Login*>(_page);
     if (p->doLogin(_serverNo, _login, _password, true)) {
         _awaiting = true;
     }
 }
 
-
 void Bot::handle_Page_Game_Generic () {
-    emit log(tr("hangle generic game page"));
-//    Page_Game *p = static_cast<Page_Game*>(_page);
+    handle_Page_Generic();
+    emit dbg(tr("hangle generic game page"));
+    Page_Game *p = static_cast<Page_Game*>(_page);
+    hp_cur  = p->hp_cur;
+    hp_max  = p->hp_max;
+    hp_spd  = p->hp_spd;
+    gold    = p->gold;
+    crystal = p->crystal;
+    fish    = p->fish;
+    green   = p->green;
 }
-
 
 void Bot::handle_Page_Game_Index () {
-    emit log(tr("hangle index game page"));
+    handle_Page_Game_Generic();
+    emit dbg(tr("hangle index game page"));
     Page_Game_Index *p = static_cast<Page_Game_Index*>(_page);
+    level = p->level;
 }
-
-void Bot::handle_Page_Game_Dozor_Entrance () {
-    emit log(tr("hangle dozor entrance game page"));
-    Page_Game_Dozor_Entrance *p = static_cast<Page_Game_Dozor_Entrance*>(_page);
-    if (p->dozor_left10 == 0) {
-        emit log(u8("у нас нет дозорного времени"));
-        _kd_Dozor = nextDay();
-        emit request_get(QUrl(_baseurl + "index.php"));
-        _awaiting = true;
-        return;
-    }
-    if (p->gold < p->dozor_price) {
-        emit log(u8("у нас нет денег на дозор"));
-        _kd_Dozor = QDateTime::currentDateTime().addSecs(60 * 60);
-        emit request_get(QUrl(_baseurl + "index.php"));
-        _awaiting = true;
-        return;
-    }
-    emit log(u8("попробуем сходить в дозор на десять минуток"));
-    if (!p->doDozor(1)) {
-        emit log(u8("не вышло :("));
-        emit request_get(QUrl(_baseurl + "index.php"));
-        _awaiting = true;
-    } else {
-        _awaiting = true;
-    }
-}
-
-void Bot::handle_Page_Game_Mine_Open () {
-    emit log(tr("hangle mine open game page"));
-    Page_Game_Mine_Open *p = static_cast<Page_Game_Mine_Open*>(_page);
-}
-
 
 void Bot::handle_Page_Game_Farm () {
-    emit log(tr("hangle farm game page"));
-    Page_Game_Farm *p = static_cast<Page_Game_Farm*>(_page);
+    handle_Page_Game_Generic();
+    emit dbg(tr("hangle farm game page"));
+    //Page_Game_Farm *p = static_cast<Page_Game_Farm*>(_page);
 }
 
 /////////// actions /////////////////////////////////////////////////////////
 
 bool Bot::action_login () {
     if (!_good) {
-        qDebug() << "attempt to login for unconfigured bot";
+        emit dbg(u8("attempt to login for unconfigured bot"));
         return false;
     }
-    qDebug() << "initiate login sequence for "
-             << _login
-             << " at " << _baseurl;
-    _awaiting = true;
-    // emit request_get(QUrl(_baseurl));
-    emit request_get(QUrl(_baseurl + "login.php"));
+    emit dbg(u8("initiate login sequence for ") + _login + " at " +_baseurl);
+    request_get(QUrl(_baseurl + "login.php"));
     return true;
 }
 
 bool Bot::action_look () {
     if (!_good) {
-        qDebug() << "attempt to login for unconfigured bot";
+        emit dbg(u8("attempt to login for unconfigured bot"));
         return false;
     }
-    qDebug() << "request index for "
-             << _login
-             << " at " << _baseurl;
-    emit request_get(QUrl(_baseurl + "index.php"));
+    emit dbg(u8("request index for ") +_login + " at " + _baseurl);
+    request_get(QUrl(_baseurl + "index.php"));
     return true;
 }
 
@@ -362,8 +350,10 @@ void Bot::configure() {
         _password = passwd;
         qDebug() << "set password (not shown)";
     }
-
     _autostart = _config->get("autostart", false, false).toBool();
+
+    _digchance  = _config->get("miner/digchance", false, 75).toInt();
+    _digcoulomb = _config->get("miner/coulomb", false, "").toString();
 
     qDebug() << "configure result: " << _good;
 }
