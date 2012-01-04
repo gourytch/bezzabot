@@ -226,7 +226,7 @@ void Bot::one_step () {
     */
     if (p->hasNoJob()) {
         //придумаем себе какое-нибудь занятие
-        if (_kd_Dozor.isNull() || _kd_Dozor < ts && hp_cur >= 25) {
+        if ((_kd_Dozor.isNull() || _kd_Dozor < ts) && (hp_cur >= 25)) {
             emit log (u8("пойду-ка в дозор."));
             request_get(QUrl(_baseurl + "dozor.php"));
             return;

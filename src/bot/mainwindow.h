@@ -3,6 +3,8 @@
 
 #include <QtGui>
 #include <QWebView>
+#include <QMenu>
+#include <QSystemTrayIcon>
 #include "webactor.h"
 #include "bot.h"
 
@@ -16,6 +18,11 @@ class MainWindow : public QWidget
 protected:
     QCheckBox   *pAutomaton;
     QPushButton *pSaveNow;
+    QSystemTrayIcon *pTrayIcon;
+    QMenu           *pTrayMenu;
+    QAction         *pActionHide;
+    QAction         *pActionRestore;
+    QAction         *pActionQuit;
 
     QProgressBar *pLoadingProgress;
     QWebView    *pWebView;
@@ -27,6 +34,7 @@ protected:
     WebActor    *pActor;
 
     void createUI ();
+    void createTrayIcon();
     void setupWebView ();
     void setupConnections ();
 
@@ -53,6 +61,7 @@ public slots:
     void stopAutomaton();
 
 protected slots:
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void slotSetAutomatonState (int state);
     void slotLoadStarted ();
     void slotLoadProgress (int percent);

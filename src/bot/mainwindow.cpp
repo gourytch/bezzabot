@@ -1,6 +1,10 @@
 #include <iostream>
 #include <QRegExp>
 #include <QStringList>
+#include <QIcon>
+#include <QMenu>
+#include <QAction>
+#include <QSystemTrayIcon>
 #include "mainwindow.h"
 #include "tools/config.h"
 #include "bot.h"
@@ -69,9 +73,39 @@ void MainWindow::createUI ()
     pLoadingProgress->setVisible (false);
 
     setupWebView ();
+    createTrayIcon();
 
     log ("UI created");
 }
+
+void MainWindow::createTrayIcon() {
+    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+        QMessageBox::critical(0, QObject::tr("Systray"),
+            QObject::tr("I couldn't detect any system tray on this system."));
+        pTrayIcon = NULL;
+        return;
+    }
+    pTrayMenu = new QMenu(this);
+
+    pActionRestore = new QAction(tr("&Restore"), this);
+    connect (pActionRestore, SIGNAL(triggered()), this, SLOT(showNormal()));
+    pTrayMenu->addAction(pActionRestore);
+
+    pActionHide = new QAction(tr("&Hide"), this);
+    connect (pActionHide, SIGNAL(triggered()), this, SLOT(hide()));
+    pTrayMenu->addAction(pActionHide);
+
+    pActionQuit = new QAction(tr("&Quit"), this);
+    connect (pActionQuit, SIGNAL(triggered()), this, SLOT(quit()));
+    pTrayMenu->addAction(pActionQuit);
+
+
+    pTrayIcon = new QSystemTrayIcon(QIcon(":/icon.png"), this);
+    pTrayIcon->setContextMenu(pTrayMenu);
+
+    pTrayIcon->show();
+}
+
 
 void MainWindow::setupConnections () {
     connect (pAutomaton, SIGNAL (stateChanged (int)),
@@ -107,6 +141,9 @@ void MainWindow::log (const QString &text)
     dbg (QString("LOG: %1").arg(text));
     QString tss = QDateTime::currentDateTime().toString("hh:mm:ss");
     pLogView->append (tss + " " + text);
+    if (pTrayIcon) {
+        pTrayIcon->showMessage(tr("bezzabot"), text);
+    }
 }
 
 void MainWindow::dbg (const QString &text)
@@ -189,4 +226,18 @@ void MainWindow::slotLoadFinished(bool success)
     }
     dbg (tr ("bytes received: %1").arg (pWebView->page ()->bytesReceived ()));
     dbg (tr ("total bytes: %1").arg (pWebView->page ()->totalBytes ()));
+}
+
+void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
+     switch (reason) {
+     case QSystemTrayIcon::Trigger:
+         break;
+     case QSystemTrayIcon::DoubleClick:
+         QTimer::singleShot(0, this, SLOT(showNormal()));
+         break;
+     case QSystemTrayIcon::MiddleClick:
+         break;
+     default:
+         break;
+     }
 }

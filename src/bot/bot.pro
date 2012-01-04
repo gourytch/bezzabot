@@ -26,6 +26,9 @@ LIBS += -L$$TOP/lib -lparsers -ltools
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 DESTDIR = $$TOP/bin
 
+RESOURCES += \
+    bot.qrc
+
 
 
 
