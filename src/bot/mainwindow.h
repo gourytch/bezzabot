@@ -16,8 +16,7 @@ class MainWindow : public QWidget
     Q_OBJECT
 
 protected:
-    QCheckBox   *pAutomaton;
-    QPushButton *pSaveNow;
+    QCheckBox       *pAutomaton;
     QSystemTrayIcon *pTrayIcon;
     QMenu           *pTrayMenu;
     QAction         *pActionHide;
@@ -39,6 +38,9 @@ protected:
     void setupConnections ();
 
     static MainWindow * _instance;
+
+    virtual void closeEvent(QCloseEvent *);
+
 public:
     explicit MainWindow (QWidget *parent = 0);
     ~MainWindow ();
@@ -52,6 +54,8 @@ public:
         return _instance;
     }
 
+    virtual void setVisible(bool visible);
+
 public slots:
 
     void log (const QString& text);
@@ -62,6 +66,7 @@ public slots:
 
 protected slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
+    void messageClicked();
     void slotSetAutomatonState (int state);
     void slotLoadStarted ();
     void slotLoadProgress (int percent);

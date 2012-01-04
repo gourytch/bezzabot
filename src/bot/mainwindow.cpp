@@ -1,9 +1,11 @@
 #include <iostream>
 #include <QRegExp>
 #include <QStringList>
+#include <QApplication>
 #include <QIcon>
 #include <QMenu>
 #include <QAction>
+#include <QMessageBox>
 #include <QSystemTrayIcon>
 #include "mainwindow.h"
 #include "tools/config.h"
@@ -45,7 +47,6 @@ MainWindow::~MainWindow()
 void MainWindow::createUI ()
 {
     pAutomaton          = new QCheckBox (tr ("Automaton"));
-    pSaveNow            = new QPushButton (tr ("Save Page"));
 
     pLoadingProgress    = new QProgressBar ();
     pWebView            = new QWebView ();
@@ -56,7 +57,6 @@ void MainWindow::createUI ()
     pSplitter           = new QSplitter (Qt::Vertical);
 
     pControls->addWidget (pAutomaton);
-    pControls->addWidget (pSaveNow);
     pControls->addWidget (pLoadingProgress);
 
     pLayout->setMargin (10);
@@ -96,12 +96,16 @@ void MainWindow::createTrayIcon() {
     pTrayMenu->addAction(pActionHide);
 
     pActionQuit = new QAction(tr("&Quit"), this);
-    connect (pActionQuit, SIGNAL(triggered()), this, SLOT(quit()));
+    connect (pActionQuit, SIGNAL(triggered()), qApp, SLOT(quit()));
     pTrayMenu->addAction(pActionQuit);
-
 
     pTrayIcon = new QSystemTrayIcon(QIcon(":/icon.png"), this);
     pTrayIcon->setContextMenu(pTrayMenu);
+
+    connect (pTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+             this, SLOT(iconActivated(QSystemTrayIcon::ActivationReason)));
+
+    connect(pTrayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
 
     pTrayIcon->show();
 }
@@ -110,9 +114,6 @@ void MainWindow::createTrayIcon() {
 void MainWindow::setupConnections () {
     connect (pAutomaton, SIGNAL (stateChanged (int)),
              this, SLOT (slotSetAutomatonState (int)));
-
-    connect (pSaveNow, SIGNAL (clicked (bool)),
-             pActor, SLOT (savePage ()));
 
     connect (pWebView->page (), SIGNAL (loadStarted ()),
              this, SLOT (slotLoadStarted ()));
@@ -127,6 +128,23 @@ void MainWindow::setupConnections () {
 void MainWindow::setupWebView ()
 {
     pWebView->setPage (pActor->page ());
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (isVisible() && pTrayIcon && pTrayIcon->isVisible() ) {
+        hide();
+        event->ignore();
+        pTrayIcon->showMessage("bezzabot", tr("I am still hiding here"));
+    }
+}
+
+void MainWindow::setVisible(bool visible) {
+    if (pTrayIcon) {
+        pActionHide->setEnabled(visible);
+        pActionRestore->setEnabled(!visible);
+    }
+    QWidget::setVisible(visible);
 }
 
 
@@ -233,11 +251,24 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
      case QSystemTrayIcon::Trigger:
          break;
      case QSystemTrayIcon::DoubleClick:
-         QTimer::singleShot(0, this, SLOT(showNormal()));
+         if (isVisible()) {
+             hide();
+         } else {
+             showNormal();
+         }
          break;
      case QSystemTrayIcon::MiddleClick:
          break;
      default:
          break;
      }
+}
+
+void MainWindow::messageClicked() {
+    if (!isVisible()) {
+        setVisible(true);
+    }
+    if (!isActiveWindow()) {
+        activateWindow();
+    }
 }
