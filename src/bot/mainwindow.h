@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QtGui>
+#include <QIcon>
 #include <QWebView>
 #include <QMenu>
 #include <QSystemTrayIcon>
@@ -16,19 +17,30 @@ class MainWindow : public QWidget
     Q_OBJECT
 
 protected:
-    QCheckBox       *pAutomaton;
+    QIcon           imgAppIcon;
+    QIcon           imgButtonOff;
+    QIcon           imgButtonOn;
+
     QSystemTrayIcon *pTrayIcon;
     QMenu           *pTrayMenu;
     QAction         *pActionHide;
     QAction         *pActionRestore;
     QAction         *pActionQuit;
+    QAction         *pActionStart;
+    QAction         *pActionStop;
 
-    QProgressBar *pLoadingProgress;
-    QWebView    *pWebView;
-    QTextEdit   *pLogView;
-    QHBoxLayout *pControls;
-    QVBoxLayout *pLayout;
-    QSplitter   *pSplitter;
+    QWebView        *pWebView;
+    QTextEdit       *pLogView;
+
+    //QToolBar        *pToolBar;
+    QPushButton     *pAutomaton;
+    QProgressBar    *pLoadingProgress;
+
+    QVBoxLayout     *pLayout;
+    QHBoxLayout     *pBottom;
+    QVBoxLayout     *pControls;
+    QSplitter       *pSplitter;
+
     Bot         *pBot;
     WebActor    *pActor;
 
@@ -67,7 +79,7 @@ public slots:
 protected slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void messageClicked();
-    void slotSetAutomatonState (int state);
+    void automatonToggled (bool checked);
     void slotLoadStarted ();
     void slotLoadProgress (int percent);
     void slotLoadFinished (bool success);

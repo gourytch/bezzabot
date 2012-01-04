@@ -46,31 +46,58 @@ MainWindow::~MainWindow()
 
 void MainWindow::createUI ()
 {
-    pAutomaton          = new QCheckBox (tr ("Automaton"));
+    imgAppIcon      = QIcon(":/icon.png");
+    imgButtonOff    = QIcon(":/button_off.png");
+    imgButtonOn     = QIcon(":/button_on.png");
+
+    setWindowIcon(imgAppIcon);
+
+    pAutomaton          = new QPushButton ();
+    pAutomaton->setIcon(imgButtonOff);
+    pAutomaton->setCheckable(true);
+    pAutomaton->setFlat(false);
+//    pAutomaton->setIconSize(QSize(22, 22));
 
     pLoadingProgress    = new QProgressBar ();
-    pWebView            = new QWebView ();
-    pLogView            = new QTextEdit ();
+    pLoadingProgress->setOrientation(Qt::Vertical);
 
-    pControls           = new QHBoxLayout ();
-    pLayout             = new QVBoxLayout ();
-    pSplitter           = new QSplitter (Qt::Vertical);
-
+    pControls           = new QVBoxLayout ();
     pControls->addWidget (pAutomaton);
     pControls->addWidget (pLoadingProgress);
+    pControls->setSizeConstraint(QLayout::SetFixedSize);
 
+    pLogView            = new QTextEdit ();
+
+    pBottom             = new QHBoxLayout ();
+    pBottom->addLayout (pControls);
+    pBottom->addWidget (pLogView); // ?
+    pBottom->setSizeConstraint(QLayout::SetFixedSize);
+
+    pWebView            = new QWebView ();
+    pWebView->setMinimumWidth(1097);
+
+    pLayout             = new QVBoxLayout ();
     pLayout->setMargin (10);
     pLayout->setSpacing (10);
+    pLayout->addWidget(pWebView);
+    pLayout->addLayout(pBottom);
+    pLayout->setStretchFactor(pWebView, 100);
+    pLayout->setStretchFactor(pBottom, 1);
 
-    pLayout->addLayout (pControls);
-//    pLayout->addWidget (pWebView);
-//    pLayout->addWidget (pLogView);
+/*
+    pSplitter           = new QSplitter (Qt::Vertical);
+    pSplitter->setOpaqueResize(false);
+
     pSplitter->addWidget (pWebView);
     pSplitter->addWidget (pLogView);
     pLayout->addWidget (pSplitter);
+*/
+
     this->setLayout (pLayout);
 
-    pLoadingProgress->setVisible (false);
+//    pLoadingProgress->setVisible (false);
+    pLoadingProgress->setVisible (true);
+    pLoadingProgress->setEnabled (false);
 
     setupWebView ();
     createTrayIcon();
@@ -99,7 +126,7 @@ void MainWindow::createTrayIcon() {
     connect (pActionQuit, SIGNAL(triggered()), qApp, SLOT(quit()));
     pTrayMenu->addAction(pActionQuit);
 
-    pTrayIcon = new QSystemTrayIcon(QIcon(":/icon.png"), this);
+    pTrayIcon = new QSystemTrayIcon(imgAppIcon, this);
     pTrayIcon->setContextMenu(pTrayMenu);
 
     connect (pTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
@@ -112,8 +139,7 @@ void MainWindow::createTrayIcon() {
 
 
 void MainWindow::setupConnections () {
-    connect (pAutomaton, SIGNAL (stateChanged (int)),
-             this, SLOT (slotSetAutomatonState (int)));
+    connect (pAutomaton, SIGNAL(toggled(bool)), this, SLOT(automatonToggled(bool)));
 
     connect (pWebView->page (), SIGNAL (loadStarted ()),
              this, SLOT (slotLoadStarted ()));
@@ -171,27 +197,19 @@ void MainWindow::dbg (const QString &text)
 }
 
 
-void MainWindow::slotSetAutomatonState (int state)
-{
-    qDebug() << tr("Set Automaton State to %1").arg(state);
-    switch (state)
-    {
-    case Qt::Unchecked:
-        log ("automaton disabled");
-        if (pBot->isStarted()) {
-            QTimer::singleShot(0, pBot, SIGNAL (stop()));
-        }
-        break;
-
-    case Qt::Checked:
-        log ("automaton enabled");
+void MainWindow::automatonToggled (bool checked) {
+    if (checked) {
+        dbg ("automaton enabled");
         if (!pBot->isStarted()) {
             QTimer::singleShot(0, pBot, SIGNAL (start()));
         }
-        break;
-    default:
-        log ("automaton undefined");
-        break;
+        pAutomaton->setIcon(imgButtonOn);
+    } else {
+        dbg ("automaton disabled");
+        if (pBot->isStarted()) {
+            QTimer::singleShot(0, pBot, SIGNAL (stop()));
+        }
+        pAutomaton->setIcon(imgButtonOff);
     }
 }
 
@@ -216,7 +234,9 @@ void MainWindow::stopAutomaton()
 void MainWindow::slotLoadStarted ()
 {
     pLoadingProgress->setValue (0);
-    pLoadingProgress->setVisible(true);
+//  pLoadingProgress->setVisible(true);
+    pLoadingProgress->setEnabled(true);
+
     QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
     dbg ("loading " + urlstr);
     setWindowTitle(tr ("bot %1: start loading %2").arg(pBot->id(), urlstr));
@@ -230,7 +250,8 @@ void MainWindow::slotLoadProgress (int percent)
 
 void MainWindow::slotLoadFinished(bool success)
 {
-    pLoadingProgress->setVisible (false);
+//    pLoadingProgress->setVisible (false);
+    pLoadingProgress->setEnabled(false);
     QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
     if (success)
     {
