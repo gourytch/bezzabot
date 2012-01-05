@@ -18,7 +18,6 @@ public:
 
 protected:
     QWebElement submit;
-    QTimer      submitTimer;
 
 public:
     Page_Generic (QWebElement& doc);

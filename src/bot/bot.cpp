@@ -132,6 +132,10 @@ void Bot::delayedGoTo() {
 //////// slots /////////////////////////////////////////////////////////
 void Bot::onPageStarted() {
     cancelAuto();
+    if (_page) {
+        delete _page;
+        _page = NULL;
+    }
 }
 
 void Bot::onPageFinished (bool ok)

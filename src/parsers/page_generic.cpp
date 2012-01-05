@@ -15,8 +15,7 @@
 
 Page_Generic::Page_Generic (QWebElement &doc) :
     QObject(),
-    document(doc),
-    submitTimer()
+    document(doc)
 {
     pagekind = page_Generic;
 }
@@ -36,7 +35,7 @@ QString Page_Generic::toString (const QString& pfx) const
 bool Page_Generic::fit(const QWebElement& doc) {
     qDebug() << "* CHECK Page_Generic";
     qDebug() << "Page_Generic always fits";
-    return true;
+    return !doc.isNull();
 }
 
 void Page_Generic::js(const QString& script) {
