@@ -76,6 +76,12 @@ protected:
     QDateTime   atime;
     Sequence    sequence;
 
+    QTimer      *_autoTimer;
+    QString     _linkToGo;
+
+    void cancelAuto(bool ok = false);
+    void GoTo(const QString& link=QString(), bool instant=false);
+
     int _mineshop_last_buying_position;
 
 protected:
@@ -92,6 +98,8 @@ protected:
     virtual void handle_Page_Game_Mine_Open ();
 
     virtual void handle_Page_Game_Farm ();
+
+    virtual void handle_Page_Game_Pier ();
 
     virtual void one_step ();
 
@@ -135,9 +143,15 @@ signals:
 
     void rq_post (const QUrl& url, const QStringList& params);
 
+private slots:
+
+    void delayedGoTo();
+
 public slots:
 
     void configure();
+
+    void onPageStarted();
 
     void onPageFinished (bool ok);
 

@@ -55,7 +55,7 @@ void Bot::handle_Page_Game_Mine_Open () {
             _mineshop_last_buying_position = -1;
         }
 
-        if (p->num_pickaxes > 0 || p->num_pickaxesPro > 0 && p->hp_cur >= 25) {
+        if (p->hp_cur >= 25 && (p->num_pickaxes > 0 || p->num_pickaxesPro > 0)) {
             emit log(u8("можно закопаться в шахту"));
             if (p->doStart()) {
                 _awaiting = true;
@@ -65,7 +65,7 @@ void Bot::handle_Page_Game_Mine_Open () {
             }
         } else {
             emit log(u8("нет кирки - копать не станем"));
-            request_get(QUrl(_baseurl + "index.php"));
+            GoTo();
         }
         return;
     }

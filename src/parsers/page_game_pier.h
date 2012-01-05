@@ -25,6 +25,8 @@ public:
     int num_steamers;
     int raid_capacity;
 
+    PageTimer timeleft;
+    bool canSend;
 
     Page_Game_Pier (QWebElement& doc);
 

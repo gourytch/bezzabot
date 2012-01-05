@@ -12,7 +12,8 @@ SOURCES += main.cpp\
         botthread.cpp \
     bot_handle_Page_Game_Dozor_Entrance.cpp \
     bot_handle_Page_Game_Mine_Open.cpp \
-    farmersgroupsprices.cpp
+    farmersgroupsprices.cpp \
+    bot_handle_Page_Game_Pier.cpp
 
 HEADERS  += mainwindow.h \
             bot.h \
@@ -28,6 +29,7 @@ DESTDIR = $$TOP/bin
 
 RESOURCES += \
     bot.qrc
+
 
 
 

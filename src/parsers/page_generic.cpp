@@ -15,7 +15,8 @@
 
 Page_Generic::Page_Generic (QWebElement &doc) :
     QObject(),
-    document(doc)
+    document(doc),
+    submitTimer()
 {
     pagekind = page_Generic;
 }

@@ -18,6 +18,7 @@ Page_Game_Pier::Page_Game_Pier (QWebElement& doc) :
     num_boats   = -1;
     num_ships   = -1;
     num_steamers= -1;
+
     for (int cnt = 0; cnt < c.count(); ++cnt) {
 //        qDebug () << QString("TD[%1] ={%2}").arg(cnt).arg();
         rx = QRegExp(u8("(.*)Кол-во:\\s+(\\d+)"));
@@ -36,11 +37,13 @@ Page_Game_Pier::Page_Game_Pier (QWebElement& doc) :
             }
         }
     }
+    canSend = false;
     c = body.findAll("FORM");
     foreach (QWebElement e, c) {
         QString do_cmd = e.findFirst("INPUT[name=do_cmd]").attribute("value");
         if (do_cmd == "send") { // форма отправления кораблика
             _formSend = e;
+            canSend = true;
         } else if (do_cmd == "buy_auto"){ // форма отправления управляющего
             _formBuyAuto = e;
         } else if (do_cmd == "set_post"){ // форма выключения отчётов
@@ -61,7 +64,10 @@ Page_Game_Pier::Page_Game_Pier (QWebElement& doc) :
             }
         }
     }
-
+    if (!canSend) {
+        parseTimerSpan(body.findFirst("SPAN[id=counter_1"),
+                       &timeleft.pit, &timeleft.hms);
+    }
 }
 
 QString Page_Game_Pier::toString (const QString& pfx) const {
@@ -71,7 +77,8 @@ QString Page_Game_Pier::toString (const QString& pfx) const {
             pfx + QString ("num_boats    : %1\n").arg(num_boats) +
             pfx + QString ("num_ships    : %1\n").arg(num_ships) +
             pfx + QString ("num_steamers : %1\n").arg(num_steamers) +
-            pfx + (_formSend.isNull() ? "can not send fishboat" : "can send fisboat") + "\n" +
+            pfx + (canSend ? "can send fishboat" : "can't send fisboat") + "\n" +
+            pfx + QString ("timeleft     : %1\n").arg(timeleft.toString()) +
             pfx + "}";
 }
 
@@ -91,7 +98,7 @@ bool Page_Game_Pier::doSend() {
         qDebug() << "no _formSend";
         return false;
     }
-    submit = _formSend.findFirst("INPUT[type=submit");
+    submit = _formSend.findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
         qDebug() << "no submit input";
         return false;

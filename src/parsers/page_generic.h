@@ -5,19 +5,22 @@
 #include <QVariant>
 #include <QWebPage>
 #include <QWebFrame>
+#include <QTimer>
 #include "types.h"
 
 
 class Page_Generic : public QObject
 {
     Q_OBJECT
-protected:
-    QWebElement submit;
-
 public:
     PageKind        pagekind;
     QWebElement     document;
 
+protected:
+    QWebElement submit;
+    QTimer      submitTimer;
+
+public:
     Page_Generic (QWebElement& doc);
     virtual ~Page_Generic ();
 
@@ -37,6 +40,7 @@ public:
     void pressSubmit (int delay_min = 500, int delay_max = 5000);
 
 protected slots:
+
     void slot_submit();
 
 };

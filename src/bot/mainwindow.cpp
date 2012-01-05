@@ -34,6 +34,9 @@ MainWindow::MainWindow (QWidget *parent) :
     }
     pBot = new Bot (id,  this);
     pActor = pBot->actor ();
+    hide_in_tray_on_close   = cfg.get("ui/hide_on_close", false, false).toBool();
+    toggle_on_tray_click    = cfg.get("ui/tray_toggle", false, true).toBool();
+    balloon_ttl             = cfg.get("ui/balloon_ttl", false, 3000).toInt();
 
     createUI ();
     setupConnections();
@@ -102,7 +105,7 @@ void MainWindow::createUI ()
     setupWebView ();
     createTrayIcon();
 
-    log ("UI created");
+    dbg("UI created");
 }
 
 void MainWindow::createTrayIcon() {
@@ -158,7 +161,10 @@ void MainWindow::setupWebView ()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (isVisible() && pTrayIcon && pTrayIcon->isVisible() ) {
+    if (hide_in_tray_on_close &&
+            isVisible() &&
+            pTrayIcon &&
+            pTrayIcon->isVisible() ) {
         hide();
         event->ignore();
         pTrayIcon->showMessage("bezzabot", tr("I am still hiding here"));
@@ -186,7 +192,8 @@ void MainWindow::log (const QString &text)
     QString tss = QDateTime::currentDateTime().toString("hh:mm:ss");
     pLogView->append (tss + " " + text);
     if (pTrayIcon) {
-        pTrayIcon->showMessage(tr("bezzabot"), text);
+        pTrayIcon->showMessage(tr("bezzabot"), text,
+                               QSystemTrayIcon::NoIcon, balloon_ttl);
     }
 }
 
@@ -270,12 +277,23 @@ void MainWindow::slotLoadFinished(bool success)
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
      switch (reason) {
      case QSystemTrayIcon::Trigger:
+         if (toggle_on_tray_click) {
+             if (!isVisible()) {
+                 show();
+                 if (!isActiveWindow()) {
+                    activateWindow();
+                 }
+             } else {
+                 hide();
+             }
+         }
          break;
      case QSystemTrayIcon::DoubleClick:
          if (isVisible()) {
              hide();
          } else {
-             showNormal();
+             setVisible(true);
+//             showNormal();
          }
          break;
      case QSystemTrayIcon::MiddleClick:

@@ -10,7 +10,7 @@ void Bot::handle_Page_Game_Dozor_Entrance () {
     if (p->dozor_left10 == 0) {
         emit log(u8("у нас нет дозорного времени"));
         _kd_Dozor = nextDay();
-        request_get(QUrl(_baseurl + "index.php"));
+        GoTo("mine.php?a=open");
         return;
     }
     if (p->gold < p->dozor_price) {
@@ -22,7 +22,7 @@ void Bot::handle_Page_Game_Dozor_Entrance () {
     emit log(u8("попробуем сходить в дозор на десять минуток"));
     if (!p->doDozor(1)) {
         emit log(u8("не вышло :("));
-        request_get(QUrl(_baseurl + "index.php"));
+        GoTo("mine.php?a=open");
     } else {
         _awaiting = true;
     }

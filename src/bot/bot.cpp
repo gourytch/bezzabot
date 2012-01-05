@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QDir>
+#include <iostream>
 #include "mainwindow.h"
 #include "bot.h"
 #include "webactor.h"
@@ -9,8 +10,11 @@
 #include "tools/tools.h"
 #include "parsers/all_pages.h"
 
+using namespace std;
+
 Bot::Bot(const QString& id, QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    _autoTimer(NULL)
 {
     _id = id;
     _config = new Config (this, _id);
@@ -30,6 +34,9 @@ Bot::Bot(const QString& id, QObject *parent) :
     _actor->page()->networkAccessManager ()->setCookieJar (_cookies);
 
     MainWindow *wnd = MainWindow::getInstance();
+
+    connect (_actor->page(), SIGNAL(loadStarted()),
+             this, SLOT(onPageStarted()));
 
     connect (_actor->page (), SIGNAL (loadFinished (bool)),
              this, SLOT (onPageFinished (bool)));
@@ -91,7 +98,41 @@ void Bot::request_post (const QUrl& url, const QStringList& params) {
     emit rq_post(url, params);
 }
 
+void Bot::cancelAuto(bool ok) {
+    if (!_autoTimer) return;
+    if (_autoTimer->isActive()) {
+        _autoTimer->stop();
+        if (ok) {
+            clog << "stop autotimer" << endl;
+        } else {
+            clog << "abort autotimer" << endl;
+        }
+    }
+    delete _autoTimer;
+    _autoTimer = NULL;
+}
+
+void Bot::GoTo(const QString& link, bool instant) {
+    cancelAuto();
+    _awaiting = true;
+    _linkToGo = link.isNull() ? _baseurl : _baseurl + link;
+    _autoTimer = new QTimer();
+    _autoTimer->setSingleShot(true);
+    int ms = instant ? 0 : 500 + (qrand() % 10000);
+    clog << "set up goto timer at " << ms << " ms." << endl;
+    connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
+    _autoTimer->start(ms);
+}
+
+void Bot::delayedGoTo() {
+    cancelAuto();
+    request_get(QUrl(_linkToGo));
+}
+
 //////// slots /////////////////////////////////////////////////////////
+void Bot::onPageStarted() {
+    cancelAuto();
+}
 
 void Bot::onPageFinished (bool ok)
 {
@@ -128,6 +169,9 @@ void Bot::onPageFinished (bool ok)
     case page_Game_Mine_Open:
         handle_Page_Game_Mine_Open();
         break;
+    case page_Game_Pier:
+        handle_Page_Game_Pier();
+        break;
     case page_Game:
         handle_Page_Game_Generic();
         break;
@@ -160,6 +204,7 @@ void Bot::start() {
 }
 
 void Bot::stop() {
+    cancelAuto();
     if (!isConfigured()) {
         emit dbg(tr("bot is not configured properly"));
         return;
@@ -215,20 +260,19 @@ void Bot::one_step () {
         return;
     }
     QDateTime ts = QDateTime::currentDateTime();
-    /*
-    if (level > 6) {
+    if (level >= 5) {
         if (_kd_Fishing.isNull() || _kd_Fishing < ts) {
             emit log (u8("пойду-ка на рыбалку."));
-            request_get(QUrl(_baseurl + "harbour.php?a=pier"));
+            GoTo("harbour.php?a=pier");
             _awaiting = true;
             return;
         }
-    */
+    }
     if (p->hasNoJob()) {
         //придумаем себе какое-нибудь занятие
         if ((_kd_Dozor.isNull() || _kd_Dozor < ts) && (hp_cur >= 25)) {
             emit log (u8("пойду-ка в дозор."));
-            request_get(QUrl(_baseurl + "dozor.php"));
+            GoTo("dozor.php");
             return;
         }
     }
@@ -239,7 +283,7 @@ void Bot::one_step () {
     QUrl url = QUrl(_baseurl + jobUrl);
     if (_actor->page()->mainFrame ()->url() != url) {
         emit log (u8("надо доделать работу. {") + url.toString() + u8("}"));
-        request_get(url);
+        GoTo(jobUrl);
     }
     return;
 
