@@ -44,6 +44,9 @@ MainWindow::MainWindow (QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    if (pTrayIcon) {
+        pTrayIcon->hide();
+    }
 }
 
 
@@ -138,6 +141,7 @@ void MainWindow::createTrayIcon() {
     connect(pTrayIcon, SIGNAL(messageClicked()), this, SLOT(messageClicked()));
 
     pTrayIcon->show();
+    pTrayIcon->setToolTip(pBot->id());
 }
 
 
@@ -192,7 +196,7 @@ void MainWindow::log (const QString &text)
     QString tss = QDateTime::currentDateTime().toString("hh:mm:ss");
     pLogView->append (tss + " " + text);
     if (pTrayIcon) {
-        pTrayIcon->showMessage(tr("bezzabot"), text,
+        pTrayIcon->showMessage(pBot->id(), text,
                                QSystemTrayIcon::NoIcon, balloon_ttl);
     }
 }

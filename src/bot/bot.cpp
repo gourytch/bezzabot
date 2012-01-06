@@ -178,6 +178,9 @@ void Bot::onPageFinished (bool ok)
     case page_Game_Pier:
         handle_Page_Game_Pier();
         break;
+    case page_Game_Farm:
+        handle_Page_Game_Farm();
+        break;
     case page_Game:
         handle_Page_Game_Generic();
         break;
@@ -278,6 +281,10 @@ void Bot::one_step () {
             GoTo("dozor.php");
             return;
         }
+        if (gold < 1000 || hp_cur < 25) {
+            emit log (u8("пойду за деньгами на ферму."));
+            GoTo("farm.php");
+        }
     }
     QString jobUrl = p->jobLink(true, 10);
     if (jobUrl.isNull()) {
@@ -326,12 +333,6 @@ void Bot::handle_Page_Game_Index () {
     emit dbg(tr("hangle index game page"));
     Page_Game_Index *p = static_cast<Page_Game_Index*>(_page);
     level = p->level;
-}
-
-void Bot::handle_Page_Game_Farm () {
-    handle_Page_Game_Generic();
-    emit dbg(tr("hangle farm game page"));
-    //Page_Game_Farm *p = static_cast<Page_Game_Farm*>(_page);
 }
 
 /////////// actions /////////////////////////////////////////////////////////

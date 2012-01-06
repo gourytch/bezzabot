@@ -13,7 +13,8 @@ SOURCES += main.cpp\
     bot_handle_Page_Game_Dozor_Entrance.cpp \
     bot_handle_Page_Game_Mine_Open.cpp \
     farmersgroupsprices.cpp \
-    bot_handle_Page_Game_Pier.cpp
+    bot_handle_Page_Game_Pier.cpp \
+    bot_handle_Page_Game_Farm.cpp
 
 HEADERS  += mainwindow.h \
             bot.h \
