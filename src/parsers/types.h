@@ -5,6 +5,7 @@
 #include <QString>
 #include <QDateTime>
 #include <QWebElement>
+#include <QMap>
 
 enum PageKind {
     page_Generic,
@@ -60,42 +61,6 @@ enum PageKind {
     page_Game_Search,
     page_Game_News
 };
-
-
-
-struct PageTimer
-{
-    QString     title;
-    QString     href;
-    QDateTime   pit;
-    int         hms;
-
-    PageTimer() {hms = -1;}
-    PageTimer(const QWebElement& e) {assign(e);}
-
-    const PageTimer& operator= (const PageTimer &v);
-    void assign (const QWebElement &e);
-    QString toString () const;
-};
-
-
-struct PageTimers
-{
-    QVector<PageTimer> timers;
-
-    void assign (const QWebElement &doc);
-
-    void add (const PageTimer& t) { timers.append(t); }
-
-    void add (const QWebElement &e) { add(PageTimer(e)); }
-
-    bool empty () const;
-    int count () const;
-    const PageTimer& operator [] (int ix) const;
-    QString toString (const QString& pfx=QString ()) const;
-};
-
-extern bool parseTimerSpan (const QWebElement& e, QDateTime *pit=0, int *hms=0);
 
 extern int dottedInt (const QString& s);
 

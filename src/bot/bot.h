@@ -12,25 +12,35 @@
 #include "tools/persistentcookiejar.h"
 #include "tools/config.h"
 
+enum WorkType { // работа (то, что не может выполняться параллельно
+    Work_None,
+    Work_Watching,
+    Work_Farming,
+    Work_Mining,
+    Work_Training
+};
+
+QString toString(WorkType v);
+
+enum ActionType { // выполняемое действие (параллельно выполнимое)
+    Action_None,            // нет никакого
+    Action_Fishing,         // рыбалка
+    Action_MineShopping,    // закупаем шахтёрский инвентарь
+    Action_Smithing,        // улушение в кузнице
+    Action_Gambling,        // играем в казино
+    Action_Healing          // лечимся
+};
+
+QString toString(ActionType v);
 
 class Bot : public QObject
 {
     Q_OBJECT
 
 public:
-    enum State
-    {
-        Bot_Udefined,
-        Bot_Not_Logged,
-        Bot_Logged,
-        Bot_Awaiting
-    };
+    WorkType currentWork;
 
-    enum Sequence
-    {
-        Sequence_Login,
-        Sequence_Undefined
-    };
+    ActionType currentAction;
 
 protected:
     QString             _id;
@@ -74,10 +84,10 @@ protected:
     int         hp_max;
     int         hp_spd;
     QDateTime   atime;
-    Sequence    sequence;
 
     QTimer      *_autoTimer;
     QString     _linkToGo;
+    QString     _prevLink;
 
     void cancelAuto(bool ok = false);
     void GoTo(const QString& link=QString(), bool instant=false);
@@ -85,6 +95,7 @@ protected:
     int _mineshop_last_buying_position;
 
 protected:
+
     virtual void handle_Page_Generic ();
 
     virtual void handle_Page_Login ();
@@ -103,6 +114,7 @@ protected:
 
     virtual void one_step ();
 
+
 public:
 
     explicit Bot (const QString& id, QObject *parent = 0);
@@ -118,6 +130,10 @@ public:
     bool action_login ();
 
     bool action_look ();
+
+    bool action_fishing();
+
+    bool action_buy_health();
 
     bool isConfigured () const { return _good;  }
 
@@ -162,5 +178,6 @@ public slots:
     void step ();
 
 };
+
 
 #endif // BOT_H

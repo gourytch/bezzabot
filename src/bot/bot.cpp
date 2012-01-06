@@ -63,6 +63,8 @@ Bot::Bot(const QString& id, QObject *parent) :
     _awaiting = false;
     _step_counter = 0;
     _step_timer.setInterval (1000);
+    currentAction = Action_None;
+    currentWork = Work_None;
 
     connect (&_step_timer, SIGNAL (timeout()),
              this, SLOT (step()));
@@ -264,14 +266,11 @@ void Bot::one_step () {
         return;
     }
     QDateTime ts = QDateTime::currentDateTime();
-    if (level >= 5) {
-        if (_kd_Fishing.isNull() || _kd_Fishing < ts) {
-            emit log (u8("пойду-ка на рыбалку."));
-            GoTo("harbour.php?a=pier");
-            _awaiting = true;
-            return;
-        }
+
+    if (action_fishing()) {
+        return;
     }
+
     if (p->hasNoJob()) {
         //придумаем себе какое-нибудь занятие
         if ((_kd_Dozor.isNull() || _kd_Dozor < ts) && (hp_cur >= 25)) {
@@ -357,6 +356,64 @@ bool Bot::action_look () {
     return true;
 }
 
+bool Bot::action_fishing() {
+    if (currentAction != Action_None) {
+//        emit dbg (u8("fisherman not activated: currentAction=%1")
+//                  .arg(::toString(currentAction)));
+        return false;
+    }
+    if (level < 5) {
+        return false;
+    }
+    if (_page == NULL) return false;
+    Page_Game *p = dynamic_cast<Page_Game*>(_page);
+    if (!p) return false;
+
+    const PageTimer *t =
+            p->timers.byTitle(u8("Время до возвращения судна с пирашками"));
+    if (_kd_Fishing.isNull() && t != NULL && !t->pit.isNull()) {
+        emit dbg (u8("pit = %1").arg(t->pit.toString("yyyy-MM-dd hh:mm:ss")));
+        int add = 300 + (qrand() % 300);
+        _kd_Fishing = t->pit.addSecs(add);
+        emit dbg (u8(" assign _kd_Fishing to %1")
+                  .arg(_kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
+    }
+
+    QDateTime now = QDateTime::currentDateTime();
+    if (!_kd_Fishing.isNull() && (now < _kd_Fishing)) {
+//        emit dbg (u8("now (%1) < _kd_Fishing (%2)")
+//                  .arg(now.toString("yyyy-MM-dd hh:mm:ss"),
+//                       _kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
+        return false;
+    }
+    if (_kd_Fishing.isNull()) {
+        emit dbg (u8("_kd_Fishing is null"));
+    } else {
+        emit dbg (u8("_kd_Fishing (%1) < now (%2)")
+                  .arg(_kd_Fishing.toString("yyyy-MM-dd hh:mm:ss"),
+                       now.toString("yyyy-MM-dd hh:mm:ss")));
+    }
+
+    if (p->resources.contains(39)) { // i39
+        int count = p->resources.value(39).count;
+        if (count == 0) {
+            emit dbg (u8("на сегодня заплывов не осталось"));
+            return false;
+        }
+        emit dbg (u8("осталось %1 походов").arg(count));
+    } else {
+        emit dbg (u8("счётчик заплывов не найден"));
+        _kd_Fishing = nextDay();
+        emit dbg (u8(" assign _kd_Fishing to %1")
+                  .arg(_kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
+        return false;
+    }
+    currentAction = Action_Fishing;
+    emit dbg (u8("Action_Fishing started"));
+    GoTo("harbour.php?a=pier");
+    return true;
+}
+
 /////////// misc /////////////////////////////////////////////////////////
 
 void Bot::configure() {
@@ -397,4 +454,27 @@ void Bot::configure() {
     _digcoulomb = _config->get("miner/coulomb", false, "").toString();
 
     qDebug() << "configure result: " << _good;
+}
+
+QString toString(WorkType v) {
+    switch (v) {
+    case Work_None: return "Work_None";
+    case Work_Watching: return "Work_Watching";
+    case Work_Farming: return "Work_Farming";
+    case Work_Mining: return "Work_Mining";
+    case Work_Training: return "Work_Training";
+    }
+    return "?";
+}
+
+QString toString(ActionType v) {
+    switch (v) {
+    case Action_None: return "Action_None";
+    case Action_Fishing: return "Action_Fishing";
+    case Action_MineShopping: return "Action_MineShopping";
+    case Action_Smithing: return "Action_Smithing";
+    case Action_Gambling: return "Action_Gambling";
+    case Action_Healing: return "Action_Healing";
+    }
+    return "?";
 }

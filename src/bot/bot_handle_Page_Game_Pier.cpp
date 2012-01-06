@@ -12,15 +12,23 @@ void Bot::handle_Page_Game_Pier () {
         emit log(u8("засылаем пирашколовецкое плавсредство"));
         if (p->doSend()) {
             _awaiting = true;
-            _kd_Fishing = QDateTime::currentDateTime().addSecs(3666 + qrand() % 300);
-            return;
+            _kd_Fishing = QDateTime::currentDateTime()
+                    .addSecs(3666 + (qrand() % 300));
         } else {
             emit log(u8("что-то не срослось"));
-            _kd_Fishing = QDateTime::currentDateTime().addSecs(300 + qrand() % 300);
+            _kd_Fishing = QDateTime::currentDateTime()
+                    .addSecs(300 + (qrand() % 300));
             GoTo("mine.php?a=open");
         }
     } else {
-        _kd_Fishing = QDateTime::currentDateTime().addSecs(300 + qrand() % 300);
+        _kd_Fishing = QDateTime::currentDateTime()
+                .addSecs(300 + (qrand() % 300));
         GoTo("mine.php?a=open");
+    }
+    emit dbg(QString("_kd_Fishing sets to %1")
+             .arg(_kd_Fishing.toString("hh:mm:ss")));
+    if (currentAction == Action_Fishing) {
+        currentAction = Action_None;
+        emit dbg(u8("Action_Fishing finished"));
     }
 }

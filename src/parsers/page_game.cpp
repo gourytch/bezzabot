@@ -2,8 +2,148 @@
 #include <QWebElementCollection>
 #include <QString>
 #include <QDebug>
+#include <QMap>
+#include <QMapIterator>
 #include "tools/tools.h"
 #include "page_game.h"
+
+
+bool parseTimerSpan (const QWebElement& e, QDateTime *pit, int *hms)
+{
+    if (pit)
+    {
+        *pit = QDateTime ();
+    }
+
+    if (hms)
+    {
+        *hms = -1;
+    }
+
+    if (e.tagName () != "SPAN" ||
+//        e.attribute ("class") != "js_timer" ||
+        e.attribute ("timer").isNull())
+    {
+        return false;
+    }
+
+    QString tstr = e.attribute ("timer");
+
+    QRegExp rx ("^(\\d*)\\|(\\d*)");
+    if (rx.indexIn (tstr) == -1)
+    {
+        return false;
+    }
+    QString pitStr = rx.cap (1);
+    if (pitStr.isEmpty()) {
+        pitStr = "0";
+    }
+    bool ok;
+    int pitInt = pitStr.toInt (&ok);
+    if (ok)
+    {
+        if (pitInt == 0) {
+            *pit = QDateTime(); // NULL TIME
+        } else {
+            pit->setTime_t (pitInt);
+        }
+    }
+    tstr = e.toInnerXml(); //.firstChild ().toPlainText ();
+    rx.setPattern ("(\\d+):(\\d\\d):(\\d\\d):(\\d\\d)");
+    if (rx.indexIn (tstr) != -1)
+    {
+        QString d = rx.cap (1);
+        QString h = rx.cap (2);
+        QString m = rx.cap (3);
+        QString s = rx.cap (4);
+        if (hms)
+        {
+            *hms = s.toInt () +
+                    m.toInt () * 60 +
+                    h.toInt () * 3600 +
+                    d.toInt() * 86400;
+        }
+    }
+    else
+    {
+        rx.setPattern ("(\\d\\d):(\\d\\d):(\\d\\d)");
+        if (rx.indexIn (tstr) == -1)
+        {
+            return false;
+        }
+        QString h = rx.cap (1);
+        QString m = rx.cap (2);
+        QString s = rx.cap (3);
+        if (hms)
+        {
+            *hms = s.toInt () + m.toInt () * 60 + h.toInt () * 3600;
+        }
+    }
+    return true;
+}
+
+
+
+QString PageTimer::toString () const
+{
+    return QString("Timer {pit=%1, hms=%2, href={%3}, title={%4}}")
+            .arg(pit.toString ("yyyy-MM-dd HH:mm:ss"),
+                 QString::number(hms), href, title);
+}
+
+
+const PageTimer& PageTimer::operator= (const PageTimer &v)
+{
+    title   = v.title;
+    href    = v.href;
+    pit     = v.pit;
+    hms     = v.hms;
+    return *this;
+}
+
+
+void PageTimer::assign (const QWebElement &e)
+{
+    if (e.tagName () == "A" && e.attribute ("class") == "timer link")
+    {
+        title = "?";
+        href = e.attribute ("href");
+        parseTimerSpan (e.findFirst ("SPAN"), &pit, &hms);
+    }
+    else if (e.tagName() == "LI")
+    {
+        title = e.attribute("title");
+        href = e.findFirst("A").attribute("href");
+        parseTimerSpan (e.findFirst ("SPAN"), &pit, &hms);
+    }
+}
+
+const PageTimer& PageTimers::operator [] (int ix) const
+{
+    return timers.at (ix);
+}
+
+QString PageTimers::toString (const QString& pfx) const
+{
+    QString buf = "PageTimers {\n";
+    for (int i = 0; i < count (); i++)
+    {
+        buf += pfx + "   " + timers.at (i).toString () + "\n";
+    }
+    buf += pfx + "}";
+    return buf;
+}
+
+const PageTimer* PageTimers::byTitle(const QString& title) const {
+    TimersIterator i(timers);
+    while (i.hasNext()) {
+        if (i.peekNext().title.indexOf(title) >= 0) {
+            return &(i.peekNext());
+        }
+        i.next();
+    }
+    return NULL;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -93,7 +233,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         timer_attack.href  = u8("");
     }
 
-    timers.timers.clear();
+    timers.clear();
     QWebElement accordion = doc.findFirst("DIV[id=accordion]");
     e = accordion.findFirst("DIV[class=counters]");
     foreach (c, e.findAll("LI")) {
@@ -104,19 +244,22 @@ Page_Game::Page_Game (QWebElement& doc) :
     resources.clear();
     foreach (c, e.findAll("LI")) {
         PageResource r;
-        r.id = c.attribute("id");
+        r.id = c.attribute("id").mid(1).toInt();
         r.title = c.attribute("title");
         QWebElement a = c.findFirst("A");
         r.href = a.attribute("href");
-        r.count = a.toPlainText().trimmed().toInt();
-        resources.append(r);
+        bool ok;
+//        qDebug() << QString("OUTER: {%1}").arg(c.toOuterXml());
+//        qDebug() << QString("PLAIN: {%1}").arg(c.toPlainText().trimmed());
+        r.count = c.toPlainText().trimmed().toInt(&ok);
+        resources[r.id] = r;
     }
 }
 
 
 QString toString(const QString& pfx, const PageResource& r) {
     return pfx + QString("{id=%1, count=%2, href=%3, title=%4}")
-            .arg(r.id, QString::number(r.count), r.href, r.title);
+            .arg(r.id).arg(r.count).arg(r.href).arg(r.title);
 }
 
 QString toString(const QString& pfx, const PageResources& s) {
