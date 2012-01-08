@@ -5,7 +5,7 @@
 
 Page_Error::Page_Error (QWebElement& doc) : Page_Generic(doc) {
     QString h1 = doc.findFirst("CENTER H1").toPlainText();
-    QRegExp rx ("(\\d)\\s+(.*)");
+    QRegExp rx ("(\\d+)\\s+(.*)");
     rx.indexIn(h1);
     pagekind = page_Error;
     status = rx.cap(1).toInt();
@@ -21,7 +21,7 @@ bool Page_Error::fit(const QWebElement& doc) {
     if (h1.isNull()) {
         return false;
     }
-    QRegExp rx ("(\\d)\\s+(.*)");
+    QRegExp rx ("(\\d+)\\s+(.*)");
     if (rx.indexIn(h1) == -1) {
         return false;
     }

@@ -120,7 +120,11 @@ public:
     QString     message;
     WorkGuild   workguild;
     int         gold;
+    int         safe_gold;
+    int         free_gold;
     int         crystal;
+    int         safe_crystal;
+    int         free_crystal;
     int         fish;
     int         green;
     int         hp_cur;

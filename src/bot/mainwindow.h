@@ -22,6 +22,10 @@ protected:
     QIcon           imgButtonOn;
     QIcon           imgNoPicsOff;
     QIcon           imgNoPicsOn;
+    QString         strAutomatonOff;
+    QString         strAutomatonOn;
+    QString         strNoPicsOff;
+    QString         strNoPicsOn;
 
     QSystemTrayIcon *pTrayIcon;
     QMenu           *pTrayMenu;

@@ -158,13 +158,16 @@ void Bot::GoTo(const QString& link, bool instant) {
 void Bot::GoReload() {
     cancelAuto();
     _reload_attempt++;
+    if (_reload_attempt > 5) _reload_attempt = 5;
     _awaiting = true;
     _autoTimer = new QTimer();
     _autoTimer->setSingleShot(true);
+    int ra2 = _reload_attempt * _reload_attempt;
+    int ra3 = ra2 * _reload_attempt;
     int s = 5 +
             (qrand() % 100) +
-            _reload_attempt * 120 +
-            (qrand() % 60 * _reload_attempt);
+            ra2 * 30 +
+            (qrand() % 60 * ra3);
     clog << "set up goto timer at " << s << " sec." << endl;
     connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
     _autoTimer->start(s * 1000 + qrand() % 1000);
@@ -178,7 +181,8 @@ void Bot::delayedGoTo() {
 
 void Bot::delayedReload() {
     cancelAuto();
-    _actor->page()->triggerAction(QWebPage::Reload);
+//    _actor->page()->triggerAction(QWebPage::Reload);
+    request_get(QUrl(_baseurl));
 }
 
 void Bot::GoToWork(const QString& deflink, bool instant) {
@@ -449,9 +453,15 @@ void Bot::handle_Page_Game_Generic () {
     crystal = _gpage->crystal;
     fish    = _gpage->fish;
     green   = _gpage->green;
+    free_gold       = _gpage->free_gold;
+    free_crystal    = _gpage->free_crystal;
     if (_gpage->resources.contains(39)) { // i39
         fishraids_remains = _gpage->resources.value(39).count;
     }
+    if (!_gpage->message.isEmpty()) {
+        emit log(u8("сообщение: «%1»").arg(_gpage->message.replace('\n', ' ')));
+    }
+
 }
 
 void Bot::handle_Page_Game_Index () {
@@ -573,41 +583,6 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
 
     quint32 active_id = 0;
 
-    int gold_unsafe = p->gold;
-    int kri_unsafe = p->crystal;
-
-    bool hasGoldSafe = true; // FIXME надо добавить определение наличия сейфов
-    bool hasKriSafe = true;
-
-    int goldsafe_cap = 0;
-    int krisafe_cap = 0;
-
-    const FGPRecord &fgpr = getFGPRecord(level);
-
-    if (hasGoldSafe) {
-        if (p->workguild == WorkGuild_Traders) {
-            goldsafe_cap = level * 100;
-        } else {
-            goldsafe_cap = fgpr.safe_limit;
-        }
-    }
-    if (hasKriSafe) {
-        if (p->workguild == WorkGuild_Miners) {
-            krisafe_cap = level;
-        } else {
-            krisafe_cap = 5;
-        }
-    }
-
-    gold_unsafe = gold_unsafe > goldsafe_cap
-            ? gold_unsafe - goldsafe_cap
-            : 0;
-
-    kri_unsafe = kri_unsafe > krisafe_cap
-            ? kri_unsafe - krisafe_cap
-            : 0;
-
-
     QDateTime now = QDateTime::currentDateTime();
     int immunity_time = p->timer_immunity.pit.isNull()
             ? 0
@@ -637,8 +612,8 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
     }
 
     emit dbg(u8("несохранённого: %1 з, %2 кр, надет #%3, immtime: %4, imm: %5")
-             .arg(gold_unsafe)
-             .arg(kri_unsafe)
+             .arg(free_gold)
+             .arg(free_crystal)
              .arg(active_id)
              .arg(immunity_time)
              .arg(safetime ? "true" : "false")
@@ -656,7 +631,8 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
         break; // будем делать штатную защиту
 
     case Work_Mining: // планируем ковырять кристаллы
-        if (safetime) { // время ещё есть - копикрируем
+        if (safetime || (free_crystal == 0 && free_gold == 0)) {
+            // время ещё есть - копикрируем
             if (id_ckhrist > 0) { // есть копикрист!
                 emit dbg(u8("возвращаем копикрист (#%1)").arg(id_ckhrist));
                 return id_ckhrist;
@@ -690,7 +666,7 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
         emit dbg(u8("возвращаем что висит (#%1)").arg(active_id));
         return active_id; // всё равно щититься нечем, оставим как есть
     }
-    if (kri_unsafe > 0) { // кристаллы жальчей чем деньги
+    if (free_crystal > 0) { // кристаллы жальчей чем деньги
         emit dbg(u8("возвращаем антимаг (#%1)").arg(id_antimag));
         return id_antimag;
     }

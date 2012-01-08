@@ -9,6 +9,7 @@
 #include <QSystemTrayIcon>
 #include "mainwindow.h"
 #include "tools/config.h"
+#include "tools/tools.h"
 #include "bot.h"
 
 using namespace std;
@@ -57,6 +58,10 @@ void MainWindow::createUI ()
     imgButtonOn     = QIcon(":/button_on.png");
     imgNoPicsOff    = QIcon(":/nopix_off.png");
     imgNoPicsOn     = QIcon(":/nopix_on.png");
+    strAutomatonOff = u8("автомат отключен");
+    strAutomatonOn  = u8("автомат включен");
+    strNoPicsOn     = u8("картинки не грузим");
+    strNoPicsOff    = u8("качаем с картинками");
 
     setWindowIcon(imgAppIcon);
 
@@ -65,12 +70,14 @@ void MainWindow::createUI ()
     pAutomaton->setCheckable(true);
     pAutomaton->setFlat(false);
     pAutomaton->setFixedSize(24, 24);
+    pAutomaton->setToolTip(strAutomatonOff);
 
     pNoPics          = new QPushButton ();
     pNoPics->setIcon(imgNoPicsOff);
     pNoPics->setCheckable(true);
     pNoPics->setFlat(false);
     pNoPics->setFixedSize(24, 24);
+    pNoPics->setToolTip(strNoPicsOff);
 
 //    pAutomaton->setIconSize(QSize(22, 22));
 
@@ -226,9 +233,11 @@ void MainWindow::nopicsToggled (bool checked) {
     if (checked) {
         dbg ("nopics enabled");
         pNoPics->setIcon(imgNoPicsOn);
+        pNoPics->setToolTip(strNoPicsOn);
     } else {
         dbg ("nopics disabled");
         pNoPics->setIcon(imgNoPicsOff);
+        pNoPics->setToolTip(strNoPicsOff);
     }
     QWebSettings *settings = pWebView->page()->settings ();
     settings->setAttribute (QWebSettings::AutoLoadImages, !checked);
@@ -241,12 +250,14 @@ void MainWindow::automatonToggled (bool checked) {
             QTimer::singleShot(0, pBot, SIGNAL (start()));
         }
         pAutomaton->setIcon(imgButtonOn);
+        pAutomaton->setToolTip(strAutomatonOn);
     } else {
         dbg ("automaton disabled");
         if (pBot->isStarted()) {
             QTimer::singleShot(0, pBot, SIGNAL (stop()));
         }
         pAutomaton->setIcon(imgButtonOff);
+        pAutomaton->setToolTip(strAutomatonOff);
     }
 }
 

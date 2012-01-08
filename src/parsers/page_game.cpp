@@ -269,17 +269,51 @@ Page_Game::Page_Game (QWebElement& doc) :
     Q_ASSERT (!body.isNull());
     pagekind = page_Game;
     pagetitle= doc.findFirst("DIV[class=title]").toPlainText ().trimmed ();
-    gold    = dottedInt (doc.findFirst ("DIV[id=gold] B").toInnerXml ());
-    crystal = dottedInt (doc.findFirst ("DIV[id=crystal] B").toInnerXml ());
+
+    gold = -1;
+    free_gold = -1;
+    safe_gold = -1;
+    {
+        QString gStr = doc.findFirst ("DIV[id=gold]").attribute("onmouseover");
+        //'total:|22517|;safe:|15360|;safe_add:|0|;pandora:|0|;free:|7157|'
+        QRegExp rx ("'total:\\|(\\d+)\\|;safe:\\|(\\d+)\\|.*free:\\|(\\d+)\\|'");
+        if (rx.indexIn(gStr) != -1) {
+            gold        = dottedInt(rx.cap(1));
+            safe_gold   = dottedInt(rx.cap(2));
+            free_gold   = dottedInt(rx.cap(3));
+        } else {
+            gold = dottedInt (doc.findFirst ("DIV[id=gold] B").toInnerXml ());
+            free_gold = gold;
+        }
+    }
+    crystal = -1;
+    free_crystal = -1;
+    safe_crystal = -1;
+    {
+        QString cStr = doc.findFirst ("DIV[id=crystal]").attribute("onmouseover");
+        QRegExp rx ("'total:\\|(\\d+)\\|;safe:\\|(\\d+)\\|.*free:\\|(\\d+)\\|'");
+        if (rx.indexIn(cStr) != -1) {
+            crystal         = dottedInt(rx.cap(1));
+            safe_crystal    = dottedInt(rx.cap(2));
+            free_crystal    = dottedInt(rx.cap(3));
+        } else {
+            crystal = dottedInt (doc.findFirst ("DIV[id=crystal] B").toInnerXml ());
+            free_crystal = crystal;
+        }
+    }
+
     fish    = dottedInt (doc.findFirst ("DIV[id=fish] B").toInnerXml ());
     green   = dottedInt (doc.findFirst ("DIV[id=green] B").toInnerXml ());
-    QString hStr = doc.findFirst ("DIV[id=char]").attribute("onmouseover");
-    QRegExp rx ("'now:\\|(\\d+)\\|;max:\\|(\\d+)\\|;speed:\\|(\\d+)\\|'");
-    if (rx.indexIn(hStr) != -1)
+
     {
-        hp_cur = dottedInt (rx.cap (1));
-        hp_max = dottedInt (rx.cap (2));
-        hp_spd = dottedInt (rx.cap (3));
+        QString hStr = doc.findFirst ("DIV[id=char]").attribute("onmouseover");
+        QRegExp rx ("'now:\\|(\\d+)\\|;max:\\|(\\d+)\\|;speed:\\|(\\d+)\\|'");
+        if (rx.indexIn(hStr) != -1)
+        {
+            hp_cur = dottedInt (rx.cap (1));
+            hp_max = dottedInt (rx.cap (2));
+            hp_spd = dottedInt (rx.cap (3));
+        }
     }
     chartitle = doc.findFirst("DIV[class=name] B").attribute ("title");
     charname = doc.findFirst("DIV[class=name] U").toPlainText ().trimmed ();
@@ -412,8 +446,12 @@ QString Page_Game::toString (const QString& pfx) const
             pfx + "character: " + chartitle + " " + charname + "\n" +
             pfx + QString("hp: %1/%2, spd %3\n")
             .arg(hp_cur).arg(hp_max).arg(hp_spd) +
-            pfx + QString("gold: %1, crystal: %2, fish: %3, green: %4\n")
+            pfx + QString("gold: %1, crystal: %2, fish:%3, green:%4\n")
             .arg(gold).arg(crystal).arg(fish).arg(green) +
+            pfx + QString("safe_gold:%1, safe_crystal:%2\n")
+            .arg(safe_gold).arg(safe_crystal) +
+            pfx + QString("free_gold:%1, free_crystal:%2\n")
+            .arg(free_gold).arg(free_crystal) +
             pfx + QString("workquild: %1\n").arg(::toString(workguild)) +
             pfx + QString("messsage: {%1}\n").arg(message) +
             pfx + QString("system timer: %1\n").arg(timer_system.toString()) +

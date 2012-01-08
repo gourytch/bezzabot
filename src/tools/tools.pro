@@ -19,6 +19,7 @@ SOURCES += \
     persistentcookiejar.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
+MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/lib
 
 

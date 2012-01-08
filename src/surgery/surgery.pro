@@ -17,6 +17,7 @@ INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
+MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/bin
 
 

@@ -15,8 +15,8 @@ void Bot::handle_Page_Game_Mine_Open () {
     {
         if (p->message.isEmpty()) {
             _mineshop_last_buying_position = -1;
-        } else {
-            emit log(u8("сообщают: ") + p->message);
+//        } else {
+//            emit log(u8("сообщают: «%1»").arg(p->message.replace('\n', ' ')));
         }
         int buyposition = -1;
         if (p->professional) {
@@ -63,7 +63,7 @@ void Bot::handle_Page_Game_Mine_Open () {
                 if (is_need_to_change_coulon(qid)) {
                     action_wear_right_coulon(qid);
                 }
-                emit log(u8("можно закопаться в шахту"));
+                emit log(u8("уходим в забой"));
                 if (p->doStart()) {
                     _awaiting = true;
                     currentWork = Work_Mining;
@@ -93,7 +93,7 @@ void Bot::handle_Page_Game_Mine_Open () {
         return;
 
     case DigReady:
-        emit log(u8("докопались до кристалла. шанс добычи %1%")
+        emit dbg(u8("докопались до кристалла. шанс добычи %1%")
                  .arg(p->success_chance));
 
         emit dbg(u8("проверим кулон"));
@@ -107,23 +107,25 @@ void Bot::handle_Page_Game_Mine_Open () {
         bool need_dig = p->success_chance >= _digchance;
 
         if (need_dig) {
-            emit log(u8("пробуем выкопать"));
+            emit dbg(u8("шанс=%1 ≥ %2, пробуем выкопать")
+                     .arg(p->success_chance).arg(_digchance));
             if (p->doDig()) {
                 _awaiting = true;
                 currentWork = Work_None;
                 currentAction = Action_None;
             } else {
-                emit log(u8("не вышло :("));
+                emit dbg(u8("не вышло :("));
                 GoToWork("index.php");
             }
         } else if (!need_change_coulon){
-            emit log(u8("ковыряем дальше"));
+            emit log(u8("шанс=%1 < %2, будем копять дальше")
+                     .arg(p->success_chance).arg(_digchance));
             if (p->doReset()) {
                 _awaiting = true;
                 currentWork = Work_Mining;
                 currentAction = Action_None;
             } else {
-                emit log(u8("не вышло :("));
+                emit dbg(u8("не вышло :("));
                 GoToWork("index.php");
                 currentWork = Work_None;
                 currentAction = Action_None;

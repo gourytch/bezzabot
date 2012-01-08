@@ -83,7 +83,9 @@ protected:
     QString     charname;
     QString     chartitle;
     int         gold;
+    int         free_gold;
     int         crystal;
+    int         free_crystal;
     int         fish;
     int         green;
     int         hp_cur;
