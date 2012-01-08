@@ -36,6 +36,7 @@ Parser::PageProducer Parser::_producer;
 bool Parser::_initialized = false;
 
 void Parser::setup() {
+    _producer.registerClass<Page_Error>();
     _producer.registerClass<Page_Login>();
     _producer.registerClass<Page_Game_Index>();
     _producer.registerClass<Page_Game_Dozor_Entrance>();

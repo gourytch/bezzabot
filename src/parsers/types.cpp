@@ -15,6 +15,7 @@ QString toString (PageKind kind)
 {
     switch (kind) {
     case page_Generic: return QString("page_Generic");
+    case page_Error: return QString("page_Error");
     case page_Entrance: return QString("page_Entrance");
     case page_Login: return QString("page_Login");
     case page_Game: return QString("page_Game");

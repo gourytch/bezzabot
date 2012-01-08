@@ -9,6 +9,7 @@
 
 enum PageKind {
     page_Generic,
+    page_Error,
     page_Entrance,
     page_Login,
     page_Game,

@@ -100,7 +100,9 @@ protected:
     void cancelAuto(bool ok = false);
     void GoTo(const QString& link=QString(), bool instant=false);
     void GoToWork(const QString& deflink=QString(), bool instant=false);
+    void GoReload();
 
+    int _reload_attempt;
     int _mineshop_last_buying_position;
 
     void reset();
@@ -108,6 +110,8 @@ protected:
 protected:
 
     virtual void handle_Page_Generic ();
+
+    virtual void handle_Page_Error ();
 
     virtual void handle_Page_Login ();
 
@@ -179,6 +183,8 @@ signals:
 private slots:
 
     void delayedGoTo();
+
+    void delayedReload();
 
 public slots:
 

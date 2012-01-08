@@ -506,6 +506,7 @@ bool Page_Game::doClickOnCoulon(quint32 id) {
         return false;
     }
     qDebug() << QString("ajax-activate coulon #%1").arg(id);
+    delay(500 + (qrand() % 3000), true);
     QString s = QString(
                 "$.getJSON('ajax.php?m=coulon&item='+%1,"
                 "function(data){"

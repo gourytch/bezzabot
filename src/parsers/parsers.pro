@@ -19,7 +19,8 @@ HEADERS += \
     page_game_dozor_onduty.h \
     page_game_dozor_gotvictim.h \
     page_game_dozor_lowhealth.h \
-    page_game_pier.h
+    page_game_pier.h \
+    page_error.h
 
 SOURCES += \
     types.cpp \
@@ -34,13 +35,16 @@ SOURCES += \
     page_game_dozor_onduty.cpp \
     page_game_dozor_gotvictim.cpp \
     page_game_dozor_lowhealth.cpp \
-    page_game_pier.cpp
+    page_game_pier.cpp \
+    page_error.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 DESTDIR = $$TOP/lib
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
+
+
 
 
 

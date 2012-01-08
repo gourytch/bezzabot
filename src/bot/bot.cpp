@@ -62,10 +62,9 @@ Bot::Bot(const QString& id, QObject *parent) :
     _regular = true;
     _page = NULL;
     _awaiting = false;
-    _step_counter = 0;
     _step_timer.setInterval (1000);
-    currentAction = Action_None;
-    currentWork = Work_None;
+
+    reset();
 
     connect (&_step_timer, SIGNAL (timeout()),
              this, SLOT (step()));
@@ -92,6 +91,13 @@ Bot::~Bot ()
 }
 
 void Bot::reset() {
+
+    _step_counter = 0;
+    currentAction = Action_None;
+    currentWork = Work_None;
+
+    _reload_attempt = 0;
+
     _kd_Dozor = QDateTime();
     _kd_Fishing = QDateTime();
     _kd_Mailbox = QDateTime();
@@ -149,9 +155,30 @@ void Bot::GoTo(const QString& link, bool instant) {
     _autoTimer->start(ms);
 }
 
+void Bot::GoReload() {
+    cancelAuto();
+    _reload_attempt++;
+    _awaiting = true;
+    _autoTimer = new QTimer();
+    _autoTimer->setSingleShot(true);
+    int s = 5 +
+            (qrand() % 100) +
+            _reload_attempt * 120 +
+            (qrand() % 60 * _reload_attempt);
+    clog << "set up goto timer at " << s << " sec." << endl;
+    connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
+    _autoTimer->start(s * 1000 + qrand() % 1000);
+
+}
+
 void Bot::delayedGoTo() {
     cancelAuto();
     request_get(QUrl(_linkToGo));
+}
+
+void Bot::delayedReload() {
+    cancelAuto();
+    _actor->page()->triggerAction(QWebPage::Reload);
 }
 
 void Bot::GoToWork(const QString& deflink, bool instant) {
@@ -193,8 +220,14 @@ void Bot::onPageFinished (bool ok)
         qDebug() << "bot is not active. no page handling will be performed";
         return;
     }
+    if (_page->pagekind != page_Error) {
+        _reload_attempt = 0;
+    }
     switch (_page->pagekind)
     {
+    case page_Error:
+        handle_Page_Error();
+        break;
     case page_Login:
         handle_Page_Login();
         break;
@@ -378,6 +411,19 @@ void Bot::one_step () {
 }
 
 //////////// page handlers //////////////////////////////////////////////////
+void Bot::handle_Page_Error () {
+    emit dbg(tr("hangle error page"));
+    Page_Error *p = static_cast<Page_Error*>(_page);
+    switch (p->status / 100) { // старший знак
+    case 5: // 504 (gateway timeout)
+        emit log (QString("state 5xx. reload page"));
+        GoReload();
+        return;
+    default:
+        emit log (QString("ERROR %1: %2").arg(p->status).arg(p->reason));
+    }
+
+}
 
 void Bot::handle_Page_Generic () {
     emit dbg(tr("hangle generic page"));
