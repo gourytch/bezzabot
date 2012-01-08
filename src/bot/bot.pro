@@ -3,6 +3,7 @@ TOP = ../..
 TARGET = bezzabot
 TEMPLATE = app
 
+CONFIG += debug console
 QT += core gui network webkit
 
 SOURCES += main.cpp\

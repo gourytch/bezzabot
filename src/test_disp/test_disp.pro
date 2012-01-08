@@ -1,5 +1,6 @@
 TOP = ../..
 
+CONFIG += debug console
 QT += core
 
 TARGET = test_disp
