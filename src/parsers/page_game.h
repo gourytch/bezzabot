@@ -7,6 +7,16 @@
 
 #include "page_generic.h"
 
+enum WorkGuild {
+    WorkGuild_None,
+    WorkGuild_Miners,
+    WorkGuild_Farmers,
+    WorkGuild_Smiths,
+    WorkGuild_Traders
+};
+
+QString toString(WorkGuild v);
+
 struct PageTimer
 {
     QString     title;
@@ -57,6 +67,49 @@ QString toString(const QString& pfx, const PageResource& v);
 typedef QMap<qint16, PageResource> PageResources;
 QString toString(const QString& pfx, const PageResources& v);
 
+struct PageCoulon {
+    quint32 id;
+    QString kind;
+    QString name;
+    int     cur_lvl;
+    int     max_lvl;
+    bool    active;
+
+    PageCoulon() :
+        id(0), kind("?"), name("?"), cur_lvl(-1), max_lvl(-1), active(false) {
+    }
+
+    PageCoulon(const PageCoulon& v) :
+        id(v.id), kind(v.kind), name(v.name),
+        cur_lvl(v.cur_lvl), max_lvl(v.max_lvl),
+        active(v.active) {
+    }
+
+    const PageCoulon& operator=(const PageCoulon& v) {
+        id = v.id;
+        kind = v.kind;
+        name = v.name;
+        cur_lvl = v.cur_lvl;
+        max_lvl = v.max_lvl;
+        active = v.active;
+        return *this;
+    }
+
+    bool assign(const QWebElement& e);
+
+    QString toString(const QString& pfx=QString()) const;
+};
+
+struct PageCoulons {
+    QVector<PageCoulon> coulons;
+    void clear() {coulons.clear();}
+    bool assign(const QWebElement& e);
+    QString toString(const QString& pfx=QString()) const;
+    const PageCoulon* byId(quint32 id) const;
+    const PageCoulon* byName(const QString& name) const;
+    const PageCoulon* active() const;
+};
+
 class Page_Game : public Page_Generic
 {
     Q_OBJECT
@@ -65,6 +118,7 @@ public:
     QString     charname;
     QString     chartitle;
     QString     message;
+    WorkGuild   workguild;
     int         gold;
     int         crystal;
     int         fish;
@@ -77,8 +131,8 @@ public:
     PageTimer   timer_immunity;
     PageTimer   timer_attack;
     PageTimers  timers;
-
     PageResources   resources;
+    PageCoulons     coulons;
 
     QWebElement body;
 
@@ -91,6 +145,8 @@ public:
     bool hasNoJob() const;
 
     QString jobLink(bool ifFinished = false, int timegap=10) const;
+
+    bool doClickOnCoulon(quint32 id);
 
 };
 

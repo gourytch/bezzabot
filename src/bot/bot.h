@@ -11,6 +11,8 @@
 #include "webactor.h"
 #include "tools/persistentcookiejar.h"
 #include "tools/config.h"
+#include "parsers/page_generic.h"
+#include "parsers/page_game.h"
 
 enum WorkType { // работа (то, что не может выполняться параллельно
     Work_None,
@@ -28,7 +30,9 @@ enum ActionType { // выполняемое действие (параллель
     Action_MineShopping,    // закупаем шахтёрский инвентарь
     Action_Smithing,        // улушение в кузнице
     Action_Gambling,        // играем в казино
-    Action_Healing          // лечимся
+    Action_Healing,         // лечимся
+    Action_DressUp,         // переодеваемся
+    Action_FinishWork       // проверяем окончание работы
 };
 
 QString toString(ActionType v);
@@ -38,7 +42,9 @@ class Bot : public QObject
     Q_OBJECT
 
 public:
-    WorkType currentWork;
+    WorkType currentWork; // текущая работа (если есть)
+
+    WorkType proposedWork; // предполагаемая работа в ближайшее время
 
     ActionType currentAction;
 
@@ -48,6 +54,7 @@ protected:
     PersistentCookieJar *_cookies;
     WebActor            *_actor;
     Page_Generic        *_page;
+    Page_Game           *_gpage;
 
     QTimer _step_timer;
     bool _started;
@@ -65,7 +72,6 @@ protected:
 
     // настройки разные
     int         _digchance;     // шанс достаточный для копания
-    QString     _digcoulomb;    // какой кулон надевать при начале копания
 
     // timers:
     QDateTime   _kd_Dozor;  // когда оттает возможность дозора
@@ -84,6 +90,8 @@ protected:
     int         hp_max;
     int         hp_spd;
     QDateTime   atime;
+    int         dozors_remains; // осталось на сегодня десятиминуток дозоров
+    int         fishraids_remains; // осталось на сегодня заплывов за пирашками
 
     QTimer      *_autoTimer;
     QString     _linkToGo;
@@ -91,8 +99,11 @@ protected:
 
     void cancelAuto(bool ok = false);
     void GoTo(const QString& link=QString(), bool instant=false);
+    void GoToWork(const QString& deflink=QString(), bool instant=false);
 
     int _mineshop_last_buying_position;
+
+    void reset();
 
 protected:
 
@@ -134,6 +145,12 @@ public:
     bool action_fishing();
 
     bool action_buy_health();
+
+    quint32 guess_coulon_to_wear(WorkType work, int seconds);
+
+    bool is_need_to_change_coulon(quint32 id);
+
+    bool action_wear_right_coulon(quint32 id);
 
     bool isConfigured () const { return _good;  }
 

@@ -3,7 +3,9 @@
 #include <QWebPage>
 #include <QWebFrame>
 #include <QDebug>
+#include <QTime>
 #include <QTimer>
+#include <QApplication>
 #include "types.h"
 #include "page_generic.h"
 
@@ -94,4 +96,16 @@ void Page_Generic::slot_submit() {
             submit.evaluateJavaScript("this.click();");
         }
     }
+}
+
+void Page_Generic::delay(int ms, bool exclusive) {
+    QTime time;
+    qDebug() << QString("DELAY %1 MS ...").arg(ms);
+    time.start();
+    while (time.elapsed() < ms) {
+        if (!exclusive) {
+            qApp->processEvents();
+        }
+    }
+    qDebug() << QString("CONTINUE EXECUTION");
 }

@@ -20,6 +20,8 @@ protected:
     QIcon           imgAppIcon;
     QIcon           imgButtonOff;
     QIcon           imgButtonOn;
+    QIcon           imgNoPicsOff;
+    QIcon           imgNoPicsOn;
 
     QSystemTrayIcon *pTrayIcon;
     QMenu           *pTrayMenu;
@@ -34,6 +36,7 @@ protected:
 
     //QToolBar        *pToolBar;
     QPushButton     *pAutomaton;
+    QPushButton     *pNoPics;
     QProgressBar    *pLoadingProgress;
 
     QVBoxLayout     *pLayout;
@@ -84,6 +87,7 @@ protected slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void messageClicked();
     void automatonToggled (bool checked);
+    void nopicsToggled (bool checked);
     void slotLoadStarted ();
     void slotLoadProgress (int percent);
     void slotLoadFinished (bool success);

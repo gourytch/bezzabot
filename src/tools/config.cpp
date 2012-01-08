@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QDebug>
+#include <QRegExp>
 #include "config.h"
 
 using namespace std;
@@ -56,7 +57,18 @@ void Config::init_check ()
     checkDir (_location_data);
     checkDir (_location_cache);
 
-    _ini_fname = _location_config + "/" + INI_NAME;
+    QString ini_name = INI_NAME;
+    QRegExp rx("config=(.*)");
+    foreach (QString s, appPtr->arguments()) {
+        if (rx.indexIn(s) != -1) {
+            ini_name = rx.cap(1);
+            break;
+        }
+    }
+
+    _ini_fname = ini_name.contains('/')
+            ? ini_name
+            : _location_config + "/" + ini_name;
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
     _global = new Config ();
     if (!_global->get("initialized").toBool()) {

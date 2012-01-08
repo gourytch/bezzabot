@@ -12,6 +12,9 @@ hide_on_close=false
 [bots]
 list=MySampleBot
 
+[miner]
+digchance = 40
+
 [connection]
 use_proxy=true
 proxy_host=proxy.intra.net
@@ -22,4 +25,6 @@ cache_size=10000000
 login\server_id=1
 login\email=samplebot@somewhere.net
 login\password=Teh Beeg And Unpred1ktab1e~Passw0rD
+
+miner\digchance=75
 

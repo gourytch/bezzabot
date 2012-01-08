@@ -55,6 +55,8 @@ void MainWindow::createUI ()
     imgAppIcon      = QIcon(":/icon.png");
     imgButtonOff    = QIcon(":/button_off.png");
     imgButtonOn     = QIcon(":/button_on.png");
+    imgNoPicsOff    = QIcon(":/nopix_off.png");
+    imgNoPicsOn     = QIcon(":/nopix_on.png");
 
     setWindowIcon(imgAppIcon);
 
@@ -62,21 +64,30 @@ void MainWindow::createUI ()
     pAutomaton->setIcon(imgButtonOff);
     pAutomaton->setCheckable(true);
     pAutomaton->setFlat(false);
+    pAutomaton->setFixedSize(24, 24);
+
+    pNoPics          = new QPushButton ();
+    pNoPics->setIcon(imgNoPicsOff);
+    pNoPics->setCheckable(true);
+    pNoPics->setFlat(false);
+    pNoPics->setFixedSize(24, 24);
+
 //    pAutomaton->setIconSize(QSize(22, 22));
 
     pLoadingProgress    = new QProgressBar ();
     pLoadingProgress->setOrientation(Qt::Vertical);
 
     pControls           = new QVBoxLayout ();
-    pControls->addWidget (pAutomaton);
-    pControls->addWidget (pLoadingProgress);
-    pControls->setSizeConstraint(QLayout::SetFixedSize);
+    pControls->addWidget (pAutomaton, 0);
+    pControls->addWidget (pNoPics, 0);
+    pControls->addWidget (pLoadingProgress, 100);
+//    pControls->setSizeConstraint(QLayout::SetFixedSize);
 
     pLogView            = new QTextEdit ();
 
     pBottom             = new QHBoxLayout ();
-    pBottom->addLayout (pControls);
-    pBottom->addWidget (pLogView); // ?
+    pBottom->addLayout (pControls, 0);
+    pBottom->addWidget (pLogView, 100); // ?
     pBottom->setSizeConstraint(QLayout::SetFixedSize);
 
     pWebView            = new QWebView ();
@@ -85,10 +96,10 @@ void MainWindow::createUI ()
     pLayout             = new QVBoxLayout ();
     pLayout->setMargin (10);
     pLayout->setSpacing (10);
-    pLayout->addWidget(pWebView);
-    pLayout->addLayout(pBottom);
-    pLayout->setStretchFactor(pWebView, 100);
-    pLayout->setStretchFactor(pBottom, 1);
+    pLayout->addWidget(pWebView, 100);
+    pLayout->addLayout(pBottom, 0);
+//    pLayout->setStretchFactor(pWebView, 100);
+//    pLayout->setStretchFactor(pBottom, 1);
 
 /*
     pSplitter           = new QSplitter (Qt::Vertical);
@@ -146,7 +157,11 @@ void MainWindow::createTrayIcon() {
 
 
 void MainWindow::setupConnections () {
-    connect (pAutomaton, SIGNAL(toggled(bool)), this, SLOT(automatonToggled(bool)));
+    connect (pAutomaton, SIGNAL(toggled(bool)),
+             this, SLOT(automatonToggled(bool)));
+
+    connect (pNoPics, SIGNAL(toggled(bool)),
+             this, SLOT(nopicsToggled(bool)));
 
     connect (pWebView->page (), SIGNAL (loadStarted ()),
              this, SLOT (slotLoadStarted ()));
@@ -207,6 +222,17 @@ void MainWindow::dbg (const QString &text)
     clog << qPrintable(tss + " " + text) << endl;
 }
 
+void MainWindow::nopicsToggled (bool checked) {
+    if (checked) {
+        dbg ("nopics enabled");
+        pNoPics->setIcon(imgNoPicsOn);
+    } else {
+        dbg ("nopics disabled");
+        pNoPics->setIcon(imgNoPicsOff);
+    }
+    QWebSettings *settings = pWebView->page()->settings ();
+    settings->setAttribute (QWebSettings::AutoLoadImages, !checked);
+}
 
 void MainWindow::automatonToggled (bool checked) {
     if (checked) {

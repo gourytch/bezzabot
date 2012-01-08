@@ -12,23 +12,29 @@ void Bot::handle_Page_Game_Pier () {
         emit log(u8("засылаем пирашколовецкое плавсредство"));
         if (p->doSend()) {
             _awaiting = true;
-            _kd_Fishing = QDateTime::currentDateTime()
-                    .addSecs(3666 + (qrand() % 300));
+            emit dbg(u8("return (должны перегрузить страничку)"));
+            return;
         } else {
-            emit log(u8("что-то не срослось"));
+            emit dbg(u8("что-то не срослось"));
             _kd_Fishing = QDateTime::currentDateTime()
                     .addSecs(300 + (qrand() % 300));
-            GoTo("mine.php?a=open");
         }
     } else {
-        _kd_Fishing = QDateTime::currentDateTime()
-                .addSecs(300 + (qrand() % 300));
-        GoTo("mine.php?a=open");
+        if (p->timeleft.pit.isNull()) {
+            _kd_Fishing = QDateTime::currentDateTime()
+                    .addSecs(300 + (qrand() % 300));
+            emit dbg(u8("timeleft не указан. возьмём минут 5 форы"));
+        } else {
+            _kd_Fishing = p->timeleft.pit
+                    .addSecs(300 + (qrand() % 300));
+            emit dbg(u8("берём время возвращения плавсредства из timeleft"));
+        }
     }
-    emit dbg(QString("_kd_Fishing sets to %1")
-             .arg(_kd_Fishing.toString("hh:mm:ss")));
+    emit dbg(u8("_kd_Fishing sets to %1")
+             .arg(_kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
     if (currentAction == Action_Fishing) {
         currentAction = Action_None;
         emit dbg(u8("Action_Fishing finished"));
     }
+    GoToWork("mine.php?a=open");
 }

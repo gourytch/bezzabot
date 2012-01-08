@@ -141,13 +141,13 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (QWebElement& doc) :
         }
     }
 
-    es = doc.findAll ("DIV[class=grbody]");
-    count = 0;
-    foreach (e, es)
-    {
-        QString s = e.toPlainText ().trimmed ();
-        qDebug () << "[" << count++ << "] = " << s;
-    }
+//    es = doc.findAll ("DIV[class=grbody]");
+//    count = 0;
+//    foreach (e, es)
+//    {
+//        QString s = e.toPlainText ().trimmed ();
+//        qDebug () << "[" << count++ << "] = " << s;
+//    }
 
 }
 

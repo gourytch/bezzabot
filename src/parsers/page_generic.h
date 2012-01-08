@@ -38,6 +38,8 @@ public:
 
     void pressSubmit (int delay_min = 500, int delay_max = 5000);
 
+    void delay(int ms, bool exclusive);
+
 protected slots:
 
     void slot_submit();

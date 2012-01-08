@@ -3,5 +3,7 @@
         <file alias="icon.png">images/icon-16x16.png</file>
         <file alias="button_off.png">images/button_off.png</file>
         <file alias="button_on.png">images/button_on.png</file>
-     </qresource>
+        <file alias="nopix_on.png">images/nopix_on.png</file>
+        <file alias="nopix_off.png">images/nopix_off.png</file>
+    </qresource>
 </RCC>

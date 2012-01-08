@@ -62,7 +62,7 @@ bool Page_Game_Dozor_Entrance::fit(const QWebElement& doc) {
     }
     foreach (QWebElement e, titles) {
         QString title = e.toPlainText ().trimmed ();
-        qDebug() << "GOT TITLE: {" + title + "}";
+//        qDebug() << "GOT TITLE: {" + title + "}";
         if (title == u8("Капитан стражи")) {
             qDebug() << u8("Page_Game_Dozor fit: Капитан Стражи detected");
             return true;

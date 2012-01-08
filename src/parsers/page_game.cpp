@@ -7,6 +7,16 @@
 #include "tools/tools.h"
 #include "page_game.h"
 
+QString toString(WorkGuild v) {
+    switch (v) {
+    case WorkGuild_None     : return "WorkGuild_None";
+    case WorkGuild_Miners   : return "WorkGuild_Miners";
+    case WorkGuild_Farmers  : return "WorkGuild_Farmers";
+    case WorkGuild_Smiths   : return "WorkGuild_Smiths";
+    case WorkGuild_Traders  : return "WorkGuild_Traders";
+    };
+    return "?";
+}
 
 bool parseTimerSpan (const QWebElement& e, QDateTime *pit, int *hms)
 {
@@ -145,6 +155,107 @@ const PageTimer* PageTimers::byTitle(const QString& title) const {
     return NULL;
 }
 
+bool PageCoulon::assign(const QWebElement& e) {
+// <a item_id="15371239" title="Скороход 99/100"><b class="item_98"></b></a>
+    if (e.tagName() != "A") {
+//        qDebug() << QString("coulon's chunk is not anchor: %1")
+//                    .arg(e.toOuterXml());
+        return false;
+    }
+
+    QString title = e.attribute("title");
+    if (title.isNull()) {
+//        qDebug() << QString("coulon's title is empty for %1")
+//                    .arg(e.toOuterXml());
+        return false;
+    }
+
+    bool ok;
+    id = e.attribute("item_id").toInt(&ok);
+    if (!ok) {
+//        qDebug() << QString("coulon's item_id parse error for %1")
+//                    .arg(e.toOuterXml());
+        return false;
+    }
+
+    active = e.attribute("class") == "active";
+
+    QRegExp rx ("(.*) (\\d+)/(\\d+)");
+    if (rx.indexIn(title) != -1) {
+        name = rx.cap(1).trimmed();
+        cur_lvl = rx.cap(2).toInt(&ok);
+        if (!ok) {
+//            qDebug() << QString("coulon's min_level parse error for %1")
+//                        .arg(e.toOuterXml());
+            return false;
+        }
+        max_lvl = rx.cap(3).toInt(&ok);
+        if (!ok) {
+//            qDebug() << QString("coulon's max_level parse error for %1")
+//                        .arg(e.toOuterXml());
+            return false;
+        }
+    }
+    kind = e.firstChild().attribute("class");
+    return true;
+}
+
+QString PageCoulon::toString(const QString& pfx) const {
+    return pfx + u8("{id=%1, kind=%2, name={%3} lvl=%4 of %5, %6}")
+            .arg(id)
+            .arg(kind)
+            .arg(name)
+            .arg(cur_lvl)
+            .arg(max_lvl)
+            .arg(active ? "active" : "inactive");
+}
+
+bool PageCoulons::assign(const QWebElement& e) {
+    clear();
+    foreach (QWebElement a, e.findAll("A")) {
+        PageCoulon c;
+        if (c.assign(a)) {
+            coulons.append(c);
+        }
+    }
+    return true;
+}
+
+QString PageCoulons::toString(const QString& pfx) const {
+    QString ret = u8("PageCoulons {\n");
+    for (int i = 0; i < coulons.size(); ++i) {
+        ret += pfx + "   " + coulons[i].toString() + "\n";
+    }
+    return ret + pfx + "}\n";
+}
+
+const PageCoulon* PageCoulons::byId(quint32 id) const {
+    for (int i = 0; i < coulons.size(); ++i) {
+        if (coulons[i].id == id) {
+            return &coulons[i];
+        }
+    }
+    return NULL;
+}
+
+const PageCoulon* PageCoulons::byName(const QString& name) const {
+    for (int i = 0; i < coulons.size(); ++i) {
+        if (coulons[i].name == name) {
+            return &coulons[i];
+        }
+    }
+    return NULL;
+}
+
+const PageCoulon* PageCoulons::active() const {
+    for (int i = 0; i < coulons.size(); ++i) {
+        if (coulons[i].active) {
+            return &coulons[i];
+        }
+    }
+    return NULL;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 //
 // Page_Game
@@ -173,7 +284,27 @@ Page_Game::Page_Game (QWebElement& doc) :
     chartitle = doc.findFirst("DIV[class=name] B").attribute ("title");
     charname = doc.findFirst("DIV[class=name] U").toPlainText ().trimmed ();
     message = doc.findFirst("DIV[class=message]").toPlainText ().trimmed ();
-
+    workguild = WorkGuild_None;
+    foreach (QWebElement e, doc.findFirst("DIV.guilds").findAll("A")) {
+        QString title = e.attribute("title");
+        if (title == u8("Шахтеры")) {
+            workguild = WorkGuild_Miners;
+        } else if (title == u8("Работяги")) {
+            workguild = WorkGuild_Farmers;
+        } else if (title == u8("Железячники")) {
+            workguild = WorkGuild_Smiths;
+        } else if (title == u8("Толстосумы")) {
+            workguild = WorkGuild_Traders;
+//      } else if (title == u8("Стражики")) {
+//      } else if (title == u8("Бандюки")) {
+//      } else if (title == u8("Мирники")) {
+//      } else if (title == u8("Устрашатели")) {
+//      } else if (title == u8("Пернатый спецназ")) {
+//      } else if (title == u8("Краснокожие")) {
+//      } else if (title == u8("Клыкуны")) {
+//      } else if (title == u8("Теневоды")) {
+        } // FIXME добавить сюда обработку на все остальные гильдии
+    }
 
     QWebElement e;
     e = doc.findFirst("B[id=time] SPAN");
@@ -254,6 +385,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         r.count = c.toPlainText().trimmed().toInt(&ok);
         resources[r.id] = r;
     }
+    coulons.assign(document.findFirst("DIV[id=coulons_bar]"));
 }
 
 
@@ -282,6 +414,7 @@ QString Page_Game::toString (const QString& pfx) const
             .arg(hp_cur).arg(hp_max).arg(hp_spd) +
             pfx + QString("gold: %1, crystal: %2, fish: %3, green: %4\n")
             .arg(gold).arg(crystal).arg(fish).arg(green) +
+            pfx + QString("workquild: %1\n").arg(::toString(workguild)) +
             pfx + QString("messsage: {%1}\n").arg(message) +
             pfx + QString("system timer: %1\n").arg(timer_system.toString()) +
             pfx + QString("work   timer: %1\n").arg(timer_work.toString()) +
@@ -290,6 +423,7 @@ QString Page_Game::toString (const QString& pfx) const
             pfx + QString("other timers:\n") +
             pfx + timers.toString (pfx + "   ") + "\n" +
             pfx + ::toString(pfx + "   ", resources) + "\n" +
+            pfx + coulons.toString(pfx + "   ") + "\n" +
             pfx + "}";
 }
 
@@ -356,4 +490,32 @@ QString Page_Game::jobLink(bool ifFinished, int timegap) const {
         }
     }
     return timer_work.href;
+}
+
+bool Page_Game::doClickOnCoulon(quint32 id) {
+//  "/ajax.php?m=coulon&item=15371239"
+    bool found = false;
+    foreach (QWebElement a, document.findAll("DIV.coulons A")) {
+        if ((quint32)(a.attribute("item_id").toInt()) == id) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        qDebug() << QString("coulon #%1 not found").arg(id);
+        return false;
+    }
+    qDebug() << QString("ajax-activate coulon #%1").arg(id);
+    QString s = QString(
+                "$.getJSON('ajax.php?m=coulon&item='+%1,"
+                "function(data){"
+                    "if (data.status=='OK'){"
+                        "fixCoulonPack(data.item);"
+                        "if(typeof resetBag == 'function'){resetBag();}"
+                        "return;"
+                    "}"
+                    "showMessage(data.status);"
+                "});").arg(id);
+    document.evaluateJavaScript(s);
+    return true;
 }
