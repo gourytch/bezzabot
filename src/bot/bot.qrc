@@ -5,5 +5,6 @@
         <file alias="button_on.png">images/button_on.png</file>
         <file alias="nopix_on.png">images/nopix_on.png</file>
         <file alias="nopix_off.png">images/nopix_off.png</file>
+        <file alias="go.png">images/go.png</file>
     </qresource>
 </RCC>

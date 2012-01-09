@@ -65,63 +65,60 @@ void MainWindow::createUI ()
 
     setWindowIcon(imgAppIcon);
 
-    pAutomaton          = new QPushButton ();
+    pAutomaton = new QPushButton();
     pAutomaton->setIcon(imgButtonOff);
     pAutomaton->setCheckable(true);
-    pAutomaton->setFlat(false);
-    pAutomaton->setFixedSize(24, 24);
+    pAutomaton->setFlat(true);
+    pAutomaton->setFixedSize(20, 20);
     pAutomaton->setToolTip(strAutomatonOff);
 
-    pNoPics          = new QPushButton ();
+    pNoPics = new QPushButton();
     pNoPics->setIcon(imgNoPicsOff);
     pNoPics->setCheckable(true);
-    pNoPics->setFlat(false);
-    pNoPics->setFixedSize(24, 24);
+    pNoPics->setFlat(true);
+    pNoPics->setFixedSize(20, 20);
     pNoPics->setToolTip(strNoPicsOff);
 
-//    pAutomaton->setIconSize(QSize(22, 22));
+    pUrlEdit = new QLineEdit();
 
-    pLoadingProgress    = new QProgressBar ();
-    pLoadingProgress->setOrientation(Qt::Vertical);
+    pGoButton = new QPushButton();
+    pGoButton->setIcon(QIcon(":/go.png"));
+    pGoButton->setCheckable(false);
+    pGoButton->setFlat(true);
+    pGoButton->setFixedSize(20, 20);
+    pGoButton->setToolTip(u8("перейти по ссылочке"));
 
-    pControls           = new QVBoxLayout ();
-    pControls->addWidget (pAutomaton, 0);
-    pControls->addWidget (pNoPics, 0);
-    pControls->addWidget (pLoadingProgress, 100);
-//    pControls->setSizeConstraint(QLayout::SetFixedSize);
-
-    pLogView            = new QTextEdit ();
-
-    pBottom             = new QHBoxLayout ();
-    pBottom->addLayout (pControls, 0);
-    pBottom->addWidget (pLogView, 100); // ?
-    pBottom->setSizeConstraint(QLayout::SetFixedSize);
-
-    pWebView            = new QWebView ();
-    pWebView->setMinimumWidth(1097);
-
-    pLayout             = new QVBoxLayout ();
-    pLayout->setMargin (10);
-    pLayout->setSpacing (10);
-    pLayout->addWidget(pWebView, 100);
-    pLayout->addLayout(pBottom, 0);
-//    pLayout->setStretchFactor(pWebView, 100);
-//    pLayout->setStretchFactor(pBottom, 1);
-
-/*
-    pSplitter           = new QSplitter (Qt::Vertical);
-    pSplitter->setOpaqueResize(false);
-
-    pSplitter->addWidget (pWebView);
-    pSplitter->addWidget (pLogView);
-    pLayout->addWidget (pSplitter);
-*/
-
-    this->setLayout (pLayout);
-
-//    pLoadingProgress->setVisible (false);
+    pLoadingProgress = new QProgressBar ();
+    pLoadingProgress->setOrientation(Qt::Horizontal);
     pLoadingProgress->setVisible (true);
     pLoadingProgress->setEnabled (false);
+    pLoadingProgress->setFixedWidth(128);
+
+    pLogView = new QTextEdit ();
+
+    pWebView = new QWebView ();
+    pWebView->setMinimumWidth(1097);
+
+    QHBoxLayout *pControls = new QHBoxLayout ();
+    pControls->setSpacing(1);
+    pControls->addWidget (pAutomaton, 0);
+    pControls->addWidget (pNoPics, 0);
+    pControls->addWidget (pUrlEdit, 100);
+    pControls->addWidget (pGoButton, 0);
+    pControls->addWidget (pLoadingProgress, 10);
+
+    QSplitter *pSplitter = new QSplitter(Qt::Vertical);
+    pSplitter->setOpaqueResize(false);
+    pSplitter->addWidget(pWebView);
+    pSplitter->addWidget(pLogView);
+
+    QVBoxLayout *pLayout = new QVBoxLayout ();
+    pLayout->addLayout(pControls, 0);
+    pLayout->addWidget(pSplitter, 100);
+
+    this->setLayout(pLayout);
+
+//    pLoadingProgress->setVisible (false);
 
     setupWebView ();
     createTrayIcon();
@@ -178,6 +175,15 @@ void MainWindow::setupConnections () {
 
     connect (pWebView->page (), SIGNAL (loadProgress (int)),
              pLoadingProgress, SLOT (setValue (int)));
+
+    connect (pGoButton, SIGNAL(clicked()), this, SLOT(slotGoClicked()));
+
+    connect (pUrlEdit, SIGNAL(returnPressed()),
+             this, SLOT(slotGoClicked()));
+
+    connect (pUrlEdit, SIGNAL(textEdited(QString)),
+             this, SLOT(slotUrlEdited(QString)));
+
 }
 
 void MainWindow::setupWebView ()
@@ -285,14 +291,14 @@ void MainWindow::slotLoadStarted ()
 //  pLoadingProgress->setVisible(true);
     pLoadingProgress->setEnabled(true);
 
-    QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
+    QString urlstr = pWebView->page()->mainFrame()->url().toString();
     dbg ("loading " + urlstr);
     setWindowTitle(tr ("bot %1: start loading %2").arg(pBot->id(), urlstr));
 }
 
 void MainWindow::slotLoadProgress (int percent)
 {
-    QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
+    QString urlstr = pWebView->page()->mainFrame()->url().toString ();
     setWindowTitle(tr ("bot %1: loading %2, %3\%").arg(pBot->id(), urlstr).arg(percent));
 }
 
@@ -300,7 +306,11 @@ void MainWindow::slotLoadFinished(bool success)
 {
 //    pLoadingProgress->setVisible (false);
     pLoadingProgress->setEnabled(false);
-    QString urlstr = pWebView->page()->mainFrame()->requestedUrl ().toString ();
+//    QString urlstr = pWebView->page()->mainFrame()->requestedUrl().toString();
+    QString urlstr = pWebView->page()->mainFrame()->url().toString();
+    pUrlEdit->setText(urlstr);
+    _entered_url = urlstr;
+
     if (success)
     {
         dbg ("load finished");
@@ -351,4 +361,13 @@ void MainWindow::messageClicked() {
     if (!isActiveWindow()) {
         activateWindow();
     }
+}
+
+void MainWindow::slotUrlEdited(const QString& s) {
+    _entered_url = s;
+}
+
+void MainWindow::slotGoClicked() {
+    if (_entered_url.isEmpty()) return;
+    pActor->request(_entered_url);
 }

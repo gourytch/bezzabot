@@ -1,3 +1,4 @@
+#include <iostream>
 #include <QDesktopServices>
 #include <QCoreApplication>
 #include <QSettings>
@@ -58,7 +59,7 @@ void Config::init_check ()
     checkDir (_location_cache);
 
     QString ini_name = INI_NAME;
-    QRegExp rx("config=(.*)");
+    QRegExp rx("config=(.+)");
     foreach (QString s, appPtr->arguments()) {
         if (rx.indexIn(s) != -1) {
             ini_name = rx.cap(1);
@@ -69,6 +70,7 @@ void Config::init_check ()
     _ini_fname = ini_name.contains('/')
             ? ini_name
             : _location_config + "/" + ini_name;
+    clog << "using config file {" << qPrintable(_ini_fname) << "}" << endl;
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
     _global = new Config ();
     if (!_global->get("initialized").toBool()) {

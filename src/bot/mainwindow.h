@@ -38,15 +38,13 @@ protected:
     QWebView        *pWebView;
     QTextEdit       *pLogView;
 
-    //QToolBar        *pToolBar;
     QPushButton     *pAutomaton;
     QPushButton     *pNoPics;
+    QLineEdit       *pUrlEdit;
+    QPushButton     *pGoButton;
     QProgressBar    *pLoadingProgress;
 
-    QVBoxLayout     *pLayout;
-    QHBoxLayout     *pBottom;
-    QVBoxLayout     *pControls;
-    QSplitter       *pSplitter;
+    QString     _entered_url;
 
     bool        hide_in_tray_on_close;
     bool        toggle_on_tray_click;
@@ -95,6 +93,9 @@ protected slots:
     void slotLoadStarted ();
     void slotLoadProgress (int percent);
     void slotLoadFinished (bool success);
+
+    void slotUrlEdited(const QString& s);
+    void slotGoClicked();
 
 };
 
