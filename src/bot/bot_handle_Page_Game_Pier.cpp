@@ -8,6 +8,16 @@ void Bot::handle_Page_Game_Pier () {
     handle_Page_Game_Generic();
     emit dbg(tr("hangle pier game page"));
     Page_Game_Pier *p = static_cast<Page_Game_Pier*>(_page);
+    if (p->message.contains(u8("не хотят."))) {
+        emit dbg(u8("на сегодня рыбалок хватит"));
+        fishraids_remains = 0;
+        _kd_Fishing = nextDay();
+        if (currentAction == Action_Fishing) {
+            currentAction = Action_None;
+        }
+        return;
+    }
+
     if (p->canSend) {
         emit log(u8("засылаем пирашколовецкое плавсредство"));
         if (p->doSend()) {
