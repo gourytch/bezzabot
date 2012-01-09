@@ -2,6 +2,8 @@
 *.swp
 *.pro.user*
 Makefile
+*.Debug
+*.Release
 moc_*.cpp
 qrc_*.cpp
 
