@@ -10,13 +10,15 @@ HEADERS += \
     producer.h \
     config.h \
     tunedpage.h \
-    persistentcookiejar.h
+    persistentcookiejar.h \
+    logger.h
 
 SOURCES += \
     tools.cpp \
     config.cpp \
     tunedpage.cpp \
-    persistentcookiejar.cpp
+    persistentcookiejar.cpp \
+    logger.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc

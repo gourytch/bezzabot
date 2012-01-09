@@ -24,6 +24,7 @@ protected:
     static QSettings*   _settings;
 
     static bool     _portable;
+    static QString  _app_name;
     static QString  _location_appdir;
     static QString  _location_config;
     static QString  _location_cache;
@@ -66,6 +67,8 @@ public:
 
 
     static bool checkDir (const QString& dirname);
+
+    static const QString& appName ();
 
     static const QString& appDirPath ();
 

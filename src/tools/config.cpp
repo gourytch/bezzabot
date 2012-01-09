@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QDateTime>
 #include <QDir>
+#include <QFileInfo>
 #include <QDebug>
 #include <QRegExp>
 #include "config.h"
@@ -20,6 +21,7 @@ QString     Config::_location_appdir;
 QString     Config::_location_config;
 QString     Config::_location_cache;
 QString     Config::_location_data;
+QString     Config::_app_name;
 QString     Config::_ini_fname;
 
 //static
@@ -37,6 +39,8 @@ void Config::init_check ()
     appPtr->setApplicationName (APP_NAME);
     appPtr->setApplicationVersion (APP_VERSION);
     _location_appdir = appPtr->applicationDirPath ();
+    QFileInfo fi(QCoreApplication::applicationFilePath());
+    _app_name = fi.baseName();
 
     if (_portable)
     {
@@ -58,7 +62,7 @@ void Config::init_check ()
     checkDir (_location_data);
     checkDir (_location_cache);
 
-    QString ini_name = INI_NAME;
+    QString ini_name = _app_name + ".ini";
     QRegExp rx("config=(.+)");
     foreach (QString s, appPtr->arguments()) {
         if (rx.indexIn(s) != -1) {
@@ -163,6 +167,12 @@ bool Config::checkDir (const QString& dirname)
         return true;
     }
     return d.mkpath (d.absolutePath ());
+}
+
+//static
+const QString& Config::appName () {
+    init_check ();
+    return _app_name;
 }
 
 //static

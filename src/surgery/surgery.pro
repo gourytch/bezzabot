@@ -1,6 +1,6 @@
 TOP = ../..
 
-CONFIG += debug console
+CONFIG += debug
 QT += core gui network webkit
 
 TARGET = surgery
