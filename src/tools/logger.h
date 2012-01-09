@@ -10,6 +10,7 @@ class Logger : public QObject
 {
     Q_OBJECT
 protected:
+    static int      _count;
     static Logger  *_instance;
     static QtMsgHandler _prev_handler;
     QString         _fname;
@@ -27,9 +28,9 @@ public:
     void log(QtMsgType mtype, const char *text);
     void setLevel(QtMsgType to_out, QtMsgType to_file);
 signals:
-    
+
 public slots:
-    
+
 };
 
 #endif // LOGGER_H

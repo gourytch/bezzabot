@@ -15,7 +15,11 @@ QString load (const QString& fname);
 
 inline QString u8 (const char *pch)
 {
-    return QString::fromUtf8 (pch);
+    if (pch) {
+        return QString::fromUtf8 (pch);
+    } else {
+        return QString();
+    }
 }
 
 
