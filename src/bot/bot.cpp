@@ -85,9 +85,9 @@ Bot::Bot(const QString& id, QObject *parent) :
 Bot::~Bot ()
 {
     stop ();
-//    delete _actor;
-//    delete _cookies;
-//    delete _config;
+    //    delete _actor;
+    //    delete _cookies;
+    //    delete _config;
 }
 
 void Bot::reset() {
@@ -181,7 +181,7 @@ void Bot::delayedGoTo() {
 
 void Bot::delayedReload() {
     cancelAuto();
-//    _actor->page()->triggerAction(QWebPage::Reload);
+    //    _actor->page()->triggerAction(QWebPage::Reload);
     request_get(QUrl(_baseurl));
 }
 
@@ -319,7 +319,7 @@ void Bot::step()
         _step_timer.stop();
     }
     if (!_awaiting && !_actor->busy()) {
-            one_step();
+        one_step();
     }
 
     if (_started) {
@@ -330,88 +330,6 @@ void Bot::step()
             QTimer::singleShot(1000, this, SLOT(step()));
         }
     }
-}
-
-//virtual
-void Bot::one_step () {
-    if (_page == NULL || (_gpage == NULL && _page->pagekind != page_Login) ) {
-        qDebug() << "we're not at game page. [re]login";
-        action_login();
-        return;
-    }
-    QDateTime ts = QDateTime::currentDateTime();
-
-    if (action_fishing()) {
-        return;
-    }
-
-    if (_gpage->hasNoJob()) {
-
-        int h = QTime::currentTime().hour();
-        if ((1 <= h) && (h < 8) && (fishraids_remains == 0)) {
-            emit log (u8("пойду на ферму отсыпаться"));
-            currentWork = Work_Farming;
-            currentAction = Action_None;
-            GoTo("farm.php");
-            return;
-        }
-
-        if (hp_cur < 25) {
-            emit log (u8("пойду на ферму отлёживаться"));
-            currentWork = Work_Farming;
-            currentAction = Action_None;
-            GoTo("farm.php");
-            return;
-        }
-
-        //придумаем себе какое-нибудь занятие
-        if ((_kd_Dozor.isNull() || _kd_Dozor < ts) && (hp_cur >= 25)) {
-            emit log (u8("пойду-ка в дозор."));
-            currentWork = Work_Watching;
-            GoTo("dozor.php");
-            return;
-        }
-
-        if (gold < 1000) {
-            emit log (u8("пойду за деньгами на ферму."));
-            currentWork = Work_Farming;
-            currentAction = Action_None;
-            GoTo("farm.php");
-            return;
-        }
-
-        if (gold < 1000) {
-            emit log (u8("пойду в шахту."));
-            currentWork = Work_Mining;
-            currentAction = Action_None;
-            GoTo("mine.php?a=open");
-            return;
-        }
-    }
-
-    QString jobUrl = _gpage->jobLink(true, 10);
-    if (jobUrl.isNull()) {
-        if (currentAction == Action_FinishWork) {
-            currentAction = Action_None;
-            currentWork = Work_None;
-        }
-        return; // не имеем работы, которую надо пойти и доделать
-    }
-    QUrl url = QUrl(_baseurl + jobUrl);
-    if (_actor->page()->mainFrame ()->url() != url) {
-        if (jobUrl.startsWith("farm.php")) {
-            currentWork = Work_Farming;
-        } else if (jobUrl.startsWith("mine.php")) { // FIXME а полянки?
-            currentWork = Work_Mining;
-        }
-        currentAction = Action_FinishWork;
-
-        emit log (u8("надо доделать работу. %1 на %2")
-                  .arg(::toString(currentWork), url.toString()));
-        GoTo(jobUrl);
-    }
-    return;
-
 }
 
 //////////// page handlers //////////////////////////////////////////////////
@@ -495,8 +413,8 @@ bool Bot::action_look () {
 
 bool Bot::action_fishing() {
     if (currentAction != Action_None) {
-//        emit dbg (u8("fisherman not activated: currentAction=%1")
-//                  .arg(::toString(currentAction)));
+        //        emit dbg (u8("fisherman not activated: currentAction=%1")
+        //                  .arg(::toString(currentAction)));
         return false;
     }
     if (level < 5) {
@@ -518,9 +436,9 @@ bool Bot::action_fishing() {
 
     QDateTime now = QDateTime::currentDateTime();
     if (!_kd_Fishing.isNull() && (now < _kd_Fishing)) {
-//        emit dbg (u8("now (%1) < _kd_Fishing (%2)")
-//                  .arg(now.toString("yyyy-MM-dd hh:mm:ss"),
-//                       _kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
+        //        emit dbg (u8("now (%1) < _kd_Fishing (%2)")
+        //                  .arg(now.toString("yyyy-MM-dd hh:mm:ss"),
+        //                       _kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
         return false;
     }
     if (_kd_Fishing.isNull()) {
@@ -531,19 +449,16 @@ bool Bot::action_fishing() {
                        now.toString("yyyy-MM-dd hh:mm:ss")));
     }
 
-    if (p->resources.contains(39)) { // i39
-        int count = p->resources.value(39).count;
-        if (count == 0) {
-            emit dbg (u8("на сегодня заплывов не осталось"));
-            return false;
-        }
-        emit dbg (u8("осталось %1 походов").arg(count));
-    } else {
-        emit dbg (u8("счётчик заплывов не найден"));
+    if (fishraids_remains == 0) {
+        emit dbg (u8("на сегодня заплывов не осталось"));
         _kd_Fishing = nextDay();
-        emit dbg (u8(" assign _kd_Fishing to %1")
+        emit dbg (u8("assign _kd_Fishing to %1")
                   .arg(_kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
         return false;
+    } else if (fishraids_remains == -1){
+        emit dbg (u8("счётчик заплывов не установлен"));
+    } else {
+        emit dbg (u8("осталось %1 походов").arg(fishraids_remains));
     }
     currentAction = Action_Fishing;
     emit dbg (u8("Action_Fishing started"));
@@ -756,7 +671,6 @@ void Bot::configure() {
     _autostart = _config->get("autostart", false, false).toBool();
 
     _digchance  = _config->get("miner/digchance", false, 75).toInt();
-//    _digcoulon = _config->get("miner/coulon", false, "").toString();
 
     qDebug() << "configure result: " << _good;
 }

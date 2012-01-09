@@ -3,7 +3,7 @@ TOP = ../..
 TARGET = bezzabot
 TEMPLATE = app
 
-CONFIG += debug console
+CONFIG += debug
 QT += core gui network webkit
 
 SOURCES += main.cpp\
@@ -15,7 +15,8 @@ SOURCES += main.cpp\
     bot_handle_Page_Game_Mine_Open.cpp \
     farmersgroupsprices.cpp \
     bot_handle_Page_Game_Pier.cpp \
-    bot_handle_Page_Game_Farm.cpp
+    bot_handle_Page_Game_Farm.cpp \
+    bot_one_step.cpp
 
 HEADERS  += mainwindow.h \
             bot.h \
