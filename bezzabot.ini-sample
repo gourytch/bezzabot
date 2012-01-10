@@ -3,6 +3,11 @@ initialized=true
 launched=2011-12-28 21:06:58
 debug=true
 
+[log]
+name=samplebot-{TS}.log
+level_out=1
+level_log=0
+
 [ui]
 balloon_ttl=2000
 tray_toggle=true

@@ -27,9 +27,18 @@ public:
     static Logger& global();
     void log(QtMsgType mtype, const char *text);
     void setLevel(QtMsgType to_out, QtMsgType to_file);
+
 signals:
+    void signalDebug(const QString& msg);
+    void signalWarning (const QString& msg);
+    void signalError(const QString& msg);
+    void signalXError(const QString& msg);
 
 public slots:
+    void slotDebug(const QString& msg);
+    void slotWarning (const QString& msg);
+    void slotError(const QString& msg);
+    void slotXError(const QString& msg);
 
 };
 

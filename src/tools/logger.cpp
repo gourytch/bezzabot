@@ -14,12 +14,23 @@ QtMsgHandler Logger::_prev_handler = NULL;
 
 Logger::Logger(QObject *parent) :
     QObject(parent) {
-    clog << "LOG[count=" << (++_count) << "]" << endl;
+    ++_count;
+//    clog << "LOG[count=" << _count << "]" << endl;
     Config& cfg = Config::global();
-    setLevel(QtDebugMsg, QtDebugMsg);
-    _fname = cfg.dataPath() + "/"
-            + cfg.get("logname", false, Config::appName()).toString()
-            + ".log";
+
+    setLevel((QtMsgType)cfg.get("log/level_out", (int)QtDebugMsg).toInt(),
+             (QtMsgType)cfg.get("log/level_log", (int)QtDebugMsg).toInt());
+
+    _fname = cfg.get("log/name", false, Config::appName()).toString();
+    if (!_fname.contains('.')) {
+        _fname += ".log";
+    }
+    if (!(_fname.startsWith("/") || _fname.startsWith("./"))) {
+        _fname = cfg.dataPath() + "/" + _fname;
+    }
+    QDateTime t = QDateTime::currentDateTime();
+    _fname = _fname.replace("{TS}", t.toString("yyyyMMdd_hhmmss"))
+            .replace("{DATE}", t.toString("yyyyMMdd"));
     _file = new QFile (_fname, this);
     if (!_file->open(QFile::WriteOnly)) {
         delete _file;
@@ -31,8 +42,14 @@ Logger::Logger(QObject *parent) :
 }
 
 Logger::~Logger() {
-    if (_instance == this) {
-        log(QtDebugMsg, "end logging");
+    if (--_count <= 0) {
+        if (_instance == this) {
+            log(QtDebugMsg, "end logging");
+        }
+        if (_prev_handler) {
+            qInstallMsgHandler(_prev_handler);
+            _prev_handler = NULL;
+        }
     }
 }
 
@@ -61,12 +78,13 @@ void Logger::log(QtMsgType mtype, const char *text) {
 
     if (mtype < _lvl_cout && mtype < _lvl_file) return;
 
+    QString t = u8(text);
+
     QDateTime ts = QDateTime::currentDateTime();
     QString m = ts.toString("yyyy-MM-dd hh:mm:ss");
     m += " -";
     m += QString("DWEX???"[(int)mtype]);
     m += "-  ";
-    QString t = u8(text);
     m += t.replace(QString("\n"), QString("\n    "));
     if (_lvl_file <= mtype && _stream) {
         (*_stream) << m << "\n";
@@ -79,4 +97,35 @@ void Logger::log(QtMsgType mtype, const char *text) {
             std::clog << qPrintable(m) << std::endl;
 //        }
     }
+
+    switch (mtype) {
+    case QtDebugMsg:
+        emit signalDebug(t);
+        break;
+    case QtWarningMsg:
+        emit signalWarning(t);
+        break;
+    case QtCriticalMsg:
+        emit signalError(t);
+        break;
+    default:
+        emit signalXError(t);
+        break;
+    }
+}
+
+void Logger::slotDebug(const QString& msg) {
+    log(QtDebugMsg, msg.toUtf8().constData());
+}
+
+void Logger::slotWarning (const QString& msg) {
+    log(QtWarningMsg, msg.toUtf8().constData());
+}
+
+void Logger::slotError(const QString& msg) {
+    log(QtCriticalMsg, msg.toUtf8().constData());
+}
+
+void Logger::slotXError(const QString& msg) {
+    log(QtFatalMsg, msg.toUtf8().constData());
 }
