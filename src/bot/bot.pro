@@ -34,7 +34,10 @@ DESTDIR = $$TOP/bin
 RESOURCES += \
     bot.qrc
 
-
-
-
-
+win32 {
+    CONFIG += static
+    SOURCES += static_plugins.cpp
+    QTPLUGIN += \
+        qjpeg qgif qico qsvg qtiff \
+        qdecorationdefault qdecorationwindows
+}
