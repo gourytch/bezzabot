@@ -202,13 +202,13 @@ void WebActor::onPageFinished (bool ok)
 
 void WebActor::onLinkClicked (const QUrl& url)
 {
-    qDebug () << "LINK CLICKED : " + url.toString ();
+    qDebug("LINK CLICKED : " + url.toString ());
 }
 
 
 void WebActor::onDownloadRequested (const QNetworkRequest& request)
 {
-    qDebug () << "DOWNLOAD REQUESTED: " + request.url ().toString ();
+    qDebug("DOWNLOAD REQUESTED: " + request.url ().toString ());
 
 }
 
@@ -218,7 +218,10 @@ void WebActor::savePage ()
     QString ts = now ();
     Config::checkDir (_savepath);
     QString pfx = _savepath + "/" + _bot->id() + "-" + ts + "-";
-    qDebug() << "save by TS=" << ts;
+    qDebug("SAVE PAGE TS=" +
+           ts + " URL:" +
+           _webpage->mainFrame ()->url().toString());
+
     ::save (pfx + ".url",
             _webpage->mainFrame ()->url().toString());
 
@@ -228,11 +231,9 @@ void WebActor::savePage ()
 //            _webpage->mainFrame ()->documentElement ().toInnerXml ());
     ::save (pfx + "text.txt",
             _webpage->mainFrame ()->documentElement ().toPlainText());
-    qDebug () << "parse loaded page:";
-    Page_Generic *page = parse ();
-    qDebug () << "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";
-    qDebug () << page->toString();
-    qDebug () << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+    Page_Generic *page = parse();
+    ::save (pfx + "parsed.txt",
+            page ? page->toString() : "NULL");
 }
 
 

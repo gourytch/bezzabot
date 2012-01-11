@@ -14,7 +14,7 @@
 using namespace std;
 
 Bot::Bot(const QString& id, QObject *parent) :
-    QObject(parent),
+    QObject(parent), // QThread
     _autoTimer(NULL)
 {
     _id = id;
@@ -92,31 +92,8 @@ Bot::~Bot ()
 
 void Bot::reset() {
 
-    _step_counter = 0;
-    currentAction = Action_None;
-    currentWork = Work_None;
-
+    state.reset();
     _reload_attempt = 0;
-
-    _kd_Dozor = QDateTime();
-    _kd_Fishing = QDateTime();
-    _kd_Mailbox = QDateTime();
-
-    level = -1;
-    charname = "?";
-    chartitle = "?";
-    gold = -1;
-    crystal = -1;
-    fish = -1;
-    green = -1;
-    hp_cur = -1;
-    hp_max = -1;
-    hp_spd = -1;
-    atime = QDateTime();
-    dozors_remains = -1;
-    fishraids_remains = -1;
-
-
 }
 
 void Bot::request_get (const QUrl& url) {
@@ -146,7 +123,11 @@ void Bot::cancelAuto(bool ok) {
 void Bot::GoTo(const QString& link, bool instant) {
     cancelAuto();
     _awaiting = true;
-    _linkToGo = link.isNull() ? _baseurl : _baseurl + link;
+    _linkToGo = link.isNull()
+            ? _baseurl
+            : link.startsWith("http")
+              ? link
+              : _baseurl + link;
     _autoTimer = new QTimer();
     _autoTimer->setSingleShot(true);
     int ms = instant ? 0 : 500 + (qrand() % 10000);
@@ -186,16 +167,18 @@ void Bot::delayedReload() {
 }
 
 void Bot::GoToWork(const QString& deflink, bool instant) {
-    Page_Game *p = dynamic_cast<Page_Game*>(_page);
-    if (!p) {
-        action_login();
-        return;
+    if (_gpage) {
+        QString href = (_gpage->timer_work.href == "/")
+                ? deflink
+                : _gpage->timer_work.href;
+        GoTo(href, instant);
+    } else {
+        GoTo(_baseurl, instant);
     }
-    QString href = (p->timer_work.href == "/") ? deflink : p->timer_work.href;
-    GoTo(href, instant);
 }
 
 //////// slots /////////////////////////////////////////////////////////
+
 void Bot::onPageStarted() {
     cancelAuto();
     if (_page) {
@@ -219,14 +202,15 @@ void Bot::onPageFinished (bool ok)
 
     _awaiting = false;
 
-    qDebug() << "page kind: " + ::toString(_page->pagekind);
+    qDebug("page kind: " + ::toString(_page->pagekind));
     if (!isStarted()) {
-        qDebug() << "bot is not active. no page handling will be performed";
+        qDebug("bot is not active. no page handling will be performed");
         return;
     }
     if (_page->pagekind != page_Error) {
         _reload_attempt = 0;
     }
+
     switch (_page->pagekind)
     {
     case page_Error:
@@ -238,30 +222,14 @@ void Bot::onPageFinished (bool ok)
     case page_Entrance:
         handle_Page_Login();
         break;
-    case page_Game_Index:
-        handle_Page_Game_Index();
-        break;
-    case page_Game_Dozor_Entrance:
-        handle_Page_Game_Dozor_Entrance();
-        break;
-    case page_Game_Mine_Open:
-        handle_Page_Game_Mine_Open();
-        break;
-    case page_Game_Pier:
-        handle_Page_Game_Pier();
-        break;
-    case page_Game_Farm:
-        handle_Page_Game_Farm();
-        break;
-    case page_Game:
-        handle_Page_Game_Generic();
-        break;
-    case page_Generic:
-        handle_Page_Generic();
-        break;
     default:
-        qDebug()<<"unhandled page with kind=" + toString(_page->pagekind);
-        break;
+        if (_gpage) { // Page_Game and descendants
+            state.update_from_page(_gpage);
+            got_page(_gpage);
+        } else {
+            qCritical("unhandled page with kind=" + toString(_page->pagekind));
+            break;
+        }
     }
 }
 
@@ -333,9 +301,10 @@ void Bot::step()
 }
 
 //////////// page handlers //////////////////////////////////////////////////
+
 void Bot::handle_Page_Error () {
-    emit dbg(tr("hangle error page"));
     Page_Error *p = static_cast<Page_Error*>(_page);
+    qCritical("page error #%d", p->status);
     switch (p->status / 100) { // старший знак
     case 5: // 504 (gateway timeout)
         emit log (QString("state 5xx. reload page"));
@@ -347,291 +316,12 @@ void Bot::handle_Page_Error () {
 
 }
 
-void Bot::handle_Page_Generic () {
-    emit dbg(tr("hangle generic page"));
-}
-
-
 void Bot::handle_Page_Login () {
-    handle_Page_Generic();
-    emit dbg(tr("hangle login page"));
+    qDebug("hangle login page");
     Page_Login *p = static_cast<Page_Login*>(_page);
     if (p->doLogin(_serverNo, _login, _password, true)) {
         _awaiting = true;
     }
-}
-
-void Bot::handle_Page_Game_Generic () {
-    handle_Page_Generic();
-    emit dbg(tr("hangle generic game page"));
-    hp_cur  = _gpage->hp_cur;
-    hp_max  = _gpage->hp_max;
-    hp_spd  = _gpage->hp_spd;
-    gold    = _gpage->gold;
-    crystal = _gpage->crystal;
-    fish    = _gpage->fish;
-    green   = _gpage->green;
-    free_gold       = _gpage->free_gold;
-    free_crystal    = _gpage->free_crystal;
-    if (_gpage->resources.contains(39)) { // i39
-        fishraids_remains = _gpage->resources.value(39).count;
-    }
-    if (!_gpage->message.isEmpty()) {
-        emit log(u8("сообщение: «%1»").arg(_gpage->message.replace('\n', ' ')));
-    }
-
-}
-
-void Bot::handle_Page_Game_Index () {
-    handle_Page_Game_Generic();
-    emit dbg(tr("hangle index game page"));
-    Page_Game_Index *p = static_cast<Page_Game_Index*>(_page);
-    level = p->level;
-}
-
-/////////// actions /////////////////////////////////////////////////////////
-
-bool Bot::action_login () {
-    if (!_good) {
-        emit dbg(u8("attempt to login for unconfigured bot"));
-        return false;
-    }
-    emit dbg(u8("initiate login sequence for ") + _login + " at " +_baseurl);
-    request_get(QUrl(_baseurl + "login.php"));
-    return true;
-}
-
-bool Bot::action_look () {
-    if (!_good) {
-        emit dbg(u8("attempt to login for unconfigured bot"));
-        return false;
-    }
-    emit dbg(u8("request index for ") +_login + " at " + _baseurl);
-    request_get(QUrl(_baseurl + "index.php"));
-    return true;
-}
-
-bool Bot::action_fishing() {
-    if (currentAction != Action_None) {
-        //        emit dbg (u8("fisherman not activated: currentAction=%1")
-        //                  .arg(::toString(currentAction)));
-        return false;
-    }
-    if (level < 5) {
-        return false;
-    }
-    if (_page == NULL) return false;
-    Page_Game *p = dynamic_cast<Page_Game*>(_page);
-    if (!p) return false;
-
-    const PageTimer *t =
-            p->timers.byTitle(u8("Время до возвращения судна с пирашками"));
-    if (_kd_Fishing.isNull() && t != NULL && !t->pit.isNull()) {
-        emit dbg (u8("pit = %1").arg(t->pit.toString("yyyy-MM-dd hh:mm:ss")));
-        int add = 300 + (qrand() % 300);
-        _kd_Fishing = t->pit.addSecs(add);
-        emit dbg (u8(" assign _kd_Fishing to %1")
-                  .arg(_kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
-    }
-
-    QDateTime now = QDateTime::currentDateTime();
-    if (!_kd_Fishing.isNull() && (now < _kd_Fishing)) {
-        //        emit dbg (u8("now (%1) < _kd_Fishing (%2)")
-        //                  .arg(now.toString("yyyy-MM-dd hh:mm:ss"),
-        //                       _kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
-        return false;
-    }
-    if (_kd_Fishing.isNull()) {
-        emit dbg (u8("_kd_Fishing is null"));
-    } else {
-        emit dbg (u8("_kd_Fishing (%1) < now (%2)")
-                  .arg(_kd_Fishing.toString("yyyy-MM-dd hh:mm:ss"),
-                       now.toString("yyyy-MM-dd hh:mm:ss")));
-    }
-
-    if (fishraids_remains == 0) {
-        emit dbg (u8("на сегодня заплывов не осталось"));
-        _kd_Fishing = nextDay();
-        emit dbg (u8("assign _kd_Fishing to %1")
-                  .arg(_kd_Fishing.toString("yyyy-MM-dd hh:mm:ss")));
-        return false;
-    } else if (fishraids_remains == -1){
-        emit dbg (u8("счётчик заплывов не установлен"));
-    } else {
-        emit dbg (u8("осталось %1 походов").arg(fishraids_remains));
-    }
-    currentAction = Action_Fishing;
-    emit dbg (u8("Action_Fishing started"));
-    GoTo("harbour.php?a=pier");
-    return true;
-}
-
-quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
-    emit dbg(u8("вычисляем нужный кулон для %1 на %2 сек")
-             .arg(::toString(work)).arg(seconds));
-
-    Page_Game *p = dynamic_cast<Page_Game*>(_page);
-    if (!p) {
-        emit dbg(u8("??? неигровая страница"));
-        return 0;
-    }
-
-    static const QString name_ckhrist = u8("Копикрист");
-    quint32 id_ckhrist = 0;
-    int lvl_ckhrist = -1;
-
-    static const QString name_antimag = u8("Антимаг");
-    quint32 id_antimag = 0;
-    int lvl_antimag = -1;
-
-    static const QString name_skorokhod = u8("Скороход");
-    quint32 id_skorokhod = 0;
-    int lvl_skorokhod = -1;
-
-    static const QString name_stakhanka = u8("Стаханка");
-    quint32 id_stakhanka = 0;
-    int lvl_stakhanka = -1;
-
-    static const QString name_nevidimtcha = u8("Невидимча");
-    quint32 id_nevidimtcha = 0;
-    int lvl_nevidimtcha = -1;
-
-    quint32 active_id = 0;
-
-    QDateTime now = QDateTime::currentDateTime();
-    int immunity_time = p->timer_immunity.pit.isNull()
-            ? 0
-            : now.secsTo(p->timer_immunity.pit);
-    bool safetime = (immunity_time - seconds - 60) > 0;
-
-    for (int i = 0; i < p->coulons.coulons.count(); ++i) {
-        PageCoulon &k = p->coulons.coulons[i];
-        if (k.active) {
-            active_id = k.id;
-        }
-        if (name_ckhrist == k.name && lvl_ckhrist < k.cur_lvl) {
-            id_ckhrist = k.id;
-        }
-        if (name_antimag == k.name && lvl_antimag < k.cur_lvl) {
-            id_antimag = k.id;
-        }
-        if (name_skorokhod == k.name && lvl_skorokhod < k.cur_lvl) {
-            id_skorokhod = k.id;
-        }
-        if (name_stakhanka == k.name && lvl_stakhanka < k.cur_lvl) {
-            id_stakhanka = k.id;
-        }
-        if (name_nevidimtcha == k.name && lvl_nevidimtcha < k.cur_lvl) {
-            id_nevidimtcha = k.id;
-        }
-    }
-
-    emit dbg(u8("несохранённого: %1 з, %2 кр, надет #%3, immtime: %4, imm: %5")
-             .arg(free_gold)
-             .arg(free_crystal)
-             .arg(active_id)
-             .arg(immunity_time)
-             .arg(safetime ? "true" : "false")
-             );
-
-    switch (work) {
-    case Work_Training: // планируем потренироваться
-        //тут предпочтения вряд ли будут
-        // - делаем то же, как если бы не делали ничего
-    case Work_None: // планируем лодырничать
-        if (safetime) { // время ещё есть
-            emit dbg(u8("возвращаем что висит (#%1)").arg(active_id));
-            return active_id; // ничего не будем менять: и так хорошо
-        }
-        break; // будем делать штатную защиту
-
-    case Work_Mining: // планируем ковырять кристаллы
-        if (safetime || (free_crystal == 0 && free_gold == 0)) {
-            // время ещё есть - копикрируем
-            if (id_ckhrist > 0) { // есть копикрист!
-                emit dbg(u8("возвращаем копикрист (#%1)").arg(id_ckhrist));
-                return id_ckhrist;
-            }
-        }
-        break; // копика нет. жаль.
-
-    case Work_Watching: // планируем пойти в дозор
-        if (safetime) { // время ещё есть
-            if (id_skorokhod > 0) { // есть скороход!
-                emit dbg(u8("возвращаем скороход (#%1)").arg(id_skorokhod));
-                return id_skorokhod;
-            }
-        }
-        break; // нету скорохода
-
-    case Work_Farming: // планируем пойти на ферму
-        if (safetime) { // время ещё есть
-            if (id_stakhanka > 0) { // есть стаханка!
-                emit dbg(u8("возвращаем стаханку (#%1)").arg(id_stakhanka));
-                return id_stakhanka;
-            }
-        }
-        break; // нету стаханки
-    default:
-        break;
-    }
-
-    // если ничего не подошло, безальтернативно защищаемся
-    if (id_nevidimtcha == 0 && id_antimag == 0) {
-        emit dbg(u8("возвращаем что висит (#%1)").arg(active_id));
-        return active_id; // всё равно щититься нечем, оставим как есть
-    }
-    if (free_crystal > 0) { // кристаллы жальчей чем деньги
-        emit dbg(u8("возвращаем антимаг (#%1)").arg(id_antimag));
-        return id_antimag;
-    }
-    emit dbg(u8("возвращаем невидимчу (#%1)").arg(id_nevidimtcha));
-    return id_nevidimtcha;
-}
-
-bool Bot::is_need_to_change_coulon(quint32 id) {
-    emit dbg (u8("проверка необходимости смены кулона на #%1").arg(id));
-    Page_Game *p = dynamic_cast<Page_Game*>(_page);
-    if (!p) {
-        emit dbg(u8("хрень какая-то: неигровая страница"));
-        return false;
-    }
-    quint32 aid = 0;
-    const PageCoulon *k = p->coulons.active();
-    if (k) aid = k->id;
-    if (id == aid) {
-        emit dbg(u8("это уже надето, ничего не надо менять"));
-        return false;
-    }
-    emit dbg(u8("надо переодеться"));
-    return true;
-}
-
-bool Bot::action_wear_right_coulon(quint32 id) {
-    emit dbg(u8("переодеваем кулон на #%1").arg(id));
-    Page_Game *p = dynamic_cast<Page_Game*>(_page);
-    if (!p) {
-        emit dbg(u8("хрень какая-то: неигровая страница"));
-        return false;
-    }
-    if (id == 0) {
-        emit dbg(u8("снимаем надетый кулон"));
-        quint32 aid = 0;
-        const PageCoulon *k = p->coulons.active();
-        if (k) aid = k->id;
-        if (id == aid) {
-            emit dbg("уже надето ничего его и оставим :)");
-            return true;
-        }
-        emit dbg(u8("будем кликать на кулон %1").arg(aid));
-        id = aid;
-    }
-    if (p->doClickOnCoulon(id)) {
-        emit dbg(u8("вроде кликнулось. надо бы попозже страничку обновить"));
-        return true;
-    }
-    emit dbg(u8("что-то не срослось"));
-    return false;
 }
 
 /////////// misc /////////////////////////////////////////////////////////
@@ -673,29 +363,4 @@ void Bot::configure() {
     _digchance  = _config->get("miner/digchance", false, 75).toInt();
 
     qDebug() << "configure result: " << _good;
-}
-
-QString toString(WorkType v) {
-    switch (v) {
-    case Work_None: return "Work_None";
-    case Work_Watching: return "Work_Watching";
-    case Work_Farming: return "Work_Farming";
-    case Work_Mining: return "Work_Mining";
-    case Work_Training: return "Work_Training";
-    }
-    return "?";
-}
-
-QString toString(ActionType v) {
-    switch (v) {
-    case Action_None: return "Action_None";
-    case Action_Fishing: return "Action_Fishing";
-    case Action_MineShopping: return "Action_MineShopping";
-    case Action_Smithing: return "Action_Smithing";
-    case Action_Gambling: return "Action_Gambling";
-    case Action_Healing: return "Action_Healing";
-    case Action_DressUp: return "Action_DressUp";
-    case Action_FinishWork: return "Action_FinishWork";
-    }
-    return "?";
 }
