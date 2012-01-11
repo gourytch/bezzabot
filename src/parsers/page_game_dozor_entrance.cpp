@@ -18,15 +18,6 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     // DIV[id=body]
     QWebElement infotab = body.findFirst("TABLE[class=info]");
     QWebElementCollection groups = infotab.findAll("DIV[class=grbody]");
-/*
-    int cnt = 0;
-    foreach (QWebElement div, groups) {
-        QString divtext = div.toOuterXml().trimmed();
-        qDebug() << "vvvvvvvvvvv";
-        qDebug() << QString("div[%1] = {%2}").arg(cnt++).arg(divtext);
-        qDebug() << "^^^^^^^^^^";
-    }
-*/
 
     _dozorForm = groups[1];
     dozor_price = _dozorForm.findFirst("SPAN[class=price_num]")
@@ -54,31 +45,30 @@ QString Page_Game_Dozor_Entrance::toString (const QString& pfx) const
 
 //static
 bool Page_Game_Dozor_Entrance::fit(const QWebElement& doc) {
-    qDebug() << "* CHECK Page_Game_Dozor_Entrance";
+//    qDebug("* CHECK Page_Game_Dozor_Entrance");
     QWebElementCollection titles = doc.findAll ("DIV[class=title]");
     if (!titles.count ()) {
-        qDebug() << "Page_Game_Dozor_Entrance doesn't fit: no titles";
+//        qDebug("Page_Game_Dozor_Entrance doesn't fit: no titles");
         return false;
     }
     foreach (QWebElement e, titles) {
         QString title = e.toPlainText ().trimmed ();
-//        qDebug() << "GOT TITLE: {" + title + "}";
         if (title == u8("Капитан стражи")) {
-            qDebug() << u8("Page_Game_Dozor fit: Капитан Стражи detected");
+//            qDebug("Page_Game_Dozor fit: Капитан Стражи detected");
             return true;
         }
     }
-    qDebug() << "Page_Game_Dozor_Entrance doesn't fit";
+//    qDebug("Page_Game_Dozor_Entrance doesn't fit");
     return false;
 }
 
 bool Page_Game_Dozor_Entrance::doDozor(int time10) {
     if (dozor_left10 < time10) {
-        qDebug () << u8("превышение времени дозора");
+        qCritical("превышение времени дозора");
         return false;
     }
     if (gold < dozor_price) {
-        qDebug () << u8("нехватка золота на дозор");
+        qCritical("нехватка золота на дозор");
         return false;
     }
     QWebElement selector = _dozorForm.findFirst("SELECT[id=auto_watch]");
@@ -92,16 +82,16 @@ bool Page_Game_Dozor_Entrance::doDozor(int time10) {
         }
     }
     if (!valSet) {
-        qDebug () << u8("опция не найдена");
+        qCritical("опция не найдена");
         return false;
     }
 
     submit = _dozorForm.findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
-        qDebug () << u8("кнопка старта не найдена");
+        qCritical("кнопка старта не найдена");
         return false;
     }
-    qDebug () << u8("нажимаем кнопку старта дозора");
+    qWarning("нажимаем кнопку старта дозора");
     pressSubmit();
     return true;
 }

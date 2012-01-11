@@ -39,10 +39,10 @@ WebActor::WebActor(Bot *bot) :
         QString proxyHost = Config::global().get("connection/proxy_host", "").toString();
         int proxyPort = Config::global().get("connection/proxy_port", 0).toInt();
         if (!proxyHost.isEmpty() && proxyPort > 0) {
-            qDebug() << "proxy host:" << proxyHost << " port:" << proxyPort;
+            qDebug(QString("proxy %1:%2").arg(proxyHost).arg(proxyPort));
             _proxy = new QNetworkProxy (QNetworkProxy::HttpCachingProxy, proxyHost, proxyPort);
         } else {
-            qDebug() << "incorrect proxy params";
+            qCritical("incorrect proxy params");
         }
     }
 
@@ -104,11 +104,11 @@ void WebActor::request_ (const QNetworkRequest& rq,
 {
     QNetworkRequest rq_mod = rq;
     rq_mod.setRawHeader ("User-Agent", USER_AGENT);
-    qDebug() << "send request";
+    qDebug("send request");
     _finished = false;
     _success = false;
     _webpage->mainFrame ()->load (rq_mod, operation, body);
-    qDebug() << "request sent";
+    qDebug("request sent");
 }
 
 
@@ -190,10 +190,10 @@ void WebActor::onPageStarted ()
 ///////////////////////////////////////////////////////////////////////////
 void WebActor::onPageFinished (bool ok)
 {
-    qDebug() << "WebActor::onPageFinished(" << ok << ")";
+    qDebug("WebActor::onPageFinished(%s)", ok ? "true" : "false");
     _finished   = true;
     _success    = ok;
-    if (_success)
+    if (!_strict || _success)
     {
         emit save_page ();
     }

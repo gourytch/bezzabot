@@ -4,13 +4,14 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QTimer>
+#include "tools.h"
 
 void save (const QString& fname, const QString& text)
 {
     QFile fout (fname);
     if (!fout.open (QFile::WriteOnly | QFile::Truncate))
     {
-        qDebug () << "FILE " << fname << " OPEN ERROR FOR WRITING";
+        qCritical("FILE " + fname + " OPEN ERROR FOR WRITING");
         return;
     }
     QTextStream out (&fout);
@@ -26,13 +27,13 @@ QString load (const QString& fname)
     QFile fin (fname);
     if (!fin.exists ())
     {
-        qDebug () << "file " << fname << " not exists";
+        qWarning("file " + fname + " not exists");
         return QString ();
     }
 
     if (!fin.open (QFile::ReadOnly))
     {
-        qDebug () << "FILE " << fname << " OPEN ERROR FOR READING";
+        qCritical("FILE " + fname + " OPEN ERROR FOR READING");
         return QString ();
     }
     QTextStream in (&fin);
@@ -41,7 +42,7 @@ QString load (const QString& fname)
     return buf;
 }
 
-QString now (bool utc = false)
+QString now (bool utc)
 {
     if (utc)
     {

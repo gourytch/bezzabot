@@ -4,7 +4,9 @@
 
 void Bot::got_page(Page_Game *gpage) {
     if (!gpage->message.isEmpty()) {
-        emit log(u8("сообщение: «%1»").arg(gpage->message.replace('\n', ' ')));
+        QString s (u8("сообщение: «%1»")
+                .arg(gpage->message.replace('\n', ' ')));
+        emit log(s);
     }
 
 }

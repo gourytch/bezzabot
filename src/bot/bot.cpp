@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QTimer>
 #include <QDir>
-#include <iostream>
 #include "mainwindow.h"
 #include "bot.h"
 #include "webactor.h"
@@ -11,19 +10,17 @@
 #include "parsers/all_pages.h"
 #include "farmersgroupsprices.h"
 
-using namespace std;
-
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent), // QThread
     _autoTimer(NULL)
 {
     _id = id;
     _config = new Config (this, _id);
-    Config::checkDir (_config->dataPath ());
-    Config::checkDir (_config->cachePath ());
-    qDebug () << "BOT ID : " << _id;
-    qDebug () << "BOTDIR : " << _config->dataPath ();
-    qDebug () << "CACHE  : " << _config->cachePath ();
+    Config::checkDir (_config->dataPath());
+    Config::checkDir (_config->cachePath());
+    qDebug("BOT ID : " + _id);
+    qDebug("BOTDIR : " + _config->dataPath());
+    qDebug("CACHE  : " + _config->cachePath());
 
     Config::checkDir (_config->dataPath ());
     QString cookiefname = _config->dataPath () + "/cookies";
@@ -75,7 +72,7 @@ Bot::Bot(const QString& id, QObject *parent) :
         return;
     }
     if (_autostart) {
-        qDebug() << "invoke autostart";
+        qWarning("invoke autostart");
         QTimer::singleShot(2000, wnd, SLOT(startAutomaton()));
     }
 }
@@ -111,9 +108,9 @@ void Bot::cancelAuto(bool ok) {
     if (_autoTimer->isActive()) {
         _autoTimer->stop();
         if (ok) {
-            clog << "stop autotimer" << endl;
+            qDebug("stop autotimer");
         } else {
-            clog << "abort autotimer" << endl;
+            qDebug("abort autotimer");
         }
     }
     delete _autoTimer;
@@ -131,7 +128,7 @@ void Bot::GoTo(const QString& link, bool instant) {
     _autoTimer = new QTimer();
     _autoTimer->setSingleShot(true);
     int ms = instant ? 0 : 500 + (qrand() % 10000);
-    clog << "set up goto timer at " << ms << " ms." << endl;
+    qDebug("set up goto timer at %d ms", ms);
     connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
     _autoTimer->start(ms);
 }
@@ -149,7 +146,7 @@ void Bot::GoReload() {
             (qrand() % 100) +
             ra2 * 30 +
             (qrand() % 60 * ra3);
-    clog << "set up goto timer at " << s << " sec." << endl;
+    qDebug("set up goto timer at %d sec", s);
     connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
     _autoTimer->start(s * 1000 + qrand() % 1000);
 
@@ -272,21 +269,21 @@ void Bot::stop() {
 void Bot::step()
 {
     if (!isConfigured()) {
-        qDebug() << "bot not configured properly";
+        qFatal("bot not configured properly");
         return;
     }
     if (!isStarted())
     {
-        qDebug() << "not started. skip step";
+        qCritical("bot not started. skip step");
         return;
     }
-    //    qDebug() << "STEP" << ++_step_counter;
-    _step_counter++;
     if (_regular)
     {
         _step_timer.stop();
     }
     if (!_awaiting && !_actor->busy()) {
+        ++_step_counter;
+//        qDebug("bot step #%d", _step_counter);
         one_step();
     }
 
@@ -294,7 +291,6 @@ void Bot::step()
         if (_regular) {
             _step_timer.start();
         } else {
-            emit dbg(tr("bot next shot"));
             QTimer::singleShot(1000, this, SLOT(step()));
         }
     }
@@ -330,37 +326,37 @@ void Bot::configure() {
     _good = true;
     int server_id = _config->get("login/server_id", true, -1).toInt();
     if (server_id < 1 || server_id > 3) {
-        qDebug() << "missing/bad: login/server_id (" << server_id << ")";
-        _config->set("login/server_id", -1111);
+        qFatal(QString("missing/bad: login/server_id (%1)").arg(server_id));
+        _config->set("login/server_id", 0);
         _good = false;
     } else {
         _serverNo = server_id;
         _baseurl = QString("http://g%1.botva.ru/").arg(server_id);
-        qDebug() << "set base url as " << _baseurl;
+        qDebug("set base url as " + _baseurl);
     }
 
     QString email = _config->get("login/email", true, "").toString();
     if (email == "") {
-        qDebug() << "missing: login/email";
+        qFatal("missing: login/email");
         _config->set("login/email", "Enter@Your.Email.Here");
         _good = false;
     } else {
         _login = email;
-        qDebug() << "set login as " << _login;
+        qDebug("set login as " + _login);
     }
 
     QString passwd = _config->get("login/password", true, "").toString();
     if (passwd == "") {
-        qDebug() << "missing: login/password";
+        qFatal("missing: login/password");
         _config->set("login/password", "EnterYourPasswordHere");
         _good = false;
     } else {
         _password = passwd;
-        qDebug() << "set password (not shown)";
+        qDebug("set password (not shown)");
     }
     _autostart = _config->get("autostart", false, false).toBool();
 
     _digchance  = _config->get("miner/digchance", false, 75).toInt();
 
-    qDebug() << "configure result: " << _good;
+    qDebug("configure %s", _good ? "success" : "failed");
 }

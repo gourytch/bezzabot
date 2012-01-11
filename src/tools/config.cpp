@@ -1,15 +1,14 @@
-#include <iostream>
 #include <QDesktopServices>
 #include <QCoreApplication>
 #include <QSettings>
 #include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
+#include <QTextCodec>
 #include <QDebug>
 #include <QRegExp>
 #include "config.h"
-
-using namespace std;
+#include "tools.h"
 
 //static
 Config*     Config::_global     = NULL;
@@ -34,6 +33,12 @@ void Config::init_check ()
     {
         throw "UNINITIALIZED APPLICATION";
     }
+
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QTextCodec::setCodecForCStrings(codec);
+    QTextCodec::setCodecForTr(codec);
+    QTextCodec::setCodecForLocale(codec);
+
     appPtr->setOrganizationName (ORG_NAME);
     appPtr->setOrganizationDomain (ORG_DOMAIN);
     appPtr->setApplicationName (APP_NAME);
@@ -74,7 +79,7 @@ void Config::init_check ()
     _ini_fname = ini_name.contains('/')
             ? ini_name
             : _location_config + "/" + ini_name;
-    clog << "using config file {" << qPrintable(_ini_fname) << "}" << endl;
+    qWarning("using config file {"  + _ini_fname + "}");
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
     _global = new Config ();
     if (!_global->get("initialized").toBool()) {

@@ -1,9 +1,6 @@
-#include <iostream>
 #include <QDebug>
 #include <QHBoxLayout>
 #include "appwindow.h"
-
-using namespace std;
 
 AppWindow::AppWindow(QWidget *parent) :
     QWidget(parent)
@@ -59,7 +56,7 @@ AppWindow::AppWindow(QWidget *parent) :
     connect(pWebPage, SIGNAL(loadFinished(bool)), this, SLOT(slotLoaded(bool)));
     connect(pCoulons, SIGNAL(itemActivated(QListWidgetItem*)),
             this, SLOT(slotSelectItem(QListWidgetItem*)));
-    cout << "ready" << endl;
+    qDebug("ready");
     pWebView->load(QUrl(_baseurl));
 }
 
@@ -68,16 +65,16 @@ AppWindow::~AppWindow() {
 
 
 void AppWindow::slotLoadStart () {
-    cout << "LOAD STARTED: {"
-         << qPrintable(pWebView->url().toString()) << "}" << endl;
+    qDebug("LOAD STARTED: {" + pWebView->url().toString());
 }
 
 void AppWindow::slotLoadProgress (int percents) {
-    cout << "LOADING: " << percents << "%" << endl;
+    qDebug("LOADING: %d%%", percents);
 }
 
 void AppWindow::slotLoaded (bool success) {
-    cout << "LOADED :" << success << endl;
+    qWarning("%s %s", success ? "LOADED" : "FAILED",
+             qPrintable(pWebView->url().toString()));
     pURL->setText(pWebView->url().toString());
     doc = pWebPage->mainFrame()->documentElement();
     if (checkLogin()) return;
@@ -85,7 +82,6 @@ void AppWindow::slotLoaded (bool success) {
 }
 
 void AppWindow::slotEditURL(const QString &text) {
-    cout << "URL={" << qPrintable(text) << "}" << endl;
     _url = text;
 }
 
@@ -96,19 +92,18 @@ void AppWindow::slotGo() {
 void AppWindow::slotSelectItem(QListWidgetItem* item) {
     QRegExp rx("\\[(\\d+)\\]");
     if (!item) {
-        cout << "no item selected" << endl;
         return;
     }
     QString s = item->text();
-    cout << "got item {" << qPrintable(s) << "}" << endl;
+    qWarning("got item {%s}", qPrintable(s));
 
     if (rx.indexIn(s) == -1) {
-        cout << "regexp not match" << endl;
+        qWarning("RX UNFIT");
+    } else {
+        quint32 id = rx.cap(1).toInt();
+        qWarning("ID=%d", id);
+        clickOnCoulon(id);
     }
-
-    quint32 id = rx.cap(1).toInt();
-    cout << "ID=" << id << endl;
-    clickOnCoulon(id);
 }
 
 bool AppWindow::clickOnCoulon(int id) {
@@ -122,10 +117,10 @@ bool AppWindow::clickOnCoulon(int id) {
         }
     }
     if (!found) {
-        cout << "coulon #" << id << " not found" << endl;
+        qCritical("coulon #%d not found", id);
         return false;
     }
-    cout << "activate coulon #" << id << endl;
+    qWarning("activate coulon #%d", id);
     QString s = QString(
                 "$.getJSON('ajax.php?m=coulon&item='+%1,"
                 "function(data){"
@@ -142,26 +137,26 @@ bool AppWindow::clickOnCoulon(int id) {
 
 
 bool AppWindow::checkLogin() {
-    cout << "checkLogin" << endl;
+    qDebug("checkLogin");
     QWebElement form = doc.findFirst("FORM[id=loginForm]");
     if (form.isNull()) {
-        cout << "no login form" << endl;
+        qWarning("no login form");
         return false;
     }
     QWebElement e = form.findFirst("INPUT[name=email]");
     if (e.isNull()) {
-        cout << "no email input" << endl;
+        qCritical("no email input");
         return false;
     }
     e.evaluateJavaScript(QString("this.value='%1';").arg(_login));
     e = form.findFirst("INPUT[name=password]");
     if (e.isNull()) {
-        cout << "no password input" << endl;
+        qCritical("no password input");
         return false;
     }
     e.evaluateJavaScript(QString("this.value='%1';").arg(_password));
 
-    cout << "login window repared" << endl;
+    qWarning("login window repared");
     return true;
 }
 
@@ -169,7 +164,7 @@ bool AppWindow::checkLogin() {
 bool AppWindow::checkGame() {
     QWebElement bar = doc.findFirst("DIV.coulons");
     if (bar.isNull()) {
-        cout << "no coulonbar" << endl;
+        qWarning("no coulonbar");
         return false;
     }
     pCoulons->clear();
@@ -184,7 +179,7 @@ bool AppWindow::checkGame() {
             continue;
         }
         QString item = QString("[%1] %2").arg(id).arg(title);
-        QListWidgetItem *p = new QListWidgetItem(item, pCoulons);
+        new QListWidgetItem(item, pCoulons);
     }
 
     return true;

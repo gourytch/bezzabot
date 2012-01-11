@@ -67,5 +67,5 @@ void BotState::update_from_page(const Page_Game *p) {
 
 
 QString toString(WorkType v) {
-    return "?";
+    return QString("WorkType#%1").arg(v);
 }

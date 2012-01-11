@@ -3,6 +3,7 @@
 #include <QIODevice>
 #include <QTextStream>
 #include <QDebug>
+#include <QString>
 #include "persistentcookiejar.h"
 #include "config.h"
 #include "tools.h"
@@ -27,13 +28,14 @@ PersistentCookieJar::~PersistentCookieJar ()
 
 void PersistentCookieJar::debug ()
 {
-    qDebug () << "COOKIES {{{";
+    QString s;
+    s.append("COOKIES {{{\n");
     foreach (QNetworkCookie cookie, allCookies ())
     {
-        qDebug () << cookie.toRawForm ();
+        s.append(cookie.toRawForm() + "\n");
     }
-    qDebug () << "}}} COOKIES";
-
+    s.append("}}} COOKIES");
+    qDebug(s);
 }
 
 
@@ -62,22 +64,20 @@ void PersistentCookieJar::load ()
     QFile fin (_fname);
     if (!fin.exists ())
     {
-        qDebug () << "file " + _fname + " not exists";
+        qWarning("file " + _fname + " not exists");
         return;
     }
 
     if (!fin.open (QFile::ReadOnly))
     {
-        qDebug () << "FILE " + _fname + " OPEN ERROR FOR READING";
+        qFatal("FILE " + _fname + " OPEN ERROR FOR READING");
         return;
     }
     QTextStream in (&fin);
     QByteArray buf = in.readAll ().toUtf8 ();
-    qDebug () << "GOT BUFFER: " << buf;
+    qDebug("GOT BUFFER: %s", buf.constData());
     setAllCookies(QNetworkCookie::parseCookies (buf));
     fin.close ();
-//    qDebug () << "COOKIES LOADED";
-//    debug ();
 }
 
 

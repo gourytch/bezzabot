@@ -172,7 +172,7 @@ QString Page_Game_Mine_Open::toString (const QString &pfx) const
 
 //static
 bool Page_Game_Mine_Open::fit(const QWebElement& doc) {
-    qDebug() << "* CHECK Page_Game_Mine_Open";
+//    qDebug("* CHECK Page_Game_Mine_Open");
     QWebElement logo = doc.findFirst ("IMG[class=part_logo]");
     if (logo.isNull()) {
         return false;
@@ -187,10 +187,10 @@ bool Page_Game_Mine_Open::fit(const QWebElement& doc) {
 bool Page_Game_Mine_Open::doStart() {
     submit = document.findFirst("CENTER").findFirst("A");
     if (submit.isNull()) {
-        qDebug() << "worklink not found";
+        qCritical("worklink not found");
         return false;
     }
-    qDebug() << "click on worklink";
+    qWarning("click on worklink");
     pressSubmit();
     return true;
 }
@@ -198,9 +198,9 @@ bool Page_Game_Mine_Open::doStart() {
 bool Page_Game_Mine_Open::doCancel() {
     submit = document.findFirst("CENTER").findFirst("CENTER").findFirst("A");
     if (submit.isNull()) {
-        qDebug() << "cancellink not found";
+        qCritical("cancellink not found");
     }
-    qDebug() << "click on cancellink";
+    qWarning("click on cancellink");
     pressSubmit();
     return true;
 }
@@ -208,11 +208,11 @@ bool Page_Game_Mine_Open::doCancel() {
 bool Page_Game_Mine_Open::doDig() {
     QWebElementCollection links = document.findFirst("CENTER").findAll("A");
     if (links.count() != 3) {
-        qDebug() << "bad links count";
+        qCritical("bad links count, %d", links.count());
         return false;
     }
     submit = links[0];
-    qDebug() << "click on diglink";
+    qWarning("click on diglink");
     pressSubmit();
     return true;
 }
@@ -220,11 +220,11 @@ bool Page_Game_Mine_Open::doDig() {
 bool Page_Game_Mine_Open::doReset() {
     QWebElementCollection links = document.findFirst("CENTER").findAll("A");
     if (links.count() != 3) {
-        qDebug() << "bad links count";
+        qCritical("bad links count, %d", links.count());
         return false;
     }
     submit = links[1];
-    qDebug() << "click on resetlink";
+    qWarning("click on resetlink");
     pressSubmit();
     return true;
 }
@@ -232,11 +232,11 @@ bool Page_Game_Mine_Open::doReset() {
 bool Page_Game_Mine_Open::doQuit() {
     QWebElementCollection links = document.findFirst("CENTER").findAll("A");
     if (links.count() != 3) {
-        qDebug() << "bad links count";
+        qCritical("bad links count, %d", links.count());
         return false;
     }
     submit = links[2];
-    qDebug() << "click on quitlink";
+    qWarning("click on quitlink");
     pressSubmit();
     return true;
 }
@@ -244,7 +244,7 @@ bool Page_Game_Mine_Open::doQuit() {
 bool Page_Game_Mine_Open::doQuickBuy(int position) {
     QWebElementCollection forms = document.findAll("FORM");
     if (position < 0 || forms.count() <= position) {
-        qDebug() << "bad buying position";
+        qCritical("bad buying position");
         return false;
     }
     QWebElement form = forms[position];
@@ -252,10 +252,10 @@ bool Page_Game_Mine_Open::doQuickBuy(int position) {
     currency1.evaluateJavaScript("this.checked=true;");
     submit = form.findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
-        qDebug() << "submit not found";
+        qCritical("submit not found");
         return false;
     }
-    qDebug() << u8("click on buylink, position %1").arg(position);
+    qWarning("click on buylink, position %d", position);
     pressSubmit();
     return true;
 }

@@ -43,23 +43,23 @@ QString Page_Game_Farm::toString (const QString& pfx) const
 
 //static
 bool Page_Game_Farm::fit(const QWebElement& doc) {
-    qDebug() << "* CHECK Page_Game_Farm";
+//    qDebug("* CHECK Page_Game_Farm");
     if (doc.findFirst("DIV[id=body] IMG.part_logo")
             .attribute("src").endsWith("/farm.jpg")) {
-        qDebug() << "Page_Game_Farm fits";
+//        qDebug("Page_Game_Farm fits");
         return true;
     }
-    qDebug() << "Page_Game_Farm doesn't fits";
+//    qDebug("Page_Game_Farm doesn't fits");
     return false;
 }
 
 bool Page_Game_Farm::doStartWork(int hours) {
     if (working) {
-        qDebug() << "working flag already true";
+        qCritical("working flag already true");
         return false;
     }
     if (hours < 0 || hours > maxhours) {
-        qDebug() << "hours out of range";
+        qCritical("hours out of range");
         return false;
     }
     foreach (QWebElement e, body.findAll("SELECT[id=work] OPTION")) {
@@ -71,25 +71,25 @@ bool Page_Game_Farm::doStartWork(int hours) {
     }
     submit = body.findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
-        qDebug() << "submit not found";
+        qCritical("submit not found");
         return false;
     }
-    qDebug() << "press submit";
+    qWarning("press submit");
     pressSubmit();
     return true;
 }
 
 bool Page_Game_Farm::doCancelWork() {
     if (!working) {
-        qDebug() << "working flag already false";
+        qCritical("working flag already false");
         return false;
     }
     submit = body.findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
-        qDebug() << "submit not found";
+        qCritical("submit not found");
         return false;
     }
-    qDebug() << "press submit";
+    qWarning("press submit");
     pressSubmit();
     return true;
 }

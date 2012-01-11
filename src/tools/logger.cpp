@@ -1,12 +1,10 @@
-#include <iostream>
+#include <stdio.h>
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
 #include "config.h"
 #include "logger.h"
 #include "tools.h"
-
-using namespace std;
 
 int Logger::_count = 0;
 Logger *Logger::_instance = NULL;
@@ -94,7 +92,7 @@ void Logger::log(QtMsgType mtype, const char *text) {
 //        if (_prev_handler) {
 //            _prev_handler(mtype, text);
 //        } else {
-            std::clog << qPrintable(m) << std::endl;
+        fprintf(stdout, "%s\n", qPrintable(m));
 //        }
     }
 

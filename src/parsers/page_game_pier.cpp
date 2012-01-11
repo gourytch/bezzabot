@@ -83,27 +83,27 @@ QString Page_Game_Pier::toString (const QString& pfx) const {
 }
 
 bool Page_Game_Pier::fit(const QWebElement& doc) {
-    qDebug() << "* CHECK Page_Game_Pier";
+//    qDebug("* CHECK Page_Game_Pier");
     if (doc.findFirst("DIV[id=body] IMG.part_logo")
             .attribute("src").endsWith("/Harbour_2.jpg")) {
-        qDebug() << "Page_Game_Pier fits";
+//        qDebug("Page_Game_Pier fits");
         return true;
     }
-    qDebug() << "Page_Game_Pier doesn't fits";
+//    qDebug("Page_Game_Pier doesn't fits");
     return false;
 }
 
 bool Page_Game_Pier::doSend() {
     if (_formSend.isNull()) {
-        qDebug() << "no _formSend";
+        qCritical("no _formSend");
         return false;
     }
     submit = _formSend.findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
-        qDebug() << "no submit input";
+        qCritical("no submit input");
         return false;
     }
-    qDebug() << "press";
+    qWarning("press send button");
     pressSubmit();
     return true;
 }

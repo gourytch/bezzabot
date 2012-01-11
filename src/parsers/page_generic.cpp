@@ -8,6 +8,7 @@
 #include <QApplication>
 #include "types.h"
 #include "page_generic.h"
+#include "tools/tools.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -35,8 +36,8 @@ QString Page_Generic::toString (const QString& pfx) const
 
 //static
 bool Page_Generic::fit(const QWebElement& doc) {
-    qDebug() << "* CHECK Page_Generic";
-    qDebug() << "Page_Generic always fits";
+//    qDebug("* CHECK Page_Generic");
+//    qDebug("Page_Generic always fits");
     return !doc.isNull();
 }
 
@@ -85,14 +86,14 @@ void Page_Generic::slot_submit() {
        "actuateLink(this);");
 
     if (submit.isNull()) {
-        qDebug() << "NULL SUBMIT";
+        qCritical("NULL SUBMIT");
     } else {
         if (submit.tagName () == "A") {
-            qDebug() << "SUBMITTING AS LINK";
+            qWarning("SUBMITTING AS LINK: " + submit.attribute("href"));
             submit.evaluateJavaScript("document.location = this.getAttribute('href');");
 //            submit.evaluateJavaScript(actuateLink);
         } else {
-            qDebug() << "SUBMITTING AS BUTTON";
+            qWarning("SUBMITTING AS BUTTON");
             submit.evaluateJavaScript("this.click();");
         }
     }
@@ -100,12 +101,12 @@ void Page_Generic::slot_submit() {
 
 void Page_Generic::delay(int ms, bool exclusive) {
     QTime time;
-    qDebug() << QString("DELAY %1 MS ...").arg(ms);
+    qDebug("DELAY %d MS ...", ms);
     time.start();
     while (time.elapsed() < ms) {
         if (!exclusive) {
             qApp->processEvents();
         }
     }
-    qDebug() << QString("CONTINUE EXECUTION");
+    qDebug("CONTINUE EXECUTION");
 }

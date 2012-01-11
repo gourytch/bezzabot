@@ -1,4 +1,3 @@
-#include <iostream>
 #include <QRegExp>
 #include <QStringList>
 #include <QApplication>
@@ -12,24 +11,26 @@
 #include "tools/tools.h"
 #include "bot.h"
 
-using namespace std;
-
 MainWindow *MainWindow::_instance = NULL;
 
 MainWindow::MainWindow (QWidget *parent) :
-    QWidget (parent)
+    QWidget (parent),
+    pTrayIcon (NULL),
+    pLogView (NULL)
 {
+
     _instance = this;
 
     Config& cfg = Config::global();
     QStringList ids = cfg.get("bots/list", "").toString().trimmed().split(QRegExp("\\s+"));
     QString id;
     if (ids.length() < 1) {
-        qDebug() << "no bots listed in confing use default name";
+        qFatal("no bots listed in confing use default name");
         id = "DUMMYBOT";
     } else {
         if (ids.length() > 1) {
-            qDebug() << "more than one bot listed in config. only first one will be initialized";
+            qCritical("more than one bot listed in config. "
+                      "only first one will be initialized");
         }
         id = ids[0];
     }
@@ -123,7 +124,7 @@ void MainWindow::createUI ()
     setupWebView ();
     createTrayIcon();
 
-    dbg("UI created");
+    dbg(u8("UI готово к использованию"));
 }
 
 void MainWindow::createTrayIcon() {
@@ -222,7 +223,9 @@ void MainWindow::log (const QString &text)
 {
     dbg (QString("LOG: %1").arg(text));
     QString tss = QDateTime::currentDateTime().toString("hh:mm:ss");
-    pLogView->append (tss + " " + text);
+    if (pLogView) {
+        pLogView->append (tss + " " + text);
+    }
     if (pTrayIcon) {
         pTrayIcon->showMessage(pBot->id(), text,
                                QSystemTrayIcon::NoIcon, balloon_ttl);
@@ -231,8 +234,7 @@ void MainWindow::log (const QString &text)
 
 void MainWindow::dbg (const QString &text)
 {
-    QString tss = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    clog << qPrintable(tss + " " + text) << endl;
+    qDebug(text);
 }
 
 void MainWindow::nopicsToggled (bool checked) {

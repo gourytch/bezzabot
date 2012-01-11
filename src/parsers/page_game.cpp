@@ -158,23 +158,17 @@ const PageTimer* PageTimers::byTitle(const QString& title) const {
 bool PageCoulon::assign(const QWebElement& e) {
 // <a item_id="15371239" title="Скороход 99/100"><b class="item_98"></b></a>
     if (e.tagName() != "A") {
-//        qDebug() << QString("coulon's chunk is not anchor: %1")
-//                    .arg(e.toOuterXml());
         return false;
     }
 
     QString title = e.attribute("title");
     if (title.isNull()) {
-//        qDebug() << QString("coulon's title is empty for %1")
-//                    .arg(e.toOuterXml());
         return false;
     }
 
     bool ok;
     id = e.attribute("item_id").toInt(&ok);
     if (!ok) {
-//        qDebug() << QString("coulon's item_id parse error for %1")
-//                    .arg(e.toOuterXml());
         return false;
     }
 
@@ -185,14 +179,10 @@ bool PageCoulon::assign(const QWebElement& e) {
         name = rx.cap(1).trimmed();
         cur_lvl = rx.cap(2).toInt(&ok);
         if (!ok) {
-//            qDebug() << QString("coulon's min_level parse error for %1")
-//                        .arg(e.toOuterXml());
             return false;
         }
         max_lvl = rx.cap(3).toInt(&ok);
         if (!ok) {
-//            qDebug() << QString("coulon's max_level parse error for %1")
-//                        .arg(e.toOuterXml());
             return false;
         }
     }
@@ -348,18 +338,6 @@ Page_Game::Page_Game (QWebElement& doc) :
 
     e = doc.findFirst("DIV[id=rmenu1] DIV[class=timers]");
 
-/*
-    if (e.isNull()) {
-        qDebug() << "!!! NO TIMERS FOUND";
-    } else {
-        int cnt=0;
-        qDebug() << "++++++++++++++++++++++++++++++++++++++++++++++++";
-        for (QWebElement c = e.firstChild(); !c.isNull(); c = c.nextSibling()) {
-            qDebug() << QString("[%1] %2").arg(cnt++).arg(c.toOuterXml().trimmed());
-        }
-        qDebug() << "++++++++++++++++++++++++++++++++++++++++++++++++";
-    }
-*/
     // 1: Таймер работы
     QWebElement c = e.firstChild();
     if (c.toPlainText().trimmed() == u8("Я свободен!")) {
@@ -414,8 +392,6 @@ Page_Game::Page_Game (QWebElement& doc) :
         QWebElement a = c.findFirst("A");
         r.href = a.attribute("href");
         bool ok;
-//        qDebug() << QString("OUTER: {%1}").arg(c.toOuterXml());
-//        qDebug() << QString("PLAIN: {%1}").arg(c.toPlainText().trimmed());
         r.count = c.toPlainText().trimmed().toInt(&ok);
         resources[r.id] = r;
     }
@@ -467,46 +443,39 @@ QString Page_Game::toString (const QString& pfx) const
 
 //static
 bool Page_Game::fit(const QWebElement& doc) {
-    qDebug() << "* CHECK Page_Game";
+//    qDebug("* CHECK Page_Game");
 
     if (doc.findFirst("DIV[id=char]").isNull()) {
-        qDebug() << "Page_Game not fit: has no char";
+//        qDebug("Page_Game not fit: has no char");
         return false;
     }
 
     if (doc.findFirst("DIV.top_money").isNull()) {
-        qDebug() << "Page_Game not fit: has no top_money";
+//        qDebug("Page_Game not fit: has no top_money");
         return false;
     }
 
     if (doc.findFirst("DIV[id=menu]").isNull()) {
-        qDebug() << "Page_Game not fit: has no menu";
+//        qDebug("Page_Game not fit: has no menu");
         return false;
     }
 
     if (doc.findFirst("DIV[id=body]").isNull()) {
-        qDebug() << "Page_Game not fit: has no body";
+//        qDebug("Page_Game not fit: has no body");
         return false;
     }
 
     if (doc.findFirst("DIV[id=rmenu1]").isNull()) {
-        qDebug() << "Page_Game not fit: has no rmenu1";
+//        qDebug("Page_Game not fit: has no rmenu1");
         return false;
     }
 
     if (doc.findFirst("DIV[id=rmenu2]").isNull()) {
-        qDebug() << "Page_Game not fit: has no rmenu2";
+//        qDebug("Page_Game not fit: has no rmenu2");
         return false;
     }
 
-/*
-    QWebElementCollection titles = doc.findAll ("DIV[class=title]");
-    if (!titles.count ()) {
-        qDebug() << "Page_Game not fit: no titles";
-        return false;
-    }
-*/
-    qDebug() << "Page_Game fit";
+//    qDebug("Page_Game fit");
     return true;
 }
 
@@ -540,10 +509,10 @@ bool Page_Game::doClickOnCoulon(quint32 id) {
         }
     }
     if (!found) {
-        qDebug() << QString("coulon #%1 not found").arg(id);
+        qCritical(QString("coulon #%1 not found").arg(id));
         return false;
     }
-    qDebug() << QString("ajax-activate coulon #%1").arg(id);
+    qWarning(QString("ajax-activate coulon #%1").arg(id));
     delay(500 + (qrand() % 3000), true);
     QString s = QString(
                 "$.getJSON('ajax.php?m=coulon&item='+%1,"
