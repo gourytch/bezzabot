@@ -34,6 +34,9 @@ MainWindow::MainWindow (QWidget *parent) :
         }
         id = ids[0];
     }
+
+    pBombTimer = NULL;
+
     pBot = new Bot (id,  this);
     pActor = pBot->actor ();
     hide_in_tray_on_close   = cfg.get("ui/hide_on_close", false, false).toBool();
@@ -261,6 +264,7 @@ void MainWindow::automatonToggled (bool checked) {
         pAutomaton->setToolTip(strAutomatonOn);
     } else {
         dbg ("automaton disabled");
+        cancelTimebomb();
         if (pBot->isStarted()) {
             QTimer::singleShot(0, pBot, SIGNAL (stop()));
         }
@@ -281,6 +285,7 @@ void MainWindow::startAutomaton()
 void MainWindow::stopAutomaton()
 {
     log ("stop automaton");
+    cancelTimebomb();
     QTimer::singleShot(0, pBot, SIGNAL (stop()));
     if (pAutomaton->isChecked()) {
         pAutomaton->toggle();
@@ -308,6 +313,7 @@ void MainWindow::slotLoadFinished(bool success)
 {
 //    pLoadingProgress->setVisible (false);
     pLoadingProgress->setEnabled(false);
+    pLoadingProgress->reset();
 //    QString urlstr = pWebView->page()->mainFrame()->requestedUrl().toString();
     QString urlstr = pWebView->page()->mainFrame()->url().toString();
     pUrlEdit->setText(urlstr);
@@ -372,4 +378,59 @@ void MainWindow::slotUrlEdited(const QString& s) {
 void MainWindow::slotGoClicked() {
     if (_entered_url.isEmpty()) return;
     pActor->request(_entered_url);
+}
+
+void MainWindow::startTimebomb(int ms, QObject *receiver, const char *member) {
+    if (pBombTimer) {
+        cancelTimebomb();
+    }
+    bombReceiver = receiver;
+    bombMember = member;
+
+    bombSavedPalette = pLoadingProgress->palette();
+    QPalette newPalette(bombSavedPalette);
+    newPalette.setColor(QPalette::Active, QPalette::Highlight, Qt::red);
+    pLoadingProgress->setPalette(newPalette);
+    pLoadingProgress->setFormat("%v");
+    pLoadingProgress->setRange(0, ms);
+    pLoadingProgress->setValue(ms);
+//    pLoadingProgress->setLayoutDirection(Qt::RightToLeft);
+//    pLoadingProgress->setInvertedAppearance(true);
+    pLoadingProgress->setEnabled(true);
+
+    pBombTimer = new QTimer(this);
+    bombTime = ms;
+    bombTicksTotal = bombTicksLeft = 20;
+    pBombTimer->setInterval(bombTime / bombTicksTotal);
+    connect(pBombTimer, SIGNAL(timeout()), this, SLOT(slotBombTick()));
+    pBombTimer->setSingleShot(false);
+    pBombTimer->start();
+}
+
+void MainWindow::cancelTimebomb() {
+    if (!pBombTimer) return;
+    delete pBombTimer;
+    pBombTimer = NULL;
+    bombReceiver = NULL;
+    bombMember = NULL;
+    pLoadingProgress->setPalette(bombSavedPalette);
+    pLoadingProgress->setFormat("%p%");
+    pLoadingProgress->setRange(0, 100);
+    pLoadingProgress->setValue(0);
+//    pLoadingProgress->setLayoutDirection(Qt::LeftToRight);
+//    pLoadingProgress->setInvertedAppearance(false);
+    pLoadingProgress->reset();
+    pLoadingProgress->setEnabled(false);
+}
+
+void MainWindow::slotBombTick() {
+    if (--bombTicksLeft <= 0) {
+        QObject *p = bombReceiver;
+        const char *s = bombMember;
+        cancelTimebomb();
+        QTimer::singleShot(0, p, s);
+    } else {
+        int n = bombTicksLeft * bombTime / bombTicksTotal;
+        pLoadingProgress->setValue(n);
+    }
 }

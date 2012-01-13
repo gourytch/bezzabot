@@ -6,6 +6,8 @@
 #include <QWebView>
 #include <QMenu>
 #include <QSystemTrayIcon>
+#include <QTimer>
+#include <QPalette>
 #include "webactor.h"
 #include "bot.h"
 
@@ -53,6 +55,14 @@ protected:
     Bot         *pBot;
     WebActor    *pActor;
 
+    QTimer *pBombTimer;
+    QPalette bombSavedPalette;
+    int bombTime;
+    int bombTicksTotal;
+    int bombTicksLeft;
+    QObject *bombReceiver;
+    const char *bombMember;
+
     void createUI ();
     void createTrayIcon();
     void setupWebView ();
@@ -61,6 +71,7 @@ protected:
     static MainWindow * _instance;
 
     virtual void closeEvent(QCloseEvent *);
+
 
 public:
     explicit MainWindow (QWidget *parent = 0);
@@ -77,6 +88,12 @@ public:
 
     virtual void setVisible(bool visible);
 
+    void startTimebomb(int ms, QObject *receiver, const char *member);
+
+signals:
+
+    void kaboom();
+
 public slots:
 
     void log (const QString& text);
@@ -84,6 +101,8 @@ public slots:
 
     void startAutomaton();
     void stopAutomaton();
+
+    void cancelTimebomb();
 
 protected slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -96,6 +115,8 @@ protected slots:
 
     void slotUrlEdited(const QString& s);
     void slotGoClicked();
+
+    void slotBombTick();
 
 };
 

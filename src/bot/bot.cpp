@@ -79,12 +79,16 @@ Bot::Bot(const QString& id, QObject *parent) :
     initWorks();
 
     if (_autostart) {
-        qWarning("invoke autostart");
-        QTimer::singleShot(2000, wnd, SLOT(startAutomaton()));
+//        QTimer::singleShot(2000, wnd, SLOT(startAutomaton()));
+        QTimer::singleShot(2000, this, SLOT(delayedAutorun()));
     }
 }
 
-
+void Bot::delayedAutorun() {
+    qWarning("invoke autostart");
+    MainWindow *wnd = MainWindow::getInstance();
+    wnd->startTimebomb(2000, wnd, SLOT(startAutomaton()));
+}
 
 Bot::~Bot ()
 {
@@ -112,6 +116,8 @@ void Bot::request_post (const QUrl& url, const QStringList& params) {
 }
 
 void Bot::cancelAuto(bool ok) {
+    MainWindow::getInstance()->cancelTimebomb();
+/*
     if (!_autoTimer) return;
     if (_autoTimer->isActive()) {
         _autoTimer->stop();
@@ -123,6 +129,7 @@ void Bot::cancelAuto(bool ok) {
     }
     delete _autoTimer;
     _autoTimer = NULL;
+*/
 }
 
 void Bot::GoTo(const QString& link, bool instant) {
@@ -133,12 +140,19 @@ void Bot::GoTo(const QString& link, bool instant) {
             : link.startsWith("http")
               ? link
               : _baseurl + link;
+    if (instant) {
+        QTimer::singleShot(0, this, SLOT(delayedGoTo()));
+    } else {
+        int ms = 500 + (qrand() % 10000);
+        MainWindow::getInstance()->startTimebomb(ms, this, SLOT(delayedGoTo()));
+    }
+/*
     _autoTimer = new QTimer();
     _autoTimer->setSingleShot(true);
-    int ms = instant ? 0 : 500 + (qrand() % 10000);
     qDebug("set up goto timer at %d ms", ms);
     connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
     _autoTimer->start(ms);
+*/
 }
 
 void Bot::GoReload() {
@@ -155,8 +169,12 @@ void Bot::GoReload() {
             ra2 * 30 +
             (qrand() % 60 * ra3);
     qDebug("set up goto timer at %d sec", s);
+/*
     connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
     _autoTimer->start(s * 1000 + qrand() % 1000);
+*/
+    int ms = s * 1000 + qrand() % 1000;
+    MainWindow::getInstance()->startTimebomb(ms, this, SLOT(delayedGoTo()));
 
 }
 

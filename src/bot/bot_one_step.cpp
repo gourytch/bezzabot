@@ -26,7 +26,7 @@ void Bot::one_step () {
         WorkListIterator i(_worklist);
         while (i.hasNext()) {
             Work *p = i.next();
-            qDebug(u8("пробуем начать работу: %1").arg(p->getWorkName()));
+//          qDebug(u8("пробуем начать работу: %1").arg(p->getWorkName()));
             if (p->processQuery(Work::CanStartWork) &&
                 p->processCommand(Work::StartWork)) {
                 qDebug(u8("работа назначена: %1").arg(p->getWorkName()));

@@ -138,6 +138,8 @@ private slots:
 
     void delayedReload();
 
+    void delayedAutorun();
+
 public slots:
 
     void configure();

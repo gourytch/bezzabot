@@ -52,7 +52,7 @@ bool WorkWatching::nextStep() {
         qDebug(u8("таймер не установлен. нужно инициировать дозор"));
     } else {
         qDebug(u8("таймер установлен на %1. нужно завершить дозор")
-               .arg("yyyy-MM-dd hh:mm:ss"));
+               .arg(_endWatching.toString("yyyy-MM-dd hh:mm:ss")));
     }
 
     if (_bot->_gpage->pagekind == page_Game_Dozor_Entrance) {
@@ -220,14 +220,18 @@ bool WorkWatching::processQuery(Query query) {
 //            _watchingCooldown = now.addSecs(s);// и заодно выставим откат
             return false; // работу начать, конечно же, не можем
         }
-        if (_bot->state.gold < _bot->state.dozor_price) {
-            qDebug("на дозор денег нет");
+        if ((_bot->state.dozor_price != -1) && (_bot->state.gold != -1) &&
+            (_bot->state.gold < _bot->state.dozor_price)) {
+            qDebug("на дозор денег нет (%d < %d)",
+                   _bot->state.gold, _bot->state.dozor_price);
             return false; // денег нет
         }
         if (!_bot->_gpage->timer_work.pit.isNull()) {
             if (_bot->_gpage->timer_work.href == "dozor.php") {
                 return true; // мы как бы уже в дозоре, так что можем перезайти
             }
+            qDebug("дозору мешает другая работа: " +
+                   _bot->_gpage->timer_work.href);
             return false; // какая-то работа уже работается.
         }
         return true; // ничто не мешает начать дозор.

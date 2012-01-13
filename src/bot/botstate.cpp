@@ -27,6 +27,8 @@ void BotState::reset() {
     dozors_remains = -1;
     fishraids_remains = -1;
 
+    dozor_price = -1;
+
     primary_work    = Work_None;
     secondary_work  = SecWork_None;
 }
