@@ -44,3 +44,14 @@ bool Page_Game_Dozor_OnDuty::fit(const QWebElement& doc) {
 //    qDebug("Page_Game_Dozor_OnDuty doesn't fit");
     return false;
 }
+
+bool Page_Game_Dozor_OnDuty::doCancel() {
+    submit = document.findFirst("DIV.grbody A");
+    if (submit.isNull()) {
+        qCritical("Cancellation Anchor not found");
+        return false;
+    }
+    qWarning("click on cancel watching");
+    pressSubmit();
+    return true;
+}

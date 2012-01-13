@@ -8,6 +8,12 @@ Work::Work(Bot *bot) :
 {
 }
 
+void Work::setAwaiting() {
+    _bot->setAwaiting();
+}
+
 QString Work::toString() const {
     return "Work:" + getWorkName() + ", Stage:" + getWorkStage();
 }
+
+

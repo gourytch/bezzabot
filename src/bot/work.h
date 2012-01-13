@@ -14,7 +14,10 @@ class Work : public QObject
 
     Q_OBJECT
 protected:
+
     Bot *_bot;
+
+    void setAwaiting();
 
 public:
 

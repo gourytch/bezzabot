@@ -1,7 +1,8 @@
 #ifndef WORKWATCHING_H
 #define WORKWATCHING_H
 
-#include "QDateTime"
+#include <QDateTime>
+#include "bot.h"
 #include "work.h"
 
 class WorkWatching : public Work
@@ -19,6 +20,29 @@ protected:
     Work::Command _command;
 
     int duration10;
+
+protected:
+
+    bool isWatching() {
+        if (_bot->_gpage->timer_work.href == "dozor.php") return true;
+        if (_endWatching.isNull()) return false;
+        if (QDateTime::currentDateTime() < _endWatching) return true;
+        return false;
+    }
+
+    bool isSafelyCancelable() {
+        return !isWatching();
+    }
+
+    bool canStartWatching() {
+        if (_bot->state.hp_cur < 25) return false;
+        if (QDateTime::currentDateTime() < _watchingCooldown) return false;
+        return true;
+    }
+
+    void gotoDozor() {
+        _bot->GoTo("dozor.php");
+    }
 
 public:
 

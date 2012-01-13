@@ -16,6 +16,8 @@ public:
 
     static bool fit(const QWebElement& doc);
 
+    bool doCancel();
+
 };
 
 #endif // PAGE_GAME_DOZOR_ONDUTY_H

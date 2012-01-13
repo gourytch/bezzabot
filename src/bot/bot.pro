@@ -16,7 +16,8 @@ SOURCES += \
     botstate.cpp \
     bot_got_page.cpp \
     work.cpp \
-    workwatching.cpp
+    workwatching.cpp \
+    worksleeping.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -26,7 +27,8 @@ HEADERS  += \
     farmersgroupsprices.h \
     botstate.h \
     work.h \
-    workwatching.h
+    workwatching.h \
+    worksleeping.h
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools

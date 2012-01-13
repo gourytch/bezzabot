@@ -9,6 +9,8 @@
 #include <QString>
 #include <QDateTime>
 #include <QTimer>
+#include <QList>
+#include <QListIterator>
 #include "webactor.h"
 #include "tools/persistentcookiejar.h"
 #include "tools/config.h"
@@ -25,23 +27,34 @@ class Bot : public QObject // QThread
 public:
 
     BotState            state;
-    Work               *work;
 
-    Page_Generic        *_page;
-    Page_Game           *_gpage;
-
-protected:
     QString             _id;
     Config              *_config;
     PersistentCookieJar *_cookies;
     WebActor            *_actor;
 
+    Page_Generic        *_page;
+    Page_Game           *_gpage;
+
+    void initWorks();
+    Work                *_work;
+    typedef QList<Work*> WorkList;
+    typedef QListIterator<Work*> WorkListIterator;
+    WorkList _worklist;
+
+    bool _awaiting;
+
+    void setAwaiting() {
+        _awaiting = true;
+    }
+
+
+protected:
+
     QTimer _step_timer;
     bool _started;
     bool _regular;
     int  _step_counter;
-
-    bool _awaiting;
 
     bool        _good;
     int         _serverNo;
@@ -62,14 +75,16 @@ protected:
     QString     _linkToGo;
     QString     _prevLink;
 
+    int _reload_attempt;
+
+    void reset();
+
+public:
+
     void cancelAuto(bool ok = false);
     void GoTo(const QString& link=QString(), bool instant=false);
     void GoToWork(const QString& deflink=QString(), bool instant=false);
     void GoReload();
-
-    int _reload_attempt;
-
-    void reset();
 
 protected:
 

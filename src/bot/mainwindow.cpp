@@ -323,8 +323,8 @@ void MainWindow::slotLoadFinished(bool success)
         dbg ("load failed");
         setWindowTitle(tr ("bot %1: failed %2").arg(pBot->id(), urlstr));
     }
-    dbg (tr ("bytes received: %1").arg (pWebView->page ()->bytesReceived ()));
-    dbg (tr ("total bytes: %1").arg (pWebView->page ()->totalBytes ()));
+//    dbg (tr ("bytes received: %1").arg (pWebView->page ()->bytesReceived ()));
+//    dbg (tr ("total bytes: %1").arg (pWebView->page ()->totalBytes ()));
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {

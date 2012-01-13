@@ -10,6 +10,10 @@
 #include "parsers/all_pages.h"
 #include "farmersgroupsprices.h"
 
+#include "worksleeping.h"
+#include "workwatching.h"
+
+
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent), // QThread
     _autoTimer(NULL)
@@ -71,6 +75,9 @@ Bot::Bot(const QString& id, QObject *parent) :
     if (!isConfigured()) {
         return;
     }
+
+    initWorks();
+
     if (_autostart) {
         qWarning("invoke autostart");
         QTimer::singleShot(2000, wnd, SLOT(startAutomaton()));
@@ -91,6 +98,7 @@ void Bot::reset() {
 
     state.reset();
     _reload_attempt = 0;
+    _work = NULL;
 }
 
 void Bot::request_get (const QUrl& url) {
@@ -359,4 +367,9 @@ void Bot::configure() {
     _digchance  = _config->get("miner/digchance", false, 75).toInt();
 
     qDebug("configure %s", _good ? "success" : "failed");
+}
+
+void Bot::initWorks() {
+    _worklist.append(new WorkSleeping(this));
+    _worklist.append(new WorkWatching(this));
 }
