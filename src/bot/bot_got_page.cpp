@@ -7,6 +7,7 @@ void Bot::got_page(Page_Game *gpage) {
         QString s (u8("сообщение: «%1»")
                 .arg(gpage->message.replace('\n', ' ')));
         emit log(s);
+        emit signalHasPage(gpage);
     }
 
 }

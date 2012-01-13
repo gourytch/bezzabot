@@ -16,6 +16,8 @@
 #include "parsers/page_game.h"
 #include "botstate.h"
 
+class Work;
+
 class Bot : public QObject // QThread
 {
     Q_OBJECT
@@ -23,14 +25,16 @@ class Bot : public QObject // QThread
 public:
 
     BotState            state;
+    Work               *work;
+
+    Page_Generic        *_page;
+    Page_Game           *_gpage;
 
 protected:
     QString             _id;
     Config              *_config;
     PersistentCookieJar *_cookies;
     WebActor            *_actor;
-    Page_Generic        *_page;
-    Page_Game           *_gpage;
 
     QTimer _step_timer;
     bool _started;
@@ -106,6 +110,12 @@ signals:
     void rq_get (const QUrl& url);
 
     void rq_post (const QUrl& url, const QStringList& params);
+
+    // для отсылки сигнала на работу
+
+    void signalHasPage(const Page_Game *gpage);
+
+    void signalHasStep();
 
 private slots:
 
