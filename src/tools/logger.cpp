@@ -6,6 +6,8 @@
 #include "logger.h"
 #include "tools.h"
 
+#include <iostream>
+
 int Logger::_count = 0;
 Logger *Logger::_instance = NULL;
 QtMsgHandler Logger::_prev_handler = NULL;
@@ -79,21 +81,19 @@ void Logger::log(QtMsgType mtype, const char *text) {
     QString t = u8(text);
 
     QDateTime ts = QDateTime::currentDateTime();
-    QString m = ts.toString("yyyy-MM-dd hh:mm:ss");
-    m += " -";
-    m += QString("DWEX???"[(int)mtype]);
-    m += "-  ";
-    m += t.replace(QString("\n"), QString("\n    "));
+    QString tss_file = ts.toString("yyyy-MM-dd hh:mm:ss");
+    QString tss_cout = ts.toString("hh:mm:ss");
+    QString m_text = t.replace(QString("\n"), QString("\n    "));
+    QString m_lvl = " -" + QString("DWCF???"[(int)mtype]) + "-  ";
+
     if (_lvl_file <= mtype && _stream) {
-        (*_stream) << m << "\n";
+        (*_stream) << tss_file + m_lvl + m_text << "\n";
         _stream->flush();
     }
     if (_lvl_cout <= mtype) {
-//        if (_prev_handler) {
-//            _prev_handler(mtype, text);
-//        } else {
-        fprintf(stdout, "%s\n", qPrintable(m));
-//        }
+        QString m = tss_cout + m_lvl + m_text;
+//        fprintf(stderr, "%s\n", qPrintable(m));
+        std::clog << m.toUtf8().constBegin() << std::endl;
     }
 
     switch (mtype) {
@@ -104,10 +104,10 @@ void Logger::log(QtMsgType mtype, const char *text) {
         emit signalWarning(t);
         break;
     case QtCriticalMsg:
-        emit signalError(t);
+        emit signalCritical(t);
         break;
     default:
-        emit signalXError(t);
+        emit signalFatal(t);
         break;
     }
 }
@@ -120,10 +120,10 @@ void Logger::slotWarning (const QString& msg) {
     log(QtWarningMsg, msg.toUtf8().constData());
 }
 
-void Logger::slotError(const QString& msg) {
+void Logger::slotCritical(const QString& msg) {
     log(QtCriticalMsg, msg.toUtf8().constData());
 }
 
-void Logger::slotXError(const QString& msg) {
+void Logger::slotFatal(const QString& msg) {
     log(QtFatalMsg, msg.toUtf8().constData());
 }

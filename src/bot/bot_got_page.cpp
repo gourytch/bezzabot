@@ -11,10 +11,12 @@ void Bot::got_page(Page_Game *gpage) {
     }
     emit signalHasPage(gpage);
 
-    if (_work) {
-        if (_work->processPage(gpage) == false) { //закончили работу
-            _work = NULL;
-        }
+    if (_workq.empty()) {
+        return;
     }
-
+    if (_workq.front()->processPage(gpage)) {
+        return;
+    }
+    popWork();
 }
+

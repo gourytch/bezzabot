@@ -103,7 +103,7 @@ bool Page_Game_Pier::doSend() {
         qCritical("no submit input");
         return false;
     }
-    qWarning("press send button");
+    qDebug("press send button");
     pressSubmit();
     return true;
 }

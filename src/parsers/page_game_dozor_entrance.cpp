@@ -91,7 +91,8 @@ bool Page_Game_Dozor_Entrance::doDozor(int time10) {
         qCritical("кнопка старта не найдена");
         return false;
     }
-    qWarning("нажимаем кнопку старта дозора");
+//    qWarning("нажимаем кнопку старта дозора");
+    qDebug("нажимаем кнопку старта дозора");
     pressSubmit();
     return true;
 }

@@ -63,7 +63,7 @@ bool Page_Login::doLogin (
     if (keep) {
         js("document.getElementsByName('remember')[0].checked='checked'';");
     }
-    qWarning("press login button");
+    qDebug("press login button");
     pressSubmit();
     return true;
 }

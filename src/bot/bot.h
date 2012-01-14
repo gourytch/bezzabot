@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QList>
+#include <QQueue>
 #include <QListIterator>
 #include "webactor.h"
 #include "tools/persistentcookiejar.h"
@@ -37,10 +38,16 @@ public:
     Page_Game           *_gpage;
 
     void initWorks();
-    Work                *_work;
+
+    typedef QQueue<Work*> WorkQueue;
     typedef QList<Work*> WorkList;
     typedef QListIterator<Work*> WorkListIterator;
-    WorkList _worklist;
+
+    WorkList    _worklist;
+    WorkList    _secworklist;
+    WorkQueue   _workq;
+
+    void popWork();
 
     bool _awaiting;
 
@@ -116,9 +123,17 @@ public:
 
     void request_post (const QUrl& url, const QStringList& params);
 
+    // FIXME найди куда лучше пристроить это
+
+    quint32 guess_coulon_to_wear(WorkType work, int seconds);
+
+    bool is_need_to_change_coulon(quint32 id);
+
+    bool action_wear_right_coulon(quint32 id);
+
 signals:
 
-    void dbg (const QString& text);
+//    void dbg (const QString& text);
 
     void log (const QString& text);
 

@@ -1,6 +1,7 @@
 #ifndef PAGE_GAME_H
 #define PAGE_GAME_H
 
+#include <QDateTime>
 #include <QObject>
 #include <QMap>
 #include <QMapIterator>
@@ -30,6 +31,14 @@ struct PageTimer
     const PageTimer& operator= (const PageTimer &v);
     void assign (const QWebElement &e);
     QString toString () const;
+
+    bool defined() const {
+        return !pit.isNull();
+    }
+
+    bool expired() const {
+        return (pit < QDateTime::currentDateTime());
+    }
 };
 
 struct PageTimers

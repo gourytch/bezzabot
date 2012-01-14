@@ -185,58 +185,78 @@ bool Page_Game_Mine_Open::fit(const QWebElement& doc) {
 }
 
 bool Page_Game_Mine_Open::doStart() {
+    if (digstage != DigNone) {
+        qCritical("digstage sould be DigNone, not " + ::toString(digstage));
+        return false;
+    }
     submit = document.findFirst("CENTER").findFirst("A");
     if (submit.isNull()) {
         qCritical("worklink not found");
         return false;
     }
-    qWarning("click on worklink");
+    qDebug("click on worklink");
     pressSubmit();
     return true;
 }
 
 bool Page_Game_Mine_Open::doCancel() {
+    if (digstage != DigProcess) {
+        qCritical("digstage sould be DigProcess, not " + ::toString(digstage));
+        return false;
+    }
     submit = document.findFirst("CENTER").findFirst("CENTER").findFirst("A");
     if (submit.isNull()) {
         qCritical("cancellink not found");
     }
-    qWarning("click on cancellink");
+    qDebug("click on cancellink");
     pressSubmit();
     return true;
 }
 
 bool Page_Game_Mine_Open::doDig() {
+    if (digstage != DigReady) {
+        qCritical("digstage sould be DigReady, not " + ::toString(digstage));
+        return false;
+    }
     QWebElementCollection links = document.findFirst("CENTER").findAll("A");
     if (links.count() != 3) {
         qCritical("bad links count, %d", links.count());
         return false;
     }
     submit = links[0];
-    qWarning("click on diglink");
+    qDebug("click on diglink");
     pressSubmit();
     return true;
 }
 
 bool Page_Game_Mine_Open::doReset() {
+    if (digstage != DigReady) {
+        qCritical("digstage sould be DigReady, not " + ::toString(digstage));
+        return false;
+    }
     QWebElementCollection links = document.findFirst("CENTER").findAll("A");
     if (links.count() != 3) {
         qCritical("bad links count, %d", links.count());
         return false;
     }
     submit = links[1];
-    qWarning("click on resetlink");
+    qDebug("click on resetlink");
     pressSubmit();
     return true;
 }
 
 bool Page_Game_Mine_Open::doQuit() {
+    if (digstage != DigReady) {
+        qCritical("digstage sould be DigReady, not " + ::toString(digstage));
+        return false;
+    }
     QWebElementCollection links = document.findFirst("CENTER").findAll("A");
     if (links.count() != 3) {
         qCritical("bad links count, %d", links.count());
         return false;
     }
     submit = links[2];
-    qWarning("click on quitlink");
+    qDebug("click on quitlink");
     pressSubmit();
     return true;
 }
@@ -255,7 +275,7 @@ bool Page_Game_Mine_Open::doQuickBuy(int position) {
         qCritical("submit not found");
         return false;
     }
-    qWarning("click on buylink, position %d", position);
+    qDebug("click on buylink, position %d", position);
     pressSubmit();
     return true;
 }

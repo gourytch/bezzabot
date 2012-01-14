@@ -31,14 +31,14 @@ public:
 signals:
     void signalDebug(const QString& msg);
     void signalWarning (const QString& msg);
-    void signalError(const QString& msg);
-    void signalXError(const QString& msg);
+    void signalCritical(const QString& msg);
+    void signalFatal(const QString& msg);
 
 public slots:
     void slotDebug(const QString& msg);
     void slotWarning (const QString& msg);
-    void slotError(const QString& msg);
-    void slotXError(const QString& msg);
+    void slotCritical(const QString& msg);
+    void slotFatal(const QString& msg);
 
 };
 

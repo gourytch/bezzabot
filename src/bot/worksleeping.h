@@ -12,6 +12,7 @@ class WorkSleeping : public Work
 
 protected:
 
+    int sleepdownHour;
     int wakeupHour;
 
     QDateTime _wakeupTime;

@@ -7,11 +7,14 @@
 #include "webactor.h"
 #include "tools/persistentcookiejar.h"
 #include "tools/tools.h"
+#include "tools/timebomb.h"
 #include "parsers/all_pages.h"
 #include "farmersgroupsprices.h"
 
 #include "worksleeping.h"
 #include "workwatching.h"
+#include "workmining.h"
+#include "workfishing.h"
 
 
 Bot::Bot(const QString& id, QObject *parent) :
@@ -43,8 +46,8 @@ Bot::Bot(const QString& id, QObject *parent) :
     connect (_actor->page (), SIGNAL (loadFinished (bool)),
              this, SLOT (onPageFinished (bool)));
 
-    connect (this, SIGNAL (dbg (const QString &)),
-             wnd, SLOT (dbg (const QString &)));
+//    connect (this, SIGNAL (dbg (const QString &)),
+//             wnd, SLOT (dbg (const QString &)));
 
     connect (this, SIGNAL (log (const QString &)),
              wnd, SLOT (log (const QString &)));
@@ -87,7 +90,7 @@ Bot::Bot(const QString& id, QObject *parent) :
 void Bot::delayedAutorun() {
     qWarning("invoke autostart");
     MainWindow *wnd = MainWindow::getInstance();
-    wnd->startTimebomb(2000, wnd, SLOT(startAutomaton()));
+    Timebomb::global()->launch(2000, wnd, SLOT(startAutomaton()));
 }
 
 Bot::~Bot ()
@@ -102,7 +105,7 @@ void Bot::reset() {
 
     state.reset();
     _reload_attempt = 0;
-    _work = NULL;
+    _workq.clear();
 }
 
 void Bot::request_get (const QUrl& url) {
@@ -116,7 +119,7 @@ void Bot::request_post (const QUrl& url, const QStringList& params) {
 }
 
 void Bot::cancelAuto(bool ok) {
-    MainWindow::getInstance()->cancelTimebomb();
+    Timebomb::global()->cancel();
 /*
     if (!_autoTimer) return;
     if (_autoTimer->isActive()) {
@@ -144,7 +147,7 @@ void Bot::GoTo(const QString& link, bool instant) {
         QTimer::singleShot(0, this, SLOT(delayedGoTo()));
     } else {
         int ms = 500 + (qrand() % 10000);
-        MainWindow::getInstance()->startTimebomb(ms, this, SLOT(delayedGoTo()));
+        Timebomb::global()->launch(ms, this, SLOT(delayedGoTo()));
     }
 /*
     _autoTimer = new QTimer();
@@ -174,7 +177,7 @@ void Bot::GoReload() {
     _autoTimer->start(s * 1000 + qrand() % 1000);
 */
     int ms = s * 1000 + qrand() % 1000;
-    MainWindow::getInstance()->startTimebomb(ms, this, SLOT(delayedGoTo()));
+    Timebomb::global()->launch(ms, this, SLOT(delayedGoTo()));
 
 }
 
@@ -259,11 +262,11 @@ void Bot::onPageFinished (bool ok)
 
 void Bot::start() {
     if (!isConfigured()) {
-        emit dbg(tr("bot is not configured properly"));
+        qFatal("bot is not configured properly");
         return;
     }
     if (isStarted()) {
-        emit dbg(tr("bot already started"));
+        qCritical("bot already started");
         return;
     }
     if (_regular) {
@@ -272,24 +275,24 @@ void Bot::start() {
         QTimer::singleShot(1000, this, SLOT(step()));
     }
     _started = true;
-    emit dbg(tr("Bot::start() : bot started"));
+    qDebug("Bot::start() : bot started");
 }
 
 void Bot::stop() {
     cancelAuto();
     if (!isConfigured()) {
-        emit dbg(tr("bot is not configured properly"));
+        qFatal("bot is not configured properly");
         return;
     }
     if (!isStarted()) {
-        emit dbg(tr("bot already stopped"));
+        qCritical("bot already stopped");
         return;
     }
     if (_regular) {
         _step_timer.stop();
     }
     _started = false;
-    emit dbg(tr("Bot::stop() : bot stopped"));
+    qDebug("Bot::stop() : bot stopped");
 }
 
 void Bot::step()
@@ -329,11 +332,11 @@ void Bot::handle_Page_Error () {
     qCritical("page error #%d", p->status);
     switch (p->status / 100) { // старший знак
     case 5: // 504 (gateway timeout)
-        emit log (QString("state 5xx. reload page"));
+        qWarning("state 5xx. reload page");
         GoReload();
         return;
     default:
-        emit log (QString("ERROR %1: %2").arg(p->status).arg(p->reason));
+        qWarning(QString("ERROR %1: %2").arg(p->status).arg(p->reason));
     }
 
 }
@@ -387,7 +390,200 @@ void Bot::configure() {
     qDebug("configure %s", _good ? "success" : "failed");
 }
 
+//
+// работа с кулонами
+//
+quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
+    qDebug(u8("вычисляем нужный кулон для %1 на %2 сек")
+             .arg(::toString(work)).arg(seconds));
+
+    static const QString name_ckhrist = u8("Копикрист");
+    quint32 id_ckhrist = 0;
+    int lvl_ckhrist = -1;
+
+    static const QString name_antimag = u8("Антимаг");
+    quint32 id_antimag = 0;
+    int lvl_antimag = -1;
+
+    static const QString name_skorokhod = u8("Скороход");
+    quint32 id_skorokhod = 0;
+    int lvl_skorokhod = -1;
+
+    static const QString name_stakhanka = u8("Стаханка");
+    quint32 id_stakhanka = 0;
+    int lvl_stakhanka = -1;
+
+    static const QString name_nevidimtcha = u8("Невидимча");
+    quint32 id_nevidimtcha = 0;
+    int lvl_nevidimtcha = -1;
+
+    quint32 active_id = 0;
+
+    QDateTime now = QDateTime::currentDateTime();
+    int immunity_time = _gpage->timer_immunity.pit.isNull()
+            ? 0
+            : now.secsTo(_gpage->timer_immunity.pit);
+    bool safetime = (immunity_time - seconds - 60) > 0;
+
+    for (int i = 0; i < _gpage->coulons.coulons.count(); ++i) {
+        PageCoulon &k = _gpage->coulons.coulons[i];
+        if (k.active) {
+            active_id = k.id;
+        }
+        if (name_ckhrist == k.name && lvl_ckhrist < k.cur_lvl) {
+            id_ckhrist = k.id;
+        }
+        if (name_antimag == k.name && lvl_antimag < k.cur_lvl) {
+            id_antimag = k.id;
+        }
+        if (name_skorokhod == k.name && lvl_skorokhod < k.cur_lvl) {
+            id_skorokhod = k.id;
+        }
+        if (name_stakhanka == k.name && lvl_stakhanka < k.cur_lvl) {
+            id_stakhanka = k.id;
+        }
+        if (name_nevidimtcha == k.name && lvl_nevidimtcha < k.cur_lvl) {
+            id_nevidimtcha = k.id;
+        }
+    }
+
+    qDebug("несохранённого: %d з, %d кр, надет #%d, immtime: %d, imm: %s",
+             state.free_gold, state.free_crystal, active_id, immunity_time,
+             safetime ? "true" : "false");
+
+    switch (work) {
+    case Work_Training: // планируем потренироваться
+        //тут предпочтения вряд ли будут
+        // - делаем то же, как если бы не делали ничего
+    case Work_None: // планируем лодырничать
+        if (safetime) { // время ещё есть
+            qDebug(u8("возвращаем что висит (#%1)").arg(active_id));
+            return active_id; // ничего не будем менять: и так хорошо
+        }
+        break; // будем делать штатную защиту
+
+    case Work_Mining: // планируем ковырять кристаллы
+        if (safetime || (state.free_crystal == 0 && state.free_gold == 0)) {
+            // время ещё есть - копикрируем
+            if (id_ckhrist > 0) { // есть копикрист!
+                qDebug(u8("возвращаем копикрист (#%1)").arg(id_ckhrist));
+                return id_ckhrist;
+            }
+        }
+        break; // копика нет. жаль.
+
+    case Work_Watching: // планируем пойти в дозор
+        if (safetime) { // время ещё есть
+            if (id_skorokhod > 0) { // есть скороход!
+                qDebug(u8("возвращаем скороход (#%1)").arg(id_skorokhod));
+                return id_skorokhod;
+            }
+        }
+        break; // нету скорохода
+
+    case Work_Farming: // планируем пойти на ферму
+        if (safetime) { // время ещё есть
+            if (id_stakhanka > 0) { // есть стаханка!
+                qDebug(u8("возвращаем стаханку (#%1)").arg(id_stakhanka));
+                return id_stakhanka;
+            }
+        }
+        break; // нету стаханки
+    default:
+        break;
+    }
+
+    // если ничего не подошло, безальтернативно защищаемся
+    if (id_nevidimtcha == 0 && id_antimag == 0) {
+        qDebug(u8("возвращаем что висит (#%1)").arg(active_id));
+        return active_id; // всё равно щититься нечем, оставим как есть
+    }
+    if (state.free_crystal > 0 && id_antimag != 0) {
+        // кристаллы жальчей чем деньги
+        qDebug(u8("возвращаем антимаг (#%1)").arg(id_antimag));
+        return id_antimag;
+    }
+    if (id_nevidimtcha != 0) {
+        qDebug(u8("возвращаем невидимчу (#%1)").arg(id_nevidimtcha));
+        return id_nevidimtcha;
+    }
+    qDebug(u8("ничего путейного нет, возвращаем старый #%1")
+           .arg(active_id));
+    return active_id;
+}
+
+bool Bot::is_need_to_change_coulon(quint32 id) {
+    qDebug(u8("проверка необходимости смены кулона на #%1").arg(id));
+    quint32 aid = 0;
+    const PageCoulon *k = _gpage->coulons.active();
+    if (k) {
+        aid = k->id;
+        qDebug(u8("найден активный кулон #%1").arg(aid));
+    } else {
+        qDebug(u8("активный кулон не найден"));
+    }
+    if (id == aid) {
+        qDebug(u8("это уже надето, ничего не надо менять"));
+        return false;
+    }
+    emit qDebug(u8("надо переодеться"));
+    return true;
+}
+
+bool Bot::action_wear_right_coulon(quint32 id) {
+    qWarning(u8("переодеваем кулон на #%1").arg(id));
+    if (id == 0) {
+        qDebug(u8("снимаем надетый кулон"));
+        quint32 aid = 0;
+        const PageCoulon *k = _gpage->coulons.active();
+        if (k) aid = k->id;
+        if (id == aid) {
+            qDebug("уже надето ничего его и оставим :)");
+            return true;
+        }
+        qWarning(u8("будем кликать на кулон %1").arg(aid));
+        id = aid;
+    }
+    if (_gpage->doClickOnCoulon(id)) {
+        qDebug(u8("вроде кликнулось. надо бы попозже страничку обновить"));
+        return true;
+    }
+    qCritical(u8("что-то не срослось"));
+    return false;
+}
+
+
+//
+// инициализация работ
+//
 void Bot::initWorks() {
-    _worklist.append(new WorkSleeping(this));
-    _worklist.append(new WorkWatching(this));
+//    _worklist.append(new WorkSleeping(this));
+//    _worklist.append(new WorkWatching(this));
+    _worklist.append(new WorkMining(this));
+
+    _secworklist.append(new WorkFishing(this));
+}
+
+void Bot::popWork() {
+    if (_workq.empty()) {
+        return;
+    }
+    for (;;) {
+        Work *p = _workq.front();
+        qDebug(u8("закончили работу ") + p->getWorkName());
+
+        _workq.pop_front(); // удаляем завершенную работу
+
+        if  (_workq.empty()) { //никого не осталось
+            qDebug("стек работ пуст");
+            break;
+        }
+
+        p = _workq.front();
+
+        qWarning(u8("размораживаем работу ") + p->getWorkName());
+        if (p->processCommand(Work::FinishSecondaryWork)) {
+            break;
+        }
+    }
 }

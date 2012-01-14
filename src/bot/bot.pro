@@ -17,7 +17,9 @@ SOURCES += \
     bot_got_page.cpp \
     work.cpp \
     workwatching.cpp \
-    worksleeping.cpp
+    worksleeping.cpp \
+    workmining.cpp \
+    workfishing.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -28,7 +30,9 @@ HEADERS  += \
     botstate.h \
     work.h \
     workwatching.h \
-    worksleeping.h
+    worksleeping.h \
+    workmining.h \
+    workfishing.h
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
@@ -39,6 +43,14 @@ DESTDIR = $$TOP/bin
 
 RESOURCES += \
     bot.qrc
+
+
+
+
+
+
+
+
 
 
 

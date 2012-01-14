@@ -9,6 +9,7 @@
 #include "types.h"
 #include "page_generic.h"
 #include "tools/tools.h"
+#include "tools/timebomb.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -61,7 +62,8 @@ void Page_Generic::pressSubmit(int delay_min, int delay_max) {
     int ms = delay_min >= delay_max
             ? delay_min
             : delay_min + qrand() % (delay_max - delay_min);
-    QTimer::singleShot(ms, this, SLOT(slot_submit()));
+//    QTimer::singleShot(ms, this, SLOT(slot_submit()));
+    Timebomb::global()->launch(ms, this, SLOT(slot_submit()));
 }
 
 void Page_Generic::slot_submit() {
@@ -89,11 +91,11 @@ void Page_Generic::slot_submit() {
         qCritical("NULL SUBMIT");
     } else {
         if (submit.tagName () == "A") {
-            qWarning("SUBMITTING AS LINK: " + submit.attribute("href"));
+            qDebug("SUBMITTING AS LINK: " + submit.attribute("href"));
             submit.evaluateJavaScript("document.location = this.getAttribute('href');");
 //            submit.evaluateJavaScript(actuateLink);
         } else {
-            qWarning("SUBMITTING AS BUTTON");
+            qDebug("SUBMITTING AS BUTTON");
             submit.evaluateJavaScript("this.click();");
         }
     }

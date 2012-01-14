@@ -51,7 +51,7 @@ bool Page_Game_Dozor_OnDuty::doCancel() {
         qCritical("Cancellation Anchor not found");
         return false;
     }
-    qWarning("click on cancel watching");
+    qDebug("click on cancel watching");
     pressSubmit();
     return true;
 }

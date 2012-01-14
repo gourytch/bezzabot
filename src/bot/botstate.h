@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include "farmersgroupsprices.h"
 #include "parsers/page_game.h"
 
 enum WorkType { // основная работа
@@ -54,6 +55,9 @@ public: // всё, описывающее текущее состояние бо
     QString     charname;
     QString     chartitle;
 
+    WorkGuild   work_guild; // в какой рабочей гильдии состоит
+    FGPRecord   fgp;
+
     int         gold;
     int         free_gold;
     int         crystal;
@@ -66,13 +70,19 @@ public: // всё, описывающее текущее состояние бо
     int         hp_max;
     int         hp_spd;
 
+    int         xp_left;
+
     int         dozors_remains; // осталось на сегодня десятиминуток дозоров
     int         fishraids_remains; // осталось на сегодня заплывов за пирашками
+    int         pickaxes_remains; // сколько осталось зарядов у кирок
+    int         bigtickets_remains; // сколько есть больших билетов
+    int         smalltickets_remains; // сколько есть маленьких билетиков
 
     int         dozor_price; // стоимость дозора
 
     WorkType    primary_work; // текущая работа
     SecWorkType secondary_work; // дополнительная работа
+
 
 signals:
 
