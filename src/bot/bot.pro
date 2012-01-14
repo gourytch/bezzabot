@@ -6,6 +6,11 @@ TEMPLATE = app
 CONFIG += debug
 QT += core gui network webkit
 
+win32 {
+  CONFIG -= debug
+  CONFIG += console
+}
+
 SOURCES += \
     main.cpp\
     mainwindow.cpp \
@@ -25,7 +30,6 @@ HEADERS  += \
     mainwindow.h \
     bot.h \
     webactor.h \
-    botthread.h \
     farmersgroupsprices.h \
     botstate.h \
     work.h \

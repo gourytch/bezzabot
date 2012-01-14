@@ -3,6 +3,12 @@ LANGUAGE = C++
 CONFIG += qt debug warn_on staticlib
 QT     += core network webkit
 
+
+win32 {
+  CONFIG -= debug
+  CONFIG += console
+}
+
 TOP = ../..
 
 HEADERS += \

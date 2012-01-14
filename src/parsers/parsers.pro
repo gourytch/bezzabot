@@ -45,9 +45,10 @@ DESTDIR = $$TOP/lib
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
 
-
-
-
+win32 {
+  CONFIG -= debug
+  CONFIG += console
+}
 
 
 
