@@ -36,7 +36,7 @@ public:
     void js_setByName(const QString& name,
                       const QVariant& value);
 
-    void pressSubmit (int delay_min = 500, int delay_max = 5000);
+    void pressSubmit (int delay_min = -1, int delay_max = -1);
 
     void delay(int ms, bool exclusive);
 

@@ -46,8 +46,11 @@ public:
     WorkList    _worklist;
     WorkList    _secworklist;
     WorkQueue   _workq;
+    WorkQueue   _nextq;
 
     void popWork();
+
+    void fillNextQ();
 
     bool _awaiting;
 
@@ -70,15 +73,11 @@ protected:
     QString     _password;
     bool        _autostart;
 
+    int _goto_delay_min;
+    int _goto_delay_max;
+
     // настройки разные
-    int         _digchance;     // шанс достаточный для копания
 
-    // timers:
-    QDateTime   _kd_Dozor;  // когда оттает возможность дозора
-    QDateTime   _kd_Fishing;  // когда оттает возможность рыбалки
-    QDateTime   _kd_Mailbox;  // когда можно будет поглядеть в почту
-
-    QTimer      *_autoTimer;
     QString     _linkToGo;
     QString     _prevLink;
 
@@ -88,7 +87,7 @@ protected:
 
 public:
 
-    void cancelAuto(bool ok = false);
+    void cancelAuto();
     void GoTo(const QString& link=QString(), bool instant=false);
     void GoToWork(const QString& deflink=QString(), bool instant=false);
     void GoReload();

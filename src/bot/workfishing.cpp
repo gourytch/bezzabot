@@ -15,8 +15,8 @@ bool WorkFishing::isPrimaryWork() const {
     return false;
 }
 
-QString WorkFishing::getWorkName() const {
-    return "WorkFishing";
+WorkType WorkFishing::getWorkType() const {
+    return Work_Fishing;
 }
 
 QString WorkFishing::getWorkStage() const {

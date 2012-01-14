@@ -14,6 +14,7 @@ protected:
 
     int sleepdownHour;
     int wakeupHour;
+    bool _use_coulons;
 
     QDateTime _wakeupTime;
 
@@ -34,7 +35,7 @@ public:
 
     virtual bool isPrimaryWork() const;
 
-    virtual QString getWorkName() const;
+    virtual WorkType getWorkType() const;
 
     virtual QString getWorkStage() const;
 

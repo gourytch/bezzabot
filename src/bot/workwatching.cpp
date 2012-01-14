@@ -11,15 +11,17 @@
 WorkWatching::WorkWatching(Bot *bot) :
     Work(bot)
 {
-    duration10 = 1;
+    Config *config = _bot->config();
+    duration10 = config->get("Work_Watching/duration10", false, 1).toInt();
+    _use_coulons = config->get("Work_Watching/use_coulons", false, true).toBool();
 }
 
 bool WorkWatching::isPrimaryWork() const {
     return true;
 }
 
-QString WorkWatching::getWorkName() const {
-    return u8("Work_Watching");
+WorkType WorkWatching::getWorkType() const {
+    return Work_Watching;
 }
 
 QString WorkWatching::getWorkStage() const {
@@ -48,6 +50,8 @@ bool WorkWatching::nextStep() {
         return true;
     }
 
+    return processPage(_bot->_gpage);
+/*
     if (_endWatching.isNull()) {
         qDebug(u8("таймер не установлен. нужно инициировать дозор"));
     } else {
@@ -70,6 +74,7 @@ bool WorkWatching::nextStep() {
         setAwaiting();
         return true;
     }
+*/
     qFatal("UNREACHABLE POINT %s:%d", __FILE__, __LINE__);
     return false; // мы досюда не должны добраться
 }
@@ -137,6 +142,38 @@ bool WorkWatching::processPage(const Page_Game *gpage) {
     qDebug(u8("дозор, обработка страницы ") +
            ::toString(gpage->pagekind));
 
+    if (gpage->timer_work.defined()) {
+        // есть работа
+        if (gpage->timer_work.href != "dozor.php") {
+            qWarning("мы дозорные, почему-то не дозорим, href=" +
+                   gpage->timer_work.href);
+            return false; // отказываемся работать не на своей работе
+        }
+        if (gpage->timer_work.expired()) {
+            // работа окончена
+            qDebug("таймер сказал, что мы додозорили");
+            if (gpage->pagekind != page_Game_Dozor_Entrance) {
+                qDebug("пойдём, завершим дозор");
+                gotoDozor();
+                return true;
+            }
+        } else { // !(gpage->timer_work.expired())
+            _endWatching = gpage->timer_work.pit;
+            qDebug("терпеливо дозорим до " +
+                   _endWatching.toString("yyyy-MM-dd hh:mm:ss"));
+            return true;
+        }
+//    } else { // else (!gpage->timer_work.defined())
+//        // пока работы нет
+//        if (gpage->pagekind != page_Game_Dozor_Entrance &&
+//            gpage->pagekind != page_Game_Dozor_LowHealth) {
+//            qDebug("пойдём начинать работу");
+//            gotoDozor();
+//            return true;
+//        }
+    }
+
+
     switch (gpage->pagekind) { // смотрим, что же нам пришло
 
     case page_Game_Dozor_OnDuty: // мы дозорим.
@@ -153,7 +190,7 @@ bool WorkWatching::processPage(const Page_Game *gpage) {
         if (!_endWatching.isNull()) { // мы только что из дозора
             _endWatching = QDateTime();
             _started = false;
-            qWarning("закончили поход");
+            qWarning("закончили поход.");
             return false;
         }
         Page_Game_Dozor_Entrance *q = (Page_Game_Dozor_Entrance*)gpage;
@@ -166,6 +203,24 @@ bool WorkWatching::processPage(const Page_Game *gpage) {
         }
         _watchingCooldown = QDateTime(); // пока не ждём откатов
         int n = qMin(q->dozor_left10, duration10); // макс. время дозора
+
+        if (_use_coulons) {
+            qDebug("проверяем кулоны");
+            int t = n * 10 * 60;
+            quint32 qid = _bot->guess_coulon_to_wear(Work_Watching, t);
+            bool rewear = _bot->is_need_to_change_coulon(qid);
+            if (rewear) {
+                qDebug("надо одеть кулон #%d", qid);
+                if (_bot->action_wear_right_coulon(qid)) {
+                    qWarning("одели кулон #%d", qid);
+                } else {
+                    qCritical("не смогли надеть кулон #%d", qid);
+                }
+            } else {
+                qDebug("кулоны не переодеваем");
+            }
+        }
+
         if (q->doDozor(n)) {
             setAwaiting();
             qWarning(u8("пошли в дозор на %1 минут").arg(n * 10));

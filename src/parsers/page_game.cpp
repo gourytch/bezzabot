@@ -512,7 +512,7 @@ bool Page_Game::doClickOnCoulon(quint32 id) {
         qCritical(QString("coulon #%1 not found").arg(id));
         return false;
     }
-    qWarning(QString("ajax-activate coulon #%1").arg(id));
+    qDebug(QString("ajax-activate coulon #%1").arg(id));
     delay(500 + (qrand() % 3000), true);
     QString s = QString(
                 "$.getJSON('ajax.php?m=coulon&item='+%1,"

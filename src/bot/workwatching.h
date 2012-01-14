@@ -21,6 +21,8 @@ protected:
 
     int duration10;
 
+    bool _use_coulons;
+
 protected:
 
     bool isWatching() {
@@ -50,7 +52,7 @@ public:
 
     virtual bool isPrimaryWork() const;
 
-    virtual QString getWorkName() const;
+    virtual WorkType getWorkType() const;
 
     virtual QString getWorkStage() const;
 

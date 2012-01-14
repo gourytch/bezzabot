@@ -8,21 +8,32 @@
 #include "work.h"
 
 void Bot::one_step () {
-    if (_page == NULL || (_gpage == NULL && _page->pagekind != page_Login) ) {
-        qWarning("we're not at game page. [re]login");
+    if (_page == NULL) {
+        qDebug("initial load for base url");
+        GoTo(_baseurl, true);
+        return;
+    }
+
+    if (_gpage == NULL && _page->pagekind != page_Login) {
+        qWarning("we're not on game page. [re]login");
         GoTo(_baseurl);
         return;
     }
+
     QDateTime ts = QDateTime::currentDateTime();
 
     if (_workq.empty()) { // нет никакой работы
         // ищем сперва основную работу
 //        qDebug(u8("ищем основную работу"));
-        WorkListIterator i(_worklist);
-        while (i.hasNext()) {
-            Work *p = i.next();
+        if (_nextq.empty()) {
+            fillNextQ();
+        }
+        while (!_nextq.empty()) {
+            Work *p = _nextq.front();
+            _nextq.pop_front();
 //          qDebug(u8("пробуем начать работу: %1").arg(p->getWorkName()));
-            if (p->processQuery(Work::CanStartWork) &&
+            if (p->isEnabled() &&
+                p->processQuery(Work::CanStartWork) &&
                 p->processCommand(Work::StartWork)) {
                 qWarning(u8("наша текущая работа: %1").arg(p->getWorkName()));
                 _workq.push_front(p);
@@ -40,7 +51,8 @@ void Bot::one_step () {
         while (i.hasNext()) {
             Work *p = i.next();
 //          qDebug(u8("пробуем начать подработку: ") + p->getWorkName()));
-            if (p->processQuery(Work::CanStartWork) &&
+            if (p->isEnabled() &&
+                p->processQuery(Work::CanStartWork) &&
                 p->processCommand(Work::StartWork)) {
                 qWarning(u8("запустили подработку: %1").arg(p->getWorkName()));
                 _workq.push_front(p);

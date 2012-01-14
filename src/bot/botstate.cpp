@@ -134,4 +134,5 @@ ECASE(Work_ClanGiving)
 ECASE(Work_Shopping)
 ECASE(Work_Reading)
 ECASE(Work_Trading)
+ECASE(Work_LuckySquare)
 EEND

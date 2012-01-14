@@ -10,6 +10,7 @@
 #include "page_generic.h"
 #include "tools/tools.h"
 #include "tools/timebomb.h"
+#include "tools/config.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -59,6 +60,12 @@ void Page_Generic::js_setByName(const QString& name,
 }
 
 void Page_Generic::pressSubmit(int delay_min, int delay_max) {
+    if (delay_min == -1) {
+        delay_min = Config::global().get("page/delay_min", false, 1).toInt();
+    }
+    if (delay_max == -1) {
+        delay_max = Config::global().get("page/delay_max", false, 15).toInt();
+    }
     int ms = delay_min >= delay_max
             ? delay_min
             : delay_min + qrand() % (delay_max - delay_min);

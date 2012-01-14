@@ -1,5 +1,6 @@
 #include "parsers/all_pages.h"
 #include "tools/tools.h"
+#include "tools/config.h"
 #include "botstate.h"
 #include "bot.h"
 #include "workmining.h"
@@ -7,19 +8,25 @@
 WorkMining::WorkMining(Bot *bot) :
     Work(bot)
 {
-    _digchance = 75;
-    _use_mineshop_pro = true;
-    _use_mineshop = true;
-    _use_continue = true;
-    _use_coulons = true;
+    Config *config = _bot->config();
+    _digchance  = config->get("Work_Mining/digchance", false,
+                              75).toInt();
+    _use_mineshop_pro = config->get("Work_Mining/use_mineshop_pro", false,
+                                    true).toBool();
+    _use_mineshop = config->get("Work_Mining/use_mineshop", false,
+                                true).toBool();
+    _use_continue = config->get("Work_Mining/use_continue", false,
+                                true).toBool();
+    _use_coulons = config->get("Work_Mining/use_coulons", false,
+                               true).toBool();
 }
 
 bool WorkMining::isPrimaryWork() const {
     return true;
 }
 
-QString WorkMining::getWorkName() const {
-    return "WorkMining";
+WorkType WorkMining::getWorkType() const {
+    return Work_Mining;
 }
 
 QString WorkMining::getWorkStage() const {
@@ -297,9 +304,9 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             if (p->success_chance >= _digchance) {
                 qDebug("будем доставать кристалл");
                 if (p->doDig()) {
-                    qWarning("кристалл достаёёёём...");
+                    qWarning("достаём кристалл и заканчиваем работу.");
                     setAwaiting();
-                    return true;
+                    return false;
                 } else {
                     qCritical("не можем управлять кристаллодоставалкой!");
                     _bot->GoTo();

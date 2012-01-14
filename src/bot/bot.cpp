@@ -18,11 +18,11 @@
 
 
 Bot::Bot(const QString& id, QObject *parent) :
-    QObject(parent), // QThread
-    _autoTimer(NULL)
+    QObject(parent) // QThread
 {
     _id = id;
     _config = new Config (this, _id);
+
     Config::checkDir (_config->dataPath());
     Config::checkDir (_config->cachePath());
     qDebug("BOT ID : " + _id);
@@ -83,7 +83,7 @@ Bot::Bot(const QString& id, QObject *parent) :
 
     if (_autostart) {
 //        QTimer::singleShot(2000, wnd, SLOT(startAutomaton()));
-        QTimer::singleShot(2000, this, SLOT(delayedAutorun()));
+        QTimer::singleShot(500, this, SLOT(delayedAutorun()));
     }
 }
 
@@ -118,21 +118,8 @@ void Bot::request_post (const QUrl& url, const QStringList& params) {
     emit rq_post(url, params);
 }
 
-void Bot::cancelAuto(bool ok) {
+void Bot::cancelAuto() {
     Timebomb::global()->cancel();
-/*
-    if (!_autoTimer) return;
-    if (_autoTimer->isActive()) {
-        _autoTimer->stop();
-        if (ok) {
-            qDebug("stop autotimer");
-        } else {
-            qDebug("abort autotimer");
-        }
-    }
-    delete _autoTimer;
-    _autoTimer = NULL;
-*/
 }
 
 void Bot::GoTo(const QString& link, bool instant) {
@@ -146,16 +133,10 @@ void Bot::GoTo(const QString& link, bool instant) {
     if (instant) {
         QTimer::singleShot(0, this, SLOT(delayedGoTo()));
     } else {
-        int ms = 500 + (qrand() % 10000);
+        int ms = _goto_delay_min * 1000 +
+                (qrand() % (1000 * (_goto_delay_max - _goto_delay_min)));
         Timebomb::global()->launch(ms, this, SLOT(delayedGoTo()));
     }
-/*
-    _autoTimer = new QTimer();
-    _autoTimer->setSingleShot(true);
-    qDebug("set up goto timer at %d ms", ms);
-    connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
-    _autoTimer->start(ms);
-*/
 }
 
 void Bot::GoReload() {
@@ -163,8 +144,6 @@ void Bot::GoReload() {
     _reload_attempt++;
     if (_reload_attempt > 5) _reload_attempt = 5;
     _awaiting = true;
-    _autoTimer = new QTimer();
-    _autoTimer->setSingleShot(true);
     int ra2 = _reload_attempt * _reload_attempt;
     int ra3 = ra2 * _reload_attempt;
     int s = 5 +
@@ -172,10 +151,6 @@ void Bot::GoReload() {
             ra2 * 30 +
             (qrand() % 60 * ra3);
     qDebug("set up goto timer at %d sec", s);
-/*
-    connect(_autoTimer, SIGNAL(timeout()), this, SLOT(delayedGoTo()));
-    _autoTimer->start(s * 1000 + qrand() % 1000);
-*/
     int ms = s * 1000 + qrand() % 1000;
     Timebomb::global()->launch(ms, this, SLOT(delayedGoTo()));
 
@@ -353,7 +328,7 @@ void Bot::handle_Page_Login () {
 
 void Bot::configure() {
     _good = true;
-    int server_id = _config->get("login/server_id", true, -1).toInt();
+    int server_id = _config->get("login/server_id", false, -1).toInt();
     if (server_id < 1 || server_id > 3) {
         qFatal(QString("missing/bad: login/server_id (%1)").arg(server_id));
         _config->set("login/server_id", 0);
@@ -364,7 +339,7 @@ void Bot::configure() {
         qDebug("set base url as " + _baseurl);
     }
 
-    QString email = _config->get("login/email", true, "").toString();
+    QString email = _config->get("login/email", false, "").toString();
     if (email == "") {
         qFatal("missing: login/email");
         _config->set("login/email", "Enter@Your.Email.Here");
@@ -374,7 +349,7 @@ void Bot::configure() {
         qDebug("set login as " + _login);
     }
 
-    QString passwd = _config->get("login/password", true, "").toString();
+    QString passwd = _config->get("login/password", false, "").toString();
     if (passwd == "") {
         qFatal("missing: login/password");
         _config->set("login/password", "EnterYourPasswordHere");
@@ -383,9 +358,11 @@ void Bot::configure() {
         _password = passwd;
         qDebug("set password (not shown)");
     }
-    _autostart = _config->get("autostart", false, false).toBool();
 
-    _digchance  = _config->get("miner/digchance", false, 75).toInt();
+    _goto_delay_min = _config->get("goto/delay_min", false, 1).toInt();
+    _goto_delay_max = _config->get("goto/delay_min", false, 60).toInt();
+
+    _autostart = _config->get("autostart", false, false).toBool();
 
     qDebug("configure %s", _good ? "success" : "failed");
 }
@@ -541,7 +518,7 @@ bool Bot::action_wear_right_coulon(quint32 id) {
             qDebug("уже надето ничего его и оставим :)");
             return true;
         }
-        qWarning(u8("будем кликать на кулон %1").arg(aid));
+        qDebug(u8("будем кликать на кулон %1").arg(aid));
         id = aid;
     }
     if (_gpage->doClickOnCoulon(id)) {
@@ -586,4 +563,29 @@ void Bot::popWork() {
             break;
         }
     }
+}
+
+void Bot::fillNextQ() {
+    QVector<Work*> desk;
+    WorkListIterator i (_worklist);
+
+    while (i.hasNext()) {
+        desk.push_back(i.next());
+    }
+
+    QString s;
+
+    while (!desk.empty()) {
+        int ix = qrand() % desk.size();
+        Work *p = desk[ix];
+        desk.remove(ix);
+        if (p->isEnabled()) {
+            _nextq.append(p);
+            if (!s.isEmpty()) {
+                s += " ";
+            }
+            s += p->getWorkName();
+        }
+    }
+    qDebug("новая очередь задач: " + s);
 }

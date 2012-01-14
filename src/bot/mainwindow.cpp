@@ -24,17 +24,11 @@ MainWindow::MainWindow (QWidget *parent) :
     _instance = this;
 
     Config& cfg = Config::global();
-    QStringList ids = cfg.get("bots/list", "").toString().trimmed().split(QRegExp("\\s+"));
-    QString id;
-    if (ids.length() < 1) {
-        qFatal("no bots listed in confing use default name");
+    QString id = cfg.get("bot/id", true, "").toString().trimmed();
+
+    if (id.isEmpty()) {
+        qFatal("no bots listed in confing");
         id = "DUMMYBOT";
-    } else {
-        if (ids.length() > 1) {
-            qCritical("more than one bot listed in config. "
-                      "only first one will be initialized");
-        }
-        id = ids[0];
     }
 
     hide_in_tray_on_close   = cfg.get("ui/hide_on_close", false, false).toBool();

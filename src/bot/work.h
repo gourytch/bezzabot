@@ -39,11 +39,15 @@ public:
         CancelWork           // необходимо досрочно завершить работу
     };
 
+    virtual bool isEnabled () const;
+
     virtual QString toString() const;
 
     virtual bool isPrimaryWork() const = 0; // true ::= основная работа
 
-    virtual QString getWorkName() const = 0; // уникальное название работы
+    virtual WorkType getWorkType() const = 0; // тип выполняемой работы
+
+    virtual QString getWorkName() const; // уникальное название работы
 
     virtual QString getWorkStage() const = 0; // состояние работы
 

@@ -6,16 +6,18 @@
 WorkSleeping::WorkSleeping(Bot *bot) :
     Work(bot)
 {
-    sleepdownHour  = 23;
-    wakeupHour = 8; // FIXME - должно конфигуриться
+    Config *config = _bot->config();
+    sleepdownHour = config->get("Work_Sleeping/sleepdown_hour", false, 23).toInt();
+    wakeupHour = config->get("Work_Sleeping/wakeup_hour", false, 8).toInt();
+    _use_coulons = config->get("Work_Sleeping/use_coulons", false, true).toBool();
 }
 
 bool WorkSleeping::isPrimaryWork() const {
     return true;
 }
 
-QString WorkSleeping::getWorkName() const {
-    return "Work_Sleeping";
+WorkType WorkSleeping::getWorkType() const {
+    return Work_Sleeping;
 }
 
 QString WorkSleeping::getWorkStage() const {
@@ -84,11 +86,13 @@ bool WorkSleeping::processCommand(Command command) {
         int secs = getTimeToSleep();
         if (secs > 0) {
             qDebug("собираемся поспать %d секунд", secs);
-            qDebug("надо решить, что одеть перед сном");
-            quint32 qid = _bot->guess_coulon_to_wear(Work_Sleeping, secs);
-            if (_bot->is_need_to_change_coulon(qid)) {
-                qDebug("надо одеть кулон №%d", qid);
-                _bot->action_wear_right_coulon(qid);
+            if (_use_coulons) {
+                qDebug("надо решить, что одеть перед сном");
+                quint32 qid = _bot->guess_coulon_to_wear(Work_Sleeping, secs);
+                if (_bot->is_need_to_change_coulon(qid)) {
+                    qDebug("надо одеть кулон №%d", qid);
+                    _bot->action_wear_right_coulon(qid);
+                }
             }
             _wakeupTime = now.addSecs(secs);
             qWarning(u8("ложимся спать до %2")

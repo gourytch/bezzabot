@@ -21,7 +21,7 @@ public:
 
     virtual bool isPrimaryWork() const;
 
-    virtual QString getWorkName() const;
+    virtual WorkType getWorkType() const;
 
     virtual QString getWorkStage() const;
 
