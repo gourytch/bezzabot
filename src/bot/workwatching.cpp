@@ -218,6 +218,7 @@ bool WorkWatching::processQuery(Query query) {
 //            qDebug(u8("нужно добрать %1 здоровья (за %2 сек)")
 //                   .arg(dh).arg(s));
 //            _watchingCooldown = now.addSecs(s);// и заодно выставим откат
+            qDebug("не хватает здоровья");
             return false; // работу начать, конечно же, не можем
         }
         if ((_bot->state.dozor_price != -1) && (_bot->state.gold != -1) &&

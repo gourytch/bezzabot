@@ -557,8 +557,8 @@ bool Bot::action_wear_right_coulon(quint32 id) {
 // инициализация работ
 //
 void Bot::initWorks() {
-//    _worklist.append(new WorkSleeping(this));
-//    _worklist.append(new WorkWatching(this));
+    _worklist.append(new WorkSleeping(this));
+    _worklist.append(new WorkWatching(this));
     _worklist.append(new WorkMining(this));
 
     _secworklist.append(new WorkFishing(this));

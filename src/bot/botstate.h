@@ -21,23 +21,18 @@ enum WorkType { // основная работа
     Work_Fighting,
     Work_ScaryFighting,
     Work_CaveExploring,
-    Work_Guarding
+    Work_Guarding,
+     // неосновная работа
+    Work_Fishing,
+    Work_Healing,
+    Work_Gambling,
+    Work_ClanGiving,
+    Work_Shopping,
+    Work_Reading,
+    Work_Trading
 };
 
-QString toString(WorkType v);
-
-enum SecWorkType { // неосновная работа
-    SecWork_None,
-    SecWork_Fishing,
-    SecWork_Healing,
-    SecWork_Gambling,
-    SecWork_ClanGiving,
-    SecWork_Shopping,
-    SecWork_Reading,
-    SecWork_Trading
-};
-
-QString toString(SecWorkType v);
+    QString toString(WorkType v);
 
 
 class BotState : public QObject
@@ -81,8 +76,6 @@ public: // всё, описывающее текущее состояние бо
     int         dozor_price; // стоимость дозора
 
     WorkType    primary_work; // текущая работа
-    SecWorkType secondary_work; // дополнительная работа
-
 
 signals:
 

@@ -91,6 +91,27 @@ bool WorkMining::processPage(const Page_Game *gpage) {
         {
             qDebug("стоим перед входом в забой");
 
+            if (_bot->state.hp_cur < 25) {
+                qDebug("очень мало здоровья");
+                if (_use_coulons &&
+                    _bot->state.hp_cur > 0 &&
+                    _bot->state.hp_spd > 0) {
+                    int t = (25 - _bot->state.hp_cur)
+                            * 3600 / _bot->state.hp_spd;
+                quint32 qid = _bot->guess_coulon_to_wear(Work_Sleeping, t);
+                    bool rewear = _bot->is_need_to_change_coulon(qid);
+                    if (rewear) {
+                        qDebug("надо одеть кулон #%d", qid);
+                        if (_bot->action_wear_right_coulon(qid)) {
+                            qWarning("одели кулон #%d", qid);
+                        } else {
+                            qCritical("не смогли надеть кулон #%d", qid);
+                        }
+                    }
+                }
+                return false;
+            }
+
             //
             // проверяем наличие инвентаря
             //
@@ -365,6 +386,10 @@ bool WorkMining::processQuery(Query query) {
             }
             qDebug("мы работаем другую работу, шахтёрить не сможем");
             return false; // мы работаем, но не как не шахтёры
+        }
+        if (_bot->state.hp_cur < 25) {
+            qDebug("очень мало здоровья");
+            return false;
         }
         if (_bot->state.pickaxes_remains == 0) {
             // в прошлый раз мы были без кирки

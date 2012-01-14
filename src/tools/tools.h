@@ -4,8 +4,6 @@
 #include <QString>
 #include <QDebug>
 
-void LOG(const QString& text);
-
 QString now (bool utc=false);
 
 QDateTime nextDay();
@@ -38,5 +36,9 @@ inline void qCritical(const QString& s) {
 inline void qFatal(const QString& s) {
     qFatal(s.toUtf8().constData());
 }
+
+#define ESTART(E) QString toString(E v) {switch (v) {
+#define ECASE(x) case x: return #x ;
+#define EEND default: return QString("UNLISTED#").arg((int)v); }}
 
 #endif // TOOLS_H

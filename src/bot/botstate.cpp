@@ -1,5 +1,6 @@
 #include "parsers/all_pages.h"
 #include "botstate.h"
+#include "tools/tools.h"
 
 BotState::BotState(QObject *parent) :
     QObject(parent)
@@ -44,7 +45,6 @@ void BotState::reset() {
     dozor_price = -1;
 
     primary_work    = Work_None;
-    secondary_work  = SecWork_None;
 }
 
 void BotState::update_from_page(const Page_Game *p) {
@@ -106,6 +106,32 @@ void BotState::update_from_page(const Page_Game *p) {
 }
 
 
-QString toString(WorkType v) {
-    return QString("WorkType#%1").arg(v);
-}
+//QString toString(WorkType v) {
+//    return QString("WorkType#%1").arg(v);
+//}
+ESTART(WorkType)
+    // основная работа
+ECASE(Work_None)
+ECASE(Work_Sleeping)
+ECASE(Work_Resting)
+ECASE(Work_Watching)
+ECASE(Work_Mining)
+ECASE(Work_MineShopping)
+ECASE(Work_BigOpening)
+ECASE(Work_SmallOpening)
+ECASE(Work_Farming)
+ECASE(Work_Training)
+ECASE(Work_Dressing)
+ECASE(Work_Fighting)
+ECASE(Work_ScaryFighting)
+ECASE(Work_CaveExploring)
+ECASE(Work_Guarding)
+ // неосновная работа
+ECASE(Work_Fishing)
+ECASE(Work_Healing)
+ECASE(Work_Gambling)
+ECASE(Work_ClanGiving)
+ECASE(Work_Shopping)
+ECASE(Work_Reading)
+ECASE(Work_Trading)
+EEND
