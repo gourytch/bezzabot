@@ -8,7 +8,6 @@ Page_Game_Mine_Main::Page_Game_Mine_Main (QWebElement& doc) : Page_Game(doc) {
     pagekind = page_Game_Mine_Main;
     foreach (QWebElement e, document.findAll("DIV.inputGroup")) {
         QString title = e.findFirst("DIV.title").toPlainText().trimmed();
-        qDebug("TITLE: {" + title + "}");
         if (title == u8("Живая Поляна")) {
             QWebElementCollection tds = e.findAll("TD");
             Q_ASSERT (tds.count() == 2);

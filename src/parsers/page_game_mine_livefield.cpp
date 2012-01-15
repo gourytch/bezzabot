@@ -40,18 +40,14 @@ QString Page_Game_Mine_LiveField::toString (const QString &pfx) const {
 }
 
 bool Page_Game_Mine_LiveField::fit(const QWebElement& doc) {
-    qDebug("*Page_Game_Mine_LiveField::fit");
     QString t = doc.findFirst("DIV.title").toPlainText().trimmed();
     if (t != u8("Правила игры")) {
-        qDebug("t={" + t + "}");
         return false;
     }
     QWebElement e = doc.findFirst("DIV[id=gameField]");
     if (e.isNull()) {
-        qDebug("gamedield is null");
         return false;
     }
-    qDebug("ok");
     return true;
 }
 
