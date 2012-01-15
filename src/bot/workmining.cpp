@@ -267,9 +267,15 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             //
             // закончили эпопею с закупками инвентаря, теперь смотрим на кулон
             //
-            if (_use_coulons && !_hardminer) {
+            if (_use_coulons) {
                 int digtime = is_miner ? 5 * 60 : 20 * 60;
-                quint32 qid = _bot->guess_coulon_to_wear(Work_Mining, digtime);
+                quint32 qid;
+                if (_hardminer) {
+                    digtime *= 3;
+                    qid = _bot->guess_coulon_to_wear(Work_Sleeping, digtime);
+                } else {
+                    qid = _bot->guess_coulon_to_wear(Work_Mining, digtime);
+                }
                 bool rewear = _bot->is_need_to_change_coulon(qid);
                 if (rewear) {
                     qDebug("надо одеть кулон #%d", qid);
@@ -304,9 +310,14 @@ bool WorkMining::processPage(const Page_Game *gpage) {
         {
             bool rewear = false;
             quint32 qid = 0;
-            if (_use_coulons && !_hardminer) {
+            if (_use_coulons) {
                 int digtime = is_miner ? 5 * 60 : 20 * 60;
-                qid = _bot->guess_coulon_to_wear(Work_Mining, digtime);
+                if (_hardminer) {
+                    digtime *= 3;
+                    qid = _bot->guess_coulon_to_wear(Work_Sleeping, digtime);
+                } else {
+                    qid = _bot->guess_coulon_to_wear(Work_Mining, digtime);
+                }
                 rewear = _bot->is_need_to_change_coulon(qid);
             }
 
