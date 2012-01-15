@@ -120,12 +120,12 @@ int WorkSleeping::getTimeToSleep() const {
 
     if (sleepdownHour <= wakeupHour) {
         if (sleepdownHour <= h && h <= wakeupHour) {
-            dh = h - wakeupHour;
+            dh = wakeupHour - h;
         }
-    } else {
+    } else { // wakeup < sleepdown, 2 parts
         if (h <= wakeupHour) {
             dh = wakeupHour - h;
-        } else if (h > sleepdownHour) {
+        } else if (sleepdownHour <= h) {
             dh = 24 - h + wakeupHour;
         }
     }
