@@ -20,7 +20,9 @@ HEADERS += \
     page_game_dozor_gotvictim.h \
     page_game_dozor_lowhealth.h \
     page_game_pier.h \
-    page_error.h
+    page_error.h \
+    page_game_mine_main.h \
+    page_game_mine_livefield.h
 
 SOURCES += \
     types.cpp \
@@ -36,7 +38,9 @@ SOURCES += \
     page_game_dozor_gotvictim.cpp \
     page_game_dozor_lowhealth.cpp \
     page_game_pier.cpp \
-    page_error.cpp
+    page_error.cpp \
+    page_game_mine_main.cpp \
+    page_game_mine_livefield.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
@@ -49,6 +53,10 @@ win32 {
   CONFIG -= debug
   CONFIG += console
 }
+
+
+
+
 
 
 

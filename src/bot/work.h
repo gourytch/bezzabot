@@ -17,6 +17,18 @@ protected:
 
     Bot *_bot;
 
+    QString _workLink;
+
+    void gotoWork();
+
+    bool hasWork() const;
+
+    bool isWorkReady() const;
+
+    bool isMyWork() const;
+
+    bool isNotMyWork() const;
+
     void setAwaiting();
 
 public:

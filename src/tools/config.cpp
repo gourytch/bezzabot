@@ -15,6 +15,7 @@ Config*     Config::_global     = NULL;
 QSettings*  Config::_settings   = NULL;
 
 bool        Config::_portable = true;
+bool        Config::_readonly = false;
 
 QString     Config::_location_appdir;
 QString     Config::_location_config;
@@ -79,13 +80,20 @@ void Config::init_check ()
     _ini_fname = ini_name.contains('/')
             ? ini_name
             : _location_config + "/" + ini_name;
-    qWarning("using config file {"  + _ini_fname + "}");
+    qDebug("using config file {"  + _ini_fname + "}");
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
     _global = new Config ();
-    if (!_global->get("initialized").toBool()) {
-        _global->setTemplate();
+
+    _readonly = _global->get("readonly").toBool();
+
+    if (!_readonly) {
+        if (!_global->get("initialized").toBool()) {
+            _global->setTemplate();
+        }
+        _global->set("launched",
+                     QDateTime::currentDateTime().
+                     toString("yyyy-MM-dd hh:mm:ss"));
     }
-    _global->set("launched", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 }
 
 
@@ -158,8 +166,10 @@ void Config::set (
         const QString& path,
         const QVariant& value)
 {
-    _settings->setValue (fullpath (path), value);
-    _settings->sync ();
+    if (!_readonly) {
+        _settings->setValue (fullpath (path), value);
+        _settings->sync ();
+    }
 }
 
 

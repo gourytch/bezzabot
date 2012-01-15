@@ -1,29 +1,25 @@
-#ifndef WORKMINING_H
-#define WORKMINING_H
-
-#include <QDateTime>
+#ifndef WORKBIGOPENING_H
+#define WORKBIGOPENING_H
 #include "work.h"
 
-class Bot;
-
-
-class WorkMining : public Work
+class WorkFieldsOpening : public Work
 {
+
     Q_OBJECT
 
 protected:
 
-    int  _digchance;
-    bool _use_mineshop_pro;
-    bool _use_mineshop;
-    bool _use_continue;
-    bool _use_coulons;
-    bool _hardminer;
-    bool _charmed;
+    bool _open_small;
+
+    bool _open_big;
+
+    int _level_gap;
+
+    int _min_amount;
 
 public:
 
-    explicit WorkMining(Bot *bot);
+    explicit WorkFieldsOpening(Bot *bot);
 
     virtual bool isPrimaryWork() const;
 
@@ -39,7 +35,7 @@ public:
 
     virtual bool processCommand(Command command);
 
+
 };
 
-
-#endif // WORKMINING_H
+#endif // WORKBIGOPENING_H

@@ -8,6 +8,7 @@
 WorkMining::WorkMining(Bot *bot) :
     Work(bot)
 {
+    _workLink = "mine.php?a=open";
     Config *config = _bot->config();
     _digchance  = config->get("Work_Mining/digchance", false,
                               75).toInt();
@@ -19,6 +20,9 @@ WorkMining::WorkMining(Bot *bot) :
                                 true).toBool();
     _use_coulons = config->get("Work_Mining/use_coulons", false,
                                true).toBool();
+    _hardminer = config->get("Work_Mining/hardminer", false, false).toBool();
+
+    _charmed = false;
 }
 
 bool WorkMining::isPrimaryWork() const {
@@ -33,18 +37,13 @@ QString WorkMining::getWorkStage() const {
     return "не определена";
 }
 
-void WorkMining::gotoMineOpen() {
-    setAwaiting();
-    _bot->GoTo("mine.php?a=open");
-}
-
 bool WorkMining::nextStep() {
-    if (_bot->_gpage->timer_work.defined()) {
+    if (hasWork()) {
         // есть какая-то работа
-        if (_bot->_gpage->timer_work.href == "mine.php?a=open") {
-            if (_bot->_gpage->timer_work.expired()) {
+        if (isMyWork()) {
+            if (isWorkReady()) {
                 qDebug("пора глянуть, что там в шахте творится");
-                gotoMineOpen();
+                gotoWork();
                 return true;
             }
             return true; // вовсю шахтёрствуем
@@ -58,22 +57,33 @@ bool WorkMining::nextStep() {
 }
 
 bool WorkMining::processPage(const Page_Game *gpage) {
-    if (gpage->timer_work.defined()) {
+    if (hasWork()) {
         // есть работа
-        if (gpage->timer_work.href != "mine.php?a=open") {
+        if (isNotMyWork()) {
             qWarning("мы шахтёры, почему-то не шахтёрим, href=" +
                    gpage->timer_work.href);
             return false; // отказываемся работать не на своей работе
         }
-        if (gpage->timer_work.expired()) {
+        if (isWorkReady()) {
             // работа окончена
             qDebug("таймер сказал, что работа готова");
             if (gpage->pagekind != page_Game_Mine_Open) {
                 qDebug("пойдём, проверим, что накопалось");
-                gotoMineOpen();
+                gotoWork();
                 return true;
             }
         } else { // !(gpage->timer_work.expired())
+            if (_hardminer) {
+                int maxnorm = (gpage->workguild == WorkGuild_Miners)
+                        ? 5 * 60
+                        :20 * 60;
+                QDateTime now = QDateTime::currentDateTime();
+                int secs = now.secsTo(gpage->timer_work.pit);
+                if (secs > maxnorm) {
+                    qDebug("время %d > max(%d), сработал УШ!", secs, maxnorm);
+                    _charmed = true;
+                }
+            }
             qDebug("терпеливо шахтёрствуем до " +
                    gpage->timer_work.pit.toString("yyyy-MM-dd hh:mm:ss"));
             return true;
@@ -82,7 +92,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
         // пока работы нет
         if (gpage->pagekind != page_Game_Mine_Open) {
             qDebug("пойдём начинать работу");
-            gotoMineOpen();
+            gotoWork();
             return true;
         }
     }
@@ -99,7 +109,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             qDebug("стоим перед входом в забой");
 
             if (_bot->state.hp_cur < 25) {
-                qDebug("очень мало здоровья");
+                qDebug("для работы в шахте у нас очень мало здоровья");
                 if (_use_coulons &&
                     _bot->state.hp_cur > 0 &&
                     _bot->state.hp_spd > 0) {
@@ -257,7 +267,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             //
             // закончили эпопею с закупками инвентаря, теперь смотрим на кулон
             //
-            if (_use_coulons) {
+            if (_use_coulons && !_hardminer) {
                 int digtime = is_miner ? 5 * 60 : 20 * 60;
                 quint32 qid = _bot->guess_coulon_to_wear(Work_Mining, digtime);
                 bool rewear = _bot->is_need_to_change_coulon(qid);
@@ -275,6 +285,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             if (p->doStart()) {
                 qWarning("вроде зашли");
                 setAwaiting();
+                _charmed = false;
                 return true;
             } else {
                 qCritical("не смогли пойти в забой!");
@@ -293,15 +304,20 @@ bool WorkMining::processPage(const Page_Game *gpage) {
         {
             bool rewear = false;
             quint32 qid = 0;
-            if (_use_coulons) {
+            if (_use_coulons && !_hardminer) {
                 int digtime = is_miner ? 5 * 60 : 20 * 60;
                 qid = _bot->guess_coulon_to_wear(Work_Mining, digtime);
                 rewear = _bot->is_need_to_change_coulon(qid);
             }
 
-            qWarning(u8("доковыряли. шанс добычи: %1%, для копки надо %2%")
-                   .arg(p->success_chance).arg(_digchance));
-            if (p->success_chance >= _digchance) {
+            if (_charmed) {
+                qWarning(u8("доковыряли. шанс добычи: %1%, сработал УШ")
+                       .arg(p->success_chance));
+            } else {
+                qWarning(u8("доковыряли. шанс добычи: %1%, для копки надо %2%")
+                       .arg(p->success_chance).arg(_digchance));
+            }
+            if (_charmed || (p->success_chance >= _digchance)) {
                 qDebug("будем доставать кристалл");
                 if (p->doDig()) {
                     qWarning("достаём кристалл и заканчиваем работу.");
@@ -321,6 +337,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                     if (p->doReset()) {
                         qWarning("продолжили копать");
                         setAwaiting();
+                        _charmed = false;
                         return true;
                     } else {
                         qCritical("не смогли нажать продолжение!");
@@ -385,9 +402,9 @@ bool WorkMining::processQuery(Query query) {
     switch (query) {
     case CanStartWork:
     {
-        if (_bot->_gpage->timer_work.defined()) {
+        if (hasWork()) {
             // чем-то уже занимаемся
-            if (_bot->_gpage->timer_work.href == "mine.php?a=open") {
+            if (isMyWork()) {
                 qDebug("мы уже шахтёрим. можем подхватить дальше");
                 return true;
             }
@@ -395,7 +412,7 @@ bool WorkMining::processQuery(Query query) {
             return false; // мы работаем, но не как не шахтёры
         }
         if (_bot->state.hp_cur < 25) {
-            qDebug("очень мало здоровья");
+            qDebug("для шахтёра у нас очень мало здоровья");
             return false;
         }
         if (_bot->state.pickaxes_remains == 0) {
@@ -451,9 +468,9 @@ bool WorkMining::processCommand(Command command) {
     switch (command) {
     case StartWork:
     { // идём поработать
-        if (_bot->_gpage->timer_work.defined()) {
+        if (hasWork()) {
             // есть какая-то работа
-            if (_bot->_gpage->timer_work.href == "mine.php?a=open") {
+            if (isMyWork()) {
                 qDebug("уже работаем шахтёрами, продолжим это");
                 return true; // вовсю шахтёрствуем
             }

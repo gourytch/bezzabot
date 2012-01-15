@@ -15,7 +15,7 @@
 #include "workwatching.h"
 #include "workmining.h"
 #include "workfishing.h"
-
+#include "workfieldsopening.h"
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent) // QThread
@@ -133,8 +133,8 @@ void Bot::GoTo(const QString& link, bool instant) {
     if (instant) {
         QTimer::singleShot(0, this, SLOT(delayedGoTo()));
     } else {
-        int ms = _goto_delay_min * 1000 +
-                (qrand() % (1000 * (_goto_delay_max - _goto_delay_min)));
+        int ms = _goto_delay_min +
+                (qrand() % (_goto_delay_max - _goto_delay_min));
         Timebomb::global()->launch(ms, this, SLOT(delayedGoTo()));
     }
 }
@@ -537,6 +537,7 @@ void Bot::initWorks() {
     _worklist.append(new WorkSleeping(this));
     _worklist.append(new WorkWatching(this));
     _worklist.append(new WorkMining(this));
+    _worklist.append(new WorkFieldsOpening(this));
 
     _secworklist.append(new WorkFishing(this));
 }

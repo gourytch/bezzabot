@@ -12,6 +12,8 @@
 #include "page_game_dozor_lowhealth.h"
 #include "page_game_dozor_onduty.h"
 #include "page_game_dozor_gotvictim.h"
+#include "page_game_mine_main.h"
 #include "page_game_mine_open.h"
+#include "page_game_mine_livefield.h"
 
 #endif // ALL_PAGES_H

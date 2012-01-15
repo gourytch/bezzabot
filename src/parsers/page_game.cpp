@@ -392,7 +392,31 @@ Page_Game::Page_Game (QWebElement& doc) :
         QWebElement a = c.findFirst("A");
         r.href = a.attribute("href");
         bool ok;
-        r.count = c.toPlainText().trimmed().toInt(&ok);
+        QString t = c.toPlainText();//.trimmed();
+
+//        if (r.id == 33 || r.id == 34) {
+//            qDebug("*** inner=" + c.toInnerXml());
+//            qDebug("*** text={" + t + "}");
+//            QWebElement z = c.firstChild();
+//            while (!z.isNull()) {
+//                qDebug("*   z=" + z.toOuterXml());
+//                z = z.nextSibling();
+//            }
+//            qDebug("*----*");
+//        }
+
+        r.count = t.toInt(&ok);
+        if (!ok) {
+            QRegExp rx( "(\\d+)\\s*/\\s*(\\d+)");
+            if (rx.indexIn(c.toInnerXml()) == -1) {
+                r.count = -1;
+            } else {
+                r.count = rx.cap(1).toInt(&ok);
+                if (!ok) {
+                    r.count = -1;
+                }
+            }
+        }
         resources[r.id] = r;
     }
     coulons.assign(document.findFirst("DIV[id=coulons_bar]"));

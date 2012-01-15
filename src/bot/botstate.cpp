@@ -103,6 +103,13 @@ void BotState::update_from_page(const Page_Game *p) {
         pickaxes_remains =  q->num_pickaxes + q->num_pickaxesPro;
     }
 
+    // из главного входа на шахту можно выдернуть данные
+    if (p->pagekind == page_Game_Mine_Main) {
+        Page_Game_Mine_Main *q = (Page_Game_Mine_Main*)p;
+        smalltickets_remains = q->num_smalltickets;
+        bigtickets_remains = q->num_bigtickets;
+    }
+
 }
 
 
@@ -117,8 +124,7 @@ ECASE(Work_Resting)
 ECASE(Work_Watching)
 ECASE(Work_Mining)
 ECASE(Work_MineShopping)
-ECASE(Work_BigOpening)
-ECASE(Work_SmallOpening)
+ECASE(Work_FieldsOpening)
 ECASE(Work_Farming)
 ECASE(Work_Training)
 ECASE(Work_Dressing)

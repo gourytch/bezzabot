@@ -30,9 +30,11 @@ protected:
     static QString  _location_cache;
     static QString  _location_data;
     static QString  _ini_fname;
+    static bool     _readonly;
 
     Config*     _base;
     QString     _id;
+
 
     QString fullpath (const QString& path) const;
 
