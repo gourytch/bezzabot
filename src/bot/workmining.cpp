@@ -22,6 +22,8 @@ WorkMining::WorkMining(Bot *bot) :
                                true).toBool();
     _hardminer = config->get("Work_Mining/hardminer", false, false).toBool();
 
+    _spender = config->get("Work_Mining/spender", false, false).toBool();
+
     _charmed = false;
 }
 
@@ -324,11 +326,16 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             if (_charmed) {
                 qWarning(u8("доковыряли. шанс добычи: %1%, сработал УШ")
                        .arg(p->success_chance));
+            } else if (_spender && (gpage->safe_gold > 0)) {
+                qWarning(u8("доковыряли. шанс добычи: %1%, и много золота")
+                            .arg(p->success_chance));
             } else {
                 qWarning(u8("доковыряли. шанс добычи: %1%, для копки надо %2%")
                        .arg(p->success_chance).arg(_digchance));
             }
-            if (_charmed || (p->success_chance >= _digchance)) {
+            if (_charmed ||
+                (p->success_chance >= _digchance) ||
+                (_spender && (gpage->safe_gold > 0))) {
                 qDebug("будем доставать кристалл");
                 if (p->doDig()) {
                     qWarning("достаём кристалл и заканчиваем работу.");

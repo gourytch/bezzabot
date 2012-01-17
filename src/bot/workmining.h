@@ -18,6 +18,7 @@ protected:
     bool _use_mineshop;
     bool _use_continue;
     bool _use_coulons;
+    bool _spender;
     bool _hardminer;
     bool _charmed;
 
