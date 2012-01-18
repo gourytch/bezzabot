@@ -82,6 +82,14 @@ void BotState::update_from_page(const Page_Game *p) {
         fishraids_remains = p->resources.value(39).count;
     }
 
+    hardminer_effect = QDateTime();
+    for (int i = 0; i < p->effects.count(); ++i) {
+        const PageTimer &t = p->effects[i];
+        if (t.title == u8("Усердный шахтер")) {
+            hardminer_effect = t.pit;
+        }
+    }
+
 
     // обработка странички персонажа
     if (p->pagekind == page_Game_Index) {

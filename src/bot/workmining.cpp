@@ -272,7 +272,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             if (_use_coulons) {
                 int digtime = is_miner ? 5 * 60 : 20 * 60;
                 quint32 qid;
-                if (_hardminer) {
+                if (_hardminer && _bot->state.hardminer_effect.isValid()) {
                     digtime *= 3;
                     qid = _bot->guess_coulon_to_wear(Work_Sleeping, digtime);
                 } else {
@@ -314,7 +314,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             quint32 qid = 0;
             if (_use_coulons) {
                 int digtime = is_miner ? 5 * 60 : 20 * 60;
-                if (_hardminer) {
+                if (_hardminer && _bot->state.hardminer_effect.isValid()) {
                     digtime *= 3;
                     qid = _bot->guess_coulon_to_wear(Work_Sleeping, digtime);
                 } else {

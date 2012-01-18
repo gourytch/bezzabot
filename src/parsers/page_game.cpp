@@ -419,6 +419,13 @@ Page_Game::Page_Game (QWebElement& doc) :
         }
         resources[r.id] = r;
     }
+
+    effects.clear();
+    e = accordion.findFirst("DIV[class=timers]");
+    foreach (c, e.findAll("LI")) {
+        effects.add(c);
+    }
+
     coulons.assign(document.findFirst("DIV[id=coulons_bar]"));
 }
 
@@ -460,7 +467,11 @@ QString Page_Game::toString (const QString& pfx) const
             pfx + QString("fight  timer: %1\n").arg(timer_attack.toString()) +
             pfx + QString("other timers:\n") +
             pfx + timers.toString (pfx + "   ") + "\n" +
+            pfx + QString("resources:\n") +
             pfx + ::toString(pfx + "   ", resources) + "\n" +
+            pfx + QString("effects:\n") +
+            pfx + effects.toString(pfx + "   ") + "\n" +
+            pfx + QString("coulons:\n") +
             pfx + coulons.toString(pfx + "   ") + "\n" +
             pfx + "}";
 }

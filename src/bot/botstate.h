@@ -77,6 +77,8 @@ public: // всё, описывающее текущее состояние бо
 
     WorkType    primary_work; // текущая работа
 
+    QDateTime   hardminer_effect; // время истечения УШ
+
 signals:
 
 public slots:

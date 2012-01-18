@@ -144,6 +144,7 @@ public:
     PageTimer   timer_immunity;
     PageTimer   timer_attack;
     PageTimers  timers;
+    PageTimers  effects;
     PageResources   resources;
     PageCoulons     coulons;
 
