@@ -41,7 +41,8 @@ bool WorkFishing::processPage(const Page_Game *gpage) {
     }
 
     if (p->canSend) {
-        qDebug("можно отослать пирашколовку");
+        qDebug("можно отослать пирашколовку (у нас %d походов по %d рыбок)",
+               _bot->state.fishraids_remains, p->raid_capacity);
         if (p->doSend()) {
             qWarning("отправили рыбачить");
             setAwaiting();
@@ -89,17 +90,22 @@ bool WorkFishing::processCommand(Command command) {
 }
 
 bool WorkFishing::checkFishraidCooldown() {
-    if (_bot->state.fishraids_remains == 0) {
-        _cooldown = nextDay();
-    } else {
-        const PageTimer *t = _bot->_gpage->timers.byTitle(
-                    u8("Время до возвращения судна с пирашками"));
-        if (_cooldown.isNull() && t != NULL && t->defined()) {
-            qDebug(u8("pit = ") + t->pit.toString("yyyy-MM-dd hh:mm:ss"));
-            int add = 300 + (qrand() % 300);
-            _cooldown = t->pit.addSecs(add);
-            qDebug(u8("finshing cooldown : %1")
-                      .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
+    if (_cooldown.isNull() ||
+        _cooldown < QDateTime::currentDateTime()) { // отката нет или просрочен
+        if (_bot->state.fishraids_remains == 0) {
+            _cooldown = nextDay().addSecs(3600); // чтоб уж наверняка
+            qDebug(u8("рейдов не осталось. поставили таймер на завтра, на ")
+                   + _cooldown.toString("yyyy-MM-dd hh:mm:ss"));
+        } else {
+            const PageTimer *t = _bot->_gpage->timers.byTitle(
+                        u8("Время до возвращения судна с пирашками"));
+            if (t != NULL && t->defined()) {
+                qDebug(u8("pit = ") + t->pit.toString("yyyy-MM-dd hh:mm:ss"));
+                int add = 300 + (qrand() % 300);
+                _cooldown = t->pit.addSecs(add);
+                qDebug(u8("fishing cooldown : %1")
+                          .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
+            }
         }
     }
     return _cooldown < QDateTime::currentDateTime();
