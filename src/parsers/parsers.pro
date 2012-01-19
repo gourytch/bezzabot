@@ -22,7 +22,8 @@ HEADERS += \
     page_game_pier.h \
     page_error.h \
     page_game_mine_main.h \
-    page_game_mine_livefield.h
+    page_game_mine_livefield.h \
+    page_game_lucky_square.h
 
 SOURCES += \
     types.cpp \
@@ -40,7 +41,8 @@ SOURCES += \
     page_game_pier.cpp \
     page_error.cpp \
     page_game_mine_main.cpp \
-    page_game_mine_livefield.cpp
+    page_game_mine_livefield.cpp \
+    page_game_lucky_square.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
