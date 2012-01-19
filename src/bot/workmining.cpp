@@ -81,8 +81,8 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                         :20 * 60;
                 QDateTime now = QDateTime::currentDateTime();
                 int secs = now.secsTo(gpage->timer_work.pit);
-                if (secs > maxnorm) {
-                    qDebug("время %d > max(%d), сработал УШ!", secs, maxnorm);
+                if (!_charmed && (secs > maxnorm)) {
+                    qWarning("время %d > max(%d), сработал УШ!", secs, maxnorm);
                     _charmed = true;
                 }
             }

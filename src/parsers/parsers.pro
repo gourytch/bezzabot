@@ -23,7 +23,7 @@ HEADERS += \
     page_error.h \
     page_game_mine_main.h \
     page_game_mine_livefield.h \
-    page_game_lucky_square.h
+    page_game_luckysquare.h
 
 SOURCES += \
     types.cpp \
@@ -42,7 +42,7 @@ SOURCES += \
     page_error.cpp \
     page_game_mine_main.cpp \
     page_game_mine_livefield.cpp \
-    page_game_lucky_square.cpp
+    page_game_luckysquare.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
@@ -55,6 +55,10 @@ win32 {
   CONFIG -= debug
   CONFIG += console
 }
+
+
+
+
 
 
 

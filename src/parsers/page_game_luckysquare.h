@@ -3,7 +3,7 @@
 
 #include "page_game.h"
 
-class Page_Game_Lucky_Square : public Page_Game
+class Page_Game_LuckySquare : public Page_Game
 {
     Q_OBJECT
 
@@ -15,7 +15,7 @@ public:
 
 public:
 
-    explicit Page_Game_Lucky_Square(QWebElement& doc);
+    explicit Page_Game_LuckySquare(QWebElement& doc);
 
     virtual QString toString (const QString& pfx = QString ()) const;
 

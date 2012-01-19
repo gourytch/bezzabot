@@ -67,6 +67,7 @@ QString toString (PageKind kind)
     case page_Game_Friends: return QString("page_Game_Friends");
     case page_Game_Search: return QString("page_Game_Search");
     case page_Game_News: return QString("page_Game_News");
+    case page_Game_LuckySquare: return QString("page_Game_LuckySquare");
     default: return QString("page_UNKNOWN");
     }
 }
