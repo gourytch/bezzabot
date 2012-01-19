@@ -63,7 +63,7 @@ bool Page_Game_Mine_Main::doOpenSmall() {
 }
 
 bool Page_Game_Mine_Main::doOpenBig() {
-    if (num_smalltickets == 0) {
+    if (num_bigtickets == 0) {
         qCritical("i have no big tickets");
         return false;
     }
