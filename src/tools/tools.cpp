@@ -57,5 +57,9 @@ QString now (bool utc)
 }
 
 QDateTime nextDay() {
+    QDateTime now = QDateTime::currentDateTime();
+    if (now.time().hour() < 2) {
+        return QDateTime(QDate::currentDate()).addSecs(2 * 60 * 60 + 1);
+    }
     return QDateTime(QDate::currentDate().addDays(1)).addSecs(2 * 60 * 60 + 1);
 }
