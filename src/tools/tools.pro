@@ -18,7 +18,8 @@ HEADERS += \
     tunedpage.h \
     persistentcookiejar.h \
     logger.h \
-    timebomb.h
+    timebomb.h \
+    netmanager.h
 
 SOURCES += \
     tools.cpp \
@@ -26,7 +27,8 @@ SOURCES += \
     tunedpage.cpp \
     persistentcookiejar.cpp \
     logger.cpp \
-    timebomb.cpp
+    timebomb.cpp \
+    netmanager.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
