@@ -328,7 +328,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                        .arg(p->success_chance));
             } else if (_spender && (gpage->free_gold > 0)) {
                 qWarning(u8("доковыряли. шанс добычи: %1% и %2 голого золота")
-                            .arg(p->success_chance, gpage->free_gold));
+                            .arg(p->success_chance).arg(gpage->free_gold));
             } else {
                 qWarning(u8("доковыряли. шанс добычи: %1%, для копки надо %2%")
                        .arg(p->success_chance).arg(_digchance));
