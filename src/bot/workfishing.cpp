@@ -90,8 +90,9 @@ bool WorkFishing::processCommand(Command command) {
 }
 
 bool WorkFishing::checkFishraidCooldown() {
+    QDateTime now = QDateTime::currentDateTime();
     if (_cooldown.isNull() ||
-        _cooldown < QDateTime::currentDateTime()) { // отката нет или просрочен
+        _cooldown < now) { // отката нет или просрочен
         if (_bot->state.fishraids_remains == 0) {
             _cooldown = nextDay().addSecs(3600); // чтоб уж наверняка
             qDebug(u8("рейдов не осталось. поставили таймер на завтра, на ")
@@ -99,11 +100,23 @@ bool WorkFishing::checkFishraidCooldown() {
         } else {
             const PageTimer *t = _bot->_gpage->timers.byTitle(
                         u8("Время до возвращения судна с пирашками"));
-            if (t != NULL && t->defined()) {
-                qDebug(u8("pit = ") + t->pit.toString("yyyy-MM-dd hh:mm:ss"));
+            if (t != NULL) {
+                if (t->defined()) {
+                    qDebug(u8("pit = ") + t->pit.toString("yyyy-MM-dd hh:mm:ss"));
+                    int add = 300 + (qrand() % 300);
+                    _cooldown = t->pit.addSecs(add);
+                    qDebug(u8("fishing cooldown : %1")
+                              .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
+                } else {
+                    int add = 300 + (qrand() % 300);
+                    _cooldown = now.addSecs(add);
+                    qDebug(u8("zero pagetimer. set fishing cooldown : %1")
+                              .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
+                }
+            } else {
                 int add = 300 + (qrand() % 300);
-                _cooldown = t->pit.addSecs(add);
-                qDebug(u8("fishing cooldown : %1")
+                _cooldown = now.addSecs(add);
+                qDebug(u8("undefined pagetimer. set fishing cooldown : %1")
                           .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
             }
         }
