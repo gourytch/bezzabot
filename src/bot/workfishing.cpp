@@ -107,21 +107,21 @@ bool WorkFishing::checkFishraidCooldown() {
                     _cooldown = t->pit.addSecs(add);
                     qDebug(u8("fishing cooldown : %1")
                               .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
-                } else {
-                    int add = 300 + (qrand() % 300);
-                    _cooldown = now.addSecs(add);
-                    qDebug(u8("zero pagetimer. set fishing cooldown : %1")
-                              .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
+//                } else {
+//                    int add = 300 + (qrand() % 300);
+//                    _cooldown = now.addSecs(add);
+//                    qDebug(u8("zero pagetimer. set fishing cooldown : %1")
+//                              .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
                 }
-            } else {
-                int add = 300 + (qrand() % 300);
-                _cooldown = now.addSecs(add);
-                qDebug(u8("undefined pagetimer. set fishing cooldown : %1")
-                          .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
+//            } else {
+//                int add = 300 + (qrand() % 300);
+//                _cooldown = now.addSecs(add);
+//                qDebug(u8("undefined pagetimer. set fishing cooldown : %1")
+//                          .arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
             }
         }
     }
-    return _cooldown < QDateTime::currentDateTime();
+    return _cooldown.isNull() || _cooldown < now;
 }
 
 void WorkFishing::gotoPier() {
