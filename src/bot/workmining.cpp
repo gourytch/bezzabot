@@ -322,20 +322,25 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                 }
                 rewear = _bot->is_need_to_change_coulon(qid);
             }
+            bool dig = false;
 
             if (_charmed) {
                 qWarning(u8("доковыряли. шанс добычи: %1%, сработал УШ")
                        .arg(p->success_chance));
+                dig = true;
             } else if (_spender && (gpage->free_gold > 0)) {
                 qWarning(u8("доковыряли. шанс добычи: %1% и %2 голого золота")
                             .arg(p->success_chance).arg(gpage->free_gold));
-            } else {
-                qWarning(u8("доковыряли. шанс добычи: %1%, для копки надо %2%")
+                dig = true;
+            } else if (p->success_chance >= _digchance) {
+                qWarning(u8("доковыряли. шанс добычи: %1% >= %2%")
                        .arg(p->success_chance).arg(_digchance));
+            } else {
+                qWarning(u8("доковыряли. шанс добычи: %1% < %2%")
+                       .arg(p->success_chance).arg(_digchance));
+                dig = false;
             }
-            if (_charmed ||
-                (p->success_chance >= _digchance) ||
-                (_spender && (gpage->safe_gold > 0))) {
+            if (dig) {
                 qDebug("будем доставать кристалл");
                 if (p->doDig()) {
                     qWarning("достаём кристалл и заканчиваем работу.");

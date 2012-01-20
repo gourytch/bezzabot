@@ -23,6 +23,8 @@ protected:
 
     bool _use_coulons;
 
+    bool _continuous;
+
 protected:
 
     bool isWatching() {

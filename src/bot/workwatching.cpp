@@ -14,6 +14,7 @@ WorkWatching::WorkWatching(Bot *bot) :
     Config *config = _bot->config();
     duration10 = config->get("Work_Watching/duration10", false, 1).toInt();
     _use_coulons = config->get("Work_Watching/use_coulons", false, true).toBool();
+    _continuous = config->get("Work_Watching/continuous", false, false).toBool();
 }
 
 bool WorkWatching::isPrimaryWork() const {
@@ -190,8 +191,11 @@ bool WorkWatching::processPage(const Page_Game *gpage) {
         if (!_endWatching.isNull()) { // мы только что из дозора
             _endWatching = QDateTime();
             _started = false;
-            qWarning("закончили поход.");
-            return false;
+            if (!_continuous) {
+                qWarning("закончили поход.");
+                return false;
+            }
+            qWarning("пробуем пойти в поход ещё раз.");
         }
         Page_Game_Dozor_Entrance *q = (Page_Game_Dozor_Entrance*)gpage;
         if (q->dozor_left10 == 0) { // подозорить не выйдет
