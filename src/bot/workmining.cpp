@@ -328,13 +328,14 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                 qWarning(u8("доковыряли. шанс добычи: %1%, сработал УШ")
                        .arg(p->success_chance));
                 dig = true;
+            } else if (p->success_chance >= _digchance) {
+                qWarning(u8("доковыряли. шанс добычи: %1% >= %2%")
+                       .arg(p->success_chance).arg(_digchance));
+                dig = true;
             } else if (_spender && (gpage->free_gold > 0)) {
                 qWarning(u8("доковыряли. шанс добычи: %1% и %2 голого золота")
                             .arg(p->success_chance).arg(gpage->free_gold));
                 dig = true;
-            } else if (p->success_chance >= _digchance) {
-                qWarning(u8("доковыряли. шанс добычи: %1% >= %2%")
-                       .arg(p->success_chance).arg(_digchance));
             } else {
                 qWarning(u8("доковыряли. шанс добычи: %1% < %2%")
                        .arg(p->success_chance).arg(_digchance));
