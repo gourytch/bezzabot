@@ -359,8 +359,8 @@ void Bot::configure() {
         qDebug("set password (not shown)");
     }
 
-    _goto_delay_min = _config->get("goto/delay_min", false, 1).toInt();
-    _goto_delay_max = _config->get("goto/delay_min", false, 60).toInt();
+    _goto_delay_min = _config->get("goto/delay_min", false, 1000).toInt();
+    _goto_delay_max = _config->get("goto/delay_min", false, 12000).toInt();
 
     _autostart = _config->get("autostart", false, false).toBool();
 
