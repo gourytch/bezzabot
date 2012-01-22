@@ -380,5 +380,6 @@ void MainWindow::slotUrlEdited(const QString& s) {
 
 void MainWindow::slotGoClicked() {
     if (_entered_url.isEmpty()) return;
+    qDebug("handmade url: {" + _entered_url + "}");
     pActor->request(_entered_url);
 }

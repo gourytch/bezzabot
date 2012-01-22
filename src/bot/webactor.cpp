@@ -38,9 +38,23 @@ WebActor::WebActor(Bot *bot) :
     if (Config::global().get("connection/use_proxy", false).toBool()) {
         QString proxyHost = Config::global().get("connection/proxy_host", "").toString();
         int proxyPort = Config::global().get("connection/proxy_port", 0).toInt();
+        QString proxyLogin = Config::global().get("connection/proxy_login").toString();
+        QString proxyPasswd = Config::global().get("connection/proxy_password").toString();
         if (!proxyHost.isEmpty() && proxyPort > 0) {
             qDebug(QString("proxy %1:%2").arg(proxyHost).arg(proxyPort));
-            _proxy = new QNetworkProxy (QNetworkProxy::HttpCachingProxy, proxyHost, proxyPort);
+            if (!proxyLogin.isNull()) {
+                qDebug(QString("proxy login: {%1}").arg(proxyLogin));
+            } else {
+                qDebug("null login for proxy");
+            }
+            if (!proxyPasswd.isNull()) {
+                qDebug("proxy password: not shown");
+            } else {
+                qDebug("null password for proxy");
+            }
+            _proxy = new QNetworkProxy (QNetworkProxy::HttpCachingProxy,
+                                        proxyHost, proxyPort,
+                                        proxyLogin, proxyPasswd);
         } else {
             qCritical("incorrect proxy params");
         }
@@ -104,7 +118,7 @@ void WebActor::request_ (const QNetworkRequest& rq,
 {
     QNetworkRequest rq_mod = rq;
     rq_mod.setRawHeader ("User-Agent", USER_AGENT);
-    qDebug("send request");
+    qDebug("send request to {" + rq_mod.url().toString() + "}");
     _finished = false;
     _success = false;
     _webpage->mainFrame ()->load (rq_mod, operation, body);
@@ -133,7 +147,7 @@ void WebActor::request (const QUrl &url, const QByteArray& data)
 
 void WebActor::request (const QUrl& url, const QStringList& params) {
     if (params.count() % 2) {
-        qDebug () << "num params % 2 != 0";
+        qCritical("num params (%d) %% 2 != 0", params.count());
         return;
     }
     QString data;
