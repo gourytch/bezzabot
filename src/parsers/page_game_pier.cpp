@@ -1,6 +1,9 @@
 #include <QRegExp>
 #include <QString>
 #include <QDebug>
+#include <QDateTime>
+#include <QDate>
+#include <QTime>
 #include "tools/tools.h"
 #include "page_game_pier.h"
 
@@ -65,8 +68,30 @@ Page_Game_Pier::Page_Game_Pier (QWebElement& doc) :
         }
     }
     if (!canSend) {
-        parseTimerSpan(body.findFirst("SPAN[id=counter_1]"),
+        parseTimerSpan(body.findFirst("SPAN#counter_1"),
                        &timeleft.pit, &timeleft.hms);
+    }
+
+    managed_till = QDateTime();
+    with_manager = false;
+
+    foreach (QWebElement e, body.findAll("DIV.inputGroup")) {
+        if (e.findFirst("DIV.title").toPlainText()
+            .trimmed() == u8("Управляющий")) {
+            with_manager = (e.findFirst("INPUT[type=submit]")
+                            .attribute("value") == u8("УВОЛИТЬ"));
+            QRegExp rx("(\\d{2}):(\\d{2}) (\\d{2})\\.(\\d{2})\\.(\\d{4})");
+            if (rx.indexIn(e.findFirst("FORM + P").toPlainText()) != -1) {
+                qDebug("T={" + rx.cap(0) + "}");
+                int hour    = rx.cap(1).toInt();
+                int minute  = rx.cap(2).toInt();
+                int day     = rx.cap(3).toInt();
+                int month   = rx.cap(4).toInt();
+                int year    = rx.cap(5).toInt();
+                managed_till = QDateTime(QDate(year, month, day),
+                                         QTime(hour, minute));
+            }
+        }
     }
 }
 
@@ -79,6 +104,9 @@ QString Page_Game_Pier::toString (const QString& pfx) const {
             pfx + QString ("num_steamers : %1\n").arg(num_steamers) +
             pfx + (canSend ? "can send fishboat" : "can't send fisboat") + "\n" +
             pfx + QString ("timeleft     : %1\n").arg(timeleft.toString()) +
+            pfx + (with_manager ? "with manager" : "witohut manager") + "\n" +
+            pfx + QString("managed_till  : %1\n")
+            .arg(managed_till.toString("yyyy-MM-dd hh:mm:ss")) +
             pfx + "}";
 }
 

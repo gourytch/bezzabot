@@ -9,6 +9,7 @@
 WorkFishing::WorkFishing(Bot *bot) :
     Work(bot)
 {
+    _workLink = "harbour.php?a=pier";
 }
 
 bool WorkFishing::isPrimaryWork() const {
@@ -34,9 +35,18 @@ bool WorkFishing::processPage(const Page_Game *gpage) {
         return true;
     }
     Page_Game_Pier *p = (Page_Game_Pier*)gpage;
+    if (p->with_manager) {
+        qWarning(u8("вместо нас рыбачит управляющий"));
+        _cooldown = p->managed_till.addSecs(120);
+        qDebug("выставим таймер возврата на " +
+               _cooldown.toString("yyyy-MM-dd hh:mm:ss"));
+        return false;
+    }
     if (p->message.contains(u8("не хотят."))) {
         qWarning(u8("на сегодня рыбалок хватит"));
         _cooldown = nextDay();
+        qDebug("выставим таймер возврата на " +
+               _cooldown.toString("yyyy-MM-dd hh:mm:ss"));
         return false;
     }
 

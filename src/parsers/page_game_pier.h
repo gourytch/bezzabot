@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QWebElement>
+#include <QDateTime>
 #include "page_game.h"
 
 class Page_Game_Pier : public Page_Game
@@ -27,6 +28,9 @@ public:
 
     PageTimer timeleft;
     bool canSend;
+
+    bool with_manager;
+    QDateTime managed_till;
 
     Page_Game_Pier (QWebElement& doc);
 

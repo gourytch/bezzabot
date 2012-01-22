@@ -5,6 +5,7 @@
 #include <QString>
 #include <QFile>
 #include <QTextStream>
+#include "build_id.h"
 
 class Logger : public QObject
 {

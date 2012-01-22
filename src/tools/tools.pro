@@ -19,7 +19,8 @@ HEADERS += \
     persistentcookiejar.h \
     logger.h \
     timebomb.h \
-    netmanager.h
+    netmanager.h \
+    build_id.h
 
 SOURCES += \
     tools.cpp \
@@ -33,6 +34,7 @@ SOURCES += \
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/lib
+
 
 
 
