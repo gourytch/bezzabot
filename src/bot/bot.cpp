@@ -204,12 +204,18 @@ void Bot::onPageFinished (bool ok)
     _awaiting = false;
 
     qDebug("page kind: " + ::toString(_page->pagekind));
+
+    if (_page->pagekind != page_Error) {
+        _reload_attempt = 0;
+    }
+
+    if (_gpage) {
+        state.update_from_page(_gpage);
+    }
+
     if (!isStarted()) {
         qDebug("bot is not active. no page handling will be performed");
         return;
-    }
-    if (_page->pagekind != page_Error) {
-        _reload_attempt = 0;
     }
 
     switch (_page->pagekind)
@@ -225,7 +231,6 @@ void Bot::onPageFinished (bool ok)
         break;
     default:
         if (_gpage) { // Page_Game and descendants
-            state.update_from_page(_gpage);
             got_page(_gpage);
         } else {
             qCritical("unhandled page with kind=" + toString(_page->pagekind));

@@ -135,7 +135,7 @@ bool WorkFieldsOpening::processQuery(Query query) {
                 qDebug("мы уже на нашей работе. подхватим её");
                 return true;
             } else {
-                qDebug("мы на какой-то работе");
+                qDebug("мы на какой-то работе, открывать полянки не можем");
                 return false;
             }
         }

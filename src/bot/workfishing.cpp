@@ -94,7 +94,8 @@ bool WorkFishing::checkFishraidCooldown() {
     if (_cooldown.isNull() ||
         _cooldown < now) { // отката нет или просрочен
         if (_bot->state.fishraids_remains == 0) {
-            _cooldown = nextDay().addSecs(3600); // чтоб уж наверняка
+            _cooldown = nextDay()
+                    .addSecs(3600 + (qrand() % 3600)); // чтоб уж наверняка
             qDebug(u8("рейдов не осталось. поставили таймер на завтра, на ")
                    + _cooldown.toString("yyyy-MM-dd hh:mm:ss"));
         } else {

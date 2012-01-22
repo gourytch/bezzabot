@@ -15,6 +15,7 @@ WorkWatching::WorkWatching(Bot *bot) :
     duration10 = config->get("Work_Watching/duration10", false, 1).toInt();
     _use_coulons = config->get("Work_Watching/use_coulons", false, true).toBool();
     _continuous = config->get("Work_Watching/continuous", false, false).toBool();
+    _immune_only = config->get("Work_Watching/immune_only", false, false).toBool();
 }
 
 bool WorkWatching::isPrimaryWork() const {
@@ -195,18 +196,25 @@ bool WorkWatching::processPage(const Page_Game *gpage) {
                 qWarning("закончили поход.");
                 return false;
             }
-            qWarning("пробуем пойти в поход ещё раз.");
+            qDebug("пробуем пойти в поход ещё раз.");
         }
         Page_Game_Dozor_Entrance *q = (Page_Game_Dozor_Entrance*)gpage;
         if (q->dozor_left10 == 0) { // подозорить не выйдет
-            _watchingCooldown = nextDay(); // поставим откат до следующего дня
+            _watchingCooldown = nextDay() // поставим откат до следующего дня
+                    .addSecs(3600 + (qrand() % 3600)); // с запасом
             qWarning("дозоров не осталось. поставили откат до " +
                    _watchingCooldown.toString("yyyy-MM-dd hh:mm:ss"));
             _started = false;
             return false;
         }
-        _watchingCooldown = QDateTime(); // пока не ждём откатов
         int n = qMin(q->dozor_left10, duration10); // макс. время дозора
+
+        if (_immune_only && (!gpage->timer_immunity.active(600 * n))) {
+            qDebug("мы не иммунны. дозорить не станем");
+            return false;
+        }
+
+        _watchingCooldown = QDateTime(); // пока не ждём откатов
 
         if (_use_coulons) {
             qDebug("проверяем кулоны");
@@ -262,6 +270,14 @@ bool WorkWatching::processQuery(Query query) {
         return true; // чисто как пинг
 
     case CanStartWork: // можем ли мы начать дозорить?
+        if (!_bot->_gpage->timer_work.pit.isNull()) {
+            if (_bot->_gpage->timer_work.href == "dozor.php") {
+                return true; // мы как бы уже в дозоре, так что можем перезайти
+            }
+            qDebug("дозору мешает другая работа: " +
+                   _bot->_gpage->timer_work.href);
+            return false; // какая-то работа уже работается.
+        }
         if (now < _watchingCooldown) { // откат в силе
             return false;
         }
@@ -286,13 +302,11 @@ bool WorkWatching::processQuery(Query query) {
                    _bot->state.gold, _bot->state.dozor_price);
             return false; // денег нет
         }
-        if (!_bot->_gpage->timer_work.pit.isNull()) {
-            if (_bot->_gpage->timer_work.href == "dozor.php") {
-                return true; // мы как бы уже в дозоре, так что можем перезайти
-            }
-            qDebug("дозору мешает другая работа: " +
-                   _bot->_gpage->timer_work.href);
-            return false; // какая-то работа уже работается.
+        if (_immune_only &&
+            !_bot->_gpage->timer_immunity.active(600 * duration10)) {
+            // мы не иммунны. дозорить не станем
+            qDebug("мы не иммунны. дозорить не станем");
+            return false;
         }
         return true; // ничто не мешает начать дозор.
 

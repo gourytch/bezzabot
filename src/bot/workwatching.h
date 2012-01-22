@@ -25,6 +25,8 @@ protected:
 
     bool _continuous;
 
+    bool _immune_only;
+
 protected:
 
     bool isWatching() {

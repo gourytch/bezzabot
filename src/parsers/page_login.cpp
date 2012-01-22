@@ -61,7 +61,7 @@ bool Page_Login::doLogin (
     js_setByName("email", login);
     js_setByName("password", password);
     if (keep) {
-        js("document.getElementsByName('remember')[0].checked='checked'';");
+        js("document.getElementsByName('remember')[0].checked=true;");
     }
     qDebug("press login button");
     pressSubmit();

@@ -39,6 +39,11 @@ struct PageTimer
     bool expired() const {
         return (pit < QDateTime::currentDateTime());
     }
+
+    bool active(int secs = 0) const {
+        return (defined() &&
+                (QDateTime::currentDateTime().addSecs(secs) < pit));
+    }
 };
 
 struct PageTimers
