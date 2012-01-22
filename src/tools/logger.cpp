@@ -57,7 +57,7 @@ Logger& Logger::global() {
     if (!_instance) {
         _instance = new Logger(NULL);
         _prev_handler = qInstallMsgHandler (_handler);
-        _instance->log(QtDebugMsg, "start logging, ID=" BUILD_ID); // VERBATIM!
+        _instance->log(QtDebugMsg, "start logging, " BUILD_ID); // VERBATIM!
     }
     return *_instance;
 }
