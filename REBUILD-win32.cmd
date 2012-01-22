@@ -1,0 +1,4 @@
+@ECHO OFF
+DEL /F /S /Q LIB OBJ BIN\*.EXE
+QMAKE -recursive
+MAKE all
