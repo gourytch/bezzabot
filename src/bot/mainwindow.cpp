@@ -51,9 +51,10 @@ MainWindow::~MainWindow()
 {
     if (pTrayIcon) {
         pTrayIcon->hide();
+        delete pTrayIcon;
+        pTrayIcon = NULL;
     }
 }
-
 
 void MainWindow::createUI ()
 {
@@ -204,6 +205,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
         hide();
         event->ignore();
         pTrayIcon->showMessage("bezzabot", tr("I am still hiding here"));
+    } else {
+        if (pTrayIcon && pTrayIcon->isVisible()) {
+            pTrayIcon->hide();
+            delete pTrayIcon;
+            pTrayIcon = NULL;
+        }
     }
 }
 
