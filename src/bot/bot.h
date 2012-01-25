@@ -74,6 +74,7 @@ protected:
     QString     _password;
     bool        _autostart;
 
+    int _step_interval;
     int _goto_delay_min;
     int _goto_delay_max;
     int _goto_afk_delay_min;

@@ -48,7 +48,7 @@ bool Page_Game_Clan_Treasury::fit(const QWebElement& doc) {
 }
 
 bool Page_Game_Clan_Treasury::doDepositGold(int amount) {
-    if (amount < gold) {
+    if (gold < amount) {
         qCritical(u8("взнос (%1) превышает количество наличности (%2)")
                   .arg(amount).arg(gold));
         return false;

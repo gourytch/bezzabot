@@ -67,7 +67,7 @@ Bot::Bot(const QString& id, QObject *parent) :
     _regular = true;
     _page = NULL;
     _awaiting = false;
-    _step_timer.setInterval (1000);
+    _step_timer.setInterval (_step_interval);
 
     reset();
 
@@ -277,7 +277,7 @@ void Bot::start() {
     if (_regular) {
         _step_timer.start();
     } else {
-        QTimer::singleShot(1000, this, SLOT(step()));
+        QTimer::singleShot(_step_interval, this, SLOT(step()));
     }
     _started = true;
     qDebug("Bot::start() : bot started");
@@ -389,11 +389,13 @@ void Bot::configure() {
         qDebug("set password (not shown)");
     }
 
+    _step_interval = _config->get("bot/step_interval", false, 6543).toInt();
+
     _goto_delay_min = _config->get("goto/delay_min", false, 700).toInt();
     _goto_delay_max = _config->get("goto/delay_max", false, 10000).toInt();
 
-    _goto_afk_delay_min = _config->get("goto/afk_delay_min", false, 1000).toInt();
-    _goto_afk_delay_max = _config->get("goto/afk_delay_max", false, 30000).toInt();
+    _goto_afk_delay_min = _config->get("goto/afk_delay_min", false, 30000).toInt();
+    _goto_afk_delay_max = _config->get("goto/afk_delay_max", false, 300000).toInt();
 
     _afk_seconds = _config->get("goto/afk_seconds", false, 200).toInt();
     _forced_afk_percents = _config->get("goto/forced_afk_percents", false, 20).toInt();
