@@ -16,5 +16,6 @@
 #include "page_game_mine_open.h"
 #include "page_game_mine_livefield.h"
 #include "page_game_luckysquare.h"
+#include "page_game_clan_treasury.h"
 
 #endif // ALL_PAGES_H

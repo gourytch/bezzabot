@@ -25,7 +25,8 @@ SOURCES += \
     worksleeping.cpp \
     workmining.cpp \
     workfishing.cpp \
-    workfieldsopening.cpp
+    workfieldsopening.cpp \
+    workclangiving.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -38,7 +39,8 @@ HEADERS  += \
     worksleeping.h \
     workmining.h \
     workfishing.h \
-    workfieldsopening.h
+    workfieldsopening.h \
+    workclangiving.h
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
@@ -49,6 +51,8 @@ DESTDIR = $$TOP/bin
 
 RESOURCES += \
     bot.qrc
+
+
 
 
 
