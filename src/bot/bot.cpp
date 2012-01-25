@@ -67,7 +67,6 @@ Bot::Bot(const QString& id, QObject *parent) :
     _regular = true;
     _page = NULL;
     _awaiting = false;
-    _step_timer.setInterval (_step_interval);
 
     reset();
 
@@ -75,6 +74,8 @@ Bot::Bot(const QString& id, QObject *parent) :
              this, SLOT (step()));
 
     configure ();
+
+    _step_timer.setInterval (_step_interval);
 
     if (!isConfigured()) {
         return;
