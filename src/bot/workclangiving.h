@@ -14,10 +14,20 @@ protected:
 
     int _minimal_amount;
 
+    int _maximal_amount;
+
     int _minimal_interval;
 
+    int _drift_interval;
+
+    bool _unsaved_only;
+
+    bool canMakeGoldenDeposit() const;
+
+    int calculateGoldenDeposit() const;
 
 public:
+
     explicit WorkClanGiving(Bot *bot);
 
     virtual bool isPrimaryWork() const;

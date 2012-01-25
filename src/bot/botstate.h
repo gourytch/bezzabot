@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QDateTime>
 #include "farmersgroupsprices.h"
 #include "parsers/page_game.h"
 
@@ -78,6 +79,8 @@ public: // всё, описывающее текущее состояние бо
     WorkType    primary_work; // текущая работа
 
     QDateTime   hardminer_effect; // время истечения УШ
+
+    QDateTime   atime; // pit последнего доступа к серверу
 
 signals:
 

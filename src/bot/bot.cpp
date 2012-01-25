@@ -16,6 +16,7 @@
 #include "workmining.h"
 #include "workfishing.h"
 #include "workfieldsopening.h"
+#include "workclangiving.h"
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent) // QThread
@@ -190,6 +191,8 @@ void Bot::onPageStarted() {
 
 void Bot::onPageFinished (bool ok)
 {
+    state.atime = QDateTime::currentDateTime();
+
     if (ok)
     {
         _cookies->save ();
@@ -545,6 +548,7 @@ void Bot::initWorks() {
     _worklist.append(new WorkFieldsOpening(this));
 
     _secworklist.append(new WorkFishing(this));
+    _secworklist.append(new WorkClanGiving(this));
 }
 
 void Bot::popWork() {
