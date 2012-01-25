@@ -119,6 +119,27 @@ void Bot::request_post (const QUrl& url, const QStringList& params) {
     emit rq_post(url, params);
 }
 
+bool Bot::isAFK() const {
+    bool afk = (!state.atime.isNull() &&
+            state.atime.secsTo(QDateTime::currentDateTime()) > _afk_seconds);
+    qDebug("initial afk = %s", afk ? "true":"false");
+    int chance = qrand() % 100;
+    if (afk) {
+        if (chance < _forced_noafk_percents) {
+            qDebug("forced noafk");
+            return false;
+        }
+        qDebug("afk");
+        return true;
+    }
+    if (chance < _forced_afk_percents) {
+        qDebug("forced afk");
+        return true;
+    }
+    qDebug("noafk");
+    return false;
+}
+
 void Bot::cancelAuto() {
     Timebomb::global()->cancel();
 }
@@ -134,8 +155,9 @@ void Bot::GoTo(const QString& link, bool instant) {
     if (instant) {
         QTimer::singleShot(0, this, SLOT(delayedGoTo()));
     } else {
-        int ms = _goto_delay_min +
-                (qrand() % (_goto_delay_max - _goto_delay_min));
+        int ms = isAFK()
+                ? _goto_afk_delay_min + (qrand() % (_goto_afk_delay_max - _goto_afk_delay_min))
+                : _goto_delay_min + (qrand() % (_goto_delay_max - _goto_delay_min));
         Timebomb::global()->launch(ms, this, SLOT(delayedGoTo()));
     }
 }
@@ -367,8 +389,15 @@ void Bot::configure() {
         qDebug("set password (not shown)");
     }
 
-    _goto_delay_min = _config->get("goto/delay_min", false, 1000).toInt();
-    _goto_delay_max = _config->get("goto/delay_max", false, 12000).toInt();
+    _goto_delay_min = _config->get("goto/delay_min", false, 700).toInt();
+    _goto_delay_max = _config->get("goto/delay_max", false, 10000).toInt();
+
+    _goto_afk_delay_min = _config->get("goto/afk_delay_min", false, 1000).toInt();
+    _goto_afk_delay_max = _config->get("goto/afk_delay_max", false, 30000).toInt();
+
+    _afk_seconds = _config->get("goto/afk_seconds", false, 200).toInt();
+    _forced_afk_percents = _config->get("goto/forced_afk_percents", false, 20).toInt();
+    _forced_noafk_percents = _config->get("goto/forced_noafk_percents", false, 20).toInt();
 
     _autostart = _config->get("autostart", false, false).toBool();
 

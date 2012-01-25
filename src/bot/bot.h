@@ -58,6 +58,7 @@ public:
         _awaiting = true;
     }
 
+    bool isAFK() const;
 
 protected:
 
@@ -75,6 +76,12 @@ protected:
 
     int _goto_delay_min;
     int _goto_delay_max;
+    int _goto_afk_delay_min;
+    int _goto_afk_delay_max;
+
+    int _afk_seconds;
+    int _forced_afk_percents;
+    int _forced_noafk_percents;
 
     // настройки разные
 

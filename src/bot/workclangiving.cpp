@@ -66,8 +66,12 @@ bool WorkClanGiving::processPage(const Page_Game *gpage) {
 bool WorkClanGiving::processQuery(Query query) {
     switch (query) {
     case CanStartWork:
-        return canMakeGoldenDeposit();
-
+        if (canMakeGoldenDeposit()) {
+            qDebug("можно вложиться в клан");
+            return true;
+        }
+//        qDebug("в клан не вкладываемся");
+        return false;
     case CanStartSecondaryWork:
         return false;
 
