@@ -13,14 +13,16 @@ protected:
 
     QString createName() const;
 
-    void setPrefix(const QString& prefix) {
-        _prefix = prefix;
-    }
-
     virtual QNetworkReply *createRequest(
             Operation op,
             const QNetworkRequest &req,
             QIODevice *outgoingData = 0);
+
+public:
+
+    void setPrefix(const QString& prefix) {
+        _prefix = prefix;
+    }
 
 };
 

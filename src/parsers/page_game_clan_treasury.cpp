@@ -38,10 +38,8 @@ QString Page_Game_Clan_Treasury::toString (const QString& pfx) const {
 }
 
 bool Page_Game_Clan_Treasury::fit(const QWebElement& doc) {
-    qDebug("* Page_Game_Clan_Treasury::fit");
     QString title = doc.findFirst("DIV.title").toPlainText().trimmed();
     if (title != u8("Вклад в казну")) {
-        qDebug("WRONG TITLE {" + title + "}");
         return false;
     }
     return true;
@@ -57,12 +55,25 @@ bool Page_Game_Clan_Treasury::doDepositGold(int amount) {
         qCritical(u8("отсутствует форма взноса золота"));
         return false;
     }
-    QWebElement entry = _formGold.findFirst("INPUT[name=amount]");
-    if (entry.isNull()) {
+    QWebElement e;
+    e = _formGold.findFirst("INPUT[name=type]");
+    if (e.isNull()) {
+        qCritical(u8("тип не найден!"));
+        return false;
+    }
+    QString typ = e.attribute("value");
+    if (typ != "1") {
+        qCritical(u8("тип={%1} а не 1!").arg(typ));
+        return false;
+    }
+
+    e = _formGold.findFirst("INPUT[name=amount]");
+    if (e.isNull()) {
         qCritical(u8("строка ввода не найдена!"));
         return false;
     }
-    entry.evaluateJavaScript(QString("value='%1';").arg(amount));
+    e.evaluateJavaScript(QString("this.value='%1';").arg(amount));
+
     submit = _formGold.findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
         qCritical(u8("кнопка подтверждения не найдена!"));

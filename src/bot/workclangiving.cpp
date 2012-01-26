@@ -116,16 +116,9 @@ int WorkClanGiving::calculateGoldenDeposit() const {
 
     if (_bot->state.free_gold > 0) {
         if (_unsaved_only) {
-            if (_bot->state.free_gold >= _minimal_amount) {
-                if (_maximal_amount > 0) {
-                    if (_bot->state.free_gold > _maximal_amount) {
-                        amount = _maximal_amount;
-                    } else {
-                        amount = _bot->state.free_gold;
-                    }
-                }
+            if (_minimal_amount <= _bot->state.free_gold) {
+                amount = _bot->state.free_gold;
             }
-            return (_bot->state.free_gold);
         } else { // ! _unsaved_only
             if (_minimal_amount <=_bot->state.gold) {
                 if (_minimal_amount <=_bot->state.free_gold) {
