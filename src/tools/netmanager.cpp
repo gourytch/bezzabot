@@ -17,7 +17,6 @@ ECASE(QNetworkAccessManager::GetOperation)
 ECASE(QNetworkAccessManager::PutOperation)
 ECASE(QNetworkAccessManager::PostOperation)
 ECASE(QNetworkAccessManager::DeleteOperation)
-ECASE(QNetworkAccessManager::CustomOperation)
 EEND
 
 QNetworkReply *NetManager::createRequest(
