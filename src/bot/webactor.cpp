@@ -9,6 +9,7 @@
 #include "webactor.h"
 #include "parsers/parser.h"
 #include "tools/tunedpage.h"
+#include "tools/netmanager.h"
 
 const qint64 CACHE_SIZE = 100 * 1024 * 1024; // 100 MB
 
@@ -65,12 +66,18 @@ WebActor::WebActor(Bot *bot) :
 
 //    _webpage = new QWebPage (this);
     _webpage = new TunedPage (this);
+    if (0) {
+        NetManager *manager = new NetManager();
+        manager->setPrefix(QString("%1-").arg(_bot->id()));
+        _webpage->setNetworkAccessManager(manager);
+    }
     QNetworkAccessManager *manager = _webpage->networkAccessManager();
-    QWebSettings *settings = _webpage->settings ();
+
     manager->setCache (_cache);
     if (_proxy) {
         manager->setProxy(*_proxy);
     }
+    QWebSettings *settings = _webpage->settings ();
     settings->setMaximumPagesInCache (10);
     settings->enablePersistentStorage ();
     settings->setOfflineStorageDefaultQuota (

@@ -23,8 +23,9 @@ QNetworkReply *NetManager::createRequest(
         Operation op,
         const QNetworkRequest &req,
         QIODevice *outgoingData) {
-
-    QString pfx = _prefix +
+    QString d = Config::globalDataPath() + "/nmlog/";
+    Config::checkDir(d);
+    QString pfx =  d + _prefix +
             QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz");
     QDir dir(Config::globalDataPath());
 
@@ -35,10 +36,14 @@ QNetworkReply *NetManager::createRequest(
     }
     QFile *f = new QFile(fname);
     QTextStream *t = NULL;
-    if (f->open(QFile::Append)) {
+    if (f->open(QFile::WriteOnly)) {
         t = new QTextStream(f);
+    } else {
+        delete f;
     }
+
     if (t) {
+        qDebug("NetManager request logged to " + fname);
         (*t) << "TIMERQST: " << QDateTime::currentDateTime()
                 .toString("yyyy-MM-dd hh:mm:ss.zzz");
         (*t) << "REQUEST : " << ::toString(op) << "\n";
@@ -55,13 +60,17 @@ QNetworkReply *NetManager::createRequest(
             (*t) << "NO OUTGOING DATA\n";
         }
         (*t) << "--- END OF REQUEST ---\n\n";
+        t->flush();
+        f->flush();
+    } else {
+        qDebug("NetManager request CAN'T BE logged to " + fname);
     }
 
     QNetworkReply *reply = QNetworkAccessManager::createRequest(
                 op, req, outgoingData);
     if (t) {
         (*t) << "TIME: " << QDateTime::currentDateTime()
-                .toString("yyyy-MM-dd hh:mm:ss.zzz");
+                .toString("yyyy-MM-dd hh:mm:ss.zzz") << "\n";
         (*t) << "URL     : " << reply->url().toString() << "\n";
         (*t) << "HEADERS :\n";
         foreach (QByteArray h, reply->rawHeaderList()) {
@@ -69,6 +78,10 @@ QNetworkReply *NetManager::createRequest(
             (*t) << "   {" << h << "} = {" << v << "}\n";
         }
         (*t) << "--- END OF RESPONSE ---\n\n";
+        t->flush();
+        f->flush();
+        delete t;
+        delete f;
     }
     return reply;
 }

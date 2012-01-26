@@ -44,7 +44,7 @@ void Config::init_check ()
     appPtr->setOrganizationDomain (ORG_DOMAIN);
     appPtr->setApplicationName (APP_NAME);
     appPtr->setApplicationVersion (APP_VERSION);
-    _location_appdir = appPtr->applicationDirPath ();
+    _location_appdir = QDir(appPtr->applicationDirPath ()).absolutePath();
     QFileInfo fi(QCoreApplication::applicationFilePath());
     _app_name = fi.baseName();
 
