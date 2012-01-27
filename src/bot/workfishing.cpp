@@ -25,6 +25,13 @@ QString WorkFishing::getWorkStage() const {
 }
 
 bool WorkFishing::nextStep() {
+    if ((_cooldown.isNull() || _cooldown < QDateTime::currentDateTime()) &&
+        (_bot->_gpage->pagekind == page_Game_Pier &&
+        _bot->state.atime.secsTo(QDateTime::currentDateTime()) > 180)) {
+        qDebug("перезагрузим страничку пирса");
+        gotoPier();
+        return true;
+    }
     return processPage(_bot->_gpage);
 }
 
