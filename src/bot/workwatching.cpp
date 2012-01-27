@@ -16,6 +16,7 @@ WorkWatching::WorkWatching(Bot *bot) :
     _use_coulons = config->get("Work_Watching/use_coulons", false, true).toBool();
     _continuous = config->get("Work_Watching/continuous", false, false).toBool();
     _immune_only = config->get("Work_Watching/immune_only", false, false).toBool();
+    _maxed_coulon = config->get("Work_Watching/maxed_coulon", false, false).toBool();
 }
 
 bool WorkWatching::isPrimaryWork() const {
@@ -272,18 +273,22 @@ bool WorkWatching::processQuery(Query query) {
     case CanStartWork: // можем ли мы начать дозорить?
         if (!_bot->_gpage->timer_work.pit.isNull()) {
             if (_bot->_gpage->timer_work.href == "dozor.php") {
+                qDebug("мы уже в дозоре. подхватим работу");
                 return true; // мы как бы уже в дозоре, так что можем перезайти
             }
             qDebug("дозору мешает другая работа: " +
                    _bot->_gpage->timer_work.href);
             return false; // какая-то работа уже работается.
         }
-        if (now < _watchingCooldown) { // откат в силе
-            return false;
+        if (!_watchingCooldown.isNull() && now < _watchingCooldown) {
+            qDebug("у дозора откат до " +
+                   _watchingCooldown.toString("yyyy-MM-dd hh:mm:ss"));
+            return false; // откат в силе
         }
         if (_bot->state.dozors_remains == 0) { // дозоров не осталось
-            _watchingCooldown = nextDay(); // и заодно выставим откат
-            qDebug("дозоров до завтра не предвидится");
+            _watchingCooldown = nextDay().addSecs(3600 + (qrand() % 3600));
+            qDebug("дозоров до завтра не предвидится. откат до " +
+                   _watchingCooldown.toString("yyyy-MM-dd hh:mm:ss"));
             return false;
         }
         if (_bot->state.hp_cur < 25) {
@@ -293,7 +298,7 @@ bool WorkWatching::processQuery(Query query) {
 //            qDebug(u8("нужно добрать %1 здоровья (за %2 сек)")
 //                   .arg(dh).arg(s));
 //            _watchingCooldown = now.addSecs(s);// и заодно выставим откат
-            qDebug("не хватает здоровья");
+            qDebug("для дозора не хватает здоровья");
             return false; // работу начать, конечно же, не можем
         }
         if ((_bot->state.dozor_price != -1) && (_bot->state.gold != -1) &&
@@ -302,13 +307,25 @@ bool WorkWatching::processQuery(Query query) {
                    _bot->state.gold, _bot->state.dozor_price);
             return false; // денег нет
         }
-        if (_immune_only &&
-            !_bot->_gpage->timer_immunity.active(600 * duration10)) {
-            // мы не иммунны. дозорить не станем
-            qDebug("мы не иммунны. дозорить не станем");
-            return false;
+        if (_immune_only) {
+            if (!_bot->_gpage->timer_immunity.active()) {
+                qDebug("без иммунитета мы дозорить не станем");
+                return false;
+            }
+            if (_maxed_coulon) {
+                if (!_bot->_gpage->timer_immunity.active(60)) { // 1 min
+                    qDebug("иммунитет менее минуты. дозорить не станем");
+                    return false;
+                }
+            } else {
+                if (!_bot->_gpage->timer_immunity.active(600 * duration10)) {
+                    qDebug("иммунитета может не хватить. дозорить не станем");
+                    return false;
+                }
+            }
         }
-        return true; // ничто не мешает начать дозор.
+        qDebug("ничто не мешает начать дозор");
+        return true;
 
     case CanStartSecondaryWork: // сможем ли мы переключиться на подработку?
         if (isWatching()) { // мы уже тратим время в дозоре

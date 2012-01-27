@@ -23,6 +23,7 @@ Page_Generic::Page_Generic (QWebElement &doc) :
     document(doc)
 {
     pagekind = page_Generic;
+    parser_pit = QDateTime::currentDateTime();
 }
 
 //virtual

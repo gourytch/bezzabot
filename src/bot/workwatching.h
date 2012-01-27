@@ -27,6 +27,8 @@ protected:
 
     bool _immune_only;
 
+    bool _maxed_coulon;
+
 protected:
 
     bool isWatching() {

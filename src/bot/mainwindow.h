@@ -51,6 +51,7 @@ protected:
     bool        hide_in_tray_on_close;
     bool        toggle_on_tray_click;
     int         balloon_ttl;
+    bool        balloon_enabled;
 
     Bot         *pBot;
     WebActor    *pActor;

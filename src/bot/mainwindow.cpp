@@ -34,6 +34,7 @@ MainWindow::MainWindow (QWidget *parent) :
     hide_in_tray_on_close   = cfg.get("ui/hide_on_close", false, false).toBool();
     toggle_on_tray_click    = cfg.get("ui/tray_toggle", false, true).toBool();
     balloon_ttl             = cfg.get("ui/balloon_ttl", false, 3000).toInt();
+    balloon_enabled         = cfg.get("ui/balloon_enabled", false, true).toBool();
 
     createUI ();
 
@@ -204,7 +205,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
             pTrayIcon->isVisible() ) {
         hide();
         event->ignore();
-        pTrayIcon->showMessage("bezzabot", tr("I am still hiding here"));
+        if (balloon_enabled && balloon_ttl > 0) {
+            pTrayIcon->showMessage("bezzabot", tr("I am still hiding here"));
+        }
     } else {
         if (pTrayIcon && pTrayIcon->isVisible()) {
             pTrayIcon->hide();
@@ -237,7 +240,7 @@ void MainWindow::log (const QString &text)
     if (pLogView) {
         pLogView->append (tss + " " + text);
     }
-    if (pTrayIcon) {
+    if (pTrayIcon && balloon_enabled && balloon_ttl > 0) {
         pTrayIcon->showMessage(pBot->id(), text,
                                QSystemTrayIcon::NoIcon, balloon_ttl);
     }
@@ -284,7 +287,7 @@ void MainWindow::automatonToggled (bool checked) {
 void MainWindow::startAutomaton()
 {
     log("start automaton");
-    QTimer::singleShot(0, pBot, SIGNAL (start()));
+//    QTimer::singleShot(0, pBot, SIGNAL (start()));
     if (!pAutomaton->isChecked()) {
         pAutomaton->toggle();
     }
@@ -294,7 +297,7 @@ void MainWindow::stopAutomaton()
 {
     log("stop automaton");
     Timebomb::global()->cancel();
-    QTimer::singleShot(0, pBot, SIGNAL (stop()));
+//    QTimer::singleShot(0, pBot, SIGNAL (stop()));
     if (pAutomaton->isChecked()) {
         pAutomaton->toggle();
     }
@@ -308,14 +311,14 @@ void MainWindow::slotLoadStarted ()
 //  pLoadingProgress->setVisible(true);
     pLoadingProgress->setEnabled(true);
 
-    QString urlstr = pWebView->page()->mainFrame()->url().toString();
+    QString urlstr = pWebView->page()->mainFrame()->requestedUrl().toString();
     qDebug("loading " + urlstr);
     setWindowTitle(tr ("bot %1: start loading %2").arg(pBot->id(), urlstr));
 }
 
 void MainWindow::slotLoadProgress (int percent)
 {
-    QString urlstr = pWebView->page()->mainFrame()->url().toString ();
+    QString urlstr = pWebView->page()->mainFrame()->requestedUrl().toString ();
     setWindowTitle(tr ("bot %1: loading %2, %3\%").arg(pBot->id(), urlstr).arg(percent));
 }
 

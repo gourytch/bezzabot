@@ -5,6 +5,7 @@
 #include <QVariant>
 #include <QWebPage>
 #include <QWebFrame>
+#include <QDateTime>
 #include <QTimer>
 #include "types.h"
 
@@ -15,6 +16,7 @@ class Page_Generic : public QObject
 public:
     PageKind        pagekind;
     QWebElement     document;
+    QDateTime       parser_pit;
 
 protected:
     QWebElement submit;

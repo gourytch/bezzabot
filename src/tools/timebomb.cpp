@@ -28,6 +28,7 @@ void Timebomb::launch(int ms, QObject *receiver, const char *member) {
     _receiver = receiver;
     _member   = member;
     if (_bar) {
+        _bar->setEnabled(true);
         _palette  = _bar->palette();
         QPalette newPalette(_palette);
         newPalette.setColor(QPalette::Active, QPalette::Highlight, Qt::red);
@@ -35,7 +36,6 @@ void Timebomb::launch(int ms, QObject *receiver, const char *member) {
         _bar->setFormat("%v");
         _bar->setRange(0, ms);
         _bar->setValue(ms);
-        _bar->setEnabled(true);
     }
     _timer = new QTimer(this);
     _msecs = ms;
