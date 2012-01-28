@@ -10,6 +10,7 @@ WorkFishing::WorkFishing(Bot *bot) :
     Work(bot)
 {
     _workLink = "harbour.php?a=pier";
+    _saved_remains = -1;
 }
 
 bool WorkFishing::isPrimaryWork() const {
@@ -108,6 +109,13 @@ bool WorkFishing::processCommand(Command command) {
 
 bool WorkFishing::checkFishraidCooldown() {
     QDateTime now = QDateTime::currentDateTime();
+
+    if (!_cooldown.isNull() &&
+        now.secsTo(_cooldown) > 4000 &&
+        _bot->state.fishraids_remains > _saved_remains) {
+        qDebug(u8("лимит рейдов сбросился! уберём \"длинный\" таймер"));
+        _cooldown = QDateTime();
+    }
     if (_cooldown.isNull() ||
         _cooldown < now) { // отката нет или просрочен
         if (_bot->state.fishraids_remains == 0) {
@@ -139,6 +147,7 @@ bool WorkFishing::checkFishraidCooldown() {
             }
         }
     }
+    _saved_remains = _bot->state.fishraids_remains;
     return _cooldown.isNull() || _cooldown < now;
 }
 

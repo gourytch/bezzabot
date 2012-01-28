@@ -206,13 +206,25 @@ bool WorkWatching::processPage(const Page_Game *gpage) {
             qWarning("дозоров не осталось. поставили откат до " +
                    _watchingCooldown.toString("yyyy-MM-dd hh:mm:ss"));
             _started = false;
+            _bot->state.dozors_remains = -1; // после отката надо зайти в дозор
             return false;
         }
         int n = qMin(q->dozor_left10, duration10); // макс. время дозора
 
-        if (_immune_only && (!gpage->timer_immunity.active(600 * n))) {
-            qDebug("мы не иммунны. дозорить не станем");
-            return false;
+        if (_immune_only) {
+            if (!gpage->timer_immunity.active()) {
+                qDebug("мы совсем не иммунны. дозорить не станем");
+                return false;
+            }
+            if (_maxed_coulon) {
+                if (!gpage->timer_immunity.active(60)) {
+                    qDebug("иммунитета меьше минуты. дозорить не станем");
+                    return false;
+                }
+            } else if (!gpage->timer_immunity.active(600 * n)) {
+                qDebug("иммуннитета не хватит. дозорить не станем");
+                return false;
+            }
         }
 
         _watchingCooldown = QDateTime(); // пока не ждём откатов
@@ -289,6 +301,7 @@ bool WorkWatching::processQuery(Query query) {
             _watchingCooldown = nextDay().addSecs(3600 + (qrand() % 3600));
             qDebug("дозоров до завтра не предвидится. откат до " +
                    _watchingCooldown.toString("yyyy-MM-dd hh:mm:ss"));
+            _bot->state.dozors_remains = -1; // после отката надо зайти в дозор
             return false;
         }
         if (_bot->state.hp_cur < 25) {

@@ -402,6 +402,9 @@ void Bot::configure() {
     _forced_afk_percents = _config->get("goto/forced_afk_percents", false, 20).toInt();
     _forced_noafk_percents = _config->get("goto/forced_noafk_percents", false, 20).toInt();
 
+    _workcycle_debug = _config->get("bot/workcycle_debug", false, true).toBool();
+    _workcycle_debug2 = _config->get("bot/workcycle_debug2", false, false).toBool();
+
     _autostart = _config->get("autostart", false, false).toBool();
 
     qDebug("configure %s", _good ? "success" : "failed");
@@ -589,18 +592,23 @@ void Bot::popWork() {
     }
     for (;;) {
         Work *p = _workq.front();
-        qDebug(u8("закончили работу ") + p->getWorkName());
+        if (_workcycle_debug) {
+            qDebug(u8("закончили работу ") + p->getWorkName());
+        }
 
         _workq.pop_front(); // удаляем завершенную работу
 
         if  (_workq.empty()) { //никого не осталось
-            qDebug("стек работ пуст");
+            if (_workcycle_debug) {
+                qDebug("стек работ пуст");
+            }
             break;
         }
 
         p = _workq.front();
-
-        qWarning(u8("размораживаем работу ") + p->getWorkName());
+        if (_workcycle_debug) {
+            qWarning(u8("размораживаем работу ") + p->getWorkName());
+        }
         if (p->processCommand(Work::FinishSecondaryWork)) {
             break;
         }

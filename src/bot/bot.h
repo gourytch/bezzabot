@@ -83,6 +83,8 @@ protected:
     int _afk_seconds;
     int _forced_afk_percents;
     int _forced_noafk_percents;
+    bool _workcycle_debug;
+    bool _workcycle_debug2;
 
     // настройки разные
 

@@ -12,6 +12,8 @@ protected:
 
     QDateTime _cooldown;
 
+    int _saved_remains;
+
     bool checkFishraidCooldown();
 
     void gotoPier();

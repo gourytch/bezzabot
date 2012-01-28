@@ -35,6 +35,8 @@ bool WorkSleeping::nextStep() {
         return true;
     }
     if (!isSleepNeed()) {
+        qWarning("мы проснулись");
+        _bot->GoTo();
         return false;
     }
     return true;
