@@ -6,8 +6,27 @@
 #include "appwindow.h"
 #include "tools/tools.h"
 #include "tools/logger.h"
-
+#include "tools/activityhours.h"
 //#include <QTextCodec>
+
+void ahtest(const char *s) {
+    ActivityHours ah;
+    ah.assign(u8(s));
+    qDebug("SRC: {%s}", s);
+    qDebug(ah.toString());
+    qDebug(ah.timeline());
+    qDebug("seg_length from 5 = %d", ah.seg_length(5));
+}
+
+void ahtest() {
+    ahtest("");
+    ahtest("0-23");
+    ahtest("7-12");
+    ahtest("1 3 5 7");
+    ahtest("1 3-5 7");
+    ahtest("21-7");
+    ahtest("21-20");
+}
 
 void dbgout() {
     qDebug("1.русские буквы в char*");
@@ -29,6 +48,8 @@ int main (int argc, char ** argv) {
 //    QTextCodec::setCodecForCStrings(codec);
 //    QTextCodec::setCodecForTr(codec);
 //    QTextCodec::setCodecForLocale(codec);
+    ahtest();
+    return 0;
 
     dbgout();
     Config::global();

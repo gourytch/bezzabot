@@ -11,7 +11,10 @@
 WorkWatching::WorkWatching(Bot *bot) :
     Work(bot)
 {
-    Config *config = _bot->config();
+}
+
+void WorkWatching::configure(Config *config) {
+    Work::configure(config);
     duration10 = config->get("Work_Watching/duration10", false, 1).toInt();
     _use_coulons = config->get("Work_Watching/use_coulons", false, true).toBool();
     _continuous = config->get("Work_Watching/continuous", false, false).toBool();

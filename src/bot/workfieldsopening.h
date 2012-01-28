@@ -21,6 +21,8 @@ public:
 
     explicit WorkFieldsOpening(Bot *bot);
 
+    virtual void configure(Config *config);
+
     virtual bool isPrimaryWork() const;
 
     virtual WorkType getWorkType() const;

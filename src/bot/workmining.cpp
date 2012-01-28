@@ -9,7 +9,10 @@ WorkMining::WorkMining(Bot *bot) :
     Work(bot)
 {
     _workLink = "mine.php?a=open";
-    Config *config = _bot->config();
+}
+
+void WorkMining::configure(Config *config) {
+    Work::configure(config);
     _digchance  = config->get("Work_Mining/digchance", false,
                               75).toInt();
     _use_mineshop_pro = config->get("Work_Mining/use_mineshop_pro", false,
@@ -75,7 +78,7 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                 return true;
             }
         } else { // !(gpage->timer_work.expired())
-            int maxnorm = (gpage->workguild == WorkGuild_Miners)
+            int maxnorm = 30 + (gpage->workguild == WorkGuild_Miners)
                     ? 5 * 60
                     :20 * 60;
             QDateTime now = QDateTime::currentDateTime();

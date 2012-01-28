@@ -6,6 +6,8 @@
 
 #include "botstate.h"
 #include "parsers/page_game.h"
+#include "tools/activityhours.h"
+#include "tools/config.h"
 
 class Bot;
 
@@ -13,9 +15,14 @@ class Work : public QObject
 {
 
     Q_OBJECT
+
 protected:
 
     Bot *_bot;
+
+    bool _enabled;
+
+    ActivityHours _activity_hours;
 
     QString _workLink;
 
@@ -51,7 +58,11 @@ public:
         CancelWork           // необходимо досрочно завершить работу
     };
 
-    virtual bool isEnabled () const;
+    virtual void configure(Config *config);
+
+    virtual bool isEnabled() const;
+
+    virtual bool isActive() const;
 
     virtual QString toString() const;
 

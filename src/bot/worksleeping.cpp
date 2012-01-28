@@ -6,7 +6,10 @@
 WorkSleeping::WorkSleeping(Bot *bot) :
     Work(bot)
 {
-    Config *config = _bot->config();
+}
+
+void WorkSleeping::configure(Config *config) {
+    Work::configure(config);
     sleepdownHour = config->get("Work_Sleeping/sleepdown_hour", false, 23).toInt();
     wakeupHour = config->get("Work_Sleeping/wakeup_hour", false, 8).toInt();
     _use_coulons = config->get("Work_Sleeping/use_coulons", false, true).toBool();

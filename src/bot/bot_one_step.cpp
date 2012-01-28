@@ -31,7 +31,7 @@ void Bot::one_step () {
         while (!_nextq.empty()) {
             Work *p = _nextq.front();
             _nextq.pop_front();
-            if (p->isEnabled()) {
+            if (p->isEnabled() && p->isActive()) {
                 if (_workcycle_debug2) {
                     qDebug(u8("пробуем начать работу: %1").arg(p->getWorkName()));
                 }
@@ -72,7 +72,7 @@ void Bot::one_step () {
         WorkListIterator i(_secworklist);
         while (i.hasNext()) {
             Work *p = i.next();
-            if (p->isEnabled()) {
+            if (p->isEnabled() && p->isActive()) {
                 if (_workcycle_debug2) {
                     qDebug(u8("пробуем начать подработку: ") + p->getWorkName());
                 }

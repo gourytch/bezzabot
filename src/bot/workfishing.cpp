@@ -13,6 +13,10 @@ WorkFishing::WorkFishing(Bot *bot) :
     _saved_remains = -1;
 }
 
+void WorkFishing::configure(Config *config) {
+    Work::configure(config);
+}
+
 bool WorkFishing::isPrimaryWork() const {
     return false;
 }

@@ -9,13 +9,15 @@
 WorkClanGiving::WorkClanGiving(Bot *bot) :
     Work(bot)
 {
-    Config *config = _bot->config();
+    _workLink = "clan_mod.php?m=treasury";
+}
+
+void WorkClanGiving::configure(Config *config) {
     _minimal_amount = config->get("Work_ClanGiving/minimal_amount", false, 1).toInt();
     _maximal_amount = config->get("Work_ClanGiving/maximal_amount", false, -1).toInt();
     _minimal_interval = config->get("Work_ClanGiving/minimal_interval", false, 300).toInt();
     _drift_interval = config->get("Work_ClanGiving/drift_interval", false, 1500).toInt();
     _unsaved_only = config->get("Work_ClanGiving/unsaved_only", false, true).toBool();
-    _workLink = "clan_mod.php?m=treasury";
 }
 
 bool WorkClanGiving::isPrimaryWork() const {

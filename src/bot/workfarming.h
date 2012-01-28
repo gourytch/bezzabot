@@ -1,25 +1,24 @@
-#ifndef WorkFishing_H
-#define WorkFishing_H
+#ifndef WORKFARMING_H
+#define WORKFARMING_H
 
 #include "work.h"
-#include <QDateTime>
+#include "QDateTime"
+#include "tools/activityhours.h"
 
-class WorkFishing : public Work
+class WorkFarming : public Work
 {
     Q_OBJECT
+    ActivityHours _sleep_hours;
+    QDateTime _cooldown;
+    bool _use_coulons;
+    int _hours;
 
 protected:
 
-    QDateTime _cooldown;
-
-    int _saved_remains;
-
-    bool checkFishraidCooldown();
-
-    void gotoPier();
 
 public:
-    explicit WorkFishing(Bot *bot);
+
+    explicit WorkFarming(Bot *bot);
 
     virtual void configure(Config *config);
 
@@ -39,4 +38,4 @@ public:
 
 };
 
-#endif // WorkFishing_H
+#endif // WORKFARMING_H

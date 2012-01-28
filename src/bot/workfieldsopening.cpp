@@ -8,8 +8,10 @@
 WorkFieldsOpening::WorkFieldsOpening(Bot *bot) :
     Work(bot) {
     _workLink = "mine.php?a=mine";
+}
 
-    Config *config = _bot->config();
+void WorkFieldsOpening::configure(Config *config) {
+    Work::configure(config);
 
     _open_small = config->get("Work_FieldsOpening/open_small", false, true).toBool();
     _open_big = config->get("Work_FieldsOpening/open_big", false, true).toBool();

@@ -17,6 +17,7 @@
 #include "workfishing.h"
 #include "workfieldsopening.h"
 #include "workclangiving.h"
+#include "workfarming.h"
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent) // QThread
@@ -437,6 +438,10 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
     quint32 id_nevidimtcha = 0;
     int lvl_nevidimtcha = -1;
 
+    static const QString name_regenetz = u8("Регенец");
+    quint32 id_regenetz = 0;
+    int lvl_regenetz = -1;
+
     quint32 active_id = 0;
 
     QDateTime now = QDateTime::currentDateTime();
@@ -465,6 +470,9 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
         if (name_nevidimtcha == k.name && lvl_nevidimtcha < k.cur_lvl) {
             id_nevidimtcha = k.id;
         }
+        if (name_regenetz == k.name && lvl_regenetz < k.cur_lvl) {
+            id_regenetz = k.id;
+        }
     }
 
     qDebug("несохранённого: %d з, %d кр, надет #%d, immtime: %d, imm: %s",
@@ -472,15 +480,6 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
              safetime ? "true" : "false");
 
     switch (work) {
-    case Work_Training: // планируем потренироваться
-        //тут предпочтения вряд ли будут
-        // - делаем то же, как если бы не делали ничего
-    case Work_None: // планируем лодырничать
-        if (safetime) { // время ещё есть
-            qDebug(u8("возвращаем что висит (#%1)").arg(active_id));
-            return active_id; // ничего не будем менять: и так хорошо
-        }
-        break; // будем делать штатную защиту
 
     case Work_Mining: // планируем ковырять кристаллы
         if (safetime || (state.free_crystal == 0 && state.free_gold == 0)) {
@@ -509,7 +508,23 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
             }
         }
         break; // нету стаханки
+
+    case Work_Training: // планируем потренироваться
+        //тут предпочтения вряд ли будут
+        // - делаем то же, как если бы не делали ничего
+
+    case Work_None: // планируем лодырничать
+
     default:
+        // нечто неописанное. будем делать вид, что мы не делаем ничего
+        if (safetime) { // время ещё есть
+            if ((_gpage->hp_cur < _gpage->hp_max) && (id_regenetz > 0)) {
+                qDebug(u8("подлечимся регенцом (#%1)").arg(id_regenetz));
+                return id_regenetz;
+            }
+            qDebug(u8("возвращаем что висит (#%1)").arg(active_id));
+            return active_id; // ничего не будем менять: и так хорошо
+        }
         break;
     }
 
@@ -581,9 +596,19 @@ void Bot::initWorks() {
     _worklist.append(new WorkWatching(this));
     _worklist.append(new WorkMining(this));
     _worklist.append(new WorkFieldsOpening(this));
+    _worklist.append(new WorkFarming(this));
 
     _secworklist.append(new WorkFishing(this));
     _secworklist.append(new WorkClanGiving(this));
+
+    for (WorkListIterator i(_worklist);
+         i.hasNext();
+         i.next()->configure(_config)) {}
+
+    for (WorkListIterator i(_secworklist);
+         i.hasNext();
+         i.next()->configure(_config)) {}
+
 }
 
 void Bot::popWork() {

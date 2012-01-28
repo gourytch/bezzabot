@@ -1,12 +1,22 @@
 #include "parsers/page_game.h"
 #include "bot.h"
 #include "work.h"
+#include "tools/activityhours.h"
 #include "tools/tools.h"
 
 Work::Work(Bot *bot) :
     QObject(bot),
     _bot(bot)
 {
+    _enabled = false;
+}
+
+void Work::configure(Config *config) {
+    QString wname = getWorkName();
+    _enabled = config->get(wname + "/enabled", false, false).toBool();
+    _activity_hours.assign(
+                config->get(wname + "/activity_hours", false, "0-23")
+                .toString());
 }
 
 void Work::setAwaiting() {
@@ -21,9 +31,12 @@ QString Work::toString() const {
     return "Work:" + getWorkName() + ", Stage:" + getWorkStage();
 }
 
-bool Work::isEnabled () const {
-    QString key = getWorkName() + "/" + "enabled";
-    return _bot->config()->get(key, false, false).toBool();
+bool Work::isEnabled() const {
+    return _enabled;
+}
+
+bool Work::isActive() const {
+    return _activity_hours.isActive();
 }
 
 void Work::gotoWork() {
