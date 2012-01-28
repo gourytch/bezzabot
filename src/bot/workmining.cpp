@@ -75,16 +75,14 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                 return true;
             }
         } else { // !(gpage->timer_work.expired())
-            if (_hardminer) {
-                int maxnorm = (gpage->workguild == WorkGuild_Miners)
-                        ? 5 * 60
-                        :20 * 60;
-                QDateTime now = QDateTime::currentDateTime();
-                int secs = now.secsTo(gpage->timer_work.pit);
-                if (!_charmed && (secs > maxnorm)) {
-                    qWarning("время %d > max(%d), сработал УШ!", secs, maxnorm);
-                    _charmed = true;
-                }
+            int maxnorm = (gpage->workguild == WorkGuild_Miners)
+                    ? 5 * 60
+                    :20 * 60;
+            QDateTime now = QDateTime::currentDateTime();
+            int secs = now.secsTo(gpage->timer_work.pit);
+            if (!_charmed && (secs > maxnorm)) {
+                qWarning("время %d > max(%d), сработал УШ!", secs, maxnorm);
+                _charmed = true;
             }
             qDebug("терпеливо шахтёрствуем до " +
                    gpage->timer_work.pit.toString("yyyy-MM-dd hh:mm:ss"));
