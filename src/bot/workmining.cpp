@@ -43,32 +43,33 @@ QString WorkMining::getWorkStage() const {
 }
 
 bool WorkMining::nextStep() {
-    if (hasWork()) {
-        // есть какая-то работа
-        if (isMyWork()) {
-            if (isWorkReady()) {
-                qDebug("пора глянуть, что там в шахте творится");
-                gotoWork();
-                return true;
-            }
-            return true; // вовсю шахтёрствуем
-        }
+    if (isNotMyWork()) {
         qDebug("мы почему-то работаем не в шахте");
         return false; // мы работаем, но не как не шахтёры
     }
+
+    if (isMyWork()) {
+        if (isWorkReady()) {
+            qDebug("пора глянуть, что там в шахте творится");
+            gotoWork();
+            return true;
+        }
+        return true; // вовсю шахтёрствуем
+    }
+
     qDebug("мы пока не работаем, надо бы начать");
     // работу пока не делаем, пойдём, обработаем страничку
     return processPage(_bot->_gpage);
 }
 
 bool WorkMining::processPage(const Page_Game *gpage) {
+    if (isNotMyWork()) {
+        qWarning("мы шахтёры, почему-то не шахтёрим, href=" +
+               gpage->timer_work.href);
+        return false; // отказываемся работать не на своей работе
+    }
     if (hasWork()) {
         // есть работа
-        if (isNotMyWork()) {
-            qWarning("мы шахтёры, почему-то не шахтёрим, href=" +
-                   gpage->timer_work.href);
-            return false; // отказываемся работать не на своей работе
-        }
         if (isWorkReady()) {
             // работа окончена
             qDebug("таймер сказал, что работа готова");
@@ -427,12 +428,12 @@ bool WorkMining::processQuery(Query query) {
     switch (query) {
     case CanStartWork:
     {
-        if (hasWork()) {
+        if (isMyWork()) {
+            qDebug("мы уже шахтёрим. можем подхватить дальше");
+            return true;
+        }
+        if (isNotMyWork()) {
             // чем-то уже занимаемся
-            if (isMyWork()) {
-                qDebug("мы уже шахтёрим. можем подхватить дальше");
-                return true;
-            }
             qDebug("мы работаем другую работу, шахтёрить не сможем");
             return false; // мы работаем, но не как не шахтёры
         }

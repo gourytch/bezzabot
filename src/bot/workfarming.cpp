@@ -117,11 +117,11 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
 bool WorkFarming::processQuery(Query query) {
     switch (query) {
     case CanStartWork:
-        if (hasWork()) {
-            if (isMyWork()) {
-                qDebug("мы уже на ферме. можем продолжить работу");
-                return true;
-            }
+        if (isMyWork()) {
+            qDebug("мы уже на ферме. можем продолжить работу");
+            return true;
+        }
+        if (isNotMyWork()) {
             qDebug("мы работаем, но не на ферме, а в " +
                    _bot->_gpage->timer_work.href);
             return false;
@@ -138,11 +138,11 @@ bool WorkFarming::processQuery(Query query) {
 bool WorkFarming::processCommand(Command command) {
     switch (command) {
     case StartWork:
-        if (hasWork()) {
-            if (isMyWork()) {
-                qDebug("продолжаем фермерствовать");
-                return true;
-            }
+        if (isMyWork()) {
+            qDebug("продолжаем фермерствовать");
+            return true;
+        }
+        if (isNotMyWork()) {
             qDebug("Хм. мы не фермерствуем, мы работаем тут:" +
                    _bot->_gpage->timer_work.href);
             return false;
@@ -150,8 +150,16 @@ bool WorkFarming::processCommand(Command command) {
         qDebug("стали фермерами");
         _cooldown = QDateTime();
         return true;
+
     case StartSecondaryWork:
         return (_sleep_hours.isActive() == false);
+
+    case FinishSecondaryWork:
+        if (_bot->_gpage->pagekind != page_Game_Farm) {
+            qDebug("возвращаемся на ферму");
+            gotoWork();
+            return true;
+        }
     default:
         return false;
     }

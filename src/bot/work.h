@@ -26,6 +26,8 @@ protected:
 
     QString _workLink;
 
+public:
+
     void gotoWork();
 
     bool hasWork() const;
@@ -37,8 +39,6 @@ protected:
     bool isNotMyWork() const;
 
     void setAwaiting();
-
-public:
 
     explicit Work(Bot *bot);
 

@@ -31,7 +31,7 @@ void Bot::one_step () {
         while (!_nextq.empty()) {
             Work *p = _nextq.front();
             _nextq.pop_front();
-            if (p->isEnabled() && p->isActive()) {
+            if (p->isEnabled() && (p->isActive() || p->isMyWork())) {
                 if (_workcycle_debug2) {
                     qDebug(u8("пробуем начать работу: %1").arg(p->getWorkName()));
                 }
