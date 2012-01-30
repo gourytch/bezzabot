@@ -49,6 +49,7 @@ void Parser::setup() {
     _producer.registerClass<Page_Game_Mine_Open>();
     _producer.registerClass<Page_Game_Mine_LiveField>();
     _producer.registerClass<Page_Game_LuckySquare>();
+    _producer.registerClass<Page_Game_Incubator>();
     _producer.registerClass<Page_Game_Clan_Treasury>();
     _producer.registerClass<Page_Game>();
     _producer.registerClass<Page_Generic>();

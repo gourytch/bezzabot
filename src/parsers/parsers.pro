@@ -24,7 +24,8 @@ HEADERS += \
     page_game_mine_main.h \
     page_game_mine_livefield.h \
     page_game_luckysquare.h \
-    page_game_clan_treasury.h
+    page_game_clan_treasury.h \
+    page_game_incubator.h
 
 SOURCES += \
     types.cpp \
@@ -44,7 +45,8 @@ SOURCES += \
     page_game_mine_main.cpp \
     page_game_mine_livefield.cpp \
     page_game_luckysquare.cpp \
-    page_game_clan_treasury.cpp
+    page_game_clan_treasury.cpp \
+    page_game_incubator.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
@@ -57,6 +59,8 @@ win32 {
   CONFIG -= debug
   CONFIG += console
 }
+
+
 
 
 

@@ -69,4 +69,5 @@ ECASE(page_Game_Friends)
 ECASE(page_Game_Search)
 ECASE(page_Game_News)
 ECASE(page_Game_LuckySquare)
+ECASE(page_Game_Incubator)
 EEND
