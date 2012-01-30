@@ -68,6 +68,20 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
         return true;
 
     }
+
+    int h = _activity_hours.seg_length();
+    if (_hours < h) {
+        h = _hours;
+    }
+    if (h <= 0) {
+        qDebug("времени на ферму не осталось. закончим работу.");
+        _bot->GoTo();
+        setAwaiting();
+        return false;
+    }
+
+    qDebug("по предварительным подсчётам нам можно поработать %d час(ов)", h);
+
     // has no work
     if (gpage->pagekind != page_Game_Farm) {
         qDebug("надо пойти на ферму");
@@ -86,21 +100,26 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
     }
 
     qDebug("мы на ферме, пока без работы");
+
+    if (p->maxhours < h) {
+        h = p->maxhours;
+    }
+
+    if (h == 0) {
+        qDebug("в итоге работать меньше часа. не резон");
+        _bot->GoTo();
+        setAwaiting();
+        return false;
+    }
+
     if (_use_coulons) {
-        int secs = _hours * 3600;
+        int secs = h * 3600;
         qDebug("посмотрим, не переодеть ли кулоны...");
         quint32 qid = _bot->guess_coulon_to_wear(Work_Farming, secs);
         if (_bot->is_need_to_change_coulon(qid)) {
             qDebug("надо одеть кулон №%d", qid);
             _bot->action_wear_right_coulon(qid);
         }
-    }
-    int h = _activity_hours.seg_length();
-    if (_hours < h) {
-        h = _hours;
-    }
-    if (p->maxhours < h) {
-        h = p->maxhours;
     }
 
     qDebug("приступаем к работе (%d ч)", h);
@@ -111,6 +130,7 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
     }
     qCritical("не смогли начать работу на ферме!");
     _bot->GoTo();
+    setAwaiting();
     return false;
 }
 
