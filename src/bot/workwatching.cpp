@@ -11,6 +11,7 @@
 WorkWatching::WorkWatching(Bot *bot) :
     Work(bot)
 {
+    _workLink = "dozor.php";
 }
 
 void WorkWatching::configure(Config *config) {
@@ -147,20 +148,18 @@ bool WorkWatching::processPage(const Page_Game *gpage) {
     //
     qDebug(u8("дозор, обработка страницы ") +
            ::toString(gpage->pagekind));
-
-    if (gpage->timer_work.defined()) {
-        // есть работа
-        if (gpage->timer_work.href != "dozor.php") {
-            qWarning("мы дозорные, почему-то не дозорим, href=" +
-                   gpage->timer_work.href);
-            return false; // отказываемся работать не на своей работе
-        }
+    if (isNotMyWork()) {
+        qWarning("мы дозорные, почему-то не дозорим, href=" +
+               gpage->timer_work.href);
+        return false; // отказываемся работать не на своей работе
+    }
+    if (isMyWork()) {
         if (gpage->timer_work.expired()) {
             // работа окончена
             qDebug("таймер сказал, что мы додозорили");
             if (gpage->pagekind != page_Game_Dozor_Entrance) {
                 qDebug("пойдём, завершим дозор");
-                gotoDozor();
+                gotoWork();
                 return true;
             }
         } else { // !(gpage->timer_work.expired())
@@ -214,6 +213,11 @@ bool WorkWatching::processPage(const Page_Game *gpage) {
         }
         int n = qMin(q->dozor_left10, duration10); // макс. время дозора
 
+        if (q->gold < q->dozor_price) {
+            qWarning("денег не хватает на оплату дозора (%d < %d)",
+                     q->gold, q->dozor_price);
+            return false;
+        }
         if (_immune_only) {
             if (!gpage->timer_immunity.active()) {
                 qDebug("мы совсем не иммунны. дозорить не станем");

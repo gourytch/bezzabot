@@ -50,6 +50,7 @@ protected:
 
     void gotoDozor() {
         _bot->GoTo("dozor.php");
+        setAwaiting();
     }
 
 public:
