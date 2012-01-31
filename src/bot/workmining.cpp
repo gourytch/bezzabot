@@ -63,6 +63,11 @@ bool WorkMining::nextStep() {
 }
 
 bool WorkMining::processPage(const Page_Game *gpage) {
+
+    bool is_miner = (gpage->workguild == WorkGuild_Miners);
+    int digtime = is_miner ? 5 * 60 : 20 * 60;
+    int maxnorm = 30 + digtime;
+
     if (isNotMyWork()) {
         qWarning("мы шахтёры, почему-то не шахтёрим, href=" +
                gpage->timer_work.href);
@@ -79,9 +84,6 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                 return true;
             }
         } else { // !(gpage->timer_work.expired())
-            int maxnorm = 30 + (gpage->workguild == WorkGuild_Miners)
-                    ? 5 * 60
-                    :20 * 60;
             QDateTime now = QDateTime::currentDateTime();
             int secs = now.secsTo(gpage->timer_work.pit);
             if (!_charmed && (secs > maxnorm)) {
@@ -104,7 +106,6 @@ bool WorkMining::processPage(const Page_Game *gpage) {
     // и только на страничке входа в забой
     // если это не так, то это юзер шалит.
     if (gpage->pagekind == page_Game_Mine_Open) {
-        bool is_miner = (gpage->workguild == WorkGuild_Miners);
 
         Page_Game_Mine_Open *p = (Page_Game_Mine_Open*)gpage;
         switch (p->digstage) {
@@ -272,7 +273,6 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             // закончили эпопею с закупками инвентаря, теперь смотрим на кулон
             //
             if (_use_coulons) {
-                int digtime = is_miner ? 5 * 60 : 20 * 60;
                 quint32 qid;
                 if (_hardminer && _bot->state.hardminer_effect.isValid()) {
                     digtime *= 3;
@@ -315,7 +315,6 @@ bool WorkMining::processPage(const Page_Game *gpage) {
             bool rewear = false;
             quint32 qid = 0;
             if (_use_coulons) {
-                int digtime = is_miner ? 5 * 60 : 20 * 60;
                 if (_hardminer && _bot->state.hardminer_effect.isValid()) {
                     digtime *= 3;
                     qid = _bot->guess_coulon_to_wear(Work_Sleeping, digtime);
