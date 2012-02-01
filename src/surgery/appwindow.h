@@ -18,14 +18,15 @@ class AppWindow : public QWidget
 {
     Q_OBJECT
 protected:
+    // неизменяемая часть фреймворка
     QLineEdit           *pURL;
     QPushButton         *pGo;
-    QListWidget         *pCoulons;
+    QPushButton         *pSave;
     QWebView            *pWebView;
     QWebPage            *pWebPage;
-    Config              *pConfig;
-
     QString             _url;
+
+    Config              *pConfig;
 
     int                 _server_no;
     QString             _baseurl;
@@ -39,7 +40,7 @@ protected:
 
     bool checkGame();
 
-    bool clickOnCoulon(int id);
+    bool quickHealth();
 
 public:
     explicit AppWindow(QWidget *parent = 0);
@@ -51,8 +52,10 @@ public slots:
     void slotLoaded (bool success);
     void slotEditURL (const QString& text);
     void slotGo();
-    void slotSelectItem(QListWidgetItem* item);
 
+    void slotSave();
+
+    void slotHeal();
 signals:
 
 };

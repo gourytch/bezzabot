@@ -48,20 +48,18 @@ int main (int argc, char ** argv) {
 //    QTextCodec::setCodecForCStrings(codec);
 //    QTextCodec::setCodecForTr(codec);
 //    QTextCodec::setCodecForLocale(codec);
-    ahtest();
-    return 0;
 
     dbgout();
     Config::global();
     dbgout();
     Logger::global();
     dbgout();
-/*
+/**/
     qDebug("initialize window");
     AppWindow w;
     w.show();
     qDebug("execute application");
     return app.exec();
-*/
+/**/
     return 0;
 }

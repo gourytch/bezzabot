@@ -304,6 +304,39 @@ Page_Game::Page_Game (QWebElement& doc) :
             hp_max = dottedInt (rx.cap (2));
             hp_spd = dottedInt (rx.cap (3));
         }
+        QRegExp rx_cage("'(uncage|cage)',\\s*(\\d+)");
+
+        foreach (QWebElement e, document.findAll("DIV#pet")) {
+            QWebElement s = e.firstChild();
+            PetInfo p;
+
+            if (s.tagName() != "A") {
+                qDebug("??? FIRST SIBLING IS NOT ANCHOR: " + s.toOuterXml());
+                continue;
+            }
+            QString href = s.attribute("href");
+            if (rx_cage.indexIn(href) == -1) {
+                qDebug(QString("??? BAD HREF {%1} FORMAT FOR {%2}")
+                       .arg(href).arg(s.toOuterXml()));
+                continue;
+            }
+            p.active = (rx_cage.cap(1) == "cage");
+            p.id = rx_cage.cap(2).toInt();
+
+            s = s.nextSibling();
+            if (s.tagName() != "DIV") {
+                qDebug("??? SECOND SIBLING IS NOT DIV: " + s.toOuterXml());
+                continue;
+            }
+            if (rx.indexIn(s.attribute("onmouseover")) == -1) {
+                qDebug("??? BAD ONMOUSEOVER FORMAT FOR " + s.toOuterXml());
+                continue;
+            }
+            p.hp_cur = dottedInt (rx.cap (1));
+            p.hp_max = dottedInt (rx.cap (2));
+            p.hp_spd = dottedInt (rx.cap (3));
+            petlist.append(p);
+        }
     }
     chartitle = doc.findFirst("DIV[class=name] B").attribute ("title");
     charname = doc.findFirst("DIV[class=name] U").toPlainText ().trimmed ();
@@ -427,6 +460,7 @@ Page_Game::Page_Game (QWebElement& doc) :
     }
 
     coulons.assign(document.findFirst("DIV[id=coulons_bar]"));
+
 }
 
 
@@ -438,6 +472,24 @@ QString toString(const QString& pfx, const PageResource& r) {
 QString toString(const QString& pfx, const PageResources& s) {
     QString ret = "Resources: {\n";
     for (PageResources::ConstIterator i = s.constBegin(); i != s.constEnd(); ++i) {
+        ret += ::toString(pfx + "   ", *i) + "\n";
+    }
+    ret += pfx +"}\n";
+    return ret;
+}
+
+QString toString(const QString& pfx, const PetInfo& p) {
+    QString ret = QString("{id=%1, hp_cur/hp_max/hp_spd=%2/%3/%4, title={%5} %6}")
+            .arg(p.id).
+            arg(p.hp_cur).arg(p.hp_max).arg(p.hp_spd)
+            .arg(p.title)
+            .arg(p.active ? "uncaged" : "caged");
+    return pfx + ret;
+}
+
+QString toString(const QString& pfx, const PetList& petlist) {
+    QString ret = "Pet List: {\n";
+    for (PetList::ConstIterator i = petlist.constBegin(); i != petlist.constEnd(); ++i) {
         ret += ::toString(pfx + "   ", *i) + "\n";
     }
     ret += pfx +"}\n";
@@ -473,6 +525,8 @@ QString Page_Game::toString (const QString& pfx) const
             pfx + effects.toString(pfx + "   ") + "\n" +
             pfx + QString("coulons:\n") +
             pfx + coulons.toString(pfx + "   ") + "\n" +
+            pfx + QString("pets:\n") +
+            pfx + ::toString(pfx + "   ", petlist) +
             pfx + "}";
 }
 
@@ -561,4 +615,51 @@ bool Page_Game::doClickOnCoulon(quint32 id) {
                 "});").arg(id);
     document.evaluateJavaScript(s);
     return true;
+}
+
+bool Page_Game::uncagePet(int id) {
+    return false; // NIY!
+    QRegExp rx("'(cage|uncage)', (\\d+)");
+    foreach (QWebElement a, document.findAll("DIV#pet A.ico_cage")) {
+        if (rx.indexIn(a.attribute("href")) > -1) {
+            if (rx.cap(1) == "cage") {
+                qCritical("pet id=%d already uncaged", id);
+                return false;
+            } else {
+                qDebug("found cage with pet id=%d, uncage it", id);
+                delay(1000 + (qrand() % 10000), true);
+                qDebug("click on cage");
+                a.evaluateJavaScript("this.click();");
+                delay(3000 + (qrand() % 10000), true);
+                qDebug("clicked");
+                return true;
+            }
+        }
+    }
+    qCritical("cage with pet id=%d not found", id);
+    return false;
+}
+
+
+bool Page_Game::cagePet(int id) {
+    return false; // NIY!
+    QRegExp rx("'(cage|uncage)', (\\d+)");
+    foreach (QWebElement a, document.findAll("DIV#pet A.ico_cage")) {
+        if (rx.indexIn(a.attribute("href")) > -1) {
+            if (rx.cap(1) == "cage") {
+                qCritical("pet id=%d already uncaged", id);
+                return false;
+            } else {
+                qDebug("found cage with pet id=%d, uncage it", id);
+                delay(1000 + (qrand() % 10000), true);
+                qDebug("click on cage");
+                a.evaluateJavaScript("this.click();");
+                delay(3000 + (qrand() % 10000), true);
+                qDebug("clicked");
+                return true;
+            }
+        }
+    }
+    qCritical("cage with pet id=%d not found", id);
+    return false;
 }

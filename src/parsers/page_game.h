@@ -124,6 +124,17 @@ struct PageCoulons {
     const PageCoulon* active() const;
 };
 
+struct PetInfo {
+    int     id;
+    QString title;
+    bool    active;
+    int     hp_cur;
+    int     hp_max;
+    int     hp_spd;
+};
+
+typedef QVector<PetInfo> PetList;
+
 class Page_Game : public Page_Generic
 {
     Q_OBJECT
@@ -152,6 +163,7 @@ public:
     PageTimers  effects;
     PageResources   resources;
     PageCoulons     coulons;
+    PetList     petlist;
 
     QWebElement body;
 
@@ -166,6 +178,10 @@ public:
     QString jobLink(bool ifFinished = false, int timegap=10) const;
 
     bool doClickOnCoulon(quint32 id);
+
+    bool uncagePet(int id);
+
+    bool cagePet(int id);
 
 };
 

@@ -26,36 +26,45 @@ AppWindow::AppWindow(QWidget *parent) :
 
     pURL        = new QLineEdit();
     pGo         = new QPushButton("GO");
+    pSave       = new QPushButton("SAVE");
     pWebView    = new QWebView();
-//  pWebView->setMinimumWidth(1097);
+    pWebView->setMinimumWidth(1097);
+    //pWebView->setMinimumWidth(220);
     pWebView->setPage (pWebPage);
     pWebView->show();
 
-    pCoulons    = new QListWidget();
-    pWebView->setMinimumWidth(220);
+    QWidget *pStuff = new QWidget();
+
+    QPushButton *pHeal = new QPushButton("HEAL");
 
     QHBoxLayout *box0 = new QHBoxLayout();
     box0->addWidget(pURL);
     box0->addWidget(pGo);
+    box0->addWidget(pSave);
 
-    QSplitter *box1 = new QSplitter(Qt::Horizontal);
-    box1->addWidget(pCoulons);
-    box1->addWidget(pWebView);
+    QVBoxLayout *box1 = new QVBoxLayout();
+    box1->addWidget(pHeal);
+    box1->addSpacerItem(new QSpacerItem(1,1));
+    pStuff->setLayout(box1);
 
-    QVBoxLayout *box2 = new QVBoxLayout();
-    box2->addLayout(box0, 0);
-    box2->addWidget(box1, 100);
+    QSplitter *box2 = new QSplitter(Qt::Horizontal);
+    box2->addWidget(pStuff);
+    box2->addWidget(pWebView);
 
-    this->setLayout(box2);
+    QVBoxLayout *box3 = new QVBoxLayout();
+    box3->addLayout(box0, 0);
+    box3->addWidget(box2, 100);
+
+    this->setLayout(box3);
 
     connect(pURL, SIGNAL(textChanged(QString)), this, SLOT(slotEditURL(QString)));
     connect(pURL, SIGNAL(returnPressed()), this, SLOT(slotGo()));
     connect(pGo, SIGNAL(clicked()), this, SLOT(slotGo()));
+    connect(pSave, SIGNAL(clicked()), this, SLOT(slotSave()));
     connect(pWebPage, SIGNAL(loadStarted()), this, SLOT(slotLoadStart()));
     connect(pWebPage, SIGNAL(loadProgress(int)), this, SLOT(slotLoadProgress(int)));
     connect(pWebPage, SIGNAL(loadFinished(bool)), this, SLOT(slotLoaded(bool)));
-    connect(pCoulons, SIGNAL(itemActivated(QListWidgetItem*)),
-            this, SLOT(slotSelectItem(QListWidgetItem*)));
+
     qDebug("ready");
     pWebView->load(QUrl(_baseurl));
 }
@@ -89,52 +98,26 @@ void AppWindow::slotGo() {
     pWebView->load(QUrl(_url));
 }
 
-void AppWindow::slotSelectItem(QListWidgetItem* item) {
-    QRegExp rx("\\[(\\d+)\\]");
-    if (!item) {
-        return;
-    }
-    QString s = item->text();
-    qWarning("got item {%s}", qPrintable(s));
+void AppWindow::slotSave() {
+    QString ts = now ();
+    QString _savepath = Config::globalDataPath() + "/surgery";
+    Config::checkDir (_savepath);
+    QString pfx = _savepath + "/" + ts + "-";
+    qDebug("SAVE PAGE TS=" +
+           ts + " URL:" +
+           pWebPage->mainFrame ()->url().toString());
 
-    if (rx.indexIn(s) == -1) {
-        qWarning("RX UNFIT");
-    } else {
-        quint32 id = rx.cap(1).toInt();
-        qWarning("ID=%d", id);
-        clickOnCoulon(id);
-    }
+    ::save (pfx + ".url",
+            pWebPage->mainFrame ()->url().toString());
+
+    ::save (pfx + "outer.xml",
+            pWebPage->mainFrame ()->documentElement ().toOuterXml ());
 }
 
-bool AppWindow::clickOnCoulon(int id) {
-    QString sid = QString::number(id);
-    QWebElement a;
-    bool found = false;
-    foreach (a, doc.findAll("DIV.coulons A")) {
-        if (a.attribute("item_id") == sid) {
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        qCritical("coulon #%d not found", id);
-        return false;
-    }
-    qWarning("activate coulon #%d", id);
-    QString s = QString(
-                "$.getJSON('ajax.php?m=coulon&item='+%1,"
-                "function(data){"
-                    "if (data.status=='OK'){"
-                        "fixCoulonPack(data.item);"
-                        "if(typeof resetBag == 'function'){resetBag();}"
-                        "return;"
-                    "}"
-                    "showMessage(data.status);"
-                "});").arg(id);
-    a.evaluateJavaScript(s);
-    return true;
-}
 
+void AppWindow::slotHeal() {
+
+}
 
 bool AppWindow::checkLogin() {
     qDebug("checkLogin");
@@ -167,21 +150,8 @@ bool AppWindow::checkGame() {
         qWarning("no coulonbar");
         return false;
     }
-    pCoulons->clear();
-    foreach (QWebElement a, bar.findAll("A")) {
-        bool ok;
-        int id = a.attribute("item_id").toInt(&ok);
-        if (!ok || id == 0) {
-            continue;
-        }
-        QString title = a.attribute("title");
-        if (title.isNull()) {
-            continue;
-        }
-        QString item = QString("[%1] %2").arg(id).arg(title);
-        new QListWidgetItem(item, pCoulons);
-    }
 
     return true;
 }
+
 
