@@ -629,7 +629,7 @@ bool Page_Game::uncagePet(int id) {
                 qDebug("found cage with pet id=%d, uncage it", id);
                 delay(1000 + (qrand() % 10000), true);
                 qDebug("click on cage");
-                a.evaluateJavaScript("this.click();");
+                actuate(a);
                 delay(3000 + (qrand() % 10000), true);
                 qDebug("clicked");
                 return true;
@@ -662,4 +662,15 @@ bool Page_Game::cagePet(int id) {
     }
     qCritical("cage with pet id=%d not found", id);
     return false;
+}
+
+
+bool Page_Game::closePopup() {
+    QWebElement btn = document.findFirst("A.ui-dialog-titlebar-close");
+    if (btn.isNull()) {
+        qDebug("close button not found");
+        return false;
+    }
+    actuate(btn);
+    return true;
 }

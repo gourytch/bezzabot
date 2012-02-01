@@ -75,37 +75,18 @@ void Page_Generic::pressSubmit(int delay_min, int delay_max) {
 }
 
 void Page_Generic::slot_submit() {
-    static const QString actuateLink = (
-       "function actuateLink(link) {"
-         "var allowDefaultAction = true; "
-         "if (link.click) { "
-           "link.click(); "
-           "return; "
-         "} else if (document.createEvent) { "
-           "var e = document.createEvent('MouseEvents'); "
-           "e.initEvent('click',true,true); "
-           "allowDefaultAction = link.dispatchEvent(e); "
-         "}"
-         "if (allowDefaultAction) { "
-           "var f = document.createElement('form'); "
-           "f.action = link.href; "
-           "document.body.appendChild(f); "
-           "f.submit(); "
-         "}"
-       "}"
-       "actuateLink(this);");
-
     if (submit.isNull()) {
         qCritical("NULL SUBMIT");
     } else {
-        if (submit.tagName () == "A") {
-            qDebug("SUBMITTING AS LINK: " + submit.attribute("href"));
-            submit.evaluateJavaScript("document.location = this.getAttribute('href');");
-//            submit.evaluateJavaScript(actuateLink);
-        } else {
-            qDebug("SUBMITTING AS BUTTON");
-            submit.evaluateJavaScript("this.click();");
-        }
+        qDebug("ACTUATE : " + submit.toOuterXml());
+        actuate(submit);
+//        if (submit.tagName () == "A") {
+//            qDebug("SUBMITTING AS LINK: " + submit.attribute("href"));
+//            submit.evaluateJavaScript("document.location = this.getAttribute('href');");
+//        } else {
+//            qDebug("SUBMITTING AS BUTTON");
+//            submit.evaluateJavaScript("this.click();");
+//        }
     }
 }
 
@@ -119,4 +100,20 @@ void Page_Generic::delay(int ms, bool exclusive) {
         }
     }
     qDebug("CONTINUE EXECUTION");
+}
+
+void Page_Generic::actuate(QWebElement e) {
+    QString js =
+            "var actuate = function(obj) {"
+            "   if (obj.click) {"
+            "       obj.click();"
+            "       return;"
+            "   } else {"
+            "       var e = document.createEvent('MouseEvents');"
+            "       e.initEvent('click', true, true);"
+            "       obj.dispatchEvent(e);"
+            "   }"
+            "};"
+            "actuate(this);";
+    QString s = e.evaluateJavaScript(js).toString();
 }

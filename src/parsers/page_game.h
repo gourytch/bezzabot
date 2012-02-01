@@ -183,6 +183,7 @@ public:
 
     bool cagePet(int id);
 
+    bool closePopup();
 };
 
 #endif // PAGE_GAME_H

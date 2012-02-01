@@ -42,6 +42,8 @@ public:
 
     void delay(int ms, bool exclusive);
 
+    void actuate(QWebElement e);
+
 protected slots:
 
     void slot_submit();

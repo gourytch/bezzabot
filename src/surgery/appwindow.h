@@ -46,15 +46,17 @@ public:
     explicit AppWindow(QWidget *parent = 0);
     virtual ~AppWindow();
 
+    void actuate(QWebElement e);
+
 public slots:
     void slotLoadStart ();
-    void slotLoadProgress (int percents);
     void slotLoaded (bool success);
     void slotEditURL (const QString& text);
     void slotGo();
 
     void slotSave();
 
+    void slotTest1();
     void slotHeal();
 signals:
 

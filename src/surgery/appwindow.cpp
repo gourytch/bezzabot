@@ -1,5 +1,7 @@
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QWebElement>
+#include <QWebElementCollection>
 #include "appwindow.h"
 
 AppWindow::AppWindow(QWidget *parent) :
@@ -13,6 +15,7 @@ AppWindow::AppWindow(QWidget *parent) :
     _password   = pConfig->get("login/password", true, "").toString();
 
     _baseurl    = QString("http://g%1.botva.ru").arg(_server_no);
+//    _baseurl    = QString("http://localhost/");
 
     pWebPage    = new TunedPage();
     //QNetworkAccessManager *manager = pWebPage->networkAccessManager();
@@ -35,7 +38,8 @@ AppWindow::AppWindow(QWidget *parent) :
 
     QWidget *pStuff = new QWidget();
 
-    QPushButton *pHeal = new QPushButton("HEAL");
+    QPushButton *pHeal       = new QPushButton("HEAL");
+    QPushButton *pTest1      = new QPushButton("TEST1");
 
     QHBoxLayout *box0 = new QHBoxLayout();
     box0->addWidget(pURL);
@@ -44,6 +48,7 @@ AppWindow::AppWindow(QWidget *parent) :
 
     QVBoxLayout *box1 = new QVBoxLayout();
     box1->addWidget(pHeal);
+    box1->addWidget(pTest1);
     box1->addSpacerItem(new QSpacerItem(1,1));
     pStuff->setLayout(box1);
 
@@ -62,8 +67,10 @@ AppWindow::AppWindow(QWidget *parent) :
     connect(pGo, SIGNAL(clicked()), this, SLOT(slotGo()));
     connect(pSave, SIGNAL(clicked()), this, SLOT(slotSave()));
     connect(pWebPage, SIGNAL(loadStarted()), this, SLOT(slotLoadStart()));
-    connect(pWebPage, SIGNAL(loadProgress(int)), this, SLOT(slotLoadProgress(int)));
     connect(pWebPage, SIGNAL(loadFinished(bool)), this, SLOT(slotLoaded(bool)));
+
+    connect(pHeal, SIGNAL(clicked()), this, SLOT(slotHeal()));
+    connect(pTest1, SIGNAL(clicked()), this, SLOT(slotTest1()));
 
     qDebug("ready");
     pWebView->load(QUrl(_baseurl));
@@ -75,10 +82,6 @@ AppWindow::~AppWindow() {
 
 void AppWindow::slotLoadStart () {
     qDebug("LOAD STARTED: {" + pWebView->url().toString());
-}
-
-void AppWindow::slotLoadProgress (int percents) {
-    qDebug("LOADING: %d%%", percents);
 }
 
 void AppWindow::slotLoaded (bool success) {
@@ -96,6 +99,45 @@ void AppWindow::slotEditURL(const QString &text) {
 
 void AppWindow::slotGo() {
     pWebView->load(QUrl(_url));
+}
+
+void AppWindow::actuate(QWebElement e) {
+    QString js =
+            "var actuate = function(obj) {"
+            "   if (obj.click) {"
+            "       obj.click();"
+            "       return;"
+            "   } else {"
+            "       var e = document.createEvent('MouseEvents');"
+            "       e.initEvent('click', true, true);"
+            "       obj.dispatchEvent(e);"
+            "   }"
+            "};"
+            "actuate(this);";
+    QString s = e.evaluateJavaScript(js).toString();
+}
+
+void AppWindow::slotTest1() {
+    QWebElement doc = pWebPage->mainFrame()->documentElement();
+    QWebElement body = doc.findFirst("BODY");
+    if (body.isNull()) {
+        qWarning("NULL");
+        return;
+    }
+    QWebElement e = body.findFirst("#my_anchor");
+    if (e.isNull()) {
+        qDebug("add");
+        body.appendInside(
+                    "<a href='javascript:alert(\"YAHOO!!!\");' "
+//                    "<input type='submit' "
+                    "id='my_anchor' "
+                    "onclick='alert(\"ONCLICK\");' "
+                    ">PUSH ME</a>");
+        e = body.findFirst("#my_anchor");
+    } else {
+        qDebug("already exists");
+    }
+    actuate(e);
 }
 
 void AppWindow::slotSave() {
@@ -116,7 +158,21 @@ void AppWindow::slotSave() {
 
 
 void AppWindow::slotHeal() {
-
+    QWebElement doc = pWebPage->mainFrame()->documentElement();
+    QWebElement char_anchor = doc.findFirst("DIV#char A");
+    QWebElement popup = doc.findFirst("TABLE#potions_popup");
+    if (popup.isNull()) {
+        qDebug("potions_popup is not on exists. activate tab");
+        actuate(char_anchor);
+        return;
+    } else {
+        qDebug("potions_popup is shown.");
+        QWebElement btn = doc.findFirst("A.ui-dialog-titlebar-close");
+        if (btn.isNull()) {
+            qDebug("close button not found");
+        }
+        actuate(btn);
+    }
 }
 
 bool AppWindow::checkLogin() {
