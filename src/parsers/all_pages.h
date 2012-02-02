@@ -18,5 +18,6 @@
 #include "page_game_luckysquare.h"
 #include "page_game_clan_treasury.h"
 #include "page_game_incubator.h"
+#include "page_game_fight_log.h"
 
 #endif // ALL_PAGES_H

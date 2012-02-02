@@ -8,7 +8,7 @@
 int dottedInt (const QString& s)
 {
     QRegExp rx ("\\.");
-    QString ss (s);
+    QString ss (s.trimmed());
     ss.replace (rx, "");
     return ss.toInt ();
 }
@@ -63,6 +63,7 @@ ECASE(page_Game_Dozor_Entrance)
 ECASE(page_Game_Dozor_LowHealth)
 ECASE(page_Game_Dozor_OnDuty)
 ECASE(page_Game_Dozor_GotVictim)
+ECASE(page_Game_Fight_Log)
 ECASE(page_Game_Headquarters)
 ECASE(page_Game_Feeder)
 ECASE(page_Game_Friends)

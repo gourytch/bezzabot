@@ -21,8 +21,6 @@ protected:
 
     QWebElement _linkRestart;
 
-    QWebElement _linkCancel;
-
 public:
 
     explicit Page_Game_Mine_LiveField(QWebElement& doc);

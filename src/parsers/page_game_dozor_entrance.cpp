@@ -20,8 +20,9 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     QWebElementCollection groups = infotab.findAll("DIV[class=grbody]");
 
     _dozorForm = groups[1];
-    dozor_price = _dozorForm.findFirst("SPAN[class=price_num]")
-            .toPlainText().trimmed().toInt();
+    dozor_price = dottedInt(
+                _dozorForm.findFirst("SPAN[class=price_num]")
+                .toPlainText());
     QWebElement selector = _dozorForm.findFirst("SELECT[id=auto_watch]");
     QWebElementCollection options = selector.findAll("OPTION");
     dozor_left10 = 0;
@@ -31,6 +32,13 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
             dozor_left10 = v;
         }
     }
+
+    _scaryForm = groups[2];
+    scary_auto_price = dottedInt(
+                _scaryForm.findFirst("SPAN[class=price_num]")
+                .toPlainText());
+
+
 }
 
 
@@ -93,6 +101,63 @@ bool Page_Game_Dozor_Entrance::doDozor(int time10) {
     }
 //    qWarning("нажимаем кнопку старта дозора");
     qDebug("нажимаем кнопку старта дозора");
+    pressSubmit();
+    return true;
+}
+
+bool Page_Game_Dozor_Entrance::doScarySearch(int ix) {
+    if (_scaryForm.isNull()) {
+        qCritical("scaryForm is null!");
+        return false;
+    }
+    QWebElementCollection forms = _scaryForm.findAll("FORM");
+    Q_ASSERT(forms.count() != 2);
+
+    if (ix == 0) { // ищем автоматом за золото
+        if (gold < scary_auto_price) {
+            qCritical("not enough gold");
+            return false;
+        }
+        submit = forms[0].findFirst("FORM INPUT[type=submit]");
+        if (submit.isNull()) {
+            qCritical("submit not found");
+            return false;
+        }
+        if (submit.attribute("value") != u8("ИСКАТЬ СТРАШИЛКУ")) {
+            qCritical("not my submit");
+            return false;
+        }
+
+        qDebug("press on autosearch for scary");
+        pressSubmit();
+        return true;
+    }
+    QWebElement form = forms[1];
+
+    //select cryst
+    form.findAll("INPUT[name=ptype]")[0].evaluateJavaScript("this.selected=true;");
+
+    QWebElementCollection levels = form.findAll("SELECT OPTION");
+    Q_ASSERT(levels.count() > 2);
+    if (ix == -1) { // ищем бандюка
+        levels[levels.count()-1].evaluateJavaScript("this.selected=true;");
+    } else {
+        if (ix > levels.count()-1) {
+            qCritical("requested level is too high");
+            return false;
+            levels[ix].evaluateJavaScript("this.selected=true;");
+        }
+    }
+    submit = form.findFirst("INPUT[type=submit]");
+    if (submit.isNull()) {
+        qCritical("submit not found");
+        return false;
+    }
+    if (submit.attribute("value") != u8("ИСКАТЬ")) {
+        qCritical("not my submit");
+        return false;
+    }
+    qDebug("press on submit");
     pressSubmit();
     return true;
 }

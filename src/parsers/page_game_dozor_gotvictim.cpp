@@ -1,3 +1,6 @@
+#include <QWebElement>
+#include <QWebElementCollection>
+#include <QRegExp>
 #include <QDebug>
 #include "tools/tools.h"
 #include "page_game_dozor_gotvictim.h"
@@ -12,29 +15,68 @@ Page_Game_Dozor_GotVictim::Page_Game_Dozor_GotVictim (QWebElement& doc) :
     Page_Game (doc)
 {
     pagekind = page_Game_Dozor_GotVictim;
+    QWebElement tab = document.findFirst("TABLE.attack");
+    QString img = tab.findFirst("TD[style]").attribute("style");
+    is_scary = (img.indexOf("/monster/") > -1);
+    level       = -1;
+    power       = -1;
+    block       = -1;
+    dexterity   = -1;
+    endurance   = -1;
+    charisma    = -1;
+    foreach (QWebElement tr, tab.findAll("TABLE.skills TR")) {
+        QWebElementCollection td = tr.findAll("TD");
+        if (td.count() < 4) continue;
+        QString name = td[1].toPlainText().trimmed();
+        if (name == u8("Уровень")) {
+            level = td[2].toPlainText().trimmed().toInt();
+        } else if (name == u8("Сила")) {
+            power = td[3].toPlainText().trimmed().toInt();
+        } else if (name == u8("Защита")) {
+            block = td[3].toPlainText().trimmed().toInt();
+        } else if (name == u8("Ловкость")) {
+            dexterity = td[3].toPlainText().trimmed().toInt();
+        } else if (name == u8("Масса")) {
+            endurance = td[3].toPlainText().trimmed().toInt();
+        } else if (name == u8("Мастерство")) {
+            charisma = td[3].toPlainText().trimmed().toInt();
+        }
+    }
+
+    foreach (QWebElement e, body.findAll("INPUT[type=submit]")) {
+        if (e.attribute("value") == u8("НАПАСТЬ")) {
+            _attack = e;
+        } else {
+            _flee = e; //  hindicode!
+        }
+    }
+
 }
 
 
 QString Page_Game_Dozor_GotVictim::toString (const QString& pfx) const
 {
     return "Page_Game_Dozor_GotVictim {\n" +
-           pfx + Page_Game::toString (pfx + "   ") + "\n" +
-           pfx + "}";
+
+            pfx + Page_Game::toString (pfx + "   ") + "\n" +
+            pfx + "VICTIM: " + (is_scary ? "MONSTER" : "PLAYER") + "\n" +
+            pfx + QString("   level     : %1\n").arg(level) +
+            pfx + QString("   power     : %1\n").arg(power) +
+            pfx + QString("   block     : %1\n").arg(block) +
+            pfx + QString("   dexterity : %1\n").arg(dexterity) +
+            pfx + QString("   endurance : %1\n").arg(endurance) +
+            pfx + QString("   charisma  : %1\n").arg(charisma) +
+            pfx + "}";
 }
 
 //static
 bool Page_Game_Dozor_GotVictim::fit(const QWebElement& doc) {
 //    qDebug("* CHECK Page_Game_Dozor_GotVictim");
-    QWebElement defAttack = doc.findFirst("TABLE[class=default\\ attack]");
-    if (defAttack.isNull()) {
-//        qDebug("Page_Game_Dozor_GotVictim doesn't fit: no default attack");
+    if (doc.findFirst("TABLE.attack").isNull()) {
         return false;
     }
-    QWebElement do_attack = doc.findFirst("INPUT[name=do_attack]");
-    if (defAttack.isNull()) {
-//        qDebug("Page_Game_Dozor_GotVictim doesn't fit: no do_attack");
+    if (doc.findFirst("INPUT[type=submit]").attribute("value") != u8("НАПАСТЬ")) {
         return false;
     }
-//    qDebug("Page_Game_Dozor_GotVictim fits");
     return true;
 }

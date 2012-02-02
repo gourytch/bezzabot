@@ -33,7 +33,7 @@ enum WorkType { // основная работа
     Work_LuckySquare
 };
 
-    QString toString(WorkType v);
+QString toString(WorkType v);
 
 
 class BotState : public QObject

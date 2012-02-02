@@ -128,8 +128,24 @@ struct PageCoulons {
     const PageCoulon* active() const;
 };
 
+enum PetKind {
+    pet_Unknown,
+    pet_Rat,
+    pet_Cat,
+    pet_Beawer,
+    pet_Porcupines,
+    pet_Racoon,
+    pet_Armadillo,
+    pet_Worm,
+    pet_RedWorm,
+    pet_Fox
+};
+
+QString toString(PetKind v);
+
 struct PetInfo {
     int     id;
+    PetKind kind;
     QString title;
     bool    active;
     int     hp_cur;

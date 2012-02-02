@@ -3,10 +3,25 @@
 
 #include <QString>
 #include <QDebug>
+#include <QDate>
+#include <QTime>
+#include <QDateTime>
 
 QString now (bool utc=false);
 
 QDateTime nextDay();
+
+inline QString toString(const QDateTime& t) {
+    return t.toString("yyyy-MM-dd hh:mm:ss");
+}
+
+inline QString toString(const QDate& t) {
+    return t.toString("yyyy-MM-dd");
+}
+
+inline QString toString(const QTime& t) {
+    return t.toString("hh:mm:ss");
+}
 
 void save (const QString& fname, const QString& text);
 
@@ -36,6 +51,7 @@ inline void qCritical(const QString& s) {
 inline void qFatal(const QString& s) {
     qFatal(s.toUtf8().constData());
 }
+
 
 #define ESTART(E) QString toString(E v) {switch (v) {
 #define ECASE(x) case x: return #x ;

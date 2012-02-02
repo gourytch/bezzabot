@@ -7,16 +7,26 @@
 #include "tools/tools.h"
 #include "page_game.h"
 
-QString toString(WorkGuild v) {
-    switch (v) {
-    case WorkGuild_None     : return "WorkGuild_None";
-    case WorkGuild_Miners   : return "WorkGuild_Miners";
-    case WorkGuild_Farmers  : return "WorkGuild_Farmers";
-    case WorkGuild_Smiths   : return "WorkGuild_Smiths";
-    case WorkGuild_Traders  : return "WorkGuild_Traders";
-    };
-    return "?";
-}
+ESTART(WorkGuild)
+ECASE(WorkGuild_None)
+ECASE(WorkGuild_Miners)
+ECASE(WorkGuild_Farmers)
+ECASE(WorkGuild_Smiths)
+ECASE(WorkGuild_Traders)
+EEND
+
+ESTART(PetKind)
+ECASE(pet_Unknown)
+ECASE(pet_Rat)
+ECASE(pet_Cat)
+ECASE(pet_Beawer)
+ECASE(pet_Porcupines)
+ECASE(pet_Racoon)
+ECASE(pet_Armadillo)
+ECASE(pet_Worm)
+ECASE(pet_RedWorm)
+ECASE(pet_Fox)
+EEND
 
 bool parseTimerSpan (const QWebElement& e, QDateTime *pit, int *hms)
 {
@@ -344,6 +354,13 @@ Page_Game::Page_Game (QWebElement& doc) :
             p.hp_cur = dottedInt (rx.cap (1));
             p.hp_max = dottedInt (rx.cap (2));
             p.hp_spd = dottedInt (rx.cap (3));
+            s = s.findFirst("B");
+            if (!s.isNull()) {
+                QRegExp rx("pet(\\d+)");
+                if (rx.indexIn(s.attribute("class")) > -1) {
+                    p.kind = (PetKind)rx.cap(1).toInt();
+                }
+            }
             petlist.append(p);
         }
     }
@@ -511,9 +528,10 @@ QString toString(const QString& pfx, const PageResources& s) {
 }
 
 QString toString(const QString& pfx, const PetInfo& p) {
-    QString ret = QString("{id=%1, hp_cur/hp_max/hp_spd=%2/%3/%4, title={%5} %6}")
-            .arg(p.id).
-            arg(p.hp_cur).arg(p.hp_max).arg(p.hp_spd)
+    QString ret = QString("{id=%1, hp_cur/hp_max/hp_spd=%2/%3/%4, kind=%5 title={%6}, %7}")
+            .arg(p.id)
+            .arg(p.hp_cur).arg(p.hp_max).arg(p.hp_spd)
+            .arg(::toString(p.kind))
             .arg(p.title)
             .arg(p.active ? "uncaged" : "caged");
     return pfx + ret;
@@ -650,7 +668,6 @@ bool Page_Game::doClickOnCoulon(quint32 id) {
 }
 
 bool Page_Game::uncagePet(int id) {
-    return false; // NIY!
     QRegExp rx("'(cage|uncage)', (\\d+)");
     foreach (QWebElement a, document.findAll("DIV#pet A.ico_cage")) {
         if (rx.indexIn(a.attribute("href")) > -1) {

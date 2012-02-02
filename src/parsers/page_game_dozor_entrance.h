@@ -13,11 +13,14 @@ class Page_Game_Dozor_Entrance : public Page_Game
 protected:
 
     QWebElement _dozorForm;
+    QWebElement _scaryForm;
 
 public:
 
     int dozor_price;
     int dozor_left10;
+    int scary_auto_price;
+    QDateTime scary_cooldown;
 
     Page_Game_Dozor_Entrance (QWebElement& doc);
 
@@ -26,6 +29,8 @@ public:
     static bool fit(const QWebElement& doc);
 
     bool doDozor(int time10);
+
+    bool doScarySearch(int ix = 1);
 
 };
 

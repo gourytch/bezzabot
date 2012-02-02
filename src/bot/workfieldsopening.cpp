@@ -112,13 +112,9 @@ bool WorkFieldsOpening::processPage(const Page_Game *gpage) {
                 return false;
             }
         }
-        qDebug("... хватит, наверное");
-        if (p->doCancel()) {
-            qDebug("отменили");
-            setAwaiting();
-            return true;
-        }
-        qCritical("отменить не вышло");
+        qDebug("... пока хватит, наверное, пойдём ко входу");
+        _bot->GoTo("mine.php");
+        setAwaiting();
         return false;
     }
 

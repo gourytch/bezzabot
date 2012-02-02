@@ -18,7 +18,6 @@ Page_Game_Mine_LiveField::Page_Game_Mine_LiveField(QWebElement& doc) :
             _linkRestart = a;
         }
     }
-    _linkCancel = document.findFirst("A.back");
 
     finished = !_linkRestart.isNull();
 
@@ -75,16 +74,6 @@ bool Page_Game_Mine_LiveField::doRestart() {
         return false;
     }
     submit = _linkRestart;
-    pressSubmit();
-    return true;
-}
-
-bool Page_Game_Mine_LiveField::doCancel() {
-    if (_linkCancel.isNull()) {
-        qCritical("linkCancel is undefined");
-        return false;
-    }
-    submit = _linkCancel;
     pressSubmit();
     return true;
 }

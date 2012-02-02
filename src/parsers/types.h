@@ -57,6 +57,7 @@ enum PageKind {
     page_Game_Dozor_LowHealth,
     page_Game_Dozor_OnDuty,
     page_Game_Dozor_GotVictim,
+    page_Game_Fight_Log,
     page_Game_Headquarters,
     page_Game_Feeder,
     page_Game_Friends,
