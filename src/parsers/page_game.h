@@ -20,6 +20,8 @@ QString toString(WorkGuild v);
 
 struct PageTimer
 {
+    static int  systime_delta;
+
     QString     title;
     QString     href;
     QDateTime   pit;
@@ -44,6 +46,8 @@ struct PageTimer
         return (defined() &&
                 (QDateTime::currentDateTime().addSecs(secs) < pit));
     }
+
+    void adjust();
 };
 
 struct PageTimers

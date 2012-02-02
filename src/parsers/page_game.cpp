@@ -93,6 +93,7 @@ bool parseTimerSpan (const QWebElement& e, QDateTime *pit, int *hms)
 }
 
 
+int PageTimer::systime_delta = 0;
 
 QString PageTimer::toString () const
 {
@@ -126,6 +127,14 @@ void PageTimer::assign (const QWebElement &e)
         href = e.findFirst("A").attribute("href");
         parseTimerSpan (e.findFirst ("SPAN"), &pit, &hms);
     }
+    adjust();
+}
+
+void PageTimer::adjust() {
+    if (pit.isNull()) {
+        return;
+    }
+    pit = pit.addSecs(systime_delta);
 }
 
 const PageTimer& PageTimers::operator [] (int ix) const
@@ -368,6 +377,25 @@ Page_Game::Page_Game (QWebElement& doc) :
     timer_system.title = "SYSTEM TIME";
     timer_system.href = "/";
     parseTimerSpan(e, &timer_system.pit, &timer_system.hms);
+    if (!timer_system.pit.isNull()) {
+        QDateTime dayStart = QDateTime(QDate::currentDate());
+        QDateTime sysStart = timer_system.pit;
+        QDateTime now = QDateTime::currentDateTime();
+        int tloc = dayStart.secsTo(now);
+        int tsys = timer_system.hms;
+        int thrs = sysStart.secsTo(dayStart);
+        PageTimer::systime_delta = thrs + tloc - tsys;
+        qDebug(QString("daystart = %1 = %2")
+               .arg(dayStart.toString("yyyy-MM-dd hh:mm:ss"))
+               .arg(dayStart.toTime_t()));
+        qDebug(QString("sysstart = %1 = %2")
+               .arg(sysStart.toString("yyyy-MM-dd hh:mm:ss"))
+               .arg(sysStart.toTime_t()));
+        qDebug("tloc = %d", tloc);
+        qDebug("tsys = %d", tsys);
+        qDebug("thrs = %d", thrs);
+        qDebug("systime_delta = %d", PageTimer::systime_delta);
+    }
 
     e = doc.findFirst("DIV[id=rmenu1] DIV[class=timers]");
 
@@ -393,6 +421,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         parseTimerSpan(c.findFirst("SPAN[class=js_timer]"),
                        &timer_immunity.pit, &timer_immunity.hms);
         timer_immunity.title = u8("SAFE");
+        timer_immunity.adjust();
         timer_immunity.href  = u8("");
     }
     // 3. таймер бодалки
@@ -405,6 +434,7 @@ Page_Game::Page_Game (QWebElement& doc) :
     } else {
         parseTimerSpan(c.findFirst("SPAN[class=js_timer]"),
                        &timer_attack.pit, &timer_attack.hms);
+        timer_attack.adjust();
         timer_attack.title = (timer_attack.hms == 0) ? "READY": "RESTING";
         timer_attack.href  = u8("");
     }

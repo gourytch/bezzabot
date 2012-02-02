@@ -26,6 +26,7 @@ Page_Game_Farm::Page_Game_Farm (QWebElement &doc) :
         working = true;
         parseTimerSpan(body.findFirst("SPAN.js_timer"),
                        &worktimer.pit, &worktimer.hms);
+        worktimer.adjust();
     }
 }
 

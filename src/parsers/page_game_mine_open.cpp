@@ -130,6 +130,7 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (QWebElement& doc) :
         {
             parseTimerSpan (doc.findFirst ("SPAN[id=counter_1]"),
                             &(timer.pit), &(timer.hms));
+            timer.adjust();
             digstage = DigProcess;
             break;
         }

@@ -70,6 +70,7 @@ Page_Game_Pier::Page_Game_Pier (QWebElement& doc) :
     if (!canSend) {
         parseTimerSpan(body.findFirst("SPAN#counter_1"),
                        &timeleft.pit, &timeleft.hms);
+        timeleft.adjust();
     }
 
     managed_till = QDateTime();
