@@ -80,3 +80,23 @@ bool Page_Game_Dozor_GotVictim::fit(const QWebElement& doc) {
     }
     return true;
 }
+
+bool Page_Game_Dozor_GotVictim::doAttack() {
+    if (_attack.isNull()) {
+        qCritical("submit for Attack is null");
+        return false;
+    }
+    submit = _attack;
+    pressSubmit();
+    return true;
+}
+
+bool Page_Game_Dozor_GotVictim::doFlee() {
+    if (_flee.isNull()) {
+        qCritical("submit for Flee is null");
+        return false;
+    }
+    submit = _flee;
+    pressSubmit();
+    return true;
+}

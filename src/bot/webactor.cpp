@@ -238,7 +238,9 @@ void WebActor::savePage ()
 {
     QString ts = now ();
     Config::checkDir (_savepath);
-    QString pfx = _savepath + "/" + _bot->id() + "-" + ts + "-";
+    Page_Generic *page = parse();
+    QString pfx = _savepath + "/" + _bot->id() + "-" + ts + "-"
+            + (page ? ::toString(page->pagekind) : u8("NULL")) + "-";
     qDebug("SAVE PAGE TS=" +
            ts + " URL:" +
            _webpage->mainFrame ()->url().toString());
@@ -252,7 +254,6 @@ void WebActor::savePage ()
 //            _webpage->mainFrame ()->documentElement ().toInnerXml ());
     ::save (pfx + "text.txt",
             _webpage->mainFrame ()->documentElement ().toPlainText());
-    Page_Generic *page = parse();
     ::save (pfx + "parsed.txt",
             page ? page->toString() : "NULL");
 }

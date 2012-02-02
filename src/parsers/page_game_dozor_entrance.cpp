@@ -34,9 +34,15 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     }
 
     _scaryForm = groups[2];
-    scary_auto_price = dottedInt(
-                _scaryForm.findFirst("SPAN[class=price_num]")
-                .toPlainText());
+    QWebElement t = _scaryForm.findFirst("SPAN.js_timer");
+    if (t.isNull()) {
+        scary_auto_price = dottedInt(
+                    _scaryForm.findFirst("SPAN[class=price_num]")
+                    .toPlainText());
+    } else {
+        scary_auto_price = -1;
+        scary_cooldown.assign(t);
+    }
 
 
 }
@@ -48,6 +54,11 @@ QString Page_Game_Dozor_Entrance::toString (const QString& pfx) const
             pfx + Page_Game::toString (pfx + "   ") + "\n" +
             pfx + "dozor_price: " + QString::number(dozor_price) + "\n" +
             pfx + "dozor_left10: " + QString::number(dozor_left10) + "\n" +
+            pfx + "scary cooldown: " +
+            (scary_cooldown.active()
+             ? scary_cooldown.toString()
+             : QString("inactive")) + "\n" +
+            pfx + "scary_auto_price: " + QString::number(scary_auto_price) + "\n" +
             pfx + "}";
 }
 
@@ -110,8 +121,12 @@ bool Page_Game_Dozor_Entrance::doScarySearch(int ix) {
         qCritical("scaryForm is null!");
         return false;
     }
+    if (scary_cooldown.active()) {
+        qCritical("scary_cooldown is active!");
+        return false;
+    }
     QWebElementCollection forms = _scaryForm.findAll("FORM");
-    Q_ASSERT(forms.count() != 2);
+    Q_ASSERT(forms.count() == 2);
 
     if (ix == 0) { // ищем автоматом за золото
         if (gold < scary_auto_price) {

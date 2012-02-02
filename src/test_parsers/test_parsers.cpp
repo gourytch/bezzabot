@@ -29,21 +29,25 @@ int main (int argc, char ** argv) {
     QApplication dummy(argc, argv);
     Config::global();
 
-    test(Config::appDirPath() + "/TEST.xml");
-    return 0;
-
     if (argc == 1) {
-        QDir dir (Config::appDirPath() + "../../../bezzabot.samples");
-        QStringList filters;
-        filters << "*.xml";
-        dir = QDir(dir.absolutePath ());
-        cout << "parse " << qPrintable(dir.absolutePath () + filters [0]) << endl;
-        QStringList fnames = dir.entryList (filters);
-        foreach (QString fname, fnames)
-        {
-            test(dir.absolutePath () + "/" + fname);
-        }
+        test(Config::appDirPath() + "/TEST.xml");
+        return 0;
     } else {
+
+//    }
+
+//    if (argc == 1) {
+//        QDir dir (Config::appDirPath() + "../../../bezzabot.samples");
+//        QStringList filters;
+//        filters << "*.xml";
+//        dir = QDir(dir.absolutePath ());
+//        cout << "parse " << qPrintable(dir.absolutePath () + filters [0]) << endl;
+//        QStringList fnames = dir.entryList (filters);
+//        foreach (QString fname, fnames)
+//        {
+//            test(dir.absolutePath () + "/" + fname);
+//        }
+//    } else {
         for (int i = 1; i < argc; ++i) {
             QString fname = argv[i];
             test(fname);

@@ -33,6 +33,9 @@ public:
 
     static bool fit(const QWebElement& doc);
 
+    bool doAttack();
+
+    bool doFlee();
 };
 
 #endif // PAGE_GAME_DOZOR_GOTVICTIM_H

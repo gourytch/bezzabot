@@ -136,6 +136,10 @@ void PageTimer::assign (const QWebElement &e)
         title = e.attribute("title");
         href = e.findFirst("A").attribute("href");
         parseTimerSpan (e.findFirst ("SPAN"), &pit, &hms);
+    } else if (e.tagName() == "SPAN") {
+        title = "";
+        href = "";
+        parseTimerSpan (e, &pit, &hms);
     }
     adjust();
 }

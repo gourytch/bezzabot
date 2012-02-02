@@ -18,6 +18,7 @@
 #include "workfieldsopening.h"
 #include "workclangiving.h"
 #include "workfarming.h"
+#include "workscaryfighting.h"
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent) // QThread
@@ -597,6 +598,7 @@ void Bot::initWorks() {
     _worklist.append(new WorkMining(this));
     _worklist.append(new WorkFieldsOpening(this));
     _worklist.append(new WorkFarming(this));
+    _worklist.append(new WorkScaryFighting(this));
 
     _secworklist.append(new WorkFishing(this));
     _secworklist.append(new WorkClanGiving(this));
@@ -649,13 +651,26 @@ void Bot::fillNextQ() {
     }
 
     QString s;
-
+    if (_workcycle_debug2) {
+        qDebug("заполяем очередь задач");
+    }
     while (!desk.empty()) {
-        int ix = qrand() % desk.size();
+//        int ix = qrand() % desk.size();
+        int ix = 0;
         Work *p = desk[ix];
         desk.remove(ix);
+        if (_workcycle_debug2) {
+            qDebug(QString("работа %1:%2,%3")
+                   .arg(p->getWorkName())
+                   .arg(p->isEnabled() ? "enabled" : "disabled")
+                   .arg(p->isActive() ? "active" : "inactive"));
+        }
+
         if (p->isEnabled()) {
             _nextq.append(p);
+            if (_workcycle_debug2) {
+                qDebug("... добавили");
+            }
             if (!s.isEmpty()) {
                 s += " ";
             }

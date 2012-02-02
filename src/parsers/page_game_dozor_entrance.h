@@ -20,7 +20,7 @@ public:
     int dozor_price;
     int dozor_left10;
     int scary_auto_price;
-    QDateTime scary_cooldown;
+    PageTimer scary_cooldown;
 
     Page_Game_Dozor_Entrance (QWebElement& doc);
 
