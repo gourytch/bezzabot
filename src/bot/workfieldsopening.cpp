@@ -132,14 +132,13 @@ bool WorkFieldsOpening::processQuery(Query query) {
     switch (query) {
     case CanStartWork:
     {
-        if (hasWork()) {
-            if (isMyWork()) {
-                qDebug("мы уже на нашей работе. подхватим её");
-                return true;
-            } else {
-                qDebug("мы на какой-то работе, открывать полянки не можем");
-                return false;
-            }
+        if (isMyWork()) {
+            qDebug("мы уже открываем полянки. подхватим работу");
+            return true;
+        }
+        if (isNotMyWork()) {
+            qDebug("мы на какой-то работе, открывать полянки не можем");
+            return false;
         }
         if (_bot->state.smalltickets_remains == 0 &&
             _bot->state.bigtickets_remains == 0) { // нет билетиков
