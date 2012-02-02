@@ -385,6 +385,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         int tsys = timer_system.hms;
         int thrs = sysStart.secsTo(dayStart);
         PageTimer::systime_delta = thrs + tloc - tsys;
+/*
         qDebug(QString("daystart = %1 = %2")
                .arg(dayStart.toString("yyyy-MM-dd hh:mm:ss"))
                .arg(dayStart.toTime_t()));
@@ -394,7 +395,8 @@ Page_Game::Page_Game (QWebElement& doc) :
         qDebug("tloc = %d", tloc);
         qDebug("tsys = %d", tsys);
         qDebug("thrs = %d", thrs);
-        qDebug("systime_delta = %d", PageTimer::systime_delta);
+*/
+        qDebug("systime_delta = %d sec", PageTimer::systime_delta);
     }
 
     e = doc.findFirst("DIV[id=rmenu1] DIV[class=timers]");

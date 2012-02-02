@@ -14,14 +14,14 @@ Page_Game_Mine_Main::Page_Game_Mine_Main (QWebElement& doc) : Page_Game(doc) {
             _linkSmall = tds[0].findFirst("A");
             _linkBig = tds[1].findFirst("A");
             QRegExp rx("(\\d+)");
-            if (rx.indexIn(tds[0].toPlainText())) {
+            if (rx.indexIn(tds[0].toPlainText()) != -1) {
                 num_smalltickets = rx.cap(1).toInt();
             } else {
                 qCritical(tds[0].toOuterXml() +
                           " gave unparseable {" +
                           tds[0].toPlainText() + "}");
             }
-            if (rx.indexIn(tds[1].toPlainText())) {
+            if (rx.indexIn(tds[1].toPlainText()) != -1) {
                 num_bigtickets = rx.cap(1).toInt();
             } else {
                 qCritical(tds[1].toOuterXml() +
