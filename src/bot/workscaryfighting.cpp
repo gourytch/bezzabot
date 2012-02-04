@@ -69,27 +69,28 @@ bool WorkScaryFighting::processPage(const Page_Game *gpage) {
             setAwaiting();
             return false;
         }
-        qCritical("... пошли искать. ждём, когда найдём");
+        qDebug("... пошли искать. ждём, когда найдём");
         setAwaiting();
         return true;
     }
     if (gpage->pagekind == page_Game_Dozor_GotVictim) {
         Page_Game_Dozor_GotVictim *p = (Page_Game_Dozor_GotVictim *)gpage;
-        qDebug("на кого-то наткнулись. нападаем безальтернативно");
+        qWarning(u8("наткнулись на %1. нападаем.").arg(p->getName()));
         if (!p->doAttack()) {
             qCritical("не смогли напасть!");
             _bot->GoTo();
             setAwaiting();
             return false;
         }
-        qDebug("вроде нападаем. ждём результатов");
+        qDebug("напали. ждём результатов");
         setAwaiting();
         return true;
     }
     if (gpage->pagekind == page_Game_Fight_Log) {
+        Page_Game_Fight_Log *p = (Page_Game_Fight_Log *)gpage;
+        qWarning("подрались. " + p->results());
         _cooldown = QDateTime::currentDateTime().addSecs(15 * 60 + (qrand() % 60));
-        qDebug("побились. заканчиваем. выставили откат на "
-               + ::toString(_cooldown));
+        qDebug("заканчиваем. выставили откат на " + ::toString(_cooldown));
         return true;
 
     }

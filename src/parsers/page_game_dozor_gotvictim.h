@@ -11,6 +11,8 @@ class Page_Game_Dozor_GotVictim : public Page_Game
 
 public:
 
+    QString name;
+    QString img_name;
     bool    is_scary;
     int     level;
     int     power;
@@ -32,6 +34,8 @@ public:
     virtual QString toString (const QString& pfx = QString ()) const;
 
     static bool fit(const QWebElement& doc);
+
+    QString getName() const;
 
     bool doAttack();
 

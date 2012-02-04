@@ -18,6 +18,12 @@ Page_Game_Dozor_GotVictim::Page_Game_Dozor_GotVictim (QWebElement& doc) :
     QWebElement tab = document.findFirst("TABLE.attack");
     QString img = tab.findFirst("TD[style]").attribute("style");
     is_scary = (img.indexOf("/monster/") > -1);
+    if (is_scary) {
+        QRegExp rx("/(.*)\\.jpg");
+        if (rx.indexIn(img) != -1) {
+            img_name = rx.cap(1);
+        }
+    }
     level       = -1;
     power       = -1;
     block       = -1;
@@ -59,7 +65,9 @@ QString Page_Game_Dozor_GotVictim::toString (const QString& pfx) const
     return "Page_Game_Dozor_GotVictim {\n" +
 
             pfx + Page_Game::toString (pfx + "   ") + "\n" +
-            pfx + "VICTIM: " + (is_scary ? "MONSTER" : "PLAYER") + "\n" +
+            pfx + QString("VICTIM: %1 %2\n")
+            .arg(is_scary ? "MONSTER" : "PLAYER")
+            .arg(getName()) +
             pfx + QString("   level     : %1\n").arg(level) +
             pfx + QString("   power     : %1\n").arg(power) +
             pfx + QString("   block     : %1\n").arg(block) +
@@ -69,6 +77,12 @@ QString Page_Game_Dozor_GotVictim::toString (const QString& pfx) const
             pfx + "}";
 }
 
+QString Page_Game_Dozor_GotVictim::getName() const {
+    if (is_scary) {
+        return img_name;
+    }
+    return name;
+}
 //static
 bool Page_Game_Dozor_GotVictim::fit(const QWebElement& doc) {
 //    qDebug("* CHECK Page_Game_Dozor_GotVictim");
