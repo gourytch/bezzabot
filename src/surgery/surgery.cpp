@@ -1,5 +1,6 @@
 #include <QtGui/QApplication>
-
+#include<QIODevice>
+#include <QFile>
 #include <QDir>
 #include <QDebug>
 #include <QString>
@@ -42,6 +43,67 @@ void dbgout() {
     qDebug() << QString("10.arg=%1").arg(u8("русские буквы в QString::arg(QString)"));
 }
 
+void parseLoot(const QString& s) {
+    QRegExp rx(u8("<span\\s*[^>]*>([^<]+)</span><span\\s*[^>]*>получил\\s*(.*)"));
+    if (rx.indexIn(s) == -1) {
+        qCritical("parseLoot: regexp does not match");
+        return;
+    }
+
+    QString name = rx.cap(1).trimmed();
+    QString loot = rx.cap(2).trimmed().replace("&nbsp;", " ");
+    qDebug("winner : " + name);
+    QRegExp rx_gold(u8("^<span\\s+class=\"price_num\">\\s*([0123456789.]+)\\s*</span>"
+                "\\s*<b [^>]+title=\"(Золото)\">\\s*</b>\\s*(.*)$"));
+    QRegExp rx_res(u8("^([0123456789.]+)\\s*<b [^>]+title=.([^>]+).>"
+                      "\\s*</b>\\s*(.*)$"));
+
+
+    int amount;
+    QString title;
+
+    while (loot.length() > 0) {
+        loot = loot.trimmed();
+        if (rx_gold.indexIn(loot) != -1) {
+            amount = dottedInt(rx_gold.cap(1));
+            title = rx_gold.cap(2).trimmed();
+            loot = rx_gold.cap(3);
+            qDebug(u8("%1:%2").arg(title).arg(amount));
+            continue;
+        }
+
+        if (rx_res.indexIn(loot) != -1) {
+            amount = dottedInt(rx_res.cap(1));
+            title = rx_res.cap(2).trimmed();
+            loot = rx_res.cap(3);
+            qDebug(u8("%1:%2").arg(title).arg(amount));
+            continue;
+        }
+
+        if (loot == "</span></td>") {
+            break;
+        }
+
+        qCritical(u8("строка не подходит: {%1}").arg(loot));
+        break;
+    }
+}
+
+void testLootParser() {
+    QFile f("loot.txt");
+    if (!f.open(QIODevice::ReadOnly)) {
+        qFatal("loot.txt not opened");
+        return;
+    }
+    QString s;
+    while (!f.atEnd()) {
+        s = f.readLine();
+        qDebug(u8("test %1").arg(s));
+        parseLoot(s);
+    }
+    f.close();
+}
+
 int main (int argc, char ** argv) {
     QApplication app(argc, argv);
 
@@ -49,16 +111,19 @@ int main (int argc, char ** argv) {
 //    QTextCodec::setCodecForCStrings(codec);
 //    QTextCodec::setCodecForTr(codec);
 //    QTextCodec::setCodecForLocale(codec);
-    QRegExp rx("/([^/]+)\\.jpg");
-    rx.indexIn("background:url(http://i.botva.ru/images/monster/NY/m1_gb.jpg) no-repeat;width:190px;height:240px;");
-    qDebug("{" + rx.cap(1) + "}");
+//    QRegExp rx("/([^/]+)\\.jpg");
+//    rx.indexIn("background:url(http://i.botva.ru/images/monster/NY/m1_gb.jpg) no-repeat;width:190px;height:240px;");
+//    qDebug("{" + rx.cap(1) + "}");
+//    return 0;
+
+//    dbgout();
+    Config::global();
+    testLootParser();
     return 0;
 
-    dbgout();
-    Config::global();
-    dbgout();
+//    dbgout();
     Logger::global();
-    dbgout();
+//    dbgout();
 /**/
     qDebug("initialize window");
     AppWindow w;

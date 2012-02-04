@@ -31,17 +31,19 @@ Page_Game_Fight_Log::Page_Game_Fight_Log(QWebElement& doc) :
             winner = e.toPlainText().trimmed();
 
 //            qDebug("E=" + e.toOuterXml());
-            foreach (QWebElement p, td[1].findAll("SPAN.price_num")) {
-//                qDebug("P=" + p.toOuterXml());
-                int count = dottedInt(p.toPlainText());
-                QString name = p.nextSibling().attribute("title");
-//                qDebug(QString("COUNT={%1}, name={%2}").arg(count).arg(name));
-                if (name.isNull()) {
-                    qDebug("MISSING CURRENCY IN " + e.toOuterXml());
-                    break;
-                }
-                loot[name] = count;
-            }
+            QString loot_text = td[1].firstChild().nextSibling().toInnerXml();
+            parseLoot(loot_text);
+//            QRegExp rx(u8(".*получил [^>]>");
+//            loot_text.indexOf()
+//            foreach (QWebElement p, All()) {
+//                int count = dottedInt(p.toPlainText());
+//                QString name = p.nextSibling().attribute("title");
+//                if (name.isNull()) {
+//                    qDebug("MISSING CURRENCY IN " + e.toOuterXml());
+//                    break;
+//                }
+//                loot[name] = count;
+//            }
         }
     }
 }
@@ -79,3 +81,48 @@ QString Page_Game_Fight_Log::results() const {
     return s;
 }
 
+void Page_Game_Fight_Log::parseLoot(const QString& s) {
+    QRegExp rx(u8("<span\\s*[^>]*>([^<]+)</span><span\\s*[^>]*>получил\\s*(.*)"));
+    if (rx.indexIn(s) == -1) {
+        qCritical("parseLoot: regexp does not match");
+        return;
+    }
+
+    loot.clear();
+    winner = rx.cap(1).trimmed();
+    QString txt = rx.cap(2).trimmed().replace("&nbsp;", " ");
+
+    QRegExp rx_gold(u8("^<span\\s+class=\"price_num\">\\s*([0123456789.]+)\\s*</span>"
+                "\\s*<b [^>]+title=\"(Золото)\">\\s*</b>\\s*(.*)$"));
+    QRegExp rx_res(u8("^([0123456789.]+)\\s*<b [^>]+title=.([^>]+).>"
+                      "\\s*</b>\\s*(.*)$"));
+
+    int amount;
+    QString title;
+
+    while (txt.length() > 0) {
+        txt = txt.trimmed();
+        if (rx_gold.indexIn(txt) != -1) {
+            amount = dottedInt(rx_gold.cap(1));
+            title = rx_gold.cap(2).trimmed();
+            txt = rx_gold.cap(3);
+            loot[title] = amount;
+            continue;
+        }
+
+        if (rx_res.indexIn(txt) != -1) {
+            amount = dottedInt(rx_res.cap(1));
+            title = rx_res.cap(2).trimmed();
+            txt = rx_res.cap(3);
+            loot[title] = amount;
+            continue;
+        }
+
+        if (txt == "</span></td>") {
+            break;
+        }
+
+        qCritical(u8("строка не подходит: {%1}").arg(txt));
+        break;
+    }
+}

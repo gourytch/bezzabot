@@ -9,6 +9,10 @@ class Page_Game_Fight_Log : public Page_Game
 {
     Q_OBJECT
 
+protected:
+
+    void parseLoot(const QString& s);
+
 public:
 
     QString winner;
@@ -21,6 +25,7 @@ public:
     static bool fit(const QWebElement& doc);
 
     QString results() const;
+
 
 };
 
