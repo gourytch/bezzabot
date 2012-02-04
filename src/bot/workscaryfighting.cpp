@@ -75,7 +75,7 @@ bool WorkScaryFighting::processPage(const Page_Game *gpage) {
     }
     if (gpage->pagekind == page_Game_Dozor_GotVictim) {
         Page_Game_Dozor_GotVictim *p = (Page_Game_Dozor_GotVictim *)gpage;
-        qWarning(u8("наткнулись на %1. нападаем.").arg(p->getName()));
+        qWarning(u8("противник: %1. нападаем.").arg(p->getName()));
         if (!p->doAttack()) {
             qCritical("не смогли напасть!");
             _bot->GoTo();

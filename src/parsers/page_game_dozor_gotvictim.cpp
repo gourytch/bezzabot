@@ -78,9 +78,21 @@ QString Page_Game_Dozor_GotVictim::toString (const QString& pfx) const
 }
 
 QString Page_Game_Dozor_GotVictim::getName() const {
-    if (is_scary) {
-        return img_name;
+    static QMap<QString, QString> scareNames;
+    if (scareNames.empty()) {
+        scareNames["m1_ga"] = "Волосапчатый Йожик";
+        scareNames["m1_cd"] = "Лягушница Квакушница";
+        scareNames["m1_gb"] = "Зомбус Крокодилус";
     }
+
+    if (is_scary) {
+        if (scareNames.contains(img_name)) {
+            return scareNames[img_name];
+        } else {
+            return "unknown:" + img_name;
+        }
+    }
+
     return name;
 }
 //static

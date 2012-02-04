@@ -31,7 +31,8 @@ Page_Game_Fight_Log::Page_Game_Fight_Log(QWebElement& doc) :
             winner = e.toPlainText().trimmed();
 
 //            qDebug("E=" + e.toOuterXml());
-            QString loot_text = td[1].firstChild().nextSibling().toInnerXml();
+//            QString loot_text = td[1].firstChild().nextSibling().toInnerXml();
+            QString loot_text = td[1].toOuterXml();
             parseLoot(loot_text);
 //            QRegExp rx(u8(".*получил [^>]>");
 //            loot_text.indexOf()
@@ -84,7 +85,7 @@ QString Page_Game_Fight_Log::results() const {
 void Page_Game_Fight_Log::parseLoot(const QString& s) {
     QRegExp rx(u8("<span\\s*[^>]*>([^<]+)</span><span\\s*[^>]*>получил\\s*(.*)"));
     if (rx.indexIn(s) == -1) {
-        qCritical("parseLoot: regexp does not match");
+        qCritical(u8("parseLoot: not match {%1}").arg(s));
         return;
     }
 
