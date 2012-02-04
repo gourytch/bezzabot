@@ -19,7 +19,7 @@ Page_Game_Dozor_GotVictim::Page_Game_Dozor_GotVictim (QWebElement& doc) :
     QString img = tab.findFirst("TD[style]").attribute("style");
     is_scary = (img.indexOf("/monster/") > -1);
     if (is_scary) {
-        QRegExp rx("/(.*)\\.jpg");
+        QRegExp rx("/([^/]+)\\.jpg");
         if (rx.indexIn(img) != -1) {
             img_name = rx.cap(1);
         }
