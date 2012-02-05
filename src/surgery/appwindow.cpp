@@ -18,7 +18,8 @@ AppWindow::AppWindow(QWidget *parent) :
 //    _baseurl    = QString("http://localhost/");
 
     pWebPage    = new TunedPage();
-    pNetMgr     = new NetManager();
+    pNetMgr     = new NetManager("surgery-{TS}");
+    pNetMgr->setMode(true, true);
     pWebPage->setNetworkAccessManager(pNetMgr);
     QWebSettings *settings = pWebPage->settings ();
     settings->setAttribute (QWebSettings::AutoLoadImages, true);

@@ -67,11 +67,10 @@ WebActor::WebActor(Bot *bot) :
 
 //    _webpage = new QWebPage (this);
     _webpage = new TunedPage (this);
-    if (_debug) {
-        NetManager *manager = new NetManager();
-        manager->setPrefix(QString("%1-").arg(_bot->id()));
-        _webpage->setNetworkAccessManager(manager);
-    }
+
+
+    _webpage->setNetworkAccessManager(new NetManager());
+
     QNetworkAccessManager *manager = _webpage->networkAccessManager();
 
     manager->setCache (_cache);
@@ -99,8 +98,6 @@ WebActor::WebActor(Bot *bot) :
              this, SLOT (onLinkClicked(const QUrl&)));
     connect (_webpage, SIGNAL (downloadRequested (const QNetworkRequest&)),
              this, SLOT (onDownloadRequested(const QNetworkRequest&)));
-    connect(manager, SIGNAL(finished(QNetworkReply*)), this,
-            SLOT(onRequestFinished(QNetworkReply*)));
 }
 
 
@@ -234,26 +231,6 @@ void WebActor::onDownloadRequested (const QNetworkRequest& request)
 {
     qDebug("DOWNLOAD REQUESTED: " + request.url ().toString ());
 
-}
-
-void WebActor::onRequestFinished (QNetworkReply *reply) {
-    if (!_debug) {
-        return;
-    }
-
-    QString s_op;
-    switch (reply->operation()) {
-    case QNetworkAccessManager::GetOperation:
-        s_op = "GET";
-        break;
-    case QNetworkAccessManager::PostOperation:
-        s_op = "POST";
-        break;
-    default:
-        s_op = ::toString(reply->operation());
-        break;
-    }
-    qDebug(u8("NET REPLY ON %1 %2").arg(s_op).arg(reply->url().toString().trimmed()));
 }
 
 void WebActor::savePage ()

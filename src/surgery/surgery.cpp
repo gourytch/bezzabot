@@ -107,29 +107,12 @@ void testLootParser() {
 int main (int argc, char ** argv) {
     QApplication app(argc, argv);
 
-//    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-//    QTextCodec::setCodecForCStrings(codec);
-//    QTextCodec::setCodecForTr(codec);
-//    QTextCodec::setCodecForLocale(codec);
-//    QRegExp rx("/([^/]+)\\.jpg");
-//    rx.indexIn("background:url(http://i.botva.ru/images/monster/NY/m1_gb.jpg) no-repeat;width:190px;height:240px;");
-//    qDebug("{" + rx.cap(1) + "}");
-//    return 0;
-
-//    dbgout();
     Config::global();
-//    testLootParser();
-//    return 0;
-
-//    dbgout();
     Logger::global();
-//    dbgout();
-/**/
     qDebug("initialize window");
     AppWindow w;
     w.show();
     qDebug("execute application");
     return app.exec();
-/**/
     return 0;
 }

@@ -75,8 +75,6 @@ protected slots:
 
     void onPageStarted ();
 
-    void onRequestFinished (QNetworkReply *reply);
-
     void onPageFinished (bool ok);
 
     void onLinkClicked (const QUrl& url);
