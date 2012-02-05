@@ -1,5 +1,6 @@
 #include "netmanager.h"
 #include <QFile>
+#include <QBuffer>
 #include <QDir>
 #include <QDateTime>
 #include <QTextStream>
@@ -18,6 +19,30 @@ ECASE(QNetworkAccessManager::PutOperation)
 ECASE(QNetworkAccessManager::PostOperation)
 ECASE(QNetworkAccessManager::DeleteOperation)
 EEND
+
+#if 1
+QNetworkReply *NetManager::createRequest(
+        Operation op,
+        const QNetworkRequest &req,
+        QIODevice *outgoingData) {
+    QString s_op;
+    switch (op) {
+    case GetOperation:
+        s_op = "GET";
+        break;
+    case PostOperation:
+        s_op = "POST";
+        break;
+    default:
+        s_op = ::toString(op);
+        break;
+    }
+
+    qDebug(u8("NET REQUEST %1 %2").arg(s_op).arg(req.url().toString().trimmed()));
+    return QNetworkAccessManager::createRequest(op, req, outgoingData);
+}
+
+#else
 
 QNetworkReply *NetManager::createRequest(
         Operation op,
@@ -42,6 +67,9 @@ QNetworkReply *NetManager::createRequest(
         delete f;
     }
 
+    QByteArray  *pData = NULL;
+    QIODevice   *pBuffer = NULL;
+
     if (t) {
         qDebug("NetManager request logged to " + fname);
         (*t) << "TIMERQST: " << QDateTime::currentDateTime()
@@ -54,8 +82,10 @@ QNetworkReply *NetManager::createRequest(
             (*t) << "   {" << h << "} = {" << v << "}\n";
         }
         if (outgoingData) {
-            (*t) << "OUTGOING DATA: " << outgoingData->size() << " OCTETS\n";
-            (*t) << outgoingData->readAll() << "\n";
+            pData = new QByteArray(outgoingData->readAll());
+            pBuffer = new QBuffer(pData, this);
+            (*t) << "OUTGOING DATA: " << pData->count() << " OCTETS\n";
+            (*t) << pData->constBegin() << "\n";
         } else {
             (*t) << "NO OUTGOING DATA\n";
         }
@@ -67,7 +97,17 @@ QNetworkReply *NetManager::createRequest(
     }
 
     QNetworkReply *reply = QNetworkAccessManager::createRequest(
-                op, req, outgoingData);
+                op, req, pBuffer ? pBuffer : outgoingData);
+
+    if (pBuffer) {
+        delete pBuffer;
+        pBuffer = NULL;
+    }
+    if (pData) {
+        delete pData;
+        pData = NULL;
+    }
+
     if (t) {
         (*t) << "TIME: " << QDateTime::currentDateTime()
                 .toString("yyyy-MM-dd hh:mm:ss.zzz") << "\n";
@@ -85,3 +125,4 @@ QNetworkReply *NetManager::createRequest(
     }
     return reply;
 }
+#endif

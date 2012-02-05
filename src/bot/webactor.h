@@ -7,6 +7,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkProxy>
 #include <QNetworkRequest>
+#include <QNetworkReply>
 #include "parsers/page_generic.h"
 
 class Bot;
@@ -20,6 +21,7 @@ private:
     static int _count;
 
 protected:
+    bool            _debug;
     bool            _strict;
     QString         _savepath;
     Bot             *_bot;
@@ -72,6 +74,8 @@ public slots:
 protected slots:
 
     void onPageStarted ();
+
+    void onRequestFinished (QNetworkReply *reply);
 
     void onPageFinished (bool ok);
 

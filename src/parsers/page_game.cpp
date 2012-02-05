@@ -648,27 +648,16 @@ bool Page_Game::doClickOnCoulon(quint32 id) {
     foreach (QWebElement a, document.findAll("DIV.coulons A")) {
         if ((quint32)(a.attribute("item_id").toInt()) == id) {
             found = true;
+            delay(500 + (qrand() % 3000), true);
+            qDebug(QString("actuate coulon #%1 (%2)")
+                   .arg(id).arg(a.attribute("title")));
+            actuate(a);
+            return true;
             break;
         }
     }
-    if (!found) {
-        qCritical(QString("coulon #%1 not found").arg(id));
-        return false;
-    }
-    qDebug(QString("ajax-activate coulon #%1").arg(id));
-    delay(500 + (qrand() % 3000), true);
-    QString s = QString(
-                "$.getJSON('ajax.php?m=coulon&item='+%1,"
-                "function(data){"
-                    "if (data.status=='OK'){"
-                        "fixCoulonPack(data.item);"
-                        "if(typeof resetBag == 'function'){resetBag();}"
-                        "return;"
-                    "}"
-                    "showMessage(data.status);"
-                "});").arg(id);
-    document.evaluateJavaScript(s);
-    return true;
+    qCritical(QString("coulon #%1 not found").arg(id));
+    return false;
 }
 
 bool Page_Game::uncagePet(int id) {

@@ -118,8 +118,8 @@ int main (int argc, char ** argv) {
 
 //    dbgout();
     Config::global();
-    testLootParser();
-    return 0;
+//    testLootParser();
+//    return 0;
 
 //    dbgout();
     Logger::global();

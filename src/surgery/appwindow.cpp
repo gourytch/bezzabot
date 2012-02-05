@@ -18,7 +18,8 @@ AppWindow::AppWindow(QWidget *parent) :
 //    _baseurl    = QString("http://localhost/");
 
     pWebPage    = new TunedPage();
-    //QNetworkAccessManager *manager = pWebPage->networkAccessManager();
+    pNetMgr     = new NetManager();
+    pWebPage->setNetworkAccessManager(pNetMgr);
     QWebSettings *settings = pWebPage->settings ();
     settings->setAttribute (QWebSettings::AutoLoadImages, true);
 //    settings->setAttribute (QWebSettings::AutoLoadImages, false);
@@ -71,6 +72,10 @@ AppWindow::AppWindow(QWidget *parent) :
 
     connect(pHeal, SIGNAL(clicked()), this, SLOT(slotHeal()));
     connect(pTest1, SIGNAL(clicked()), this, SLOT(slotTest1()));
+
+    connect(pWebPage->networkAccessManager(),
+            SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(slotGotReply(QNetworkReply*)));
 
     qDebug("ready");
     pWebView->load(QUrl(_baseurl));
@@ -206,8 +211,12 @@ bool AppWindow::checkGame() {
         qWarning("no coulonbar");
         return false;
     }
-
     return true;
 }
 
+void AppWindow::slotGotReply(QNetworkReply *reply) {
+    qDebug(u8("got network reply: ") + ::toString(reply->operation()));
+    qDebug(u8("              url: ") + reply->url().toString());
+
+}
 

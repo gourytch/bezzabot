@@ -83,6 +83,40 @@ QString Page_Game_Dozor_GotVictim::getName() const {
         scareNames["m1_ga"] = "Волосапчатый Йожик";
         scareNames["m1_cd"] = "Лягушница Квакушница";
         scareNames["m1_gb"] = "Зомбус Крокодилус";
+
+        scareNames["m2_za"] = "Крылатая Наковальница";
+        scareNames["m2_??"] = "Кар Карычус";
+        scareNames["m2_kz"] = "Пугальё";
+
+        scareNames["m3_sk"] = "Свинтус Зомбус";
+        scareNames["m3_??"] = "Барантус Зомбус";
+        scareNames["m3_??"] = "Касперус";
+
+        scareNames["m4_??"] = "Паучог Сногаток";
+        scareNames["m4_??"] = "Двурогая Жижа";
+        scareNames["m4_??"] = "Кротупырь";
+
+        scareNames["m5_??"] = "Жар Курица";
+        scareNames["m5_??"] = "Йобатами";
+        scareNames["m5_??"] = "Чупичапа";
+
+        scareNames["m6_??"] = "Магическая Капикошка";
+        scareNames["m6_??"] = "Слизистый Разноглаз";
+
+        scareNames["m7_??"] = "Пандус Бамбегуби";
+        scareNames["m7_??"] = "Грибок Огребок";
+
+        scareNames["m8_??"] = "Асминогус Одимандия";
+        scareNames["m8_??"] = "Змеюка Злюка";
+
+        scareNames["m9_??"] = "Древо Злобы";
+        scareNames["m9_??"] = "Бабушка Жубдуба";
+
+        scareNames["m20_??"] = "Коварный Манаглот";
+        scareNames["m20_??"] = "Генералус тьмы Челюсти";
+
+        scareNames["m50_??"] = "Каменный Големус";
+        scareNames["m50_??"] = "Смертушка";
     }
 
     if (is_scary) {

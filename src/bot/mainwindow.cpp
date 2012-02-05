@@ -35,6 +35,7 @@ MainWindow::MainWindow (QWidget *parent) :
     toggle_on_tray_click    = cfg.get("ui/tray_toggle", false, true).toBool();
     balloon_ttl             = cfg.get("ui/balloon_ttl", false, 3000).toInt();
     balloon_enabled         = cfg.get("ui/balloon_enabled", false, true).toBool();
+    noimages                = cfg.get("ui/noimages", false, false).toBool();
 
     createUI ();
 
@@ -46,6 +47,11 @@ MainWindow::MainWindow (QWidget *parent) :
     createTrayIcon();
     setupWebView ();
     setupConnections();
+
+    if (noimages) {
+        pNoPics->toggle();
+    }
+//    nopicsToggled(noimages);
 }
 
 MainWindow::~MainWindow()
@@ -189,7 +195,6 @@ void MainWindow::setupConnections () {
     connect(pLogger, SIGNAL(signalWarning(QString)), this, SLOT(log(QString)));
     connect(pLogger, SIGNAL(signalCritical(QString)), this, SLOT(log(QString)));
     connect(pLogger, SIGNAL(signalFatal(QString)), this, SLOT(log(QString)));
-
 }
 
 void MainWindow::setupWebView ()

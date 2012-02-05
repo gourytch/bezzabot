@@ -52,6 +52,7 @@ protected:
     bool        toggle_on_tray_click;
     int         balloon_ttl;
     bool        balloon_enabled;
+    bool        noimages;
 
     Bot         *pBot;
     WebActor    *pActor;

@@ -23,7 +23,8 @@ public:
     void setPrefix(const QString& prefix) {
         _prefix = prefix;
     }
-
 };
+
+QString toString(QNetworkAccessManager::Operation v);
 
 #endif // NETMANAGER_H
