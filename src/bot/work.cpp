@@ -86,6 +86,6 @@ void Work::wearOnEnd() {
     quint32 id = _bot->search_coulon_by_name(_wear_on_end);
     if (!_bot->is_need_to_change_coulon(id)) return;
     qDebug(u8("после окончания %1 надеваем %2 (#%3)")
-           .arg(getWorkName()).arg(_wear_on_begin).arg(id));
+           .arg(getWorkName()).arg(_wear_on_end).arg(id));
     _bot->action_wear_right_coulon(id);
 }
