@@ -19,6 +19,8 @@
 #include "parsers/page_game.h"
 #include "botstate.h"
 
+const quint32 NULL_COULON = 0xDEADBEEF;
+
 class Work;
 
 class Bot : public QObject // QThread
@@ -136,9 +138,12 @@ public:
 
     quint32 guess_coulon_to_wear(WorkType work, int seconds);
 
+    quint32 search_coulon_by_name(const QString& name);
+
     bool is_need_to_change_coulon(quint32 id);
 
     bool action_wear_right_coulon(quint32 id);
+
 
 signals:
 

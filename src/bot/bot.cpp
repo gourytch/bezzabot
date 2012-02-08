@@ -548,8 +548,34 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
     return active_id;
 }
 
+quint32 Bot::search_coulon_by_name(const QString& name) {
+    if (name.isNull() || name.isEmpty()) {
+        return NULL_COULON;
+    }
+    int lvl = -1;
+    quint32 id = NULL_COULON;
+    qDebug(u8("ищем кулон «%1»").arg(name));
+    for (int i = 0; i < _gpage->coulons.coulons.count(); ++i) {
+        PageCoulon &k = _gpage->coulons.coulons[i];
+        if (k.name == name && k.cur_lvl > lvl) {
+            id = k.id;
+            lvl = k.cur_lvl;
+        }
+    }
+    if (id == NULL_COULON) {
+        qDebug("вернём NULL");
+    } else {
+        qDebug("вернём #%d (lvl %d)", id, lvl);
+    }
+    return id;
+}
+
 bool Bot::is_need_to_change_coulon(quint32 id) {
     qDebug(u8("проверка необходимости смены кулона на #%1").arg(id));
+    if (id == NULL_COULON) {
+        qDebug(u8("NULL-кулон. оставляем всё как есть"));
+        return false;
+    }
     quint32 aid = 0;
     const PageCoulon *k = _gpage->coulons.active();
     if (k) {
@@ -567,6 +593,10 @@ bool Bot::is_need_to_change_coulon(quint32 id) {
 }
 
 bool Bot::action_wear_right_coulon(quint32 id) {
+    if (id == NULL_COULON) {
+        qDebug(u8("NULL-кулон. не переодеваем его"));
+        return false;
+    }
     qWarning(u8("переодеваем кулон на #%1").arg(id));
     if (id == 0) {
         qDebug(u8("снимаем надетый кулон"));

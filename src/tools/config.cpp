@@ -82,6 +82,7 @@ void Config::init_check ()
             : _location_config + "/" + ini_name;
     qDebug("using config file {"  + _ini_fname + "}");
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
+    _settings->setIniCodec(codec);
     _global = new Config ();
 
     _readonly = _global->get("readonly").toBool();

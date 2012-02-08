@@ -26,6 +26,10 @@ protected:
 
     QString _workLink;
 
+    QString _wear_on_begin;
+
+    QString _wear_on_end;
+
 public:
 
     void gotoWork();
@@ -39,6 +43,10 @@ public:
     bool isNotMyWork() const;
 
     void setAwaiting();
+
+    void wearOnBegin();
+
+    void wearOnEnd();
 
     explicit Work(Bot *bot);
 

@@ -39,6 +39,7 @@ void Bot::one_step () {
                     if (_workcycle_debug2) {
                         qDebug(u8("%1 startable").arg(p->getWorkName()));
                     }
+                    p->wearOnBegin();
                     if (p->processCommand(Work::StartWork)) {
                         if (_workcycle_debug) {
                             qWarning(u8("наша текущая работа: %1").arg(p->getWorkName()));
@@ -47,6 +48,7 @@ void Bot::one_step () {
                         //break;
                         return; // лучше в следующем цикле придём
                     } else {
+                        p->wearOnEnd();
                         if (_workcycle_debug) {
                             qDebug(u8("работа %1 почему-то не запустилась")
                                    .arg(p->getWorkName()));
@@ -119,6 +121,7 @@ void Bot::one_step () {
     _workq.pop_front();
     if (p->isPrimaryWork()) {
         if (_workcycle_debug) {
+            p->wearOnEnd();
             qWarning(u8("закончена работа ") + p->getWorkName());
         }
     } else {
