@@ -36,6 +36,7 @@ MainWindow::MainWindow (QWidget *parent) :
     balloon_ttl             = cfg.get("ui/balloon_ttl", false, 3000).toInt();
     balloon_enabled         = cfg.get("ui/balloon_enabled", false, true).toBool();
     noimages                = cfg.get("ui/noimages", false, false).toBool();
+    history_size            = cfg.get("ui/history_size", false, 1000).toInt();
 
     createUI ();
 
@@ -244,6 +245,14 @@ void MainWindow::log (const QString &text)
     QString tss = QDateTime::currentDateTime().toString("hh:mm:ss");
     if (pLogView) {
         pLogView->append (tss + " " + text);
+        if (history_size > 0 && pLogView->document()->lineCount() > history_size) {
+            do {
+                pLogView->moveCursor(QTextCursor::Start);
+                pLogView->moveCursor(QTextCursor::Down, QTextCursor::KeepAnchor);
+                pLogView->textCursor().removeSelectedText();
+            } while (pLogView->document()->lineCount() > history_size);
+        }
+        pLogView->moveCursor(QTextCursor::End);
     }
     if (pTrayIcon && balloon_enabled && balloon_ttl > 0) {
         pTrayIcon->showMessage(pBot->id(), text,

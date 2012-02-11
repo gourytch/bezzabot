@@ -53,6 +53,7 @@ protected:
     int         balloon_ttl;
     bool        balloon_enabled;
     bool        noimages;
+    int         history_size;
 
     Bot         *pBot;
     WebActor    *pActor;
