@@ -111,8 +111,8 @@ void testTarball() {
         qFatal("tarball not opened");
         return;
     }
-    tarball.add("first.txt", "{this is my first datafile}");
-    tarball.add("second.txt", "{this is my second datafile}");
+    tarball.add("first.txt", QByteArray("{this is my first datafile}"));
+    tarball.add("second.txt", QByteArray("{this is my second datafile}"));
     tarball.close();
 }
 
