@@ -62,6 +62,20 @@ WebActor::WebActor(Bot *bot) :
         }
     }
 
+    _use_tarball = Config::global()
+            .get("connection/use_tarball", false, true).toBool();
+    if (_use_tarball) {
+        QString fname = u8("%1/pages_%2-%3.tar.gz")
+                .arg(_savepath)
+                .arg(_bot->id())
+                .arg(Config::uptime0().toString("yyyyMMdd_hhmmss"));
+        if (_tarball.open(fname)) {
+            qDebug("use %s as storage for pages", qPrintable(fname));
+        } else {
+            qDebug("file storage %s not opened.", qPrintable(fname));
+        }
+    }
+
     _finished = true;
     _success = false;
 
@@ -238,23 +252,28 @@ void WebActor::savePage ()
     QString ts = now ();
     Config::checkDir (_savepath);
     Page_Generic *page = parse();
-    QString pfx = _savepath + "/" + _bot->id() + "-" + ts + "-"
-            + (page ? ::toString(page->pagekind) : u8("NULL")) + "-";
     qDebug("SAVE PAGE TS=" +
            ts + " URL:" +
            _webpage->mainFrame ()->url().toString());
-
-    ::save (pfx + ".url",
-            _webpage->mainFrame ()->url().toString());
-
-    ::save (pfx + "outer.xml",
-            _webpage->mainFrame ()->documentElement ().toOuterXml ());
-//    ::save (pfx + "inner.xml",
-//            _webpage->mainFrame ()->documentElement ().toInnerXml ());
-    ::save (pfx + "text.txt",
-            _webpage->mainFrame ()->documentElement ().toPlainText());
-    ::save (pfx + "parsed.txt",
-            page ? page->toString() : "NULL");
+    if (_tarball.isOpened()) {
+        QString pfx = _bot->id() + "-" + ts + "-"
+                + (page ? ::toString(page->pagekind) : u8("NULL"));
+        _tarball.add(pfx + ".url",
+                     _webpage->mainFrame ()->url().toString());
+        _tarball.add(pfx + ".xml",
+                _webpage->mainFrame ()->documentElement ().toOuterXml ());
+        _tarball.add(pfx + ".txt",
+                page ? page->toString() : QString("NULL"));
+    } else {
+        QString pfx = _savepath + "/" + _bot->id() + "-" + ts + "-"
+                + (page ? ::toString(page->pagekind) : u8("NULL"));
+        ::save (pfx + ".url",
+                _webpage->mainFrame ()->url().toString());
+        ::save (pfx + ".xml",
+                _webpage->mainFrame ()->documentElement ().toOuterXml ());
+        ::save (pfx + ".txt",
+                page ? page->toString() : "NULL");
+    }
 }
 
 

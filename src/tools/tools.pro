@@ -21,7 +21,8 @@ HEADERS += \
     timebomb.h \
     netmanager.h \
     build_id.h \
-    activityhours.h
+    activityhours.h \
+    tarball.h
 
 SOURCES += \
     tools.cpp \
@@ -31,11 +32,14 @@ SOURCES += \
     logger.cpp \
     timebomb.cpp \
     netmanager.cpp \
-    activityhours.cpp
+    activityhours.cpp \
+    tarball.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/lib
+
+
 
 
 

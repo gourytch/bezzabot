@@ -9,6 +9,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include "parsers/page_generic.h"
+#include "tools/tarball.h"
 
 class Bot;
 
@@ -20,9 +21,12 @@ private:
     static QNetworkDiskCache *_cache;
     static int _count;
 
+    Tarball _tarball;
+
 protected:
     bool            _debug;
     bool            _strict;
+    bool            _use_tarball;
     QString         _savepath;
     Bot             *_bot;
     QWebPage        *_webpage;

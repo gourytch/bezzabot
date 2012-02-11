@@ -21,6 +21,17 @@ void save (const QString& fname, const QString& text)
     fout.close();
 }
 
+void save (const QString& fname, const QByteArray& data) {
+    QFile fout (fname);
+    if (!fout.open (QFile::WriteOnly | QFile::Truncate))
+    {
+        qCritical("FILE " + fname + " OPEN ERROR FOR WRITING");
+        return;
+    }
+    fout.write(data);
+    fout.flush();
+    fout.close();
+}
 
 QString load (const QString& fname)
 {

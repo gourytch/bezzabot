@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QSettings>
-
+#include <QDateTime>
 
 #define ORG_DOMAIN  "zhukoid.net"
 #define ORG_NAME    "zhukoid"
@@ -23,6 +23,7 @@ protected:
     static Config*      _global;
     static QSettings*   _settings;
 
+
     static bool     _portable;
     static QString  _app_name;
     static QString  _location_appdir;
@@ -31,6 +32,8 @@ protected:
     static QString  _location_data;
     static QString  _ini_fname;
     static bool     _readonly;
+
+    static QDateTime _uptime0;
 
     Config*     _base;
     QString     _id;
@@ -51,6 +54,9 @@ public:
     virtual ~Config ();
 
     static Config& global ();
+
+    static QDateTime uptime0() {return _uptime0; }
+
 
     static QSettings& settings ()
     {

@@ -24,6 +24,8 @@ QString     Config::_location_data;
 QString     Config::_app_name;
 QString     Config::_ini_fname;
 
+QDateTime Config::_uptime0;
+
 //static
 void Config::init_check ()
 {
@@ -34,6 +36,8 @@ void Config::init_check ()
     {
         throw "UNINITIALIZED APPLICATION";
     }
+
+    _uptime0 = QDateTime::currentDateTime();
 
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QTextCodec::setCodecForCStrings(codec);

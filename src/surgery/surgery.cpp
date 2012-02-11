@@ -9,6 +9,7 @@
 #include "tools/tools.h"
 #include "tools/logger.h"
 #include "tools/activityhours.h"
+#include "tools/tarball.h"
 //#include <QTextCodec>
 
 void ahtest(const char *s) {
@@ -104,11 +105,34 @@ void testLootParser() {
     f.close();
 }
 
+void testTarball() {
+    Tarball tarball;
+    if (!tarball.open("tar_test")) {
+        qFatal("tarball not opened");
+        return;
+    }
+    tarball.add("first.txt", "{this is my first datafile}");
+    tarball.add("second.txt", "{this is my second datafile}");
+    tarball.close();
+}
+
+void testGzip() {
+    QByteArray src("{*0123456789ABCDEF*}");
+    ::save("testGzip_raw", src);
+    ::save("testGzip_compressed", qCompress(src, 9));
+    ::save("testGzip_gziped", gzipFile(src));
+}
+
 int main (int argc, char ** argv) {
     QApplication app(argc, argv);
-
     Config::global();
     Logger::global();
+    //////////////////////////////////////
+    testTarball();
+    testGzip();
+
+    return 0;
+    //////////////////////////////////////
     qDebug("initialize window");
     AppWindow w;
     w.show();

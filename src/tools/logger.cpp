@@ -28,7 +28,8 @@ Logger::Logger(QObject *parent) :
     if (!(_fname.startsWith("/") || _fname.startsWith("./"))) {
         _fname = cfg.dataPath() + "/" + _fname;
     }
-    QDateTime t = QDateTime::currentDateTime();
+//    QDateTime t = QDateTime::currentDateTime();
+    QDateTime t = Config::uptime0();
     _fname = _fname.replace("{TS}", t.toString("yyyyMMdd_hhmmss"))
             .replace("{DATE}", t.toString("yyyyMMdd"));
     _file = new QFile (_fname, this);
