@@ -69,6 +69,7 @@ Bot::Bot(const QString& id, QObject *parent) :
     _regular = true;
     _page = NULL;
     _awaiting = false;
+    _page_busy = false;
 
     reset();
 
@@ -109,6 +110,8 @@ void Bot::reset() {
 
     state.reset();
     _reload_attempt = 0;
+    _page_busy = false;
+    _awaiting = false;
     _workq.clear();
 }
 
@@ -320,7 +323,7 @@ void Bot::step()
     {
         _step_timer.stop();
     }
-    if (!_awaiting && !_actor->busy()) {
+    if (!_awaiting && !_page_busy && !_actor->busy()) {
         ++_step_counter;
 //        qDebug("bot step #%d", _step_counter);
         one_step();

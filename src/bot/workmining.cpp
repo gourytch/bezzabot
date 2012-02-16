@@ -291,9 +291,9 @@ bool WorkMining::processPage(const Page_Game *gpage) {
                 }
             }
 
-            qWarning("входим в забой");
+            qDebug("входим в забой");
             if (p->doStart()) {
-                qWarning("вроде зашли");
+                qWarning("зашли в забой, начинаем копку");
                 setAwaiting();
                 _charmed = false;
                 return true;

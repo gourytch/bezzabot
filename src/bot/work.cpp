@@ -32,6 +32,10 @@ void Work::setAwaiting() {
     _bot->setAwaiting();
 }
 
+void Work::unsetAwaiting() {
+    _bot->unsetAwaiting();
+}
+
 QString Work::getWorkName() const {
     return ::toString(getWorkType());
 }

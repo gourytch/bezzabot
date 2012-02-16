@@ -250,7 +250,7 @@ public:
 
     bool uncagePet(int id);
 
-    bool cagePet(int id);
+    bool cagePet();
 
     bool closePopup();
 };

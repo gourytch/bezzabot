@@ -14,9 +14,12 @@ void Bot::got_page(Page_Game *gpage) {
     if (_workq.empty()) {
         return;
     }
+    _page_busy = true;
     if (_workq.front()->processPage(gpage)) {
+        _page_busy = false;
         return;
     }
+    _page_busy = false;
     popWork();
 }
 

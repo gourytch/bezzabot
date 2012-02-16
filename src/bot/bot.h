@@ -56,8 +56,14 @@ public:
 
     bool _awaiting;
 
+    bool _page_busy;
+
     void setAwaiting() {
         _awaiting = true;
+    }
+
+    void unsetAwaiting() {
+        _awaiting = false;
     }
 
     bool isAFK() const;

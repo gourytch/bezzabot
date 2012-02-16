@@ -12,6 +12,10 @@ class WorkScaryFighting : public Work
 
     int _level;
 
+    int _pet_index;
+
+    bool _save_pet;
+
     QDateTime _cooldown;
 
 public:
@@ -33,6 +37,7 @@ public:
 
     virtual bool processCommand(Command command);
 
+    void checkPet();
 };
 
 #endif // WORKSCARYFIGHTING_H

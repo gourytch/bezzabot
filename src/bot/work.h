@@ -44,6 +44,8 @@ public:
 
     void setAwaiting();
 
+    void unsetAwaiting();
+
     void wearOnBegin();
 
     void wearOnEnd();

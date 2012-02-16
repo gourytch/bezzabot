@@ -93,10 +93,11 @@ void Page_Generic::slot_submit() {
 void Page_Generic::delay(int ms, bool exclusive) {
     QTime time;
     qDebug("DELAY %d MS ...", ms);
+    QEventLoop loop;
     time.start();
     while (time.elapsed() < ms) {
         if (!exclusive) {
-            qApp->processEvents();
+            loop.processEvents(QEventLoop::ExcludeUserInputEvents);
         }
     }
     qDebug("CONTINUE EXECUTION");
