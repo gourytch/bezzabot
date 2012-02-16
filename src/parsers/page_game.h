@@ -155,6 +155,54 @@ struct PetInfo {
 
 typedef QVector<PetInfo> PetList;
 
+enum FlyingKind {
+    flying_Manticore,
+    flying_Draco,
+    flying_Grifan,
+    flying_Ponny
+};
+
+QString toString(FlyingKind v);
+
+struct FlyingInfo {
+    QString href;
+    QString icon;
+    QString title;
+
+    bool is_egg;
+    int condition;
+    int cleanings_performed;
+    int cleanings_total;
+    PageTimer cleanings_cooldown;
+
+    int feed;
+    int hits;
+    int gold;
+
+    bool in_journey;
+    PageTimer journey_cooldown;
+    bool boxgame;
+
+    void init() {
+        href    = QString();
+        icon    = QString();
+        title   = QString();
+        is_egg  = false;
+        condition           = -1;
+        cleanings_performed = -1;
+        cleanings_total     = -1;
+        cleanings_cooldown.pit = QDateTime();
+        feed    = -1;
+        hits    = -1;
+        gold    = -1;
+        in_journey  = false;
+        journey_cooldown.pit = QDateTime();
+        boxgame     = false;
+    }
+};
+
+typedef QVector<FlyingInfo> FlyingsList;
+
 class Page_Game : public Page_Generic
 {
     Q_OBJECT
@@ -184,6 +232,7 @@ public:
     PageResources   resources;
     PageCoulons     coulons;
     PetList     petlist;
+    FlyingsList flyingslist;
 
     QWebElement body;
 

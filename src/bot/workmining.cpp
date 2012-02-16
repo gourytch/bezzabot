@@ -410,7 +410,8 @@ bool WorkMining::processPage(const Page_Game *gpage) {
         } // end case DigReady
 
         default:
-            qFatal("UNREACHABLE POINT %s:%d", __FILE__, __LINE__);
+            qFatal("UNREACHABLE POINT %s:%d, digstage=%s",
+                   __FILE__, __LINE__, qPrintable(::toString(p->digstage)));
             return false; // мы сюда попасть не должны никогда
 
         } // end switch p->digstage

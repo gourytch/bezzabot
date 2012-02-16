@@ -28,6 +28,13 @@ ECASE(pet_RedWorm)
 ECASE(pet_Fox)
 EEND
 
+ESTART(FlyingKind)
+ECASE(flying_Manticore)
+ECASE(flying_Draco)
+ECASE(flying_Grifan)
+ECASE(flying_Ponny)
+EEND
+
 bool parseTimerSpan (const QWebElement& e, QDateTime *pit, int *hms)
 {
     if (pit)
@@ -514,8 +521,51 @@ Page_Game::Page_Game (QWebElement& doc) :
 
     coulons.assign(document.findFirst("DIV[id=coulons_bar]"));
 
-}
+    // летучки
+    e = accordion.findFirst("DIV.flyings");
+    if (!e.isNull()) {
+        FlyingInfo info;
+        foreach (QWebElement div_title, e.findAll("DIV.title")) {
+        // 1.title
+            QWebElement a = div_title.firstChild();
+            if (a.isNull() || a.tagName() != "A") continue;
+            info.href = a.attribute("href");
+            QWebElement b = a.firstChild();
+            info.title = b.attribute("title");
+            info.icon = b.attribute("class").split(" ")[1]; // FIXME
+        // 2. content
+            QWebElement div_content = div_title.nextSibling();
+            if (div_content.tagName() != "DIV") continue;
+            if (div_content.attribute("class") != "content") continue;
+            info.init();
+            if (info.title.startsWith(u8("Яйцо"))) {
+                info.is_egg = true;
+            } else {
+                foreach (a, div_content.findAll("A")) {
+                    QString text = e.toPlainText().trimmed().replace("%", "");
+                    if (text == "Большое приключение") {
+                        info.in_journey = true;
+                        b = a.findFirst("SPAN.js_timer");
+                        info.journey_cooldown.assign(b);
+                    } else {
+                        b = a.firstChild();
+                        if (b.isNull()) continue;
+                        QString title = b.attribute("title");
+                        if (title == u8("Здоровье")) {
+                            info.hits = text.toInt();
+                        } else if (title == u8("Сытость зверушки")) {
+                            info.feed = text.toInt();
+                        } else if (title == u8("Золото")) {
+                            info.gold = dottedInt(text);
+                        }
+                    }
+                }
+            }
+            flyingslist.append(info);
+        }
+    }
 
+}
 
 QString toString(const QString& pfx, const PageResource& r) {
     return pfx + QString("{id=%1, count=%2, href=%3, title=%4}")
@@ -550,6 +600,33 @@ QString toString(const QString& pfx, const PetList& petlist) {
     return ret;
 }
 
+QString toString(const FlyingInfo& info) {
+    QString ret = u8("{%1, %2 state ").arg(info.title, info.icon);
+    if (info.is_egg) {
+        ret += "EGG";
+    } else if (info.boxgame) {
+        ret += u8("BOXGAME");
+    } else if (info.in_journey) {
+        ret += u8("JOURNEY till %1").arg(::toString(info.journey_cooldown.pit));
+    } else {
+        ret += u8("RESTING, feed=%1% hits=%2% gold=%3")
+                .arg(info.feed)
+                .arg(info.hits)
+                .arg(info.gold);
+    }
+    ret += "}\n";
+    return ret;
+}
+
+QString toString(const QString& pfx, const FlyingsList& list) {
+    QString ret = "Flyings {\n";
+    foreach(const FlyingInfo info, list) {
+        ret += pfx + "   " + toString(info);
+    }
+    ret += pfx + "}\n";
+    return ret;
+}
+
 QString Page_Game::toString (const QString& pfx) const
 {
 
@@ -581,6 +658,8 @@ QString Page_Game::toString (const QString& pfx) const
             pfx + coulons.toString(pfx + "   ") + "\n" +
             pfx + QString("pets:\n") +
             pfx + ::toString(pfx + "   ", petlist) +
+            pfx + QString("flyings:\n") +
+            pfx + ::toString(pfx + "   ", flyingslist) +
             pfx + "}";
 }
 
