@@ -13,5 +13,6 @@ MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/bin
 
 INCLUDEPATH += $$TOP/src
-LIBS += -L$$TOP/lib -lparsers
+LIBS += -L$$TOP/lib -ltools -lparsers
+PRE_TARGETDEPS += $$TOP/lib/libtools.a $$TOP/lib/libparsers.a
 

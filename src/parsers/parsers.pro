@@ -57,7 +57,8 @@ MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/lib
 
 INCLUDEPATH += $$TOP/src
-LIBS += -L$$TOP/lib -lparsers -ltools
+LIBS += -L$$TOP/lib -ltools
+PRE_TARGETDEPS += $$TOP/lib/libtools.a
 
 win32 {
   CONFIG -= debug

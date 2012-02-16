@@ -48,6 +48,7 @@ HEADERS  += \
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
+PRE_TARGETDEPS += $$TOP/lib/libtools.a $$TOP/lib/libparsers.a
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
