@@ -813,6 +813,30 @@ bool Page_Game::waitForPopup(int ms) {
     return false;
 }
 
+bool Page_Game::waitForPopupClosed(int ms) {
+    if (document.findFirst("A.ui-dialog-titlebar-close").isNull()) {
+        qDebug("check for popup closed is success");
+        return true;
+    }
+
+    if (ms <= 0) {
+        ms = 5000 + (qrand() % 5000);
+    }
+    qDebug("awaiting for popup close with %d ms timeout", ms);
+    QTime time;
+    QEventLoop loop;
+    time.start();
+    while (time.elapsed() < ms) {
+        loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+        if (document.findFirst("A.ui-dialog-titlebar-close").isNull()) {
+            qDebug("popup was closed after %d ms", time.elapsed());
+            return true;
+        }
+    }
+    qDebug("popup timeout. seems still on page =(");
+    return false;
+}
+
 bool Page_Game::closePopup() {
     QWebElement btn = document.findFirst("A.ui-dialog-titlebar-close");
     if (btn.isNull()) {
@@ -821,6 +845,6 @@ bool Page_Game::closePopup() {
     }
     qDebug("actuate close popup button");
     actuate(btn);
-    delay(1000 + (qrand() % 2000), false);
+    waitForPopupClosed();
     return true;
 }

@@ -254,6 +254,8 @@ public:
 
     bool waitForPopup(int ms = -1);
 
+    bool waitForPopupClosed(int ms = -1);
+
     bool closePopup();
 };
 
