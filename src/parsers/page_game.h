@@ -252,6 +252,8 @@ public:
 
     bool cagePet();
 
+    bool waitForPopup(int ms = -1);
+
     bool closePopup();
 };
 

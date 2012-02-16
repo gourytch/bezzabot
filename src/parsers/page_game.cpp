@@ -1,3 +1,4 @@
+#include <QEventLoop>
 #include <QWebElement>
 #include <QWebElementCollection>
 #include <QString>
@@ -749,9 +750,13 @@ bool Page_Game::uncagePet(int id) {
                 delay(7000 + (qrand() % 5000), false);
                 qDebug("click on cage");
                 actuate(a);
-                delay(3000 + (qrand() % 5000), false);
-                qDebug("clicked (i hope)");
-                return closePopup();
+                if (waitForPopup()) {
+                    qDebug("got popup. close it");
+                    return closePopup();
+                } else {
+                    qDebug("popup is missing :(");
+                    return false;
+                }
             }
         }
     }
@@ -780,11 +785,33 @@ bool Page_Game::cagePet() {
     delay(700 + (qrand() % 2000), false);
     qDebug("click on cage");
     actuate(a);
-    delay(3000 + (qrand() % 4000), false);
-    qDebug("clicked. close popup");
-    return closePopup();
+    if (waitForPopup()) {
+        qDebug("got popup. close it");
+        return closePopup();
+    } else {
+        qDebug("popup is missing :(");
+        return false;
+    }
 }
 
+bool Page_Game::waitForPopup(int ms) {
+    if (ms <= 0) {
+        ms = 5000 + (qrand() % 5000);
+    }
+    qDebug("awaiting for popup with %d ms timeout", ms);
+    QTime time;
+    QEventLoop loop;
+    time.start();
+    while (time.elapsed() < ms) {
+        loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+        if (!document.findFirst("A.ui-dialog-titlebar-close").isNull()) {
+            qDebug("got popup. after %d ms", time.elapsed());
+            return true;
+        }
+    }
+    qDebug("popup timeout.");
+    return false;
+}
 
 bool Page_Game::closePopup() {
     QWebElement btn = document.findFirst("A.ui-dialog-titlebar-close");
