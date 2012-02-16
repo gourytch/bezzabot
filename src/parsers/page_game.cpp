@@ -644,10 +644,8 @@ QString Page_Game::jobLink(bool ifFinished, int timegap) const {
 
 bool Page_Game::doClickOnCoulon(quint32 id) {
 //  "/ajax.php?m=coulon&item=15371239"
-    bool found = false;
     foreach (QWebElement a, document.findAll("DIV.coulons A")) {
         if ((quint32)(a.attribute("item_id").toInt()) == id) {
-            found = true;
             delay(500 + (qrand() % 3000), true);
             qDebug(QString("actuate coulon #%1 (%2)")
                    .arg(id).arg(a.attribute("title")));
