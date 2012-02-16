@@ -3,6 +3,7 @@
 
 #include "page_generic.h"
 #include "page_error.h"
+#include "page_underconstruction.h"
 #include "page_login.h"
 #include "page_game.h"
 #include "page_game_index.h"

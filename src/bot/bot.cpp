@@ -179,7 +179,6 @@ void Bot::GoReload() {
     qDebug("set up goto timer at %d sec", s);
     int ms = s * 1000 + qrand() % 1000;
     Timebomb::global()->launch(ms, this, SLOT(delayedGoTo()));
-
 }
 
 void Bot::delayedGoTo() {
@@ -250,6 +249,9 @@ void Bot::onPageFinished (bool ok)
     {
     case page_Error:
         handle_Page_Error();
+        break;
+    case page_UnderConstruction:
+        handle_Page_UnderConstruction();
         break;
     case page_Login:
         handle_Page_Login();
@@ -347,6 +349,12 @@ void Bot::handle_Page_Error () {
         qWarning(QString("ERROR %1: %2").arg(p->status).arg(p->reason));
     }
 
+}
+
+void Bot::handle_Page_UnderConstruction() {
+    int sec = 1800 + (qrand() % 3600);
+    qWarning("hangle UnderConstruction page. reload index at %d sec", sec);
+    Timebomb::global()->launch(sec * 1000UL, this, SLOT(delayedReload()));
 }
 
 void Bot::handle_Page_Login () {

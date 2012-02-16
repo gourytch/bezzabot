@@ -31,7 +31,7 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (QWebElement& doc) :
     professional = !(grbody[0].findFirst("DIV[id=buy_block_1]").isNull());
     QWebElementCollection es = grbody [0].findAll ("TD");
     QWebElement e;
-    int count = 0;
+    //int count = 0;
 
     //                "TABLE[class='default padding5'] TD");
 
@@ -61,7 +61,7 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (QWebElement& doc) :
     num_gogglesPro  = 0;
     num_helmsPro    = 0;
 
-    count = 0;
+//    count = 0;
     foreach (e, es) {
         QString s = e.toPlainText ().trimmed ();
 
@@ -119,7 +119,7 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (QWebElement& doc) :
 
     QRegExp rx (u8 ("Вероятность успеха.*(\\d+)"));
     es = doc.findAll ("P");
-    count = 0;
+    //count = 0;
     digstage = DigNone;
     success_chance = -1;
     foreach (e, es)

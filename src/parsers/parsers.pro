@@ -26,7 +26,8 @@ HEADERS += \
     page_game_luckysquare.h \
     page_game_clan_treasury.h \
     page_game_incubator.h \
-    page_game_fight_log.h
+    page_game_fight_log.h \
+    page_underconstruction.h
 
 SOURCES += \
     types.cpp \
@@ -48,7 +49,8 @@ SOURCES += \
     page_game_luckysquare.cpp \
     page_game_clan_treasury.cpp \
     page_game_incubator.cpp \
-    page_game_fight_log.cpp
+    page_game_fight_log.cpp \
+    page_underconstruction.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc

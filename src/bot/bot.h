@@ -108,6 +108,8 @@ protected:
 
     virtual void handle_Page_Error();
 
+    virtual void handle_Page_UnderConstruction();
+
     virtual void handle_Page_Login();
 
     virtual void got_page (Page_Game *gpage);
