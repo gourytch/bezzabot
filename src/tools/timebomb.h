@@ -35,6 +35,10 @@ public:
     void launch(int ms, QObject *receiver, const char *member);
     void cancel();
 
+    QProgressBar *bar() {
+        return _bar;
+    }
+
 signals:
 
 protected slots:

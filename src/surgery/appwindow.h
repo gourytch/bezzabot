@@ -24,6 +24,7 @@ protected:
     QLineEdit           *pURL;
     QPushButton         *pGo;
     QPushButton         *pSave;
+    QPushButton         *pHeal;
     QWebView            *pWebView;
     QWebPage            *pWebPage;
     QString             _url;
@@ -37,6 +38,9 @@ protected:
     QString             _password;
 
     QWebElement doc;
+
+    Page_Generic        *_page;
+    Page_Game           *_gpage;
 
 protected:
     bool checkLogin();

@@ -128,10 +128,6 @@ int main (int argc, char ** argv) {
     Config::global();
     Logger::global();
     //////////////////////////////////////
-    testTarball();
-    testGzip();
-
-    return 0;
     //////////////////////////////////////
     qDebug("initialize window");
     AppWindow w;

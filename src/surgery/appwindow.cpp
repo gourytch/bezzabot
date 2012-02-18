@@ -7,6 +7,8 @@
 AppWindow::AppWindow(QWidget *parent) :
     QWidget(parent)
 {
+    _page = NULL;
+    _gpage = NULL;
     Config& cfg = Config::global();
     QString name = cfg.get("bots/_list").toString().trimmed();
     pConfig = new Config(this, name, &cfg);
@@ -40,8 +42,8 @@ AppWindow::AppWindow(QWidget *parent) :
 
     QWidget *pStuff = new QWidget();
 
-    QPushButton *pHeal       = new QPushButton("HEAL");
-    QPushButton *pTest1      = new QPushButton("TEST1");
+    pHeal               = new QPushButton("HEAL");
+    QPushButton *pTest1 = new QPushButton("TEST1");
 
     QHBoxLayout *box0 = new QHBoxLayout();
     box0->addWidget(pURL);
@@ -87,7 +89,10 @@ AppWindow::~AppWindow() {
 
 
 void AppWindow::slotLoadStart () {
-    qDebug("LOAD STARTED: {" + pWebView->url().toString());
+    qDebug("LOAD STARTED: {" + pWebView->url().toString() + "}");
+    if (_page) delete _page;
+    _page = NULL;
+    _gpage = NULL;
 }
 
 void AppWindow::slotLoaded (bool success) {
@@ -95,6 +100,9 @@ void AppWindow::slotLoaded (bool success) {
              qPrintable(pWebView->url().toString()));
     pURL->setText(pWebView->url().toString());
     doc = pWebPage->mainFrame()->documentElement();
+    _page = Parser::parse(doc);
+    _gpage = dynamic_cast<Page_Game*>(_page);
+    pHeal->setEnabled(_gpage != NULL);
     if (checkLogin()) return;
     if (checkGame()) return;
 }
