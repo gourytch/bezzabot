@@ -786,7 +786,9 @@ bool Page_Game::cagePet() {
     qDebug("click on cage");
     actuate(a);
     if (waitForPopup()) {
-        qDebug("got popup. close it");
+        int ms = 700 + (qrand() % 2000);
+        qDebug("got popup. wait %d ms then close popup", ms);
+        delay(ms, false);
         return closePopup();
     } else {
         qDebug("popup is missing :(");
@@ -795,56 +797,22 @@ bool Page_Game::cagePet() {
 }
 
 bool Page_Game::waitForPopup(int ms) {
-    if (ms <= 0) {
-        ms = 5000 + (qrand() % 5000);
-    }
     qDebug("awaiting for popup with %d ms timeout", ms);
-    QTime time;
-    QEventLoop loop;
-    time.start();
-    while (time.elapsed() < ms) {
-        loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-        if (!document.findFirst("A.ui-dialog-titlebar-close").isNull()) {
-            qDebug("got popup. after %d ms", time.elapsed());
-            return true;
-        }
-    }
-    qDebug("popup timeout.");
-    return false;
+    return wait4("A.ui-dialog-titlebar-close", true, ms);
 }
 
 bool Page_Game::waitForPopupClosed(int ms) {
-    if (document.findFirst("A.ui-dialog-titlebar-close").isNull()) {
-        qDebug("check for popup closed is success");
-        return true;
-    }
-
-    if (ms <= 0) {
-        ms = 5000 + (qrand() % 5000);
-    }
-    qDebug("awaiting for popup close with %d ms timeout", ms);
-    QTime time;
-    QEventLoop loop;
-    time.start();
-    while (time.elapsed() < ms) {
-        loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-        if (document.findFirst("A.ui-dialog-titlebar-close").isNull()) {
-            qDebug("popup was closed after %d ms", time.elapsed());
-            return true;
-        }
-    }
-    qDebug("popup timeout. seems still on page =(");
-    return false;
+    return wait4("A.ui-dialog-titlebar-close", false, ms);
 }
 
 bool Page_Game::closePopup() {
     QWebElement btn = document.findFirst("A.ui-dialog-titlebar-close");
     if (btn.isNull()) {
         qDebug("close button not found");
-        return false;
+        return true;
     }
     qDebug("actuate close popup button");
     actuate(btn);
-    waitForPopupClosed();
+    return waitForPopupClosed();
     return true;
 }

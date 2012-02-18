@@ -108,8 +108,8 @@ void Page_Generic::actuate(QWebElement e) {
             "   }"
             "};"
             "actuate(this); null;";
-    qDebug("actuate element {%s}", qPrintable(e.toOuterXml()));
-    QString s = e.evaluateJavaScript(js).toString();
+    qDebug("actuate(\"%s\")", qPrintable(e.toOuterXml()));
+    e.evaluateJavaScript(js);
 }
 
 bool Page_Generic::wait4(QString etext, bool present, int timeout) {
