@@ -212,8 +212,9 @@ void Bot::onPageStarted() {
     cancelAuto();
     if (_page) {
         delete _page;
-        _page = NULL;
     }
+    _page = NULL;
+    _gpage = NULL;
 }
 
 void Bot::onPageFinished (bool ok)
@@ -651,7 +652,6 @@ void Bot::initWorks() {
     for (WorkListIterator i(_secworklist);
          i.hasNext();
          i.next()->configure(_config)) {}
-
 }
 
 void Bot::popWork() {

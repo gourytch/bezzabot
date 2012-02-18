@@ -274,6 +274,8 @@ void WebActor::savePage ()
         ::save (pfx + ".txt",
                 page ? page->toString() : "NULL");
     }
+    if (page) delete page;
+    page = NULL;
 }
 
 
