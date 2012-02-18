@@ -132,7 +132,10 @@ bool Page_Generic::wait4(QString etext, bool present, int timeout) {
     while (time.elapsed() < timeout) {
         loop.processEvents(QEventLoop::ExcludeUserInputEvents);
         if (present != document.findFirst(etext).isNull()) {
-            qDebug("done after %d ms", time.elapsed());
+            int ms = 250 + (qrand() % 500);
+            qDebug("done after %d ms, wait %d ms and return",
+                   time.elapsed(), ms);
+            delay(ms, false);
             return true;
         }
     }
