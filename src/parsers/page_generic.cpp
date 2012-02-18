@@ -78,15 +78,7 @@ void Page_Generic::slot_submit() {
     if (submit.isNull()) {
         qCritical("NULL SUBMIT");
     } else {
-        qDebug("ACTUATE : " + submit.toOuterXml());
         actuate(submit);
-//        if (submit.tagName () == "A") {
-//            qDebug("SUBMITTING AS LINK: " + submit.attribute("href"));
-//            submit.evaluateJavaScript("document.location = this.getAttribute('href');");
-//        } else {
-//            qDebug("SUBMITTING AS BUTTON");
-//            submit.evaluateJavaScript("this.click();");
-//        }
     }
 }
 
@@ -115,6 +107,35 @@ void Page_Generic::actuate(QWebElement e) {
             "       obj.dispatchEvent(e);"
             "   }"
             "};"
-            "actuate(this);";
+            "actuate(this); null;";
+    qDebug("actuate element {%s}", qPrintable(e.toOuterXml()));
     QString s = e.evaluateJavaScript(js).toString();
+}
+
+bool Page_Generic::wait4(QString etext, bool present, int timeout) {
+    if (document.findFirst(etext).isNull() != present) {
+        qDebug("success check for {%s} element %s",
+               present ? "exists" : "missing",
+               qPrintable(etext));
+        return true;
+    }
+
+    if (timeout <= 0) {
+        timeout = 5000 + (qrand() % 5000);
+    }
+    qDebug("awaiting for %s element by {%s}, timeout %d ms",
+           present ? "appearing" : "disappearing",
+           qPrintable(etext), timeout);
+    QTime time;
+    QEventLoop loop;
+    time.start();
+    while (time.elapsed() < timeout) {
+        loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+        if (present != document.findFirst(etext).isNull()) {
+            qDebug("done after %d ms", time.elapsed());
+            return true;
+        }
+    }
+    qDebug("popup timeout.");
+    return false;
 }
