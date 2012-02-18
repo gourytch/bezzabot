@@ -13,6 +13,7 @@ WorkClanGiving::WorkClanGiving(Bot *bot) :
 }
 
 void WorkClanGiving::configure(Config *config) {
+    Work::configure(config);
     _minimal_amount = config->get("Work_ClanGiving/minimal_amount", false, 1).toInt();
     _maximal_amount = config->get("Work_ClanGiving/maximal_amount", false, -1).toInt();
     _minimal_interval = config->get("Work_ClanGiving/minimal_interval", false, 300).toInt();
