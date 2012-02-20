@@ -40,6 +40,7 @@ void Parser::setup() {
     _producer.registerClass<Page_UnderConstruction>();
     _producer.registerClass<Page_Login>();
     _producer.registerClass<Page_Game_Index>();
+    _producer.registerClass<Page_Game_LevelUp>();
     _producer.registerClass<Page_Game_Dozor_Entrance>();
     _producer.registerClass<Page_Game_Dozor_LowHealth>();
     _producer.registerClass<Page_Game_Dozor_OnDuty>();
@@ -53,6 +54,7 @@ void Parser::setup() {
     _producer.registerClass<Page_Game_Incubator>();
     _producer.registerClass<Page_Game_Clan_Treasury>();
     _producer.registerClass<Page_Game_Fight_Log>();
+    ///
     _producer.registerClass<Page_Game>();
     _producer.registerClass<Page_Generic>();
 }

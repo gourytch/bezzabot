@@ -6,5 +6,6 @@
         <file alias="nopix_on.png">images/nopix_on.png</file>
         <file alias="nopix_off.png">images/nopix_off.png</file>
         <file alias="go.png">images/go.png</file>
+        <file alias="save.png">images/save.png</file>
     </qresource>
 </RCC>

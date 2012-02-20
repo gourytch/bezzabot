@@ -263,6 +263,9 @@ void Bot::onPageFinished (bool ok)
     case page_Entrance:
         handle_Page_Login();
         break;
+    case page_Game_LevelUp:
+        handle_Page_LevelUp();
+        break;
     default:
         if (_gpage) { // Page_Game and descendants
             got_page(_gpage);
@@ -367,6 +370,12 @@ void Bot::handle_Page_Login () {
     if (p->doLogin(_serverNo, _login, _password, true)) {
         _awaiting = true;
     }
+}
+
+void Bot::handle_Page_LevelUp() {
+    qWarning("*** *** WE HAVE GOT NEW LEVEL *** ***");
+    Page_Game_LevelUp *p = static_cast<Page_Game_LevelUp *>(_page);
+    p->doNext();
 }
 
 /////////// misc /////////////////////////////////////////////////////////

@@ -44,6 +44,8 @@ public:
 
     void actuate(QWebElement e);
 
+    void actuate(QString id);
+
     bool wait4(QString etext, bool present=true, int timeout=-1);
 
 protected slots:

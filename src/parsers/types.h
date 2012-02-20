@@ -65,7 +65,8 @@ enum PageKind {
     page_Game_Search,
     page_Game_News,
     page_Game_LuckySquare,
-    page_Game_Incubator
+    page_Game_Incubator,
+    page_Game_LevelUp
 };
 
 extern int dottedInt (const QString& s);

@@ -92,6 +92,21 @@ void MainWindow::createUI ()
     pNoPics->setFixedSize(20, 20);
     pNoPics->setToolTip(strNoPicsOff);
 
+//    pShowLog = new QPushButton();
+//    pShowLog->setIcon(imgLogVisible);
+//    pShowLog->setCheckable(true);
+//    pShowLog->setFlat(true);
+//    pShowLog->setFixedSize(20, 20);
+//    pShowLog->setToolTip(strNoPicsOff);
+
+    pSaveButton = new QPushButton();
+    pSaveButton->setIcon(QIcon(":/save.png"));
+    pSaveButton->setCheckable(false);
+    pSaveButton->setFlat(true);
+    pSaveButton->setFixedSize(20, 20);
+    pSaveButton->setToolTip(u8("сохранить страницу"));
+
+
     pUrlEdit = new QLineEdit();
 
     pGoButton = new QPushButton();
@@ -116,6 +131,7 @@ void MainWindow::createUI ()
     pControls->setSpacing(1);
     pControls->addWidget (pAutomaton, 0);
     pControls->addWidget (pNoPics, 0);
+    pControls->addWidget (pSaveButton, 0);
     pControls->addWidget (pUrlEdit, 100);
     pControls->addWidget (pGoButton, 0);
     pControls->addWidget (pLoadingProgress, 10);
@@ -185,6 +201,8 @@ void MainWindow::setupConnections () {
              pLoadingProgress, SLOT (setValue (int)));
 
     connect (pGoButton, SIGNAL(clicked()), this, SLOT(slotGoClicked()));
+
+    connect (pGoButton, SIGNAL(clicked()), this, SLOT(slotSavePage()));
 
     connect (pUrlEdit, SIGNAL(returnPressed()),
              this, SLOT(slotGoClicked()));
@@ -406,4 +424,8 @@ void MainWindow::slotGoClicked() {
     if (_entered_url.isEmpty()) return;
     qDebug("handmade url: {" + _entered_url + "}");
     pActor->request(_entered_url);
+}
+
+void MainWindow::slotSavePage () {
+    pActor->savePage();
 }

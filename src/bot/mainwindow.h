@@ -24,6 +24,8 @@ protected:
     QIcon           imgButtonOn;
     QIcon           imgNoPicsOff;
     QIcon           imgNoPicsOn;
+//    QIcon           imgLogVisible;
+    QIcon           imgLogHidden;
     QString         strAutomatonOff;
     QString         strAutomatonOn;
     QString         strNoPicsOff;
@@ -42,8 +44,10 @@ protected:
 
     QPushButton     *pAutomaton;
     QPushButton     *pNoPics;
+    QPushButton     *pShowLog;
     QLineEdit       *pUrlEdit;
     QPushButton     *pGoButton;
+    QPushButton     *pSaveButton;
     QProgressBar    *pLoadingProgress;
 
     QString     _entered_url;
@@ -101,6 +105,7 @@ protected slots:
     void slotLoadStarted ();
     void slotLoadProgress (int percent);
     void slotLoadFinished (bool success);
+    void slotSavePage ();
 
     void slotUrlEdited(const QString& s);
     void slotGoClicked();

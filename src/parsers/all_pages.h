@@ -20,5 +20,6 @@
 #include "page_game_clan_treasury.h"
 #include "page_game_incubator.h"
 #include "page_game_fight_log.h"
+#include "page_game_levelup.h"
 
 #endif // ALL_PAGES_H
