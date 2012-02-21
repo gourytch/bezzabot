@@ -37,6 +37,7 @@ MainWindow::MainWindow (QWidget *parent) :
     balloon_enabled         = cfg.get("ui/balloon_enabled", false, true).toBool();
     noimages                = cfg.get("ui/noimages", false, false).toBool();
     history_size            = cfg.get("ui/history_size", false, 1000).toInt();
+    icon_index              = cfg.get("ui/icon_index", false, -1).toInt();
 
     createUI ();
 
@@ -66,7 +67,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::createUI ()
 {
-    imgAppIcon      = QIcon(":/icon.png");
+    if (icon_index >= 0 && icon_index < 400) {
+        QPixmap total(":/ico.png");
+        int row = icon_index / 15;
+        int col = icon_index % 15;
+        imgAppIcon = QIcon(total.copy(QRect(col * 20, row * 20, 20, 20)));
+    } else {
+        imgAppIcon      = QIcon(":/icon.png");
+    }
     imgButtonOff    = QIcon(":/button_off.png");
     imgButtonOn     = QIcon(":/button_on.png");
     imgNoPicsOff    = QIcon(":/nopix_off.png");
