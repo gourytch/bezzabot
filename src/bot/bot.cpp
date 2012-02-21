@@ -214,7 +214,8 @@ void Bot::GoToNeutralUrl() {
 }
 
 bool Bot::needUnLoop() {
-    if (_last_url_counter < _last_url_count_for_unloop) {
+    if (_last_url_count_for_unloop <= 0 ||
+        _last_url_counter < _last_url_count_for_unloop) {
         return false;
     }
     qDebug("url {%s} returns %d times. try unloop",
