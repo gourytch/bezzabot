@@ -430,6 +430,10 @@ void MainWindow::slotUrlEdited(const QString& s) {
 
 void MainWindow::slotGoClicked() {
     if (_entered_url.isEmpty()) return;
+    if (!_entered_url.contains("://")) {
+        qDebug("protocol_id not detected, prepend url with http://");
+        _entered_url = "http://" + _entered_url;
+    }
     qDebug("handmade url: {" + _entered_url + "}");
     pActor->request(_entered_url);
 }
