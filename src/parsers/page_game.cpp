@@ -806,13 +806,15 @@ bool Page_Game::waitForPopupClosed(int ms) {
 }
 
 bool Page_Game::closePopup() {
-    QWebElement btn = document.findFirst("A.ui-dialog-titlebar-close");
-    if (btn.isNull()) {
-        qDebug("close button not found");
-        return true;
+    { // btn надо удалить перед ожиданием
+        QWebElement btn = document.findFirst("A.ui-dialog-titlebar-close");
+        if (btn.isNull()) {
+            qDebug("close button not found");
+            return true;
+        }
+        qDebug("actuate close popup button");
+        actuate(btn);
     }
-    qDebug("actuate close popup button");
-    actuate(btn);
     return waitForPopupClosed();
     return true;
 }

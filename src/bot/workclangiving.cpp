@@ -41,6 +41,10 @@ bool WorkClanGiving::nextStep() {
 bool WorkClanGiving::processPage(const Page_Game *gpage) {
     Q_CHECK_PTR(gpage);
 
+    if (needUnLoop()) {
+        return false;
+    }
+
     if (!canMakeGoldenDeposit()) {
         qDebug("отдавать денег не станем");
         return false;

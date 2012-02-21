@@ -56,6 +56,12 @@ bool WorkFarming::nextStep() {
 }
 
 bool WorkFarming::processPage(const Page_Game *gpage) {
+
+    if (needUnLoop()) {
+        return false;
+    }
+
+
     if (hasWork()) {
         if (isNotMyWork()) {
             qDebug("мы работаем, но не на ферме, а в " +

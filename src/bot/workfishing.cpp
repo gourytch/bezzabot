@@ -41,6 +41,10 @@ bool WorkFishing::nextStep() {
 }
 
 bool WorkFishing::processPage(const Page_Game *gpage) {
+    if (needUnLoop()) {
+        return false;
+    }
+
     if (gpage->pagekind != page_Game_Pier) {
         qDebug("идём на пирс");
         gotoPier();

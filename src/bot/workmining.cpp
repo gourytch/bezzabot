@@ -63,6 +63,9 @@ bool WorkMining::nextStep() {
 }
 
 bool WorkMining::processPage(const Page_Game *gpage) {
+    if (needUnLoop()) {
+        return false;
+    }
 
     bool is_miner = (gpage->workguild == WorkGuild_Miners);
     int digtime = is_miner ? 5 * 60 : 20 * 60;

@@ -112,6 +112,24 @@ void Page_Generic::actuate(QWebElement e) {
     e.evaluateJavaScript(js);
 }
 
+void Page_Generic::actuate(QString id) {
+    QString js = QString(
+                "var actuate = function(obj) {"
+                "   if (obj.click) {"
+                "       obj.click();"
+                "       return;"
+                "   } else {"
+                "       var e = document.createEvent('MouseEvents');"
+                "       e.initEvent('click', true, true);"
+                "       obj.dispatchEvent(e);"
+                "   }"
+                "};"
+                "actuate(document.getElementById('%1')); null;").arg(id);
+    qDebug("actuate(id=\"%s\")", qPrintable(id));
+    document.evaluateJavaScript(js);
+}
+
+
 bool Page_Generic::wait4(QString etext, bool present, int timeout) {
     if (document.findFirst(etext).isNull() != present) {
         qDebug("success check for {%s} element %s",
@@ -130,13 +148,32 @@ bool Page_Generic::wait4(QString etext, bool present, int timeout) {
     QEventLoop loop;
     time.start();
     while (time.elapsed() < timeout) {
-        loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-        if (present != document.findFirst(etext).isNull()) {
-            int ms = 250 + (qrand() % 500);
-            qDebug("done after %d ms, wait %d ms and return",
-                   time.elapsed(), ms);
-            delay(ms, false);
-            return true;
+//        loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+        loop.processEvents();
+        QWebElement e = document.findFirst(etext);
+
+        if (present) { // wait for creating
+            if (e.isNull()) {
+                qDebug("still not exists");
+                usleep(250000L);
+            } else {
+                int ms = 250 + (qrand() % 500);
+                qDebug("found after %d ms, wait %d ms and return",
+                       time.elapsed(), ms);
+                delay(ms, false);
+                return true;
+            }
+        } else { // wait for disappearing
+            if (e.isNull()) {
+                int ms = 250 + (qrand() % 500);
+                qDebug("disappeared after %d ms, wait %d ms and return",
+                       time.elapsed(), ms);
+                delay(ms, false);
+                return true;
+            } else {
+                qDebug("still exists as %s", qPrintable(e.toOuterXml()));
+                usleep(250000L);
+            }
         }
     }
     qDebug("popup timeout.");

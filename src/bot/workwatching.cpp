@@ -87,6 +87,10 @@ bool WorkWatching::nextStep() {
 }
 
 bool WorkWatching::processPage(const Page_Game *gpage) {
+    if (needUnLoop()) {
+        return false;
+    }
+
     Q_CHECK_PTR(gpage);
 
     if (_command == CancelWork) { // говорят, что надо отменить всё.

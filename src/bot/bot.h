@@ -50,6 +50,14 @@ public:
     WorkQueue   _workq;
     WorkQueue   _nextq;
 
+    QString _last_url;
+    int     _last_url_counter;
+    int     _last_url_count_for_unloop;
+    int     _last_url_count_for_warning;
+    int     _last_url_count_for_forced_unloop;
+    int     _last_url_count_for_quit;
+    QList<QString> _neutral_urls;
+
     void popWork();
 
     void fillNextQ();
@@ -109,6 +117,9 @@ public:
     void GoTo(const QString& link=QString(), bool instant=false);
     void GoToWork(const QString& deflink=QString(), bool instant=false);
     void GoReload();
+    void GoToNeutralUrl();
+    bool needUnLoop();
+
 
 protected:
 

@@ -107,12 +107,13 @@ Bot::~Bot ()
 }
 
 void Bot::reset() {
-
     state.reset();
     _reload_attempt = 0;
     _page_busy = false;
     _awaiting = false;
     _workq.clear();
+    _last_url = QString();
+    _last_url_counter = 0;
 }
 
 void Bot::request_get (const QUrl& url) {
@@ -206,6 +207,22 @@ void Bot::GoToWork(const QString& deflink, bool instant) {
     }
 }
 
+void Bot::GoToNeutralUrl() {
+    QString s = _neutral_urls.at(qrand() % _neutral_urls.count());
+    qDebug("go to neutral url: {%s}", qPrintable(s));
+    GoTo(s);
+}
+
+bool Bot::needUnLoop() {
+    if (_last_url_counter < _last_url_count_for_unloop) {
+        return false;
+    }
+    qDebug("url {%s} returns %d times. try unloop",
+           qPrintable(_last_url), _last_url_counter);
+    GoToNeutralUrl();
+    return true;
+}
+
 //////// slots /////////////////////////////////////////////////////////
 
 void Bot::onPageStarted() {
@@ -247,6 +264,33 @@ void Bot::onPageFinished (bool ok)
     if (!isStarted()) {
         qDebug("bot is not active. no page handling will be performed");
         return;
+    }
+
+    QString new_url = _actor->page()->mainFrame ()->url().toString();
+    if (_last_url == new_url) {
+        ++_last_url_counter;
+        if (_last_url_count_for_warning > 0 &&
+            _last_url_count_for_warning == _last_url_counter) {
+            qCritical("URL {%s} WAS RETURNED %d TIMES",
+                      qPrintable(_last_url), _last_url_counter);
+        }
+        if (_last_url_count_for_forced_unloop > 0 &&
+            _last_url_count_for_forced_unloop == _last_url_counter) {
+            qCritical("URL {%s} WAS RETURNED %d TIMES. START FORCED UNLOOP",
+                      qPrintable(_last_url), _last_url_counter);
+            GoToNeutralUrl();
+            return;
+        }
+        if (_last_url_count_for_quit > 0 &&
+            _last_url_count_for_quit  <= _last_url_counter) {
+            qFatal("URL {%s} WAS RETURNED %d TIMES. EXIT IMMEDIATELY",
+                      qPrintable(_last_url), _last_url_counter);
+            qApp->quit();
+            return;
+        }
+    } else {
+        _last_url = new_url;
+        _last_url_counter = 1;
     }
 
     switch (_page->pagekind)
@@ -429,6 +473,24 @@ void Bot::configure() {
     _workcycle_debug2 = _config->get("bot/workcycle_debug2", false, false).toBool();
 
     _autostart = _config->get("autostart", false, false).toBool();
+
+    _last_url_count_for_warning = _config->get("watchdog/loop_warning_count", false, 5).toInt();
+    _last_url_count_for_unloop = _config->get("watchdog/loop_soft_unloop_count", false, 10).toInt();
+    _last_url_count_for_forced_unloop = _config->get("watchdog/loop_forced_unloop_count", false, 13).toInt();
+    _last_url_count_for_quit = _config->get("watchdog/loop_fatal_count", false, 15).toInt();
+
+    _neutral_urls.append("dressingroom.php");
+    _neutral_urls.append("house.php");
+    _neutral_urls.append("school.php");
+    _neutral_urls.append("shtab.php");
+    _neutral_urls.append("contacts.php");
+    _neutral_urls.append("search.php");
+    _neutral_urls.append("kormushka.php");
+    _neutral_urls.append("harbour.php");
+    _neutral_urls.append("shop.php");
+    _neutral_urls.append("village.php");
+    _neutral_urls.append("tavern.php");
+    _neutral_urls.append("castle.php");
 
     qDebug("configure %s", _good ? "success" : "failed");
 }

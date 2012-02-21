@@ -36,6 +36,10 @@ bool WorkScaryFighting::nextStep() {
 }
 
 bool WorkScaryFighting::processPage(const Page_Game *gpage) {
+    if (needUnLoop()) {
+        return false;
+    }
+
     if (hasWork()) {
         qDebug("мы чем-то заняты");
         checkPet();

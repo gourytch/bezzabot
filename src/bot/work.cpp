@@ -36,6 +36,10 @@ void Work::unsetAwaiting() {
     _bot->unsetAwaiting();
 }
 
+bool Work::needUnLoop() {
+    return _bot->needUnLoop();
+}
+
 QString Work::getWorkName() const {
     return ::toString(getWorkType());
 }

@@ -50,6 +50,8 @@ public:
 
     void wearOnEnd();
 
+    bool needUnLoop();
+
     explicit Work(Bot *bot);
 
     enum Query {
