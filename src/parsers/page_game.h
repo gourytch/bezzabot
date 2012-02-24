@@ -171,6 +171,7 @@ struct FlyingInfo {
         QString href;
         QString icon;
         QString title;
+        QWebElement actionObj;
 
         Caption() {
             valid   = false;
@@ -240,6 +241,9 @@ struct FlyingInfo {
         QString feed_url;
         QString heal_url;
         QString train_url;
+        QWebElement feed_obj;
+        QWebElement heal_obj;
+        QWebElement train_obj;
 
         Normal() {
             valid = false;
@@ -403,6 +407,11 @@ public:
     bool waitForPopupClosed(int ms = -1);
 
     bool closePopup();
+
+    bool doFlyingBoxgame(int flyingNo);
+
+    bool doFlyingGoEvents(int flyingNo);
+
 };
 
 #endif // PAGE_GAME_H

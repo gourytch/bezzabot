@@ -969,3 +969,42 @@ bool Page_Game::closePopup() {
     return waitForPopupClosed();
     return true;
 }
+
+bool Page_Game::doFlyingBoxgame(int flyingNo) {
+    if (flyingslist.size() < flyingNo) {
+        qCritical("flyings pos too big");
+        return false;
+    }
+    if (!flyingslist.at(flyingNo).boxgame.valid) {
+        qCritical("boxgame is not active");
+        return false;
+    }
+    submit = document.findAll("DIV.flyings DIV.content")[flyingNo]
+            .findFirst("FORM INPUT[type=submit]");
+    if (submit.isNull()) {
+        qCritical("boxbutton missing");
+        return false;
+    }
+    qDebug("submitting boxgame");
+    pressSubmit();
+    return true;
+}
+
+bool Page_Game::doFlyingGoEvents(int flyingNo) {
+    if (flyingslist.size() < flyingNo) {
+        qCritical("flyings pos too big");
+        return false;
+    }
+    if (!flyingslist.at(flyingNo).normal.valid) {
+        qCritical("normal is not active");
+        return false;
+    }
+    submit = document.findAll("DIV.flyings DIV.title")[flyingNo].findFirst("A");
+    if (submit.isNull()) {
+        qCritical("link missing");
+        return false;
+    }
+    qDebug("submitting eventlink");
+    pressSubmit();
+    return true;
+}
