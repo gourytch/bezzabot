@@ -279,6 +279,209 @@ const PageCoulon* PageCoulons::active() const {
 
 ////////////////////////////////////////////////////////////////////////////
 //
+////////////////////////////////////////////////////////////////////////////
+
+bool FlyingInfo::Caption::parse(QWebElement &div_title) {
+    valid = false;
+    QWebElement e = div_title.findFirst("A");
+    if (e.isNull()) return false;
+    href = e.attribute("href");
+    e = e.firstChild();
+    if (e.tagName() != "B") return false;
+    title = e.attribute("title");
+    QRegExp rx(".*(flying_\\d+)");
+    if (rx.indexIn(e.attribute("class")) == -1) return false;
+    icon = rx.cap(1);
+    valid = true;
+    return true;
+}
+
+
+QString FlyingInfo::Caption::toString() const {
+    if (!valid) {
+        return "??invalid??";
+    }
+    return u8("{icon=\"%1\" title=\"%2\"}").arg(icon, title);
+}
+
+
+bool FlyingInfo::Egg::parse(QWebElement &content) {
+    valid = false;
+    QWebElement e = content.firstChild();
+    if (e.tagName() != "SPAN") return false;
+    QRegExp rx(u8("Состояние:(\\d+)%"));
+    if (rx.indexIn(e.toInnerXml()) == -1) return false;
+    condition = rx.cap(1).toInt();
+    e = e.nextSibling();
+    if (e.tagName() != "FORM") return false;
+    e = e.nextSibling();
+    if (e.tagName() != "DIV") return false;
+    e = e.nextSibling();
+    if (e.tagName() != "SPAN") return false;
+    rx = QRegExp(u8("Чистка:\\s*(\\d)\\s*/\\s*(\\d)"));
+    if (rx.indexIn(e.toInnerXml()) == -1) return false;
+    cleanings_performed = rx.cap(1).toInt();
+    cleanings_total = rx.cap(2).toInt();
+    e = e.nextSibling();
+    if (e.tagName() == "I") {
+        e = e.findFirst("SPAN.js_timer");
+        if (e.isNull()) return false;
+        cleanings_cooldown.assign(e);
+        valid = true;
+        return true;
+    } else if (e.tagName() == "FORM") {
+        cleanings_cooldown = PageTimer();
+        valid = true;
+        return true;
+    }
+    return false;
+}
+
+
+bool FlyingInfo::Egg::canClean() const {
+    if (cleanings_performed == cleanings_total) return false;
+    if (cleanings_cooldown.active()) return false;
+    return true;
+}
+
+
+QString FlyingInfo::Egg::toString() const {
+    if (!valid) {
+        return "??invalid??";
+    }
+    return u8("{cond:%1% clean:%2/%3 %4}")
+            .arg(condition)
+            .arg(cleanings_performed)
+            .arg(cleanings_total)
+            .arg(cleanings_cooldown.toString());
+}
+
+
+bool FlyingInfo::Normal::parse(QWebElement &content) {
+    valid = false;
+    QWebElementCollection anchors = content.findAll("A");
+    if (anchors.count() != 3) return false;
+    feed_url    = anchors[0].attribute("href");
+    heal_url    = anchors[1].attribute("href");
+    train_url   = anchors[2].attribute("href");
+    QRegExp rx(">\\s*(\\d+)%\\s*<");
+    if (rx.indexIn(anchors[0].toOuterXml()) == -1) return false;
+    feed = rx.cap(1).trimmed().toInt();
+    if (rx.indexIn(anchors[1].toOuterXml()) == -1) return false;
+    hits = rx.cap(1).trimmed().toInt();
+    rx = QRegExp(">\\s*([0123456789.]+)\\s*<");
+    if (rx.indexIn(anchors[2].toOuterXml()) == -1) return false;
+    gold = dottedInt(rx.cap(1).trimmed());
+    valid = true;
+    return true;
+}
+
+
+QString FlyingInfo::Normal::toString() const {
+    if (!valid) {
+        return "??invalid??";
+    }
+    return u8("{feed=%1% hits=%2% gold=%3}").arg(feed).arg(hits).arg(gold);
+}
+
+
+bool FlyingInfo::Journey::parse(QWebElement &content) {
+    valid = false;
+    QWebElement e = content.findFirst("CENTER B A");
+    if (e.isNull()) return false;
+    QRegExp rx(u8(">((Большое|Маленькое) приключение)<"));
+    if (rx.indexIn(e.toOuterXml()) == -1) return false;
+    title = rx.cap(1);
+    e = content.findFirst("SPAN.js_timer");
+    if (e.isNull()) return false;
+    journey_cooldown.assign(e);
+    valid = true;
+    return true;
+}
+
+
+QString FlyingInfo::Journey::toString() const {
+    if (!valid) return "??invalid??";
+    return u8("{journey:\"%1\", cooldown:%2}")
+            .arg(title)
+            .arg(journey_cooldown.toString());
+}
+
+
+bool FlyingInfo::Boxgame::parse(QWebElement &content) {
+    valid = false;
+    QWebElement e = content.findFirst("FORM INPUT[type=submit]");
+    if (e.isNull()) return false;
+    if (e.attribute("value") != u8("ПОМОЧЬ")) return false;
+    valid = true;
+    return true;
+}
+
+
+QString FlyingInfo::Boxgame::toString() const {
+    if (!valid) return "??invalid??";
+    return u8("{boxgame}");
+}
+
+
+FlyingInfo::FlyingInfo() {
+    init();
+}
+
+FlyingInfo::FlyingInfo(const FlyingInfo& that) {
+    *this = that;
+}
+
+void FlyingInfo::init() {
+    valid   = false;
+    caption = Caption();
+    egg     = Egg();
+    normal  = Normal();
+    journey = Journey();
+    boxgame = Boxgame();
+}
+
+
+const FlyingInfo& FlyingInfo::operator=(const FlyingInfo& that) {
+    valid   = that.valid;
+    caption = that.caption;
+    egg     = that.egg;
+    normal  = that.normal;
+    journey = that.journey;
+    boxgame = that.boxgame;
+
+    return *this;
+}
+
+
+bool FlyingInfo::parse(QWebElement& element) {
+    init();
+    if (element.tagName() != "DIV" || element.attribute("class") != "title")
+        return false;
+    if (!caption.parse(element)) return false;
+    QWebElement e = element.nextSibling();
+    if (e.tagName() != "DIV" || e.attribute("class") != "content")
+        return false;
+    valid = egg.parse(e) ||
+            normal.parse(e) ||
+            journey.parse(e) ||
+            boxgame.parse(e);
+    return valid;
+}
+
+
+QString FlyingInfo::toString() const {
+    if (!valid) return "?INVALID FLYING?";
+    QString s = caption.toString();
+    if (egg.valid)      s += egg.toString();
+    if (normal.valid)   s += normal.toString();
+    if (journey.valid)  s += journey.toString();
+    if (boxgame.valid)  s += boxgame.toString();
+    return "{" + s + "}";
+}
+
+////////////////////////////////////////////////////////////////////////////
+//
 // Page_Game
 //
 ////////////////////////////////////////////////////////////////////////////
@@ -527,46 +730,12 @@ Page_Game::Page_Game (QWebElement& doc) :
     if (!e.isNull()) {
         FlyingInfo info;
         foreach (QWebElement div_title, e.findAll("DIV.title")) {
-        // 1.title
-            QWebElement a = div_title.firstChild();
-            if (a.isNull() || a.tagName() != "A") continue;
-            info.href = a.attribute("href");
-            QWebElement b = a.firstChild();
-            info.title = b.attribute("title");
-            info.icon = b.attribute("class").split(" ")[1]; // FIXME
-        // 2. content
-            QWebElement div_content = div_title.nextSibling();
-            if (div_content.tagName() != "DIV") continue;
-            if (div_content.attribute("class") != "content") continue;
             info.init();
-            if (info.title.startsWith(u8("Яйцо"))) {
-                info.is_egg = true;
-            } else {
-                foreach (a, div_content.findAll("A")) {
-                    QString text = e.toPlainText().trimmed().replace("%", "");
-                    if (text == "Большое приключение") {
-                        info.in_journey = true;
-                        b = a.findFirst("SPAN.js_timer");
-                        info.journey_cooldown.assign(b);
-                    } else {
-                        b = a.firstChild();
-                        if (b.isNull()) continue;
-                        QString title = b.attribute("title");
-                        if (title == u8("Здоровье")) {
-                            info.hits = text.toInt();
-                        } else if (title == u8("Сытость зверушки")) {
-                            info.feed = text.toInt();
-                        } else if (title == u8("Золото")) {
-                            info.gold = dottedInt(text);
-                        }
-                    }
-                }
-            }
-            flyingslist.append(info);
+            if (info.parse(div_title)) flyingslist.append(info);
         }
     }
-
 }
+
 
 QString toString(const QString& pfx, const PageResource& r) {
     return pfx + QString("{id=%1, count=%2, href=%3, title=%4}")
@@ -601,28 +770,10 @@ QString toString(const QString& pfx, const PetList& petlist) {
     return ret;
 }
 
-QString toString(const FlyingInfo& info) {
-    QString ret = u8("{%1, %2 state ").arg(info.title, info.icon);
-    if (info.is_egg) {
-        ret += "EGG";
-    } else if (info.boxgame) {
-        ret += u8("BOXGAME");
-    } else if (info.in_journey) {
-        ret += u8("JOURNEY till %1").arg(::toString(info.journey_cooldown.pit));
-    } else {
-        ret += u8("RESTING, feed=%1% hits=%2% gold=%3")
-                .arg(info.feed)
-                .arg(info.hits)
-                .arg(info.gold);
-    }
-    ret += "}\n";
-    return ret;
-}
-
 QString toString(const QString& pfx, const FlyingsList& list) {
     QString ret = "Flyings {\n";
     foreach(const FlyingInfo info, list) {
-        ret += pfx + "   " + toString(info);
+        ret += pfx + "   " + info.toString() + "\n";
     }
     ret += pfx + "}\n";
     return ret;

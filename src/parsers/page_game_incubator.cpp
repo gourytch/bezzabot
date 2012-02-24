@@ -1,6 +1,34 @@
 #include "page_game_incubator.h"
 #include "tools/tools.h"
 
+///
+/// Page_Game_Incubator::Flying
+///
+//////////////////////////////////
+Page_Game_Incubator::Flying::Flying() {
+}
+
+
+Page_Game_Incubator::Flying::Flying(const Flying& that) {
+    *this = that;
+}
+
+
+const Page_Game_Incubator::Flying& Page_Game_Incubator::Flying::operator=(
+        const Flying& that) {
+    rel         = that.rel;
+    title       = that.title;
+    kind        = that.kind;
+    active      = that.active;
+    was_born    = that.was_born;
+    readiness   = that.readiness;
+    birth_pit   = that.birth_pit;
+
+    return *this;
+}
+
+
+
 Page_Game_Incubator::Page_Game_Incubator(QWebElement& doc) : Page_Game(doc) {
     pagekind = page_Game_Incubator;
     QWebElement e;

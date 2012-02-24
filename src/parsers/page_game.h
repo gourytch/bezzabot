@@ -165,40 +165,185 @@ enum FlyingKind {
 QString toString(FlyingKind v);
 
 struct FlyingInfo {
-    QString href;
-    QString icon;
-    QString title;
 
-    bool is_egg;
-    int condition;
-    int cleanings_performed;
-    int cleanings_total;
-    PageTimer cleanings_cooldown;
+    struct Caption {
+        bool valid;
+        QString href;
+        QString icon;
+        QString title;
 
-    int feed;
-    int hits;
-    int gold;
+        Caption() {
+            valid   = false;
+            href    = QString();
+            icon    = QString();
+            title   = QString();
+        }
 
-    bool in_journey;
-    PageTimer journey_cooldown;
-    bool boxgame;
+        Caption(const Caption& that) {
+            *this = that;
+        }
 
-    void init() {
-        href    = QString();
-        icon    = QString();
-        title   = QString();
-        is_egg  = false;
-        condition           = -1;
-        cleanings_performed = -1;
-        cleanings_total     = -1;
-        cleanings_cooldown.pit = QDateTime();
-        feed    = -1;
-        hits    = -1;
-        gold    = -1;
-        in_journey  = false;
-        journey_cooldown.pit = QDateTime();
-        boxgame     = false;
-    }
+        const Caption& operator=(const Caption& that) {
+            valid   = that.valid;
+            href    = that.href;
+            icon    = that.icon;
+            title   = that.title;
+            return *this;
+        }
+
+        bool parse(QWebElement &div_title);
+
+        QString toString() const;
+    };
+
+    struct Egg {
+        bool valid;
+        int condition;
+        int cleanings_performed;
+        int cleanings_total;
+        PageTimer cleanings_cooldown;
+
+        Egg() {
+            valid               = false;
+            condition           = -1;
+            cleanings_performed = -1;
+            cleanings_total     = -1;
+            cleanings_cooldown  = PageTimer();
+        }
+
+        Egg(const Egg& that) {
+            *this = that;
+        }
+
+        const Egg& operator=(const Egg& that) {
+            valid               = that.valid;
+            condition           = that.condition;
+            cleanings_performed = that.cleanings_performed;
+            cleanings_total     = that.cleanings_total;
+            cleanings_cooldown  = that.cleanings_cooldown;
+            return *this;
+        }
+
+        bool parse(QWebElement &content);
+
+        bool canClean() const;
+
+        QString toString() const;
+    };
+
+
+    struct Normal {
+        bool valid;
+        int feed;
+        int hits;
+        int gold;
+        QString feed_url;
+        QString heal_url;
+        QString train_url;
+
+        Normal() {
+            valid = false;
+            feed = -1;
+            hits = -1;
+            gold = -1;
+            feed_url = QString();
+            heal_url = QString();
+            train_url = QString();
+        }
+
+        Normal(const Normal& that) {
+            *this = that;
+        }
+
+        const Normal& operator=(const Normal& that) {
+            valid = that.valid;
+            feed = that.feed;
+            hits = that.hits;
+            gold = that.gold;
+            feed_url = that.feed_url;
+            heal_url = that.heal_url;
+            train_url = that.train_url;
+            return *this;
+        }
+
+        bool parse(QWebElement &content);
+
+        QString toString() const;
+
+    };
+
+
+    struct Journey {
+        bool        valid;
+        QString     title;
+        PageTimer  journey_cooldown;
+
+        Journey() {
+            valid = false;
+            title = QString();
+            journey_cooldown = PageTimer();
+        }
+
+        Journey(const Journey& that) {
+            *this = that;
+        }
+
+        const Journey& operator=(const Journey& that) {
+            valid = that.valid;
+            title = that.title;
+            journey_cooldown = that.journey_cooldown;
+            return *this;
+        }
+
+        bool parse(QWebElement &content);
+
+        QString toString() const;
+
+    };
+
+
+    struct Boxgame {
+        bool        valid;
+
+        Boxgame() {
+            valid = false;
+        }
+
+        Boxgame(const Boxgame& that) {
+            *this = that;
+        }
+
+        const Boxgame& operator=(const Boxgame& that) {
+            valid = that.valid;
+            return *this;
+        }
+
+        bool parse(QWebElement &content);
+
+        QString toString() const;
+
+    };
+
+
+    //
+    bool    valid;
+    Caption caption;
+    Egg     egg;
+    Normal  normal;
+    Journey journey;
+    Boxgame boxgame;
+
+    FlyingInfo();
+
+    FlyingInfo(const FlyingInfo& that);
+
+    const FlyingInfo& operator=(const FlyingInfo& that);
+
+    void init();
+
+    bool parse(QWebElement& element);
+
+    QString toString() const;
 };
 
 typedef QVector<FlyingInfo> FlyingsList;
@@ -206,6 +351,7 @@ typedef QVector<FlyingInfo> FlyingsList;
 class Page_Game : public Page_Generic
 {
     Q_OBJECT
+
 public:
     QString     pagetitle;
     QString     charname;
