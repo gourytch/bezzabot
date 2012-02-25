@@ -140,7 +140,7 @@ bool WorkFlyingBreeding::processQuery(Query query) {
             }
             if (fi.journey.valid) {
                 if (!fi.journey.journey_cooldown.active()) {
-                    qDebug(u8("летун %s завершил путешествие!")
+                    qDebug(u8("летун %1 завершил путешествие!")
                            .arg(fi.caption.title));
                     return true;
                 } else {
