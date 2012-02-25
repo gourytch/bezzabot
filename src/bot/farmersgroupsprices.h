@@ -1,6 +1,8 @@
 #ifndef FARMERSGROUPSPRICES_H
 #define FARMERSGROUPSPRICES_H
 
+#include <QString>
+
 struct FGPRecord {
     int start_level;
     int farm_income;
@@ -10,8 +12,10 @@ struct FGPRecord {
     int price_helm;
 };
 
-extern FGPRecord FarmersGroupdPrices[];
+extern FGPRecord FarmersGroupsPrices[];
 
 extern const FGPRecord& getFGPRecord(int level);
+
+extern QString toString(const FGPRecord& fgpr);
 
 #endif // FARMERSGROUPSPRICES_H

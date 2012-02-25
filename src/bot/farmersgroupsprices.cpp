@@ -1,6 +1,6 @@
 #include "farmersgroupsprices.h"
 
-FGPRecord FarmersGroupdPrices[] = {
+FGPRecord FarmersGroupsPrices[] = {
     { 1,    40,    960,    320, 80, 120},
     { 3,    80,   1920,    640, 160, 240},
     { 7,   160,   3840,   1280, 320, 480},
@@ -28,7 +28,14 @@ const FGPRecord& getFGPRecord(int level) {
     if (level < 1) level = 1;
     if (level > 99) level = 99;
     const FGPRecord *p;
-    for (p = FarmersGroupdPrices; p->start_level < level; ++p);
+    for (p = FarmersGroupsPrices; p->start_level < level; ++p);
     if (level < p->start_level) --p;
     return *p;
+}
+
+extern QString toString(const FGPRecord& fgpr) {
+    return QString("{start_level:%1, farm_income:%2, safe_limit:%3, "
+                   "price_pickaxe:%4, price_goggles:%5, price_helm:%6}")
+            .arg(fgpr.start_level).arg(fgpr.farm_income).arg(fgpr.safe_limit)
+            .arg(fgpr.price_pickaxe).arg(fgpr.price_goggles).arg(fgpr.price_helm);
 }

@@ -132,7 +132,7 @@ public:
     bool doStartBigJourney();
     bool doSelectBox(int boxNo = -1);
     bool doFinishGame();
-
+    bool doSelectTab(const QString& tab, int timeout=-1);
 
 protected:
 

@@ -96,6 +96,7 @@ void BotState::update_from_page(const Page_Game *p) {
         Page_Game_Index *q = (Page_Game_Index*)p;
         level = q->level;
         fgp = getFGPRecord(level);
+        qDebug("FGPR: %s", qPrintable(::toString(fgp)));
     }
 
     // из дозора можно выдернуть данные

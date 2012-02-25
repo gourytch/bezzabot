@@ -27,11 +27,16 @@ QString WorkFlyingBreeding::getWorkStage() const {
 }
 
 bool WorkFlyingBreeding::nextStep() {
-    return GoToIncubator();
+    if (_bot->_gpage->pagekind != page_Game_Incubator) {
+        qDebug("отправляемся в инкубатор.");
+        return GoToIncubator();
+    }
+    return true;
 }
 
 
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
+    qDebug("Обработаем страничку");
     if (gpage->pagekind != page_Game_Incubator) {
         qDebug("мы пока не в инкубаторе. а должны.");
         return GoToIncubator();
@@ -39,25 +44,56 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("мы в инкубаторе.");
     Page_Game_Incubator *p = (Page_Game_Incubator *)gpage;
     if (p->selectedTab != "fa_events") {
-        qDebug("мы на %s. с ней мы работать пока не умеем",
+        qDebug("мы на %s. с ней мы работать пока не умеем, перейдём на events",
                qPrintable(p->selectedTab));
-        _cooldown = QDateTime::currentDateTime()
-                .addSecs(300 + (qrand() % 10000));
-        qDebug("поставили птичкооткат на %s",
-               qPrintable(::toString(_cooldown)));
-        return false;
+        if (!p->doSelectTab("fa_events")) {
+            qDebug("перейти как-то не получилось :(");
+            _cooldown = QDateTime::currentDateTime()
+                    .addSecs(300 + (qrand() % 10000));
+            qDebug("поставили птичкооткат на %s",
+                   qPrintable(::toString(_cooldown)));
+            return false;
+        }
+        if (p->selectedTab != "fa_events") {
+            qDebug("всё равно мы не там где надо. :(");
+            _cooldown = QDateTime::currentDateTime()
+                    .addSecs(300 + (qrand() % 10000));
+            qDebug("поставили птичкооткат на %s",
+                   qPrintable(::toString(_cooldown)));
+            return false;
+        }
+        if (!(p->fa_events0.valid || p->fa_boxgame.valid)) {
+            qDebug("нет валидного содержимого fa_events. :(");
+            _cooldown = QDateTime::currentDateTime()
+                    .addSecs(300 + (qrand() % 10000));
+            qDebug("поставили птичкооткат на %s",
+                   qPrintable(::toString(_cooldown)));
+            return false;
+        }
     }
     qDebug("мы на вкладке событий.");
     if (p->fa_boxgame.valid) {
-        qDebug("сыграем в ящик.");
-        setAwaiting();
-        if (!p->doSelectBox()) {
-            qCritical(u8("печаль. пойдм отсюда"));
-            _bot->GoToNeutralUrl();
-            return false;
+        if (p->fa_boxgame.is_finished) {
+            qDebug("заканчиваем игру.");
+            setAwaiting();
+            if (!p->doFinishGame()) {
+                qCritical(u8("печаль. не закончили. пойдём отсюда"));
+                _bot->GoToNeutralUrl();
+                return false;
+            }
+            qDebug("ожидаем закрытия.");
+            return true;
+        } else {
+            qDebug("сыграем в ящик.");
+            setAwaiting();
+            if (!p->doSelectBox()) {
+                qCritical(u8("печаль. не сыграли. пойдём отсюда"));
+                _bot->GoToNeutralUrl();
+                return false;
+            }
+            qDebug("ожидаем результатов.");
+            return true;
         }
-        qDebug("ожидаем результатов.");
-        return true;
     }
 
     if (p->fa_events0.valid) {
@@ -88,7 +124,7 @@ bool WorkFlyingBreeding::processQuery(Query query) {
         for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
             const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
             if (fi.boxgame.valid) {
-                qDebug(u8("летун %s долетел до ящичков!")
+                qDebug(u8("летун %1 долетел до ящичков!")
                        .arg(fi.caption.title));
                 return true;
             }
@@ -104,7 +140,7 @@ bool WorkFlyingBreeding::processQuery(Query query) {
                 }
             }
             if (fi.normal.valid) {
-                qDebug(u8("летун %s отлынивает от полётов!")
+                qDebug(u8("летун %1 отлынивает от полётов!")
                        .arg(fi.caption.title));
                 return true;
             }
@@ -124,9 +160,19 @@ bool WorkFlyingBreeding::processQuery(Query query) {
 bool WorkFlyingBreeding::processCommand(Command command) {
     switch (command) {
     case StartWork: {
-        qDebug("зарефрешим страничку");
-        setAwaiting();
-        _bot->GoToNeutralUrl();
+        bool needRefresh = false;
+        for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
+            const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
+            if (fi.journey.valid && fi.journey.journey_cooldown.expired()) {
+                needRefresh = true;
+                break;
+            }
+        }
+        if (needRefresh) {
+            qDebug("зарефрешим страничку");
+            setAwaiting();
+            _bot->GoToNeutralUrl();
+        }
         return true;
     }
     default:
@@ -137,6 +183,8 @@ bool WorkFlyingBreeding::processCommand(Command command) {
 
 
 bool WorkFlyingBreeding::GoToIncubator() {
+    qDebug("долгий путь в инкубатор");
+
     QDateTime now = QDateTime::currentDateTime();
     if (_cooldown.isValid() && now < _cooldown) {
         qDebug("и чего, спрашивается, пришли? таймер же активен!");
@@ -167,7 +215,7 @@ bool WorkFlyingBreeding::GoToIncubator() {
     for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
         if (fi.normal.valid) {
-            qDebug(u8("пойдём отправлять летуна %s")
+            qDebug(u8("пойдём отправлять летуна %1")
                    .arg(fi.caption.title));
             setAwaiting();
             if (!_bot->_gpage->doFlyingGoEvents(i)) {

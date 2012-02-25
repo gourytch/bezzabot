@@ -1,3 +1,4 @@
+#include <QEventLoop>
 #include "page_game_incubator.h"
 #include "tools/tools.h"
 
@@ -203,7 +204,15 @@ bool Page_Game_Incubator::doStartBigJourney() {
         qCritical("doStartBigJourney() on invalid tab");
         return false;
     }
-    submit = fa_events0.block.findFirst("DIV.zoo_event_2 FORM INPUT.cmd_all");
+    submit = QWebElement();
+
+    foreach (QWebElement form, document.findAll("DIV#flying_block FORM")) {
+        if (form.findFirst("INPUT[name=do_cmd]").attribute("value") == "do_big") {
+            submit = form.findFirst("INPUT[type=submit]");
+            break;
+        }
+    }
+
     if (submit.isNull()) {
         qCritical("start-button not found");
         return false;
@@ -216,7 +225,7 @@ bool Page_Game_Incubator::doStartBigJourney() {
 
 
 bool Page_Game_Incubator::doSelectBox(int boxNo) {
-    QWebElementCollection chests = document.findAll("DIV#flying_stop A.chest");
+    QWebElementCollection chests = document.findAll("DIV#flying_block A.chest");
     if (chests.count() == 0) {
         qCritical("found no chests");
         return false;
@@ -243,4 +252,36 @@ bool Page_Game_Incubator::doFinishGame() {
     qDebug("to next journeys");
     pressSubmit();
     return true;
+}
+
+bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
+    {
+        QWebElement e = document.findFirst("DIV#" + tab);
+        if (e.isNull()) {
+            qCritical("MISSING TAB {%s}", qPrintable(tab));
+            return false;
+        }
+        if (e.attribute("class").contains("selected")) {
+            qDebug("tab %s already selected", qPrintable(tab));
+            return true;
+        }
+        e = QWebElement();
+    }
+    qDebug("actuate tab " + tab);
+    actuate(tab);
+    delay((timeout < 0) ? 3000 + (qrand() % 3000) : timeout, false);
+    QWebElement e = document.findFirst("DIV#" + tab);
+    if (e.isNull()) {
+        qCritical("TAB {%s} LOST", qPrintable(tab));
+        return false;
+    }
+    if (!e.attribute("class").contains("selected")) {
+        qCritical("tab %s was NOT selected", qPrintable(tab));
+        qDebug("e = {%s}", qPrintable(e.toOuterXml()));
+        return false;
+    }
+    qDebug("TAB SELECTED: %s, reparse and return", qPrintable(tab));
+    reparse();
+    return true;
+
 }
