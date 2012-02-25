@@ -11,6 +11,8 @@ protected:
 
     QDateTime _cooldown;
 
+    bool _fast_mode;
+
     bool GoToIncubator();
 
 public:
