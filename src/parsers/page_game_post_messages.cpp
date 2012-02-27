@@ -36,13 +36,13 @@ bool Message::parse(QWebElement& tr) {
         return false;
     }
     //
-    QRegExp rx("(\\d\\d\\.\\d\\d\\.\\d\\d \\d\\d:\\d\\d)");
+    QRegExp rx("(\\d\\d\\.\\d\\d\\.)(\\d\\d \\d\\d:\\d\\d)");
     QString t = tds[1].toOuterXml();
     if (rx.indexIn(t) == -1) {
         qDebug("not fit to regexp from %s", qPrintable(tr.toOuterXml()));
         return false;
     }
-    pit = QDateTime::fromString(rx.cap(1), "dd.MM.yy hh:mm");
+    pit = QDateTime::fromString(rx.cap(1) + "20" + rx.cap(2), "dd.MM.yyyy hh:mm");
     td = tds[2];
     return true;
 }
@@ -52,8 +52,10 @@ QString Message::toString() const {
     QRegExp rxB("<b \\s*[^>]*title=\"([^\"]+)\"[^>]*>");
     QRegExp rxX("<[^>]*>");
     QRegExp rxS("\\s+");
+    QRegExp rxN("\\.(\\d\\d\\d)");
     s = s.replace(rxB, "[\\1]")
             .replace(rxX, " ")
+            .replace(rxN, "\\1")
             .replace("&nbsp;", " ")
             .replace(rxS, " ")
             .trimmed();
