@@ -54,6 +54,7 @@ void Parser::setup() {
     _producer.registerClass<Page_Game_Incubator>();
     _producer.registerClass<Page_Game_Clan_Treasury>();
     _producer.registerClass<Page_Game_Fight_Log>();
+    _producer.registerClass<Page_Game_Post_Messages>();
     ///
     _producer.registerClass<Page_Game>();
     _producer.registerClass<Page_Generic>();

@@ -21,5 +21,6 @@
 #include "page_game_incubator.h"
 #include "page_game_fight_log.h"
 #include "page_game_levelup.h"
+#include "page_game_post_messages.h"
 
 #endif // ALL_PAGES_H
