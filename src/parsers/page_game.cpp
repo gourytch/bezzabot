@@ -957,17 +957,20 @@ bool Page_Game::waitForPopupClosed(int ms) {
 }
 
 bool Page_Game::closePopup() {
-    { // btn надо удалить перед ожиданием
-        QWebElement btn = document.findFirst("A.ui-dialog-titlebar-close");
-        if (btn.isNull()) {
-            qDebug("close button not found");
-            return true;
-        }
-        qDebug("actuate close popup button");
-        actuate(btn);
+    // btn надо удалить перед ожиданием
+    QWebElement btn = document.findFirst("A.ui-dialog-titlebar-close");
+    if (btn.isNull()) {
+        qDebug("close button not found");
+        return true;
     }
+    QString id = btn.attribute("id");
+    if (id.isEmpty()) {
+        id = "__close_popup__";
+        btn.setAttribute("id", id);
+    }
+    qDebug("actuate close popup button by id {%s}", qPrintable(id));
+    actuate(id);
     return waitForPopupClosed();
-    return true;
 }
 
 bool Page_Game::doFlyingBoxgame(int flyingNo) {
