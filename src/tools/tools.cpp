@@ -4,7 +4,9 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QTimer>
+#include <cmath>
 #include "tools.h"
+
 
 void save (const QString& fname, const QString& text)
 {
@@ -73,4 +75,15 @@ QDateTime nextDay() {
         return QDateTime(QDate::currentDate()).addSecs(2 * 60 * 60 + 1);
     }
     return QDateTime(QDate::currentDate().addDays(1)).addSecs(2 * 60 * 60 + 1);
+}
+
+double gaussian_rand() {
+    return sqrt(-2 * log((double)(qrand()) / RAND_MAX)) *
+            cos(6.2831273072 * qrand() / RAND_MAX);
+}
+
+int gaussian_rand(int minValue, int maxValue) {
+    Q_ASSERT(minValue < maxValue);
+    int drift = maxValue - minValue + 1;
+    return (int)(gaussian_rand() * drift + minValue);
 }

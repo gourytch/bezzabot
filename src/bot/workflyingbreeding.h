@@ -11,9 +11,19 @@ protected:
 
     QDateTime _cooldown;
 
-    bool _fast_mode;
+    int _min_timegap;
+    int _max_timegap;
+    int _next_timegap;
 
     bool GoToIncubator();
+
+    void adjustCooldown(Page_Game *gpage);
+
+    bool canStartWork();
+
+    void invalidateCooldown();
+
+    void setNextTimegap();
 
 public:
 

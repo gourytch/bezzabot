@@ -54,6 +54,9 @@ inline void qFatal(const QString& s) {
     qFatal("%s", s.toUtf8().constData());
 }
 
+double gaussian_rand();
+
+int gaussian_rand(int minValue, int maxValue); // [min..max]
 
 #define ESTART(E) QString toString(E v) {switch (v) {
 #define ECASE(x) case x: return #x ;

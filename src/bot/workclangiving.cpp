@@ -61,6 +61,7 @@ bool WorkClanGiving::processPage(const Page_Game *gpage) {
             .addSecs(_minimal_interval + (qrand() % _drift_interval));
     qWarning(u8("помещаем в клан %1 золота, откат ставим на %2")
              .arg(amount).arg(_cooldown.toString("yyyy-MM-dd hh:mm:ss")));
+    setAwaiting();
     if (((Page_Game_Clan_Treasury*)gpage)->doDepositGold(amount)) {
         qDebug("вроде нормально, вдонатили");
         return false;

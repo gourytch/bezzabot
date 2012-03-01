@@ -12,7 +12,9 @@ WorkFlyingBreeding::WorkFlyingBreeding(Bot *bot) :
 
 void WorkFlyingBreeding::configure(Config *config) {
     Work::configure(config);
-    _fast_mode = config->get("Work_FlyingBreeding/fast_mode", false, false).toBool();
+    _min_timegap = config->get("Work_FlyingBreeding/min_timegap", false, 5).toInt();
+    _max_timegap = config->get("Work_FlyingBreeding/max_timegap", false, 300).toInt();
+    setNextTimegap();
 }
 
 bool WorkFlyingBreeding::isPrimaryWork() const {
@@ -39,7 +41,7 @@ bool WorkFlyingBreeding::nextStep() {
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
     if (gpage->pagekind != page_Game_Incubator) {
-        qDebug("мы пока не в инкубаторе. а должны.");
+        qDebug("мы пока не в инкубаторе. пойдём туда.");
         return GoToIncubator();
     }
     qDebug("мы в инкубаторе.");
@@ -124,43 +126,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
 bool WorkFlyingBreeding::processQuery(Query query) {
     switch (query) {
     case CanStartWork: {
-        QDateTime now = QDateTime::currentDateTime();
-        if (_cooldown.isValid() && now < _cooldown) {
-            return false;
-        }
-        if (_bot->_gpage == NULL) return false;
-        if (_bot->_gpage->flyingslist.size() == 0) return false;
-        QDateTime nearest = now.addSecs(4 * 3600);
-        for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
-            const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
-            if (fi.boxgame.valid) {
-                qDebug(u8("летун %1 долетел до ящичков!")
-                       .arg(fi.caption.title));
-                return true;
-            }
-            if (fi.journey.valid) {
-                if (!fi.journey.journey_cooldown.active()) {
-                    qDebug(u8("летун %1 завершил путешествие!")
-                           .arg(fi.caption.title));
-                    return true;
-                } else {
-                    if (fi.journey.journey_cooldown.pit < nearest) {
-                        nearest = fi.journey.journey_cooldown.pit;
-                    }
-                }
-            }
-            if (fi.normal.valid) {
-                qDebug(u8("летун %1 отлынивает от полётов!")
-                       .arg(fi.caption.title));
-                return true;
-            }
-        }
-        int sec = _fast_mode
-                ? 3 + (qrand() % 30)
-                : 30 + (qrand() % 300) + (qrand() % 300);
-        _cooldown = nearest.addSecs(sec);
-        qDebug(u8("выставили птичий откат до %1").arg(::toString(_cooldown)));
-        return false;
+        return canStartWork();
     }
     default:
         break;
@@ -173,20 +139,7 @@ bool WorkFlyingBreeding::processQuery(Query query) {
 bool WorkFlyingBreeding::processCommand(Command command) {
     switch (command) {
     case StartWork: {
-        bool needRefresh = false;
-        for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
-            const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
-            if (fi.journey.valid && fi.journey.journey_cooldown.expired()) {
-                needRefresh = true;
-                break;
-            }
-        }
-        if (needRefresh) {
-            qDebug("зарефрешим страничку");
-            setAwaiting();
-            _bot->GoToNeutralUrl();
-        }
-        return true;
+        return GoToIncubator();
     }
     default:
         break;
@@ -196,17 +149,20 @@ bool WorkFlyingBreeding::processCommand(Command command) {
 
 
 bool WorkFlyingBreeding::GoToIncubator() {
-    qDebug("долгий путь в инкубатор");
+    qDebug("проверяем, зачем нам надо в инкубатор");
+
+    if (_bot->_gpage->flyingslist.size() == 0) {
+        qDebug("а чего пришли? летунов-то нет!");
+        return false;
+    }
 
     QDateTime now = QDateTime::currentDateTime();
     if (_cooldown.isValid() && now < _cooldown) {
         qDebug("и чего, спрашивается, пришли? таймер же активен!");
         return false;
     }
-    if (_bot->_gpage->flyingslist.size() == 0) {
-        qDebug("и чего, спрашивается, пришли? летунов-то нет!");
-        return false;
-    }
+
+    invalidateCooldown();
 
     for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
@@ -224,7 +180,6 @@ bool WorkFlyingBreeding::GoToIncubator() {
         }
     }
 
-    QDateTime nearest = now.addSecs(4 * 3600);
     for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
         if (fi.normal.valid) {
@@ -239,10 +194,127 @@ bool WorkFlyingBreeding::GoToIncubator() {
             qDebug("ждём страничку с взлётной полосой");
             return true;
         }
+        if (fi.journey.valid && !fi.journey.journey_cooldown.active()) {
+            qDebug(u8("откат летуна %1 иссяк, пойдём его отправлять")
+                   .arg(fi.caption.title));
+            setAwaiting();
+            if (!_bot->_gpage->doFlyingGoEvents(i)) {
+                qCritical("не смогли перейти на отправление летуна :(");
+                _bot->GoToNeutralUrl();
+                return false;
+            }
+            qDebug("ожидаем перехода на страничку с взлётной полосой");
+            return true;
+        }
     }
-    _cooldown = nearest.addSecs(30 + (qrand() % 300) + (qrand() % 300));
-    qDebug(u8("выставили птичий откат до %1").arg(::toString(_cooldown)));
+    qDebug(u8("похоже, что ожидающих летунов нет."));
     setAwaiting();
-    _bot->GoToNeutralUrl();
+    _bot->GoToWork();
     return false;
 }
+
+
+void WorkFlyingBreeding::adjustCooldown(Page_Game *gpage) {
+    if (gpage == NULL) return;
+    if (gpage->flyingslist.size() == 0) return;
+    QDateTime cd;
+    QDateTime now = QDateTime::currentDateTime();
+    for (int i = 0; i <  gpage->flyingslist.size(); ++i) {
+        const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
+        if (fi.normal.valid || fi.boxgame.valid) {
+            // можно что-то сделать прямо сейчас
+            cd = now;
+            break;
+        }
+        if (fi.journey.valid) {
+            if (!fi.journey.journey_cooldown.active()) {
+                // истекло время путешествия
+                cd = now;
+                break;
+            } else {
+                if (cd.isNull() || fi.journey.journey_cooldown.pit < cd) {
+                    cd = fi.journey.journey_cooldown.pit;
+                }
+            }
+        }
+    }
+    if (cd.isNull()) { // cooldown не изменился
+        return;
+    }
+    // добавим немножко тормозов
+    cd = cd.addSecs(_next_timegap);
+
+    if (_cooldown.isNull()) { // начальная установка cooldown-а
+        qDebug(u8("птичий откат выставлен на %1 (осталось %2)")
+               .arg(::toString(cd))
+               .arg(::toString(QTime(0,0).addSecs(now.secsTo(cd)))));
+        _cooldown = cd;
+        setNextTimegap(); // в следующий раз будет уже по другому
+    } else if (cd < _cooldown) { // уменьшили cooldown
+        qDebug(u8("птичий откат уменьшен с %1 до %2 (осталось %3)")
+               .arg(::toString(_cooldown))
+               .arg(::toString(cd))
+               .arg(::toString(QTime(0,0).addSecs(now.secsTo(cd)))));
+        _cooldown = cd;
+    }
+}
+
+bool WorkFlyingBreeding::canStartWork() {
+
+    if (_bot->_gpage == NULL) return false;
+
+    if (_bot->_gpage->flyingslist.size() == 0) return false;
+
+    adjustCooldown(_bot->_gpage);
+
+    QDateTime now = QDateTime::currentDateTime();
+    if (_cooldown.isValid() && now < _cooldown) {
+        return false;
+    }
+    return true;
+}
+
+
+void WorkFlyingBreeding::setNextTimegap() {
+    _next_timegap = _min_timegap + (qrand() % (_max_timegap - _min_timegap));
+    qDebug(u8("будем добавлять к птичьему откату %1 сек").arg(_next_timegap));
+}
+
+void WorkFlyingBreeding::invalidateCooldown() {
+    qDebug(u8("сбросим птичий откат"));
+    _cooldown = QDateTime();
+//    setNextTimegap();
+}
+
+//bool WorkFlyingBreeding::checkDoSomething() {
+//    bool nothingToDo = true;
+//    for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
+//        const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
+//        if (fi.boxgame.valid) {
+//            qDebug(u8("летун %1 долетел до ящичков!")
+//                   .arg(fi.caption.title));
+//            nothingToDo = false;
+//            break;
+//        }
+//        if (fi.journey.valid) {
+//            if (!fi.journey.journey_cooldown.active()) {
+//                qDebug(u8("летун %1 завершил путешествие!")
+//                       .arg(fi.caption.title));
+//                nothingToDo = false;
+//                break;
+//            }
+//        }
+//        if (fi.normal.valid) {
+//            qDebug(u8("летун %1 отлынивает от полётов!")
+//                   .arg(fi.caption.title));
+//            nothingToDo = false;
+//            break;
+//        }
+//    }
+//    if (nothingToDo) {
+//        qDebug(u8("все летуны заняты своими делами. не станем им мешать"));
+//        return false;
+//    }
+//    qDebug(u8("стоит проведать летунов"));
+//    return true;
+//}
