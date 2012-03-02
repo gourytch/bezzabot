@@ -133,7 +133,7 @@ const PageTimer& PageTimer::operator= (const PageTimer &v)
 
 void PageTimer::assign (const QWebElement &e)
 {
-    if (e.tagName () == "A" && e.attribute ("class") == "timer link")
+    if (e.tagName () == "A" && e.attribute ("class").contains("timer"))
     {
         title = "?";
         href = e.attribute ("href");
@@ -392,7 +392,7 @@ bool FlyingInfo::Journey::parse(QWebElement &content) {
     QRegExp rx(u8(">((Большое|Маленькое) приключение)<"));
     if (rx.indexIn(e.toOuterXml()) == -1) return false;
     title = rx.cap(1);
-    e = content.findFirst("SPAN.js_timer");
+    e = content.findFirst("SPAN[timer]");
     if (e.isNull()) return false;
     journey_cooldown.assign(e);
     valid = true;
@@ -492,7 +492,13 @@ Page_Game::Page_Game (QWebElement& doc) :
     body = document.findFirst("DIV[id=body]");
     Q_ASSERT (!body.isNull());
     pagekind = page_Game;
-    pagetitle= doc.findFirst("DIV[class=title]").toPlainText ().trimmed ();
+    foreach (QWebElement e, doc.findAll("DIV.title")) {
+        if (isDisplayed(e)) {
+            pagetitle = e.toPlainText().trimmed();
+            break;
+        }
+    }
+//  pagetitle= doc.findFirst("DIV[class=title]").toPlainText ().trimmed ();
 
     gold = -1;
     free_gold = -1;
@@ -581,7 +587,17 @@ Page_Game::Page_Game (QWebElement& doc) :
     }
     chartitle = doc.findFirst("DIV[class=name] B").attribute ("title");
     charname = doc.findFirst("DIV[class=name] U").toPlainText ().trimmed ();
-    message = doc.findFirst("DIV[class=message]").toPlainText ().trimmed ();
+    foreach (QWebElement e, doc.findAll("DIV.message")) {
+        if (isDisplayed(e)) {
+            message = e.toPlainText().trimmed();
+            qDebug("[message] displayed: {%s}", qPrintable(message));
+            break;
+        } else {
+            qDebug("[message] hidden: {%s}",
+                   qPrintable(e.toPlainText().trimmed()));
+        }
+    }
+//    message = doc.findFirst("DIV[class=message]").toPlainText ().trimmed ();
     workguild = WorkGuild_None;
     foreach (QWebElement e, doc.findFirst("DIV.guilds").findAll("A")) {
         QString title = e.attribute("title");
@@ -973,6 +989,40 @@ bool Page_Game::closePopup() {
     return waitForPopupClosed();
 }
 
+bool Page_Game::doShowFlyingsAccordion() {
+    QWebElement accordion = document.findFirst("DIV#accordion");
+    if (accordion.isNull()) {
+        qCritical("accordion not found");
+        return false;
+    }
+    QWebElement e = accordion.findFirst("DIV.flyings");
+    if (e.isNull()) {
+        qCritical("panel flyings not found");
+        return false;
+    }
+    if (isDisplayed(e)) {
+        qDebug("panel with flyings is already visible");
+        return true;
+    }
+    qDebug("panel with flyings is not visible");
+    foreach (QWebElement tab, accordion.findAll("H3[role=tab]")) {
+        if (tab.toPlainText().contains(u8("Инкубатор"))) {
+            qDebug("found tab, actuate it");
+            actuate(tab);
+            if (!wait4("DIV#accordion DIV.flyings")) {
+                qDebug("fail :(");
+                return false;
+            }
+            delay(333 + (qrand() % 777), false);
+            qDebug("seems now is ok");
+            return true;
+        }
+    }
+    qDebug("tab not found :(");
+    return false;
+}
+
+
 bool Page_Game::doFlyingBoxgame(int flyingNo) {
     if (flyingslist.size() < flyingNo) {
         qCritical("flyings pos too big");
@@ -980,6 +1030,10 @@ bool Page_Game::doFlyingBoxgame(int flyingNo) {
     }
     if (!flyingslist.at(flyingNo).boxgame.valid) {
         qCritical("boxgame is not active");
+        return false;
+    }
+    if (!doShowFlyingsAccordion()) {
+        qCritical("accordion tab not visible");
         return false;
     }
     submit = document.findAll("DIV.flyings DIV.content")[flyingNo]
@@ -1000,6 +1054,10 @@ bool Page_Game::doFlyingGoEvents(int flyingNo) {
     }
     if (!flyingslist.at(flyingNo).normal.valid) {
         qCritical("normal is not active");
+        return false;
+    }
+    if (!doShowFlyingsAccordion()) {
+        qCritical("accordion tab not visible");
         return false;
     }
     submit = document.findAll("DIV.flyings DIV.title")[flyingNo].findFirst("A");

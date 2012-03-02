@@ -210,7 +210,7 @@ void MainWindow::setupConnections () {
 
     connect (pGoButton, SIGNAL(clicked()), this, SLOT(slotGoClicked()));
 
-    connect (pGoButton, SIGNAL(clicked()), this, SLOT(slotSavePage()));
+    connect (pSaveButton, SIGNAL(clicked()), this, SLOT(slotSavePage()));
 
     connect (pUrlEdit, SIGNAL(returnPressed()),
              this, SLOT(slotGoClicked()));

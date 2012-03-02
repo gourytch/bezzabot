@@ -156,9 +156,12 @@ bool Page_Generic::wait4(QString etext, bool present, int timeout) {
             if (e.isNull()) {
                 qDebug("still not exists");
                 usleep(250000L);
+            } else if (!isDisplayed(e)){
+                qDebug("exists but not showed");
+                usleep(250000L);
             } else {
                 int ms = 250 + (qrand() % 500);
-                qDebug("found after %d ms, wait %d ms and return",
+                qDebug("reveals after %d ms, wait %d ms and return",
                        time.elapsed(), ms);
                 delay(ms, false);
                 return true;
@@ -166,16 +169,33 @@ bool Page_Generic::wait4(QString etext, bool present, int timeout) {
         } else { // wait for disappearing
             if (e.isNull()) {
                 int ms = 250 + (qrand() % 500);
-                qDebug("disappeared after %d ms, wait %d ms and return",
+                qDebug("vanished after %d ms, wait %d ms and return",
+                       time.elapsed(), ms);
+                delay(ms, false);
+                return true;
+            } else if (!isDisplayed(e)){
+                int ms = 250 + (qrand() % 500);
+                qDebug("cloaked after %d ms, wait %d ms and return",
                        time.elapsed(), ms);
                 delay(ms, false);
                 return true;
             } else {
-                qDebug("still exists as %s", qPrintable(e.toOuterXml()));
+                qDebug("still exists and visible");
                 usleep(250000L);
             }
         }
     }
     qDebug("popup timeout.");
     return false;
+}
+
+
+bool Page_Generic::isDisplayed(QWebElement e) {
+    if (e.attribute("style").contains(QRegExp("display:\\s*none"))) {
+        return false;
+    }
+    if (e.attribute("class").contains("hidden")) {
+        return false;
+    }
+    return (e.parent().isNull()) ? true : isDisplayed(e.parent());
 }

@@ -408,6 +408,8 @@ public:
 
     bool closePopup();
 
+    bool doShowFlyingsAccordion();
+
     bool doFlyingBoxgame(int flyingNo);
 
     bool doFlyingGoEvents(int flyingNo);

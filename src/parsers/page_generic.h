@@ -48,6 +48,8 @@ public:
 
     bool wait4(QString etext, bool present=true, int timeout=-1);
 
+    bool isDisplayed(QWebElement e);
+
 protected slots:
 
     void slot_submit();

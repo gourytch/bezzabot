@@ -15,15 +15,13 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     Page_Game (doc)
 {
     pagekind = page_Game_Dozor_Entrance;
-    // DIV[id=body]
-    QWebElement infotab = body.findFirst("TABLE[class=info]");
-    QWebElementCollection groups = infotab.findAll("DIV[class=grbody]");
+    QWebElementCollection groups = document.findAll("DIV#body DIV.grbody");
 
-    _dozorForm = groups[1];
+    _dozorForm = groups[2];
     dozor_price = dottedInt(
-                _dozorForm.findFirst("SPAN[class=price_num]")
+                _dozorForm.findFirst("SPAN.price_num")
                 .toPlainText());
-    QWebElement selector = _dozorForm.findFirst("SELECT[id=auto_watch]");
+    QWebElement selector = _dozorForm.findFirst("SELECT#auto_watch");
     QWebElementCollection options = selector.findAll("OPTION");
     dozor_left10 = 0;
     foreach (QWebElement e, options) {
@@ -33,11 +31,11 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
         }
     }
 
-    _scaryForm = groups[2];
-    QWebElement t = _scaryForm.findFirst("SPAN.js_timer");
+    _scaryForm = groups[4];
+    QWebElement t = _scaryForm.findFirst("SPAN[timer]");
     if (t.isNull()) {
         scary_auto_price = dottedInt(
-                    _scaryForm.findFirst("SPAN[class=price_num]")
+                    _scaryForm.findFirst("P.sub_title_text B")
                     .toPlainText());
     } else {
         scary_auto_price = -1;
@@ -168,7 +166,7 @@ bool Page_Game_Dozor_Entrance::doScarySearch(int ix) {
         qCritical("submit not found");
         return false;
     }
-    if (submit.attribute("value") != u8("ИСКАТЬ")) {
+    if (submit.attribute("value") != u8("АТАКА")) {
         qCritical("not my submit");
         return false;
     }
