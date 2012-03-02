@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 //    a.setOrganizationDomain (ORG_DOMAIN);
 //    a.setApplicationName (APP_NAME);
 //    a.setApplicationVersion (APP_VERSION);
-
+    qsrand(QDateTime::currentDateTime().toTime_t());
     MainWindow *wnd = MainWindow::getInstance();
     wnd->show();
     return a.exec();
