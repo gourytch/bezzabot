@@ -407,6 +407,7 @@ void Bot::handle_Page_Error () {
 void Bot::handle_Page_UnderConstruction() {
     int sec = 1800 + (qrand() % 3600);
     qWarning("hangle UnderConstruction page. reload index at %d sec", sec);
+    _awaiting = true;
     Timebomb::global()->launch(sec * 1000UL, this, SLOT(delayedReload()));
 }
 
