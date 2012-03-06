@@ -153,13 +153,7 @@ bool Page_Generic::wait4(QString etext, bool present, int timeout) {
         QWebElement e = document.findFirst(etext);
 
         if (present) { // wait for creating
-            if (e.isNull()) {
-                qDebug("still not exists");
-                usleep(250000L);
-            } else if (!isDisplayed(e)){
-                qDebug("exists but not showed");
-                usleep(250000L);
-            } else {
+            if (!e.isNull() && isDisplayed(e)) {
                 int ms = 250 + (qrand() % 500);
                 qDebug("reveals after %d ms, wait %d ms and return",
                        time.elapsed(), ms);
@@ -167,21 +161,12 @@ bool Page_Generic::wait4(QString etext, bool present, int timeout) {
                 return true;
             }
         } else { // wait for disappearing
-            if (e.isNull()) {
+            if (e.isNull() || !isDisplayed(e)) {
                 int ms = 250 + (qrand() % 500);
                 qDebug("vanished after %d ms, wait %d ms and return",
                        time.elapsed(), ms);
                 delay(ms, false);
                 return true;
-            } else if (!isDisplayed(e)){
-                int ms = 250 + (qrand() % 500);
-                qDebug("cloaked after %d ms, wait %d ms and return",
-                       time.elapsed(), ms);
-                delay(ms, false);
-                return true;
-            } else {
-                qDebug("still exists and visible");
-                usleep(250000L);
             }
         }
     }
