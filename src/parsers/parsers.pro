@@ -29,7 +29,8 @@ HEADERS += \
     page_game_fight_log.h \
     page_underconstruction.h \
     page_game_levelup.h \
-    page_game_post_messages.h
+    page_game_post_messages.h \
+    page_game_harbor_market.h
 
 SOURCES += \
     types.cpp \
@@ -54,7 +55,8 @@ SOURCES += \
     page_game_fight_log.cpp \
     page_underconstruction.cpp \
     page_game_levelup.cpp \
-    page_game_post_messages.cpp
+    page_game_post_messages.cpp \
+    page_game_harbor_market.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
@@ -68,6 +70,8 @@ win32 {
   CONFIG -= debug
   CONFIG += console
 }
+
+
 
 
 

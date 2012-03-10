@@ -262,8 +262,8 @@ void WebActor::savePage ()
                      _webpage->mainFrame ()->url().toString());
         _tarball.add(pfx + ".xml",
                 _webpage->mainFrame ()->documentElement ().toOuterXml ());
-        _tarball.add(pfx + ".txt",
-                page ? page->toString() : QString("NULL"));
+//        _tarball.add(pfx + ".txt",
+//                page ? page->toString() : QString("NULL"));
     } else {
         QString pfx = _savepath + "/" + _bot->id() + "-" + ts + "-"
                 + (page ? ::toString(page->pagekind) : u8("NULL"));
