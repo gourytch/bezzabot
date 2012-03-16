@@ -14,6 +14,10 @@ void WorkFlyingBreeding::configure(Config *config) {
     Work::configure(config);
     _min_timegap = config->get("Work_FlyingBreeding/min_timegap", false, 5).toInt();
     _max_timegap = config->get("Work_FlyingBreeding/max_timegap", false, 300).toInt();
+    _use_small_journey = config->get("Work_FlyingBreeding/use_small_journey",
+                                     false, false).toBool();
+    _duration10 = config->get("Work_FlyingBreeding/duration10",
+                              false, 0).toInt();
     setNextTimegap();
 }
 
@@ -106,6 +110,22 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     }
 
     if (p->fa_events0.valid) {
+        if (_use_small_journey) {
+            if (p->fa_events0.minutesleft > 0 &&
+                p->fa_events0.minutesleft >= _duration10) {
+                qDebug("запустим по маленькому");
+                setAwaiting();
+                if (!p->doStartSmallJourney(_duration10)) {
+                    qCritical(u8("не выщло по маленькому. запретим на будущее"));
+                    _use_small_journey = false;
+                    _bot->GoToNeutralUrl();
+                    return false;
+                }
+                qDebug("ожидаем результатов.");
+                return true;
+            }
+        }
+//        if (_use_big_journey) {
         qDebug("запускаем далеко и надолго.");
         setAwaiting();
         if (!p->doStartBigJourney()) {
@@ -115,6 +135,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         }
         qDebug("ожидаем результатов.");
         return true;
+//      }
     }
     qDebug("тут нам больше делать нечего. перейдём на другую страничку");
     setAwaiting();

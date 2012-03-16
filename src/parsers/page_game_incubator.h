@@ -129,6 +129,7 @@ public:
 
     void reparse();
 
+    bool doStartSmallJourney(int duration10);
     bool doStartBigJourney();
     bool doSelectBox(int boxNo = -1);
     bool doFinishGame();

@@ -199,6 +199,51 @@ QString Page_Game_Incubator::Tab_Action_Boxgame::toString() const {
 // doXXXXX
 ////////////////////////////////////////////////////////////////////////////
 
+bool Page_Game_Incubator::doStartSmallJourney(int duration10) {
+    if (!fa_events0.valid) {
+        qCritical("doStartSmallJourney() on invalid tab");
+        return false;
+    }
+    submit = QWebElement();
+
+    foreach (QWebElement form, document.findAll("DIV#flying_block FORM")) {
+        if (form.findFirst("INPUT[name=do_cmd]").attribute("value") == "do_small") {
+
+            submit = form.findFirst("INPUT[type=submit]");
+
+            if (submit.isNull()) {
+                qCritical("start-button not found");
+                return false;
+            }
+
+            QWebElement selectedOpt;
+            QString s10 = QString::number(duration10 * 10);
+            foreach (QWebElement opt, form.findAll("SELECT[name=watch_time] OPTION")) {
+                if (duration10 <= 0) {
+                    selectedOpt = opt;
+                    continue;
+                }
+                if (opt.attribute("value").trimmed() == s10) {
+                    selectedOpt = opt;
+                    break;
+                }
+            }
+            if (selectedOpt.isNull()) {
+                qCritical("select not found");
+                return false;
+            }
+            selectedOpt.evaluateJavaScript("this.selected = true;");
+            qWarning("Запускаю летуна в малое путешествие на %s минут",
+                     qPrintable(selectedOpt.attribute("value").trimmed()));
+            pressSubmit();
+            return true;
+        }
+    }
+    qCritical("small journey form not found");
+    return false;
+}
+
+
 bool Page_Game_Incubator::doStartBigJourney() {
     if (!fa_events0.valid) {
         qCritical("doStartBigJourney() on invalid tab");
