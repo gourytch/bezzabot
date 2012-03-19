@@ -17,6 +17,7 @@ void WorkFieldsOpening::configure(Config *config) {
     _open_big = config->get("Work_FieldsOpening/open_big", false, true).toBool();
     _level_gap = config->get("Work_FieldsOpening/level_gap", false, 1).toInt();
     _min_amount = config->get("Work_FieldsOpening/min_amount", false, 1).toInt();
+    _fast_game =  config->get("Work_FieldsOpening/fast_game", false, false).toBool();
 }
 
 bool WorkFieldsOpening::isPrimaryWork() const {
@@ -53,7 +54,7 @@ bool WorkFieldsOpening::processPage(const Page_Game *gpage) {
         // work & livefield
         Page_Game_Mine_LiveField *p = (Page_Game_Mine_LiveField*)gpage;
         qDebug("открываем всё разом");
-        if (p->doRandomOpen()) {
+        if (p->doRandomOpen(_fast_game)) {
             qDebug("пока всё нормально");
             setAwaiting();
             return true;
@@ -103,7 +104,7 @@ bool WorkFieldsOpening::processPage(const Page_Game *gpage) {
         if (p->tickets_left > 0 && p->hp_cur >= 25) {
             // продолжим, наверное, пока здоровье позволяет
             qDebug("... ещё разок сыграем");
-            if (p->doRestart()) {
+            if (p->doRestart(_fast_game)) {
                 qDebug("рестартанули");
                 setAwaiting();
                 return true;
@@ -115,7 +116,7 @@ bool WorkFieldsOpening::processPage(const Page_Game *gpage) {
         qDebug("... пока хватит, наверное, пойдём ко входу");
         _bot->GoTo("mine.php");
         setAwaiting();
-        return false;
+        return true;
     }
 
     qDebug("надо начать работу. идём на вход шахты");

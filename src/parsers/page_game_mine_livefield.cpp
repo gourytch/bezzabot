@@ -50,7 +50,7 @@ bool Page_Game_Mine_LiveField::fit(const QWebElement& doc) {
     return true;
 }
 
-bool Page_Game_Mine_LiveField::doRandomOpen() {
+bool Page_Game_Mine_LiveField::doRandomOpen(bool fast) {
     if (finished) {
         qCritical("game already finished");
         return false;
@@ -60,11 +60,15 @@ bool Page_Game_Mine_LiveField::doRandomOpen() {
         return false;
     }
     submit = _linkRandom;
-    pressSubmit();
+    if (fast) {
+        pressSubmit(30, 500);
+    } else {
+        pressSubmit();
+    }
     return true;
 }
 
-bool Page_Game_Mine_LiveField::doRestart() {
+bool Page_Game_Mine_LiveField::doRestart(bool fast) {
     if (!finished) {
         qCritical("game is not finished");
         return false;
@@ -74,6 +78,10 @@ bool Page_Game_Mine_LiveField::doRestart() {
         return false;
     }
     submit = _linkRestart;
-    pressSubmit();
+    if (fast) {
+        pressSubmit(30, 500);
+    } else {
+        pressSubmit();
+    }
     return true;
 }

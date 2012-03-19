@@ -29,7 +29,8 @@ SOURCES += \
     workclangiving.cpp \
     workfarming.cpp \
     workscaryfighting.cpp \
-    workflyingbreeding.cpp
+    workflyingbreeding.cpp \
+    worktraining.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -46,7 +47,8 @@ HEADERS  += \
     workclangiving.h \
     workfarming.h \
     workscaryfighting.h \
-    workflyingbreeding.h
+    workflyingbreeding.h \
+    worktraining.h
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
@@ -58,6 +60,8 @@ DESTDIR = $$TOP/bin
 
 RESOURCES += \
     bot.qrc
+
+
 
 
 

@@ -29,11 +29,9 @@ public:
 
     static bool fit(const QWebElement& doc);
 
-    bool doRandomOpen();
+    bool doRandomOpen(bool fast = false);
 
-    bool doRestart();
-
-    bool doCancel();
+    bool doRestart(bool fast = false);
 
 signals:
 

@@ -17,6 +17,8 @@ protected:
 
     int _min_amount;
 
+    bool _fast_game;
+
 public:
 
     explicit WorkFieldsOpening(Bot *bot);
