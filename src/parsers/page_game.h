@@ -43,8 +43,15 @@ struct PageTimer
     }
 
     bool active(int secs = 0) const {
-        return (defined() &&
-                (QDateTime::currentDateTime().addSecs(secs) < pit));
+        return (cooldown() > secs);
+    }
+
+    int cooldown() const {
+        if (defined()) {
+            int secs = QDateTime::currentDateTime().secsTo(pit);
+            return secs < 0 ? 0 : secs;
+        }
+        return 0;
     }
 
     void adjust();
