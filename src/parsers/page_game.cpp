@@ -27,6 +27,9 @@ ECASE(pet_Armadillo)
 ECASE(pet_Worm)
 ECASE(pet_RedWorm)
 ECASE(pet_Fox)
+ECASE(pet_Unknown2)
+ECASE(pet_Unknown3)
+ECASE(pet_Monkey)
 EEND
 
 ESTART(FlyingKind)

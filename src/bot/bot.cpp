@@ -20,6 +20,8 @@
 #include "workfarming.h"
 #include "workscaryfighting.h"
 #include "workflyingbreeding.h"
+#include "worktraining.h"
+
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent) // QThread
@@ -715,6 +717,7 @@ void Bot::initWorks() {
     _worklist.append(new WorkFieldsOpening(this));
     _worklist.append(new WorkFarming(this));
     _worklist.append(new WorkScaryFighting(this));
+    _worklist.append(new WorkTraining(this));
 
     _secworklist.append(new WorkFishing(this));
     _secworklist.append(new WorkClanGiving(this));

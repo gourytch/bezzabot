@@ -139,6 +139,8 @@ enum PetKind {
     pet_Worm,
     pet_RedWorm,
     pet_Fox,
+    pet_Unknown2,
+    pet_Unknown3,
     pet_Monkey
 };
 

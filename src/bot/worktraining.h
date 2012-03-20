@@ -7,17 +7,8 @@ class WorkTraining : public Work
 {
     Q_OBJECT
 
-    QString _trainlist;
-    bool _use_power;
-    bool _use_block;
-    bool _use_dexterity;
-    bool _use_endurance;
-    bool _use_charisma;
-    long _price_power;
-    long _price_block;
-    long _price_dexterity;
-    long _price_endurance;
-    long _price_charisma;
+    bool _uselist[5];
+    long _price[5];
 
     bool canTraining();
 

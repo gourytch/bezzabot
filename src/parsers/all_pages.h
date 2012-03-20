@@ -23,5 +23,6 @@
 #include "page_game_levelup.h"
 #include "page_game_post_messages.h"
 #include "page_game_harbor_market.h"
+#include "page_game_training.h"
 
 #endif // ALL_PAGES_H
