@@ -53,58 +53,60 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("мы в инкубаторе.");
     Page_Game_Incubator *p = (Page_Game_Incubator *)gpage;
 
-    if (p->selectedTab != "fa_bonus") {
-        qDebug("зайдём на бонус-вкладку.");
-        if (!p->doSelectTab("fa_bonus")) {
-            qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.");
-        }
-    }
-
-    if (p->fa_bonus.valid) {
-        qDebug("мы на бонусовой вкладке");
-
-#define TEST_BONUS 6
-
-        int cd = p->getBonusCooldown(TEST_BONUS);
-        QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[TEST_BONUS]);
-        if (cd < 3600) {
-            qDebug(u8("%1 истекает! надо продлять").arg(name));
-            if (p->crystal >= p->getBonusPrice2(TEST_BONUS)) {
-                qWarning(u8("продлеваем %1").arg(name));
-                if (!p->doBonusSetCheck(TEST_BONUS, true)) {
-                    qCritical("set check failed!");
-                    setAwaiting();
-                    _bot->GoToWork();
-                    return false;
-                }
-                if (!p->doBonusSetCurrency(1)) {
-                    qCritical("set currency failed!");
-                    setAwaiting();
-                    _bot->GoToWork();
-                    return false;
-                }
-                if (!p->doBonusSetDuration(1)) {
-                    qCritical("set duration failed!");
-                    setAwaiting();
-                    _bot->GoToWork();
-                    return false;
-                }
-                if (!p->doBonusSubmit()) {
-                    qCritical("submit failed!");
-                    setAwaiting();
-                    _bot->GoToWork();
-                    return false;
-                }
-                qDebug("ждём перезагрузки страницы");
-                setAwaiting();
-                return true;
-            } else {
-                qDebug("... но кристаллов не хватает :(");
+    if (_check4bell) {
+        if (p->selectedTab != "fa_bonus") {
+            qDebug("зайдём на бонус-вкладку.");
+            if (!p->doSelectTab("fa_bonus")) {
+                qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.");
             }
-        } else {
-            qDebug(u8("... %1 активен ещё %2 сек").arg(name).arg(cd));
         }
-    }
+
+        if (p->fa_bonus.valid) {
+            qDebug("мы на бонусовой вкладке");
+
+#define BELL_IX 6
+
+            int cd = p->getBonusCooldown(BELL_IX);
+            QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
+            if (cd < 3600) {
+                qDebug(u8("%1 истекает! надо продлять").arg(name));
+                if (p->crystal >= p->getBonusPrice2(BELL_IX)) {
+                    qWarning(u8("продлеваем %1").arg(name));
+                    if (!p->doBonusSetCheck(BELL_IX, true)) {
+                        qCritical("set check failed!");
+                        setAwaiting();
+                        _bot->GoToWork();
+                        return false;
+                    }
+                    if (!p->doBonusSetCurrency(1)) {
+                        qCritical("set currency failed!");
+                        setAwaiting();
+                        _bot->GoToWork();
+                        return false;
+                    }
+                    if (!p->doBonusSetDuration(1)) {
+                        qCritical("set duration failed!");
+                        setAwaiting();
+                        _bot->GoToWork();
+                        return false;
+                    }
+                    if (!p->doBonusSubmit()) {
+                        qCritical("submit failed!");
+                        setAwaiting();
+                        _bot->GoToWork();
+                        return false;
+                    }
+                    qDebug("ждём перезагрузки страницы");
+                    setAwaiting();
+                    return true;
+                } else {
+                    qDebug("... но кристаллов не хватает :(");
+                }
+            } else {
+                qDebug(u8("... %1 активен ещё %2 сек").arg(name).arg(cd));
+            }
+        }
+    } // check4bell
 
     if (p->selectedTab != "fa_events") {
         qDebug("мы на %s. перейдём на events",
