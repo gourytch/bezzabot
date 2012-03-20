@@ -21,20 +21,25 @@ void WorkTraining::configure(Config *config) {
     _gold_over = config->get("Work_Training/gold_over", false, 0).toInt();
     QStringList L = config->get("Work_Training/train", false, "")
             .toString().split(QRegExp("\\s*(\\s+|,)\\s*"));
+
+    for (int i = 0; i < 5; ++i) {
+        _price[i] = 0;
+        _uselist[i] = false;
+    }
     foreach (QString ss, L) {
         QString s = ss.trimmed();
-        _uselist[0] |= (s == "power") || (s == u8("сила"));
-        _uselist[1] |= (s == "block") || (s == u8("защита"));
-        _uselist[2] |= (s == "dexterity") || (s == u8("ловкость"));
-        _uselist[3] |= (s == "endurance") || (s == u8("масса"));
-        _uselist[4] |= (s == "charisma") || (s == u8("мастерство"));
+        _uselist[0] |= (s == u8("power")) || (s == u8("сила"));
+        _uselist[1] |= (s == u8("block")) || (s == u8("защита"));
+        _uselist[2] |= (s == u8("dexterity")) || (s == u8("ловкость"));
+        _uselist[3] |= (s == u8("endurance")) || (s == u8("масса"));
+        _uselist[4] |= (s == u8("charisma")) || (s == u8("мастерство"));
     }
-    qDebug("Расписание тренировок:");
-    qDebug("  Сила      : %s", _uselist[0] ? "активно" : "неактивно");
-    qDebug("  Защита    : %s", _uselist[1] ? "активно" : "неактивно");
-    qDebug("  Ловкость  : %s", _uselist[2] ? "активно" : "неактивно");
-    qDebug("  Масса     : %s", _uselist[3] ? "активно" : "неактивно");
-    qDebug("  Мастерство: %s", _uselist[4] ? "активно" : "неактивно");
+    qDebug(u8("Расписание тренировок:"));
+    qDebug(u8("  Сила      : %1").arg(u8(_uselist[0] ? "активно" : "неактивно")));
+    qDebug(u8("  Защита    : %1").arg(u8(_uselist[1] ? "активно" : "неактивно")));
+    qDebug(u8("  Ловкость  : %1").arg(u8(_uselist[2] ? "активно" : "неактивно")));
+    qDebug(u8("  Масса     : %1").arg(u8(_uselist[3] ? "активно" : "неактивно")));
+    qDebug(u8("  Мастерство: %1").arg(u8(_uselist[4] ? "активно" : "неактивно")));
     qDebug(u8("сохраняем %1 золота при тренировке").arg(_gold_over));
 }
 
@@ -61,7 +66,7 @@ bool WorkTraining::nextStep() {
 
 bool WorkTraining::processPage(const Page_Game *gpage) {
     if (gpage->pagekind != page_Game_Training) {
-        qDebug("пойдём тренироваться или посмотрим на цены");
+        qDebug(u8("пойдём тренироваться или посмотрим на цены"));
         gotoWork();
         return true;
     }
