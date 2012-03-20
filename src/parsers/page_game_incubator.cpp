@@ -288,7 +288,7 @@ bool Page_Game_Incubator::doSelectBox(int boxNo) {
 
 
 bool Page_Game_Incubator::doFinishGame() {
-    QWebElement link= document.findFirst("DIV#flying_stop A");
+    QWebElement link= document.findFirst("DIV#flying_block CENTER A");
     if (link.isNull()) {
         qCritical("found no link");
         return false;

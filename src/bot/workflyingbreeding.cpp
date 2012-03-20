@@ -87,6 +87,9 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("мы на вкладке событий.");
     if (p->fa_boxgame.valid) {
         if (p->fa_boxgame.is_finished) {
+            qWarning(u8("мы открыли сундучок и добыли %1 [%2]")
+                     .arg(p->fa_boxgame.amount)
+                     .arg(p->fa_boxgame.currency));
             qDebug("заканчиваем игру.");
             setAwaiting();
             if (!p->doFinishGame()) {
