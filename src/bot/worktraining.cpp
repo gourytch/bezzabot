@@ -35,6 +35,7 @@ void WorkTraining::configure(Config *config) {
     qDebug("  Ловкость  : %s", _uselist[2] ? "активно" : "неактивно");
     qDebug("  Масса     : %s", _uselist[3] ? "активно" : "неактивно");
     qDebug("  Мастерство: %s", _uselist[4] ? "активно" : "неактивно");
+    qDebug(u8("сохраняем %1 золота при тренировке").arg(_gold_over));
 }
 
 
