@@ -2,6 +2,7 @@
 #include <QString>
 #include "worktraining.h"
 #include "bot.h"
+#include "tools/tools.h"
 
 
 WorkTraining::WorkTraining(Bot *bot) : Work(bot) {

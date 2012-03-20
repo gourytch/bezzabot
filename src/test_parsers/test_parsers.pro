@@ -1,5 +1,6 @@
 TOP = ../..
 
+CONFIG += qt debug warn_on
 QT += core gui network webkit
 
 TARGET = test_parsers

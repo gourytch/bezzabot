@@ -60,6 +60,6 @@ int gaussian_rand(int minValue, int maxValue); // [min..max]
 
 #define ESTART(E) QString toString(E v) {switch (v) {
 #define ECASE(x) case x: return #x ;
-#define EEND default: return QString("UNLISTED#").arg((int)v); }}
+#define EEND default: return QString("UNLISTED#%1").arg((int)v); }}
 
 #endif // TOOLS_H

@@ -138,7 +138,8 @@ enum PetKind {
     pet_Armadillo,
     pet_Worm,
     pet_RedWorm,
-    pet_Fox
+    pet_Fox,
+    pet_Monkey
 };
 
 QString toString(PetKind v);

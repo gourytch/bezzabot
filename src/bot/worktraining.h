@@ -13,11 +13,11 @@ class WorkTraining : public Work
     bool _use_dexterity;
     bool _use_endurance;
     bool _use_charisma;
-    ulong _price_power;
-    ulong _price_block;
-    ulong _price_dexterity;
-    ulong _price_endurance;
-    ulong _price_charisma;
+    long _price_power;
+    long _price_block;
+    long _price_dexterity;
+    long _price_endurance;
+    long _price_charisma;
 
     bool canTraining();
 

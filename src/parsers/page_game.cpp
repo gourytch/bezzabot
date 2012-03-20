@@ -800,8 +800,8 @@ QString Page_Game::toString (const QString& pfx) const
 
     return "Page_Game {\n" +
             pfx + Page_Generic::toString (pfx + "   ") + "\n" +
-            pfx + "pagetitle: {" + pagetitle + "}\n" +
-            pfx + "character: " + chartitle + " " + charname + "\n" +
+            pfx + u8("pagetitle: {%1}\n").arg(pagetitle) +
+            pfx + u8("character: %1 %2\n").arg(chartitle, charname) +
             pfx + QString("hp: %1/%2, spd %3\n")
             .arg(hp_cur).arg(hp_max).arg(hp_spd) +
             pfx + QString("gold: %1, crystal: %2, fish:%3, green:%4\n")
