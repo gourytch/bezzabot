@@ -18,6 +18,7 @@ WorkTraining::WorkTraining(Bot *bot) : Work(bot) {
 
 void WorkTraining::configure(Config *config) {
     Work::configure(config);
+    _gold_over = config->get("Work_Training/gold_over", false, 0).toInt();
     QStringList L = config->get("Work_Training/train", false, "")
             .toString().split(QRegExp("\\s*(\\s+|,)\\s*"));
     foreach (QString ss, L) {
@@ -74,7 +75,7 @@ bool WorkTraining::processPage(const Page_Game *gpage) {
     // ищем максимальный по стоимости навык, который можно прокачать
     int price = -1;
     int ix = -1;
-    int gold = p->gold;
+    int gold = p->gold - _gold_over;
     for (int i = 0; i < 5; ++i) {
         if (!_uselist[i]) continue;
         if (gold < _price[i]) continue;
@@ -126,7 +127,7 @@ bool WorkTraining::canTraining() {
     if (_bot == NULL) return false;
     if (_bot->_gpage == NULL) return false;
     if (_bot->_gpage->timer_work.defined()) return false;
-    long gold = _bot->_gpage->gold;
+    long gold = _bot->_gpage->gold - _gold_over;
     for (int i = 0; i < 5; ++i) {
         if (_uselist[i] && _price[i] <= gold) {
             qDebug(u8("можно натренировать %1")

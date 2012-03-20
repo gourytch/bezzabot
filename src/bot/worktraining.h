@@ -9,7 +9,7 @@ class WorkTraining : public Work
 
     bool _uselist[5];
     long _price[5];
-
+    long _gold_over;
     bool canTraining();
 
 public:
