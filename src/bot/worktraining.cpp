@@ -53,7 +53,7 @@ QString WorkTraining::getWorkStage() const {
 
 
 bool WorkTraining::nextStep() {
-    return false;
+    return processPage(_bot->_gpage);
 }
 
 
@@ -128,7 +128,12 @@ bool WorkTraining::canTraining() {
     if (_bot->_gpage->timer_work.defined()) return false;
     long gold = _bot->_gpage->gold;
     for (int i = 0; i < 5; ++i) {
-        if (_uselist[i] && _price[i] <= gold) return true;
+        if (_uselist[i] && _price[i] <= gold) {
+            qDebug(u8("можно натренировать %1")
+                   .arg(u8(Page_Game_Training::stat_name[i])));
+            return true;
+        }
     }
+    qDebug(u8("тренироваться не выйдет"));
     return false;
 }
