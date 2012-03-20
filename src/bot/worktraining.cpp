@@ -1,5 +1,6 @@
 #include <QStringList>
 #include <QString>
+#include <QRegExp>
 #include "worktraining.h"
 #include "bot.h"
 #include "tools/tools.h"
@@ -17,8 +18,10 @@ WorkTraining::WorkTraining(Bot *bot) : Work(bot) {
 
 void WorkTraining::configure(Config *config) {
     Work::configure(config);
-    QStringList L = config->get("Work_Training/train", false, "").toStringList();
-    foreach (QString s, L) {
+    QStringList L = config->get("Work_Training/train", false, "")
+            .toString().split(QRegExp("\\s*(\\s+|,)\\s*"));
+    foreach (QString ss, L) {
+        QString s = ss.trimmed();
         _uselist[0] |= (s == "power") || (s == u8("сила"));
         _uselist[1] |= (s == "block") || (s == u8("защита"));
         _uselist[2] |= (s == "dexterity") || (s == u8("ловкость"));
