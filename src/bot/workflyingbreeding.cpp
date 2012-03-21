@@ -44,6 +44,9 @@ bool WorkFlyingBreeding::nextStep() {
 }
 
 
+#define BELL_IX 6
+#define BELL_TIMEOUT (4 * 3600)
+
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
     if (gpage->pagekind != page_Game_Incubator) {
@@ -53,7 +56,11 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("мы в инкубаторе.");
     Page_Game_Incubator *p = (Page_Game_Incubator *)gpage;
 
-    if (_check4bell) {
+    if (_check4bell &&
+        (((qrand() % 10) == 0) ||
+         _bell_pit.isNull() ||
+         QDateTime::currentDateTime().secsTo(_bell_pit) < BELL_TIMEOUT)) {
+        qDebug("проверим, как там колокольчик поживает.");
         if (p->selectedTab != "fa_bonus") {
             qDebug("зайдём на бонус-вкладку.");
             if (!p->doSelectTab("fa_bonus")) {
@@ -63,12 +70,10 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
 
         if (p->fa_bonus.valid) {
             qDebug("мы на бонусовой вкладке");
-
-#define BELL_IX 6
-
             int cd = p->getBonusCooldown(BELL_IX);
+            _bell_pit = QDateTime::currentDateTime().addSecs(cd);
             QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
-            if (cd < 3600) {
+            if (cd < BELL_TIMEOUT) {
                 qDebug(u8("%1 истекает! надо продлять").arg(name));
                 if (p->crystal >= p->getBonusPrice2(BELL_IX)) {
                     qWarning(u8("продлеваем %1").arg(name));

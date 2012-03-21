@@ -10,6 +10,7 @@ class WorkFlyingBreeding : public Work
 protected:
 
     QDateTime _cooldown;
+    QDateTime _bell_pit;
 
     int     _min_timegap;
     int     _max_timegap;
