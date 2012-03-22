@@ -30,6 +30,10 @@ protected:
 
     QString _wear_on_end;
 
+    static bool _use_postponed_wearing;
+
+    static QString _wear_postponed;
+
 public:
 
     void gotoWork();

@@ -4,6 +4,10 @@
 #include "tools/activityhours.h"
 #include "tools/tools.h"
 
+bool Work::_use_postponed_wearing;
+QString Work::_wear_postponed;
+
+
 Work::Work(Bot *bot) :
     QObject(bot),
     _bot(bot)
@@ -21,11 +25,16 @@ void Work::configure(Config *config) {
             .toString().trimmed();
     _wear_on_end   = config->get(wname + "/wear_on_end", false, "")
             .toString().trimmed();
+    _use_postponed_wearing = config->get("Work/use_postponed_wearing",
+                                         false, true).toBool();
+
     qDebug(u8("%1 generic settings:").arg(wname));
     qDebug(u8("   enabled        : %1").arg(_enabled ? "true" : "false"));
     qDebug(u8("   activity_hours : %1").arg(_activity_hours.toString()));
     qDebug(u8("   wear_on_begin  : «%1»").arg(_wear_on_begin));
     qDebug(u8("   wear_on_end    : «%1»").arg(_wear_on_end));
+    qDebug(u8("use_postponed_wearing (global): «%1»")
+           .arg(_use_postponed_wearing ? "true" : "false"));
 }
 
 void Work::setAwaiting() {
@@ -82,6 +91,9 @@ bool Work::isNotMyWork() const {
 
 void Work::wearOnBegin() {
     if (hasWork()) return;
+    QString coulon = _wear_on_begin.isNull() ?_wear_postponed : _wear_on_begin;
+    _wear_postponed = QString();
+
     quint32 id = _bot->search_coulon_by_name(_wear_on_begin);
     if (!_bot->is_need_to_change_coulon(id)) return;
     qDebug(u8("перед началом %1 надеваем %2 (#%3)")
@@ -90,6 +102,10 @@ void Work::wearOnBegin() {
 }
 
 void Work::wearOnEnd() {
+    if (_use_postponed_wearing) {
+        _wear_postponed = _wear_on_end;
+        return;
+    }
     if (hasWork()) return;
     quint32 id = _bot->search_coulon_by_name(_wear_on_end);
     if (!_bot->is_need_to_change_coulon(id)) return;
