@@ -710,7 +710,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         QWebElement a = c.findFirst("A");
         r.href = a.attribute("href");
         bool ok;
-        QString t = c.toPlainText();//.trimmed();
+        QString t = c.toPlainText().trimmed();
 
 //        if (r.id == 33 || r.id == 34) {
 //            qDebug("*** inner=" + c.toInnerXml());
@@ -728,10 +728,20 @@ Page_Game::Page_Game (QWebElement& doc) :
             QRegExp rx( "(\\d+)\\s*/\\s*(\\d+)");
             if (rx.indexIn(c.toInnerXml()) == -1) {
                 r.count = -1;
+                // дерьмовый toPlainText
+                QRegExp rx2("</a>\\s*([0123456789+-.]+)\\s*</li>");
+                if (rx2.indexIn(c.toOuterXml())) {
+//                    qDebug(u8("cap={%1}").arg(rx2.cap(1)));
+                    r.count = dottedInt(rx2.cap(1));
+                }
+                qDebug(u8("unbarseable t={%1} from c={%2}")
+                       .arg(t, c.toOuterXml()));
             } else {
                 r.count = rx.cap(1).toInt(&ok);
                 if (!ok) {
                     r.count = -1;
+                    qDebug(u8("unbarseable t={%1} from c={%2}")
+                           .arg(t, c.toOuterXml()));
                 }
             }
         }
