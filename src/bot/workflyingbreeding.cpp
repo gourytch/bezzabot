@@ -86,20 +86,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     }
     qDebug("мы на вкладке событий.");
     if (p->fa_boxgame.valid) {
-        if (p->fa_boxgame.is_finished) {
-            qWarning(u8("мы открыли сундучок и добыли %1 [%2]")
-                     .arg(p->fa_boxgame.amount)
-                     .arg(p->fa_boxgame.currency));
-            qDebug("заканчиваем игру.");
-            setAwaiting();
-            if (!p->doFinishGame()) {
-                qCritical(u8("печаль. не закончили. пойдём отсюда"));
-                _bot->GoToWork();
-                return false;
-            }
-            qDebug("ожидаем закрытия.");
-            return true;
-        } else {
+        if (!p->fa_boxgame.is_finished) {
             qDebug("сыграем в ящик.");
             setAwaiting();
             if (!p->doSelectBox()) {
@@ -109,6 +96,26 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             }
             qDebug("ожидаем результатов.");
             return true;
+        } else {
+            qWarning(u8("мы открыли сундучок и добыли %1 [%2]")
+                     .arg(p->fa_boxgame.amount)
+                     .arg(p->fa_boxgame.currency));
+            qDebug("закрываем игру, переходим к приключениям.");
+            if (!p->doFinishGame()) {
+                qCritical(u8("печаль. не закончили. пойдём отсюда"));
+                setAwaiting();
+                _bot->GoToWork();
+                return false;
+            }
+            qDebug("проверим, действительно ли открылась отправлялка...");
+            if (p->fa_events0.valid) {
+                qDebug("... всё хорошо. работаем дальше");
+            } else {
+                qCritical(u8("нужная панелька почему-то не открылась. уйдём"));
+                setAwaiting();
+                _bot->GoToWork();
+                return false;
+            }
         }
     }
 

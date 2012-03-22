@@ -293,9 +293,13 @@ bool Page_Game_Incubator::doFinishGame() {
         qCritical("found no link");
         return false;
     }
+    qDebug("close boxgame");
     submit = link;
-    qDebug("to next journeys");
     pressSubmit();
+    qDebug("wait for reload");
+    delay(3000 + (qrand() % 3000), false);
+    qDebug("... reparse");
+    reparse();
     return true;
 }
 
