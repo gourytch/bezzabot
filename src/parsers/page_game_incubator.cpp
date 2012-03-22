@@ -9,6 +9,13 @@
 ///
 //////////////////////////////////
 Page_Game_Incubator::Flying::Flying() {
+    rel         = -1;
+    title       = "UNASSIGNED TITLE";
+    kind        = "UNASSIGNED KIND";
+    active      = false;
+    was_born    = false;
+    readiness   = -1;
+    birth_pit   = PageTimer();
 }
 
 
@@ -38,12 +45,14 @@ bool Page_Game_Incubator::Flying::parse(QWebElement& e) {
     if (rx.indexIn(e.attribute("class")) == -1) return false;
     kind    = rx.cap(1);
     active  = (rx.cap(2) == "active");
+    was_born= !kind.endsWith('1');
     return true;
 }
 
 QString Page_Game_Incubator::Flying::toString() const {
-    return u8("{rel=%1 title=%2 kind=%3 active=%4}")
-            .arg(rel).arg(title).arg(kind).arg(active);
+    return u8("{rel=%1 title=%2 kind=%3 active=%4 born=%5}")
+            .arg(rel).arg(title).arg(kind).arg(active)
+            .arg(was_born ? "true" : "false");
 }
 
 
@@ -90,11 +99,20 @@ void Page_Game_Incubator::reparse() {
 
 void Page_Game_Incubator::parseDivFlyings() {
     flyings.clear();
+    rel_active = -1;
+    ix_active = -1;
+    int ix = -1;
     foreach (QWebElement e, document.findAll("DIV#flyings DIV[rel]")) {
         Flying item;
-        if (item.parse(e))  flyings.append(item);
+        ++ix;
+        if (item.parse(e)) {
+            flyings.append(item);
+            if (item.active) {
+                rel_active = item.rel;
+                ix_active = ix;
+            }
+        }
     }
-
 }
 
 

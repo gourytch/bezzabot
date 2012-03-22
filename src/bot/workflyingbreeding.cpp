@@ -53,25 +53,28 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         qDebug("мы пока не в инкубаторе. пойдём туда.");
         return GoToIncubator();
     }
-    qDebug("мы в инкубаторе.");
     Page_Game_Incubator *p = (Page_Game_Incubator *)gpage;
+    qDebug(u8("мы в инкубаторе. rel_active = %1").arg(p->rel_active));
 
-    if (_check4bell &&
-        (((qrand() % 10) == 0) ||
-         _bell_pit.isNull() ||
-         QDateTime::currentDateTime().secsTo(_bell_pit) < BELL_TIMEOUT)) {
-        qDebug("проверим, как там колокольчик поживает.");
-        if (p->selectedTab != "fa_bonus") {
-            qDebug("зайдём на бонус-вкладку.");
-            if (!p->doSelectTab("fa_bonus")) {
-                qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.");
+    if (_check4bell && p->flyings.at(p->ix_active).was_born) {
+        QDateTime pit = _pit_bell[p->rel_active];
+
+        if (((qrand() % 10) == 0) ||
+                pit.isNull() ||
+                QDateTime::currentDateTime().secsTo(pit) < BELL_TIMEOUT) {
+            qDebug("проверим, как там колокольчик поживает.");
+            if (p->selectedTab != "fa_bonus") {
+                qDebug("зайдём на бонус-вкладку.");
+                if (!p->doSelectTab("fa_bonus")) {
+                    qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.");
+                }
             }
         }
 
         if (p->fa_bonus.valid) {
             qDebug("мы на бонусовой вкладке");
             int cd = p->getBonusCooldown(BELL_IX);
-            _bell_pit = QDateTime::currentDateTime().addSecs(cd);
+            _pit_bell[p->rel_active] = QDateTime::currentDateTime().addSecs(cd);
             QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
             if (cd < BELL_TIMEOUT) {
                 qDebug(u8("%1 истекает! надо продлять").arg(name));
@@ -108,7 +111,10 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                     qDebug("... но кристаллов не хватает :(");
                 }
             } else {
-                qDebug(u8("... %1 активен ещё %2 сек").arg(name).arg(cd));
+                qDebug(u8("... %1 активен ещё %2 сек (pit = %3)")
+                       .arg(name)
+                       .arg(cd)
+                       .arg(::toString(_pit_bell[p->rel_active])));
             }
         }
     } // check4bell

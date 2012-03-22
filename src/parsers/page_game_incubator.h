@@ -131,6 +131,8 @@ public:
     QString selectedTab;
 
     FlyingContainer flyings;
+    int rel_active;
+    int ix_active;
 
     Tab_Action_Normal fa_events0;
     Tab_Action_Boxgame fa_boxgame;

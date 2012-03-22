@@ -1,6 +1,7 @@
 #ifndef WORKFLYINGBREEDING_H
 #define WORKFLYINGBREEDING_H
 
+#include <QMap>
 #include "work.h"
 
 class WorkFlyingBreeding : public Work
@@ -9,8 +10,11 @@ class WorkFlyingBreeding : public Work
 
 protected:
 
+    QMap<int, QDateTime> _pit_bell;
+    QMap<int, QDateTime> _pit_feed;
+
     QDateTime _cooldown;
-    QDateTime _bell_pit;
+//    QDateTime _bell_pit;
 
     int     _min_timegap;
     int     _max_timegap;
@@ -33,17 +37,6 @@ protected:
     bool    _use_powerup_redbag;
     bool    _use_powerup_bell;
     bool    _use_powerup_clower;
-
-
-    QDateTime    _pit_strength;
-    QDateTime    _pit_block;
-    QDateTime    _pit_dexterity;
-    QDateTime    _pit_endurance;
-    QDateTime    _pit_charisma;
-    QDateTime    _pit_goldbag;
-    QDateTime    _pit_redbag;
-    QDateTime    _pit_bell;
-    QDateTime    _pit_clower;
 
     bool    _use_food_crystals;
     bool    _use_food_peasants;
