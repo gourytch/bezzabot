@@ -10,6 +10,7 @@ class WorkFlyingBreeding : public Work
 protected:
 
     QDateTime _cooldown;
+    QDateTime _bell_pit;
 
     int     _min_timegap;
     int     _max_timegap;
@@ -33,6 +34,7 @@ protected:
     bool    _use_powerup_bell;
     bool    _use_powerup_clower;
 
+
     QDateTime    _pit_strength;
     QDateTime    _pit_block;
     QDateTime    _pit_dexterity;
@@ -46,6 +48,7 @@ protected:
     bool    _use_food_crystals;
     bool    _use_food_peasants;
 
+    bool _check4bell;
 
     bool GoToIncubator();
 

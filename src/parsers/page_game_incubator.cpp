@@ -1,4 +1,6 @@
 #include <QEventLoop>
+#include <QWebElement>
+#include <QWebElementCollection>
 #include "page_game_incubator.h"
 #include "tools/tools.h"
 
@@ -65,6 +67,7 @@ QString Page_Game_Incubator::toString (const QString& pfx) const {
             pfx + u8("вкладка: %1\n").arg(selectedTab) +
             pfx + u8("fa_events0: %1\n").arg(fa_events0.toString()) +
             pfx + u8("fa_boxgame: %1\n").arg(fa_boxgame.toString()) +
+            pfx + u8("fa_bonus  : %1\n").arg(fa_bonus.toString()) +
             pfx + "}";
 }
 
@@ -104,6 +107,8 @@ void Page_Game_Incubator::parseDivFlyingBlock() {
     QWebElement flying_block = document.findFirst("DIV#flying_block");
     fa_events0.reset();
     fa_boxgame.reset();
+    fa_bonus.reset();
+
     if (flying_block.isNull()) {
         qCritical("flying_block not found");
         return;
@@ -116,12 +121,18 @@ void Page_Game_Incubator::parseDivFlyingBlock() {
         qDebug("fa_boxgame detected");
         return;
     }
+    if (fa_bonus.parse(flying_block)) {
+        qDebug("fa_bonus detected");
+        return;
+    }
 }
 
 
 //////////////////////////////////////////////////////////////////////////////
 
-
+///
+/// Tab_Action_Normal
+///
 void Page_Game_Incubator::Tab_Action_Normal::reset() {
     block = QWebElement();
     valid = false;
@@ -151,6 +162,9 @@ QString Page_Game_Incubator::Tab_Action_Normal::toString() const {
 }
 
 
+///
+/// Tab_Action_Boxgame
+///
 void Page_Game_Incubator::Tab_Action_Boxgame::reset() {
     block       = QWebElement();
     valid       = false;
@@ -193,6 +207,95 @@ QString Page_Game_Incubator::Tab_Action_Boxgame::toString() const {
         return u8("boxgame finished %1: %2").arg(currency).arg(amount);
     }
     return u8("boxgame started. %1 boxes").arg(num_chests);
+}
+
+///
+/// Tab_Bonus
+///
+
+const char *Page_Game_Incubator::Tab_Bonus::bonus_name[8] = {
+    "power", "block", "dexterity", "charisma",
+    "safe", "safe2", "fast", "luck"
+};
+
+
+const char *Page_Game_Incubator::Tab_Bonus::bonus_name_r[8] = {
+    "сила", "защита", "ловкость", "мастерство",
+    "золотой_мешочек", "красный_мешочек", "колокольчик", "подкова"
+};
+
+
+const int Page_Game_Incubator::Tab_Bonus::bonus_price1[8] = {
+    75, 75, 75, 75,
+    75, 50, 250, 250
+};
+
+const int Page_Game_Incubator::Tab_Bonus::bonus_price2[8] = {
+    15, 15, 15, 15,
+    15, 10, 50, 50
+};
+
+void Page_Game_Incubator::Tab_Bonus::reset() {
+    valid = false;
+    block = QWebElement();
+    checkboxes = QWebElementCollection();
+    cooldowns.clear();
+    submit = QWebElement();
+}
+
+
+bool Page_Game_Incubator::Tab_Bonus::parse(QWebElement flying_block) {
+    reset();
+    block = flying_block.findFirst("FORM.m0p0");
+    if (block.isNull()) {
+        return false;
+    }
+    checkboxes = block.findAll("DIV.bonus INPUT[type=checkbox]");
+    if (checkboxes.count() != 8) {
+        return false;
+    }
+
+    QWebElementCollection divs = block.findAll("DIV.bonus");
+    if (divs.count() != 8) {
+        return false;
+    }
+
+    for (int i = 0; i < divs.count(); ++i) {
+        cooldowns.add(PageTimer(divs[i].findFirst("SPAN.js_timer")));
+    }
+
+    submit = block.findFirst("INPUT[type=submit]");
+    if (submit.isNull()) {
+        qDebug("? missing submit");
+        return false;
+    }
+    valid = true;
+    return true;
+}
+
+QString Page_Game_Incubator::Tab_Bonus::toString() const {
+    if (!valid) return "?invalid bonus tab?";
+    QString s;
+    for (int i = 0; i < 8; ++i) {
+        bool checked = checkboxes[i].attribute("checked") != "";
+        QString cd;
+        if (cooldowns[i].defined()) {
+            int sec = QDateTime::currentDateTime().secsTo(cooldowns[i].pit);
+            QString pit = ::toString(cooldowns[i].pit);
+            if (sec > 0) {
+                cd += u8("%1 seconds till %2").arg(sec).arg(pit);
+            } else {
+                cd += u8("expired since %1").arg(pit);
+            }
+        } else {
+            cd = "unset";
+        }
+        s += u8("{#%1 %2, %3} ")
+                .arg(i)
+                .arg(u8(checked ? "checked" : "unchecked"))
+                .arg(cd);
+    }
+    return cooldowns.toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -332,5 +435,133 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
     qDebug("TAB SELECTED: %s, reparse and return", qPrintable(tab));
     reparse();
     return true;
+}
 
+
+int  Page_Game_Incubator::getBonusCooldown(int bonus_ix) {
+    Q_ASSERT(bonus_ix >= 0 && bonus_ix < 8);
+    if (!fa_bonus.valid) {
+        qCritical("bonus tab is not active");
+        return -1;
+    }
+
+    return fa_bonus.cooldowns[bonus_ix].cooldown();
+}
+
+
+bool Page_Game_Incubator::doBonusSetCheck(int bonus_ix, bool checked) {
+    Q_ASSERT(bonus_ix >= 0 && bonus_ix < 8);
+    if (!fa_bonus.valid) {
+        qCritical("bonus tab is not active");
+        return false;
+    }
+
+    qDebug("we need checkbox #%d be %schecked",
+           bonus_ix, checked ? "" : "un");
+
+    if (checked != getBonusChecked(bonus_ix)) {
+        qDebug("click to bonus checkbox #%d", bonus_ix);
+        actuate(fa_bonus.checkboxes[bonus_ix]);
+    }
+    return true;
+}
+
+
+bool Page_Game_Incubator::getBonusChecked(int bonus_ix) {
+    Q_ASSERT(bonus_ix >= 0 && bonus_ix < 8);
+    if (!fa_bonus.valid) {
+        qCritical("bonus tab is not active");
+        return false;
+    }
+    bool checked = fa_bonus.checkboxes[bonus_ix]
+            .evaluateJavaScript("this.checked;").toBool();
+    qDebug("bonus #%d is %schecked", bonus_ix, checked ? "" : "un");
+    return checked;
+}
+
+
+int  Page_Game_Incubator::getBonusPrice1(int bonus_ix) {
+    Q_ASSERT(bonus_ix >= 0 && bonus_ix < 8);
+    return Tab_Bonus::bonus_price1[bonus_ix];
+}
+
+
+int  Page_Game_Incubator::getBonusPrice2(int bonus_ix) {
+    Q_ASSERT(bonus_ix >= 0 && bonus_ix < 8);
+    return Tab_Bonus::bonus_price1[bonus_ix];
+}
+
+
+int Page_Game_Incubator::getBonusTotalPrice1() {
+    if (!fa_bonus.valid) {
+        qCritical("bonus tab is not active");
+        return false;
+    }
+    qDebug("retrieve total price for currency #1");
+    int n = dottedInt(document.findFirst("SPAN#bonus_money1")
+                     .toPlainText().trimmed());
+    qDebug("... = %d", n);
+    return n;
+}
+
+int  Page_Game_Incubator::getBonusTotalPrice2() {
+    if (!fa_bonus.valid) {
+        qCritical("bonus tab is not active");
+        return false;
+    }
+    qDebug("retrieve total price for currency #2");
+    int n = dottedInt(document.findFirst("SPAN#bonus_money2")
+                     .toPlainText().trimmed());
+    qDebug("... = %d", n);
+    return n;
+}
+
+
+bool Page_Game_Incubator::doBonusSetCurrency(int ix) {
+    if (!fa_bonus.valid) {
+        qCritical("bonus tab is not active");
+        return false;
+    }
+    Q_ASSERT(ix >= 0 && ix < 2);
+    qDebug("set currency #%d", ix);
+    QWebElementCollection ptypes = document.findFirst("DIV#bonus_zoo_did")
+            .findAll("INPUT[name=ptype]");
+    actuate(ptypes[ix]);
+    return true;
+}
+
+
+bool Page_Game_Incubator::doBonusSetDuration(int days) {
+    if (!fa_bonus.valid) {
+        qCritical("bonus tab is not active");
+        return false;
+    }
+    Q_ASSERT(days == 1 || days == 2 || days == 3 ||
+             days == 7 || days == 14 || days == 28);
+    qDebug("search for %d-days option", days);
+    QString s = QString::number(days);
+    foreach (QWebElement op, document.findAll("SELECT#buy_per_days OPTION")) {
+        if (op.attribute("value").trimmed() == s) {
+            qDebug("js-selecting %s", qPrintable(op.toOuterXml()));
+            op.evaluateJavaScript("this.selected=true;");
+            return true;
+        }
+    }
+    qDebug("selected nothing");
+    return false;
+}
+
+
+bool Page_Game_Incubator::doBonusSubmit() {
+    if (!fa_bonus.valid) {
+        qCritical("bonus tab is not active");
+        return false;
+    }
+    QWebElement submit = document.findFirst("DIV#bonus_zoo_did INPUT[type=submit]");
+    if (submit.isNull()) {
+        qCritical("submit not found");
+        return false;
+    }
+    actuate(submit);
+    return true;
 }

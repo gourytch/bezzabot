@@ -9,13 +9,15 @@ WorkFlyingBreeding::WorkFlyingBreeding(Bot *bot) :
 {
 }
 
-
 void WorkFlyingBreeding::configure(Config *config) {
     Work::configure(config);
     _min_timegap = config->get("Work_FlyingBreeding/min_timegap", false, 5).toInt();
     _max_timegap = config->get("Work_FlyingBreeding/max_timegap", false, 300).toInt();
     _use_small_journey = config->get("Work_FlyingBreeding/use_small_journey",
                                      false, false).toBool();
+    _check4bell = config->get("Work_FlyingBreeding/check4bell",
+                              false, false).toBool();
+
     _duration10 = config->get("Work_FlyingBreeding/duration10",
                               false, 0).toInt();
     setNextTimegap();
@@ -42,6 +44,9 @@ bool WorkFlyingBreeding::nextStep() {
 }
 
 
+#define BELL_IX 6
+#define BELL_TIMEOUT (4 * 3600)
+
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
     if (gpage->pagekind != page_Game_Incubator) {
@@ -50,8 +55,66 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     }
     qDebug("мы в инкубаторе.");
     Page_Game_Incubator *p = (Page_Game_Incubator *)gpage;
+
+    if (_check4bell &&
+        (((qrand() % 10) == 0) ||
+         _bell_pit.isNull() ||
+         QDateTime::currentDateTime().secsTo(_bell_pit) < BELL_TIMEOUT)) {
+        qDebug("проверим, как там колокольчик поживает.");
+        if (p->selectedTab != "fa_bonus") {
+            qDebug("зайдём на бонус-вкладку.");
+            if (!p->doSelectTab("fa_bonus")) {
+                qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.");
+            }
+        }
+
+        if (p->fa_bonus.valid) {
+            qDebug("мы на бонусовой вкладке");
+            int cd = p->getBonusCooldown(BELL_IX);
+            _bell_pit = QDateTime::currentDateTime().addSecs(cd);
+            QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
+            if (cd < BELL_TIMEOUT) {
+                qDebug(u8("%1 истекает! надо продлять").arg(name));
+                if (p->crystal >= p->getBonusPrice2(BELL_IX)) {
+                    qWarning(u8("продлеваем %1").arg(name));
+                    if (!p->doBonusSetCheck(BELL_IX, true)) {
+                        qCritical("set check failed!");
+                        setAwaiting();
+                        _bot->GoToWork();
+                        return false;
+                    }
+                    if (!p->doBonusSetCurrency(1)) {
+                        qCritical("set currency failed!");
+                        setAwaiting();
+                        _bot->GoToWork();
+                        return false;
+                    }
+                    if (!p->doBonusSetDuration(1)) {
+                        qCritical("set duration failed!");
+                        setAwaiting();
+                        _bot->GoToWork();
+                        return false;
+                    }
+                    if (!p->doBonusSubmit()) {
+                        qCritical("submit failed!");
+                        setAwaiting();
+                        _bot->GoToWork();
+                        return false;
+                    }
+                    qDebug("ждём перезагрузки страницы");
+                    setAwaiting();
+                    return true;
+                } else {
+                    qDebug("... но кристаллов не хватает :(");
+                }
+            } else {
+                qDebug(u8("... %1 активен ещё %2 сек").arg(name).arg(cd));
+            }
+        }
+    } // check4bell
+
     if (p->selectedTab != "fa_events") {
-        qDebug("мы на %s. с ней мы работать пока не умеем, перейдём на events",
+        qDebug("мы на %s. перейдём на events",
                qPrintable(p->selectedTab));
         if (!p->doSelectTab("fa_events")) {
             qDebug("перейти как-то не получилось :(");

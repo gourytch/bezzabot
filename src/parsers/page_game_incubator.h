@@ -72,8 +72,16 @@ public:
     };
 
     struct Tab_Bonus {
+        static const char *bonus_name[8];
+        static const char *bonus_name_r[8];
+        static const int   bonus_price1[8];
+        static const int   bonus_price2[8];
+
         QWebElement block;
         bool valid;
+        PageTimers cooldowns;
+        QWebElementCollection checkboxes;
+        QWebElement submit;
 
         void reset();
         bool parse(QWebElement flying_block);
@@ -126,14 +134,31 @@ public:
 
     Tab_Action_Normal fa_events0;
     Tab_Action_Boxgame fa_boxgame;
+    Tab_Bonus fa_bonus;
 
     void reparse();
 
+    bool doSelectTab(const QString& tab, int timeout=-1);
+
+    // journey
     bool doStartSmallJourney(int duration10);
     bool doStartBigJourney();
+
+    // boxgame
     bool doSelectBox(int boxNo = -1);
     bool doFinishGame();
-    bool doSelectTab(const QString& tab, int timeout=-1);
+
+    // bonus
+    int  getBonusCooldown(int bonus_ix);
+    bool doBonusSetCheck(int bonus_ix, bool checked = true);
+    bool getBonusChecked(int bonus_ix);
+    int  getBonusPrice1(int bonus_ix);
+    int  getBonusPrice2(int bonus_ix);
+    int  getBonusTotalPrice1(); // смотрим сколько стоит в пирашках
+    int  getBonusTotalPrice2(); // смотрим сколько стоит в кристаллах
+    bool doBonusSetCurrency(int ix); // 0 - пирашки, 1 - кристаллы
+    bool doBonusSetDuration(int days); // установить длительность (делай =1)
+    bool doBonusSubmit(); // оплатить за бонусы
 
 protected:
 
