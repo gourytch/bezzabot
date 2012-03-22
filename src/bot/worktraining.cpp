@@ -135,10 +135,16 @@ bool WorkTraining::canTraining() {
     if (_bot->_gpage->timer_work.defined()) return false;
     long gold = _bot->_gpage->gold - _gold_over;
     for (int i = 0; i < 5; ++i) {
-        if (_uselist[i] && _price[i] <= gold) {
-            qDebug(u8("можно натренировать %1")
-                   .arg(u8(Page_Game_Training::stat_name[i])));
-            return true;
+        if (_uselist[i]) {
+            if (_price[i] <= 0) {
+                qDebug(u8("надо узнать прейскурант в гимнастическом зале"));
+                return true;
+            }
+            if (_price[i] <= gold) {
+                qDebug(u8("можно натренировать %1")
+                       .arg(u8(Page_Game_Training::stat_name[i])));
+                return true;
+            }
         }
     }
     qDebug(u8("тренироваться не выйдет"));
