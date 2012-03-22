@@ -94,7 +94,7 @@ void Work::wearOnBegin() {
     QString coulon = _wear_on_begin.isNull() ?_wear_postponed : _wear_on_begin;
     _wear_postponed = QString();
 
-    quint32 id = _bot->search_coulon_by_name(_wear_on_begin);
+    quint32 id = _bot->search_coulon_by_name(coulon);
     if (!_bot->is_need_to_change_coulon(id)) return;
     qDebug(u8("перед началом %1 надеваем %2 (#%3)")
            .arg(getWorkName()).arg(_wear_on_begin).arg(id));
