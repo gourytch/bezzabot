@@ -595,11 +595,11 @@ Page_Game::Page_Game (QWebElement& doc) :
     foreach (QWebElement e, doc.findAll("DIV.message")) {
         if (isDisplayed(e)) {
             message = e.toPlainText().trimmed();
-            qDebug("[message] displayed: {%s}", qPrintable(message));
+//            qDebug("[message] displayed: {%s}", qPrintable(message));
             break;
         } else {
-            qDebug("[message] hidden: {%s}",
-                   qPrintable(e.toPlainText().trimmed()));
+//            qDebug("[message] hidden: {%s}",
+//                   qPrintable(e.toPlainText().trimmed()));
         }
     }
 //    message = doc.findFirst("DIV[class=message]").toPlainText ().trimmed ();
