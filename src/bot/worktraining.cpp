@@ -134,6 +134,7 @@ bool WorkTraining::canTraining() {
     if (_bot->_gpage == NULL) return false;
     if (_bot->_gpage->timer_work.defined()) return false;
     long gold = _bot->_gpage->gold - _gold_over;
+    int minVal = -1;
     for (int i = 0; i < 5; ++i) {
         if (_uselist[i]) {
             if (_price[i] <= 0) {
@@ -141,12 +142,17 @@ bool WorkTraining::canTraining() {
                 return true;
             }
             if (_price[i] <= gold) {
-                qDebug(u8("можно натренировать %1")
+                qDebug(u8("за %1 з. можно натренировать %2")
+                       .arg(_price[i])
                        .arg(u8(Page_Game_Training::stat_name[i])));
                 return true;
             }
+            if (minVal == -1 || (_price[i] < minVal)) {
+                minVal = _price[i];
+            }
         }
     }
-    qDebug(u8("тренироваться не выйдет"));
+    qDebug(u8("тренировки не будет: золота надо минимум %1 а есть только %2")
+           .arg(minVal).arg(gold));
     return false;
 }
