@@ -31,7 +31,8 @@ HEADERS += \
     page_game_levelup.h \
     page_game_post_messages.h \
     page_game_harbor_market.h \
-    page_game_training.h
+    page_game_training.h \
+    page_game_house_plantation.h
 
 SOURCES += \
     types.cpp \
@@ -58,7 +59,8 @@ SOURCES += \
     page_game_levelup.cpp \
     page_game_post_messages.cpp \
     page_game_harbor_market.cpp \
-    page_game_training.cpp
+    page_game_training.cpp \
+    page_game_house_plantation.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
@@ -72,6 +74,12 @@ win32 {
   CONFIG -= debug
   CONFIG += console
 }
+
+
+
+
+
+
 
 
 

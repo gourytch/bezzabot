@@ -497,6 +497,8 @@ void Bot::configure() {
     _neutral_urls.append("tavern.php");
     _neutral_urls.append("castle.php");
 
+    state.plant_capacity = _config->get("bot/plant_capacity", false, -1).toInt();
+
     qDebug("configure %s", _good ? "success" : "failed");
 }
 
@@ -731,6 +733,44 @@ void Bot::initWorks() {
          i.hasNext();
          i.next()->configure(_config)) {}
 }
+
+
+bool Bot::pushWork(Work* work) {
+    if (work->isEnabled() && (work->isActive() || work->isMyWork())) {
+        if (_workcycle_debug2) {
+            qDebug(u8("пробуем начать работу: %1").arg(work->getWorkName()));
+        }
+        if (work->processQuery(Work::CanStartWork)) {
+            if (_workcycle_debug2) {
+                qDebug(u8("%1 startable").arg(work->getWorkName()));
+            }
+            work->wearOnBegin();
+            if (work->processCommand(Work::StartWork)) {
+                if (_workcycle_debug) {
+                    qWarning(u8("наша текущая работа: %1").arg(work->getWorkName()));
+                }
+                _workq.push_front(work);
+                return true; // всё нормально запустилось
+            } else {
+                work->wearOnEnd();
+                if (_workcycle_debug) {
+                    qDebug(u8("работа %1 почему-то не запустилась")
+                           .arg(work->getWorkName()));
+                }
+            }
+        } else {
+            if (_workcycle_debug2) {
+                qDebug(u8("%1 is not startable").arg(work->getWorkName()));
+            }
+        }
+    } else {
+        if (_workcycle_debug2) {
+            qDebug(u8("%1 is not enabled").arg(work->getWorkName()));
+        }
+    }
+    return false;
+}
+
 
 void Bot::popWork() {
     if (_workq.empty()) {

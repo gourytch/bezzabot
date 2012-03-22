@@ -44,6 +44,10 @@ void BotState::reset() {
 
     dozor_price = -1;
 
+    plant_income = -1;
+    plant_capacity = -1;
+    plant_slaves = -1;
+
     primary_work    = Work_None;
 }
 
@@ -66,22 +70,6 @@ void BotState::update_from_page(const Page_Game *p) {
     fish    = p->fish;
     green   = p->green;
 
-    if (p->resources.contains(32)) { // i32
-        xp_left = p->resources.value(32).count;
-    }
-
-    if (p->resources.contains(33)) { // i33
-        bigtickets_remains = p->resources.value(33).count;
-    }
-
-    if (p->resources.contains(34)) { // i34
-        smalltickets_remains = p->resources.value(34).count;
-    }
-
-    if (p->resources.contains(39)) { // i39
-        fishraids_remains = p->resources.value(39).count;
-    }
-
     hardminer_effect = QDateTime();
     for (int i = 0; i < p->effects.count(); ++i) {
         const PageTimer &t = p->effects[i];
@@ -89,7 +77,6 @@ void BotState::update_from_page(const Page_Game *p) {
             hardminer_effect = t.pit;
         }
     }
-
 
     // обработка странички персонажа
     if (p->pagekind == page_Game_Index) {
@@ -119,6 +106,27 @@ void BotState::update_from_page(const Page_Game *p) {
         bigtickets_remains = q->num_bigtickets;
     }
 
+    if (p->resources.contains(32)) { // i32
+        xp_left = p->resources.value(32).count;
+    }
+
+    if (p->resources.contains(33)) { // i33
+        bigtickets_remains = p->resources.value(33).count;
+    }
+
+    if (p->resources.contains(34)) { // i34
+        smalltickets_remains = p->resources.value(34).count;
+    }
+
+    if (p->resources.contains(39)) { // i39
+        fishraids_remains = p->resources.value(39).count;
+    }
+
+    if (p->resources.contains(20)) { // i20
+        if (plant_capacity >= 0) {
+            plant_slaves = plant_capacity - p->resources.value(20).count;
+        }
+    }
 }
 
 

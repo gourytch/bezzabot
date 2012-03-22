@@ -77,6 +77,10 @@ public: // всё, описывающее текущее состояние бо
 
     int         dozor_price; // стоимость дозора
 
+    int         plant_income;
+    int         plant_capacity;
+    int         plant_slaves;
+
     WorkType    primary_work; // текущая работа
 
     QDateTime   hardminer_effect; // время истечения УШ

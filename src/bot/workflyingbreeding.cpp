@@ -46,6 +46,8 @@ bool WorkFlyingBreeding::nextStep() {
 
 #define BELL_IX 6
 #define BELL_TIMEOUT (4 * 3600)
+#define BELL_CURRENCY 1
+#define BELL_DAYS 1
 
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
@@ -58,10 +60,18 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
 
     if (_check4bell && p->flyings.at(p->ix_active).was_born) {
         QDateTime pit = _pit_bell[p->rel_active];
-
-        if (((qrand() % 10) == 0) ||
-                pit.isNull() ||
-                QDateTime::currentDateTime().secsTo(pit) < BELL_TIMEOUT) {
+        bool go_n_look = false;
+        if (pit.isNull()) {
+            go_n_look = true;
+            qDebug("для первичного осмотра...");
+        } else if (QDateTime::currentDateTime().secsTo(pit) < BELL_TIMEOUT) {
+            go_n_look = true;
+            qDebug("по причине истекающего отката...");
+        } else if ((qrand() % 10) == 0) {
+            go_n_look = true;
+            qDebug("просто разнообразия ради...");
+        }
+        if (go_n_look) {
             qDebug("проверим, как там колокольчик поживает.");
             if (p->selectedTab != "fa_bonus") {
                 qDebug("зайдём на бонус-вкладку.");
@@ -86,13 +96,13 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                         _bot->GoToWork();
                         return false;
                     }
-                    if (!p->doBonusSetCurrency(1)) {
+                    if (!p->doBonusSetCurrency(BELL_CURRENCY)) {
                         qCritical("set currency failed!");
                         setAwaiting();
                         _bot->GoToWork();
                         return false;
                     }
-                    if (!p->doBonusSetDuration(1)) {
+                    if (!p->doBonusSetDuration(BELL_DAYS)) {
                         qCritical("set duration failed!");
                         setAwaiting();
                         _bot->GoToWork();

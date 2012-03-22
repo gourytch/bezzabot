@@ -40,6 +40,9 @@ public:
     Page_Game           *_gpage;
 
     void initWorks();
+    bool pushWork(Work* work);
+    void popWork();
+    void fillNextQ();
 
     typedef QQueue<Work*> WorkQueue;
     typedef QList<Work*> WorkList;
@@ -58,9 +61,6 @@ public:
     int     _last_url_count_for_quit;
     QList<QString> _neutral_urls;
 
-    void popWork();
-
-    void fillNextQ();
 
     bool _awaiting;
 

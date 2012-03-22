@@ -57,6 +57,7 @@ void Parser::setup() {
     _producer.registerClass<Page_Game_Post_Messages>();
     _producer.registerClass<Page_Game_Harbor_Market>();
     _producer.registerClass<Page_Game_Training>();
+    _producer.registerClass<Page_Game_House_Plantation>();
     ///
     _producer.registerClass<Page_Game>();
     _producer.registerClass<Page_Generic>();

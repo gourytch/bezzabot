@@ -31,39 +31,42 @@ void Bot::one_step () {
         while (!_nextq.empty()) {
             Work *p = _nextq.front();
             _nextq.pop_front();
-            if (p->isEnabled() && (p->isActive() || p->isMyWork())) {
-                if (_workcycle_debug2) {
-                    qDebug(u8("пробуем начать работу: %1").arg(p->getWorkName()));
-                }
-                if (p->processQuery(Work::CanStartWork)) {
-                    if (_workcycle_debug2) {
-                        qDebug(u8("%1 startable").arg(p->getWorkName()));
-                    }
-                    p->wearOnBegin();
-                    if (p->processCommand(Work::StartWork)) {
-                        if (_workcycle_debug) {
-                            qWarning(u8("наша текущая работа: %1").arg(p->getWorkName()));
-                        }
-                        _workq.push_front(p);
-                        //break;
-                        return; // лучше в следующем цикле придём
-                    } else {
-                        p->wearOnEnd();
-                        if (_workcycle_debug) {
-                            qDebug(u8("работа %1 почему-то не запустилась")
-                                   .arg(p->getWorkName()));
-                        }
-                    }
-                } else {
-                    if (_workcycle_debug2) {
-                        qDebug(u8("%1 is not startable").arg(p->getWorkName()));
-                    }
-                }
-            } else {
-                if (_workcycle_debug2) {
-                    qDebug(u8("%1 is not enabled").arg(p->getWorkName()));
-                }
+            if (pushWork(p)) {
+                return; // вернёмся в следующем цикле
             }
+//            if (p->isEnabled() && (p->isActive() || p->isMyWork())) {
+//                if (_workcycle_debug2) {
+//                    qDebug(u8("пробуем начать работу: %1").arg(p->getWorkName()));
+//                }
+//                if (p->processQuery(Work::CanStartWork)) {
+//                    if (_workcycle_debug2) {
+//                        qDebug(u8("%1 startable").arg(p->getWorkName()));
+//                    }
+//                    p->wearOnBegin();
+//                    if (p->processCommand(Work::StartWork)) {
+//                        if (_workcycle_debug) {
+//                            qWarning(u8("наша текущая работа: %1").arg(p->getWorkName()));
+//                        }
+//                        _workq.push_front(p);
+//                        //break;
+//                        return; // лучше в следующем цикле придём
+//                    } else {
+//                        p->wearOnEnd();
+//                        if (_workcycle_debug) {
+//                            qDebug(u8("работа %1 почему-то не запустилась")
+//                                   .arg(p->getWorkName()));
+//                        }
+//                    }
+//                } else {
+//                    if (_workcycle_debug2) {
+//                        qDebug(u8("%1 is not startable").arg(p->getWorkName()));
+//                    }
+//                }
+//            } else {
+//                if (_workcycle_debug2) {
+//                    qDebug(u8("%1 is not enabled").arg(p->getWorkName()));
+//                }
+//            }
         }
     }
 

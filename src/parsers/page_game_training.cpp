@@ -36,7 +36,7 @@ QString Page_Game_Training::toString (const QString& pfx) const {
 bool Page_Game_Training::fit(const QWebElement& doc) {
     QString t = doc.findFirst("DIV.title").toPlainText().trimmed();
     if (t != u8("Тренер Шварцбургер")) {
-        qDebug("Page_Game_Training::fit(), t={%s}", qPrintable(t));
+//        qDebug("Page_Game_Training::fit(), t={%s}", qPrintable(t));
         return false;
     }
     if (doc.findFirst("FORM").attribute("action") != "?a=basic") {
