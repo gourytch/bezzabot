@@ -431,9 +431,11 @@ FlyingInfo::FlyingInfo() {
     init();
 }
 
+
 FlyingInfo::FlyingInfo(const FlyingInfo& that) {
     *this = that;
 }
+
 
 void FlyingInfo::init() {
     valid   = false;
@@ -1055,8 +1057,9 @@ bool Page_Game::doFlyingGoEvents(int flyingNo) {
         qCritical("flyings pos too big");
         return false;
     }
-    if (!flyingslist.at(flyingNo).normal.valid) {
-        qCritical("normal is not active");
+    const FlyingInfo & fi = flyingslist.at(flyingNo);
+    if (!(fi.normal.valid || fi.boxgame.valid || fi.journey.valid)) {
+        qCritical("normal/boxgame/journey is not active");
         return false;
     }
     if (!doShowFlyingsAccordion()) {
