@@ -165,9 +165,16 @@ void Bot::GoTo(const QString& link, bool instant) {
     if (instant) {
         QTimer::singleShot(0, this, SLOT(delayedGoTo()));
     } else {
-        int ms = isAFK()
+        bool afk =  isAFK();
+        int ms = afk
                 ? _goto_afk_delay_min + (qrand() % (_goto_afk_delay_max - _goto_afk_delay_min))
                 : _goto_delay_min + (qrand() % (_goto_delay_max - _goto_delay_min));
+        if (afk) {
+            QDateTime t = QDateTime::currentDateTime().addMSecs(ms);
+            qDebug(u8("delayed at %1 ms, till %2")
+                   .arg(ms)
+                   .arg(::toString(t)));
+        }
         Timebomb::global()->launch(ms, this, SLOT(delayedGoTo()));
     }
 }
