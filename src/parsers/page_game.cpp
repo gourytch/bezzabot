@@ -1064,12 +1064,12 @@ bool Page_Game::doFlyingBoxgame(int flyingNo) {
 
 bool Page_Game::doFlyingGoEvents(int flyingNo) {
     if (flyingslist.size() < flyingNo) {
-        qCritical("flyings pos too big");
+        qCritical("flyings pos %d is too big", flyingNo);
         return false;
     }
     const FlyingInfo & fi = flyingslist.at(flyingNo);
     if (!(fi.normal.valid || fi.boxgame.valid || fi.journey.valid)) {
-        qCritical("normal/boxgame/journey is not active");
+        qCritical("normal/boxgame/journey is not active for flyingNo=%d", flyingNo);
         return false;
     }
     if (!doShowFlyingsAccordion()) {
@@ -1078,10 +1078,10 @@ bool Page_Game::doFlyingGoEvents(int flyingNo) {
     }
     submit = document.findAll("DIV.flyings DIV.title")[flyingNo].findFirst("A");
     if (submit.isNull()) {
-        qCritical("link missing");
+        qCritical("link missing for flyingNo=%d", flyingNo);
         return false;
     }
-    qDebug("submitting eventlink");
+    qDebug("submitting eventlink for flyingNo=%d", flyingNo);
     pressSubmit();
     return true;
 }
