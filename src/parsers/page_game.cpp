@@ -929,7 +929,7 @@ bool Page_Game::uncagePet(int id) {
                 return false;
             } else {
                 qDebug("found cage with pet id=%d, uncage it", id);
-                delay(7000 + (qrand() % 5000), false);
+                delay(500 + (qrand() % 3000), false);
                 qDebug("click on cage");
                 actuate(a);
                 if (waitForPopup()) {
