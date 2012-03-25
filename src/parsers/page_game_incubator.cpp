@@ -117,7 +117,8 @@ void Page_Game_Incubator::parseDivFlyings() {
 
 
 void Page_Game_Incubator::parseDivFlyingActions() {
-    selectedTab = document.findFirst("DIV.flying_actions DIV.selected").attribute("id");
+    QWebElement selectedDiv = document.findFirst("DIV.flying_actions DIV.selected");
+    selectedTab = selectedDiv.attribute("id").trimmed();
 }
 
 
