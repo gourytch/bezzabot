@@ -440,7 +440,7 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
     }
     qDebug("actuate tab " + tab);
     actuate(tab);
-    delay((timeout < 0) ? 3000 + (qrand() % 3000) : timeout, false);
+    delay((timeout < 0) ? 6000 + (qrand() % 3000) : timeout, false);
     QWebElement e = document.findFirst("DIV#" + tab);
     if (e.isNull()) {
         qCritical("TAB {%s} LOST", qPrintable(tab));

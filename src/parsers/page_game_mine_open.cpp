@@ -190,12 +190,31 @@ bool Page_Game_Mine_Open::doStart() {
         qCritical("digstage sould be DigNone, not " + ::toString(digstage));
         return false;
     }
-    submit = document.findFirst("CENTER").findFirst("A");
-    if (submit.isNull()) {
-        qCritical("worklink not found");
+    QWebElement form = document.findFirst("FORM#mine_form");
+    if (form.isNull()) {
+        qFatal("mine_form not found!");
         return false;
     }
-    qDebug("click on worklink");
+    QWebElement justWork;
+    foreach (QWebElement e, form.findAll("SELECT#work OPTION")) {
+        if (e.attribute("value") == "0") {
+            justWork = e;
+            break;
+        }
+    }
+
+    if (justWork.isNull()) {
+        qFatal("option for free work was not found!");
+        return false;
+    }
+    justWork.evaluateJavaScript("this.selected=true;");
+
+    submit = form.findFirst("INPUT[type=submit]");
+    if (submit.isNull()) {
+        qFatal("worklink not found");
+        return false;
+    }
+    qDebug("press on work-button");
     pressSubmit();
     return true;
 }
