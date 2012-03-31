@@ -3,6 +3,7 @@
 #include <QWebElementCollection>
 #include "page_game_incubator.h"
 #include "tools/tools.h"
+#include "tools/netmanager.h"
 
 ///
 /// Page_Game_Incubator::Flying
@@ -122,28 +123,35 @@ void Page_Game_Incubator::parseDivFlyingActions() {
 }
 
 
-void Page_Game_Incubator::parseDivFlyingBlock() {
+bool Page_Game_Incubator::parseDivFlyingBlock() {
     QWebElement flying_block = document.findFirst("DIV#flying_block");
     fa_events0.reset();
     fa_boxgame.reset();
     fa_bonus.reset();
 
+    detectedTab = QString();
+
     if (flying_block.isNull()) {
         qCritical("flying_block not found");
-        return;
+        return false;
     }
     if (fa_events0.parse(flying_block)) {
         qDebug("fa_events0 detected");
-        return;
+        detectedTab = "fa_events0";
+        return true;
     }
     if (fa_boxgame.parse(flying_block)) {
         qDebug("fa_boxgame detected");
-        return;
+        detectedTab = "fa_boxgame";
+        return true;
     }
     if (fa_bonus.parse(flying_block)) {
         qDebug("fa_bonus detected");
-        return;
+        detectedTab = "fa_bonus";
+        return true;
     }
+    qDebug("flying block not parsed");
+    return false;
 }
 
 
@@ -439,8 +447,82 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         e = QWebElement();
     }
     qDebug("actuate tab " + tab);
+
+    if (NetManager::shared) {
+        qDebug("reset gotReply flag");
+        NetManager::shared->gotReply = false;
+    }
     actuate(tab);
-    delay((timeout < 0) ? 6000 + (qrand() % 3000) : timeout, false);
+    if (NetManager::shared) {
+        int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
+        qDebug("awaiting for net response whitin %d ms", ms);
+
+        QEventLoop loop;
+        QTime time;
+        time.start();
+        while (time.elapsed() < ms) {
+            loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+            if (NetManager::shared->gotReply) {
+                qDebug("got reply after %d ms", time.elapsed());
+                break;
+            }
+        }
+    } else {
+        int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
+        qDebug("force sleeping for %d ms", ms);
+        delay (ms, false);
+    }
+
+    {
+        int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
+        qDebug(u8("now try gentle touching to {%1} whitin %2 ms")
+               .arg(tab).arg(ms));
+        QEventLoop loop;
+        QTime time;
+        time.start();
+        while (time.elapsed() < ms) {
+            loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+            refreshDocument();
+            QString s = document.evaluateJavaScript(
+                        u8("document.getElementById('%1').outerHTML").arg(tab))
+                    .toString();
+            if (!s.isEmpty()) {
+                if (s.contains("selected")) {
+                    qDebug("tab was been selected");
+                    break;
+                } else {
+                    qDebug(u8("got non-null string: {%1}").arg(s));
+                }
+            } else {
+                qDebug("still waiting for word 'selected' in class...");
+                usleep(200000);
+            }
+        }
+    }
+
+    {
+        int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
+        qDebug("now awaiting for valid fa-block whitin %d ms", ms);
+        QEventLoop loop;
+        QTime time;
+        time.start();
+        while (time.elapsed() < ms) {
+            loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+            if (parseDivFlyingBlock()) {
+                if (detectedTab.startsWith(tab)) {
+                    qDebug(u8("got desired {%1})").arg(detectedTab));
+                    break;
+                } else {
+                    qDebug(u8("we have {%1} but need {%2})")
+                           .arg(detectedTab, tab));
+                }
+            }
+            qDebug("still awaiting for a desired fa-block");
+            usleep(200000);
+        }
+    }
+
+    qDebug("continue parsing");
     QWebElement e = document.findFirst("DIV#" + tab);
     if (e.isNull()) {
         qCritical("TAB {%s} LOST", qPrintable(tab));
@@ -518,7 +600,7 @@ int Page_Game_Incubator::getBonusTotalPrice1() {
     }
     qDebug("retrieve total price for currency #1");
     int n = dottedInt(document.findFirst("SPAN#bonus_money1")
-                     .toPlainText().trimmed());
+                      .toPlainText().trimmed());
     qDebug("... = %d", n);
     return n;
 }
@@ -530,7 +612,7 @@ int  Page_Game_Incubator::getBonusTotalPrice2() {
     }
     qDebug("retrieve total price for currency #2");
     int n = dottedInt(document.findFirst("SPAN#bonus_money2")
-                     .toPlainText().trimmed());
+                      .toPlainText().trimmed());
     qDebug("... = %d", n);
     return n;
 }

@@ -42,6 +42,10 @@ public:
 
     void setMode(bool write_debug, bool write_log);
 
+    static NetManager *shared;
+
+    bool gotReply;
+
 protected slots:
 
     void slotGotReply(QNetworkReply *reply);

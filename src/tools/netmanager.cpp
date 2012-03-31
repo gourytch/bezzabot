@@ -20,6 +20,8 @@ ECASE(QNetworkAccessManager::PostOperation)
 ECASE(QNetworkAccessManager::DeleteOperation)
 EEND
 
+NetManager *NetManager::shared = NULL;
+
 QString opStr(QNetworkAccessManager::Operation op) {
     switch (op) {
     case QNetworkAccessManager::GetOperation:
@@ -40,6 +42,12 @@ NetManager::NetManager(const QString& fname, QObject *parent) :
     setFName(fname);
     setMode(Config::global().get("connection/debug", false, false).toBool(),
             Config::global().get("connection/nmlog", false, false).toBool());
+
+    gotReply = false;
+
+    if (shared == NULL) {
+        shared = this;
+    }
 
     connect(this, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(slotGotReply(QNetworkReply*)));
@@ -156,6 +164,9 @@ QNetworkReply *NetManager::createRequest(
 }
 
 void NetManager::slotGotReply(QNetworkReply *reply) {
+
+    gotReply = true;
+
     QString s_op = opStr(reply->operation());
 
     if (_write_debug) {

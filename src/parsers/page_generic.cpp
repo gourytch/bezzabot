@@ -24,6 +24,12 @@ Page_Generic::Page_Generic (QWebElement &doc) :
 {
     pagekind = page_Generic;
     parser_pit = QDateTime::currentDateTime();
+    webframe = document.webFrame();
+    if (webframe) {
+        webpage = webframe->page();
+    } else {
+        webpage = NULL;
+    }
 }
 
 //virtual
@@ -183,4 +189,13 @@ bool Page_Generic::isDisplayed(QWebElement e) {
         return false;
     }
     return (e.parent().isNull()) ? true : isDisplayed(e.parent());
+}
+
+bool Page_Generic::refreshDocument() {
+    if (webpage == NULL) {
+        return false;
+    }
+    webframe = webpage->mainFrame();
+    document = webframe->documentElement();
+    return true;
 }

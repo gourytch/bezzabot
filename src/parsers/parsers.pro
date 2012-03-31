@@ -1,7 +1,7 @@
 TEMPLATE = lib
 LANGUAGE = C++
 CONFIG += qt debug warn_on staticlib
-QT     += core webkit
+QT     += core network webkit
 
 TOP = ../..
 

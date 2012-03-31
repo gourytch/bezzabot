@@ -17,6 +17,8 @@ public:
     PageKind        pagekind;
     QWebElement     document;
     QDateTime       parser_pit;
+    QWebFrame      *webframe;
+    QWebPage       *webpage;
 
 protected:
     QWebElement submit;
@@ -49,6 +51,9 @@ public:
     bool wait4(QString etext, bool present=true, int timeout=-1);
 
     bool isDisplayed(QWebElement e);
+
+    bool refreshDocument();
+
 
 protected slots:
 

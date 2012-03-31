@@ -128,7 +128,8 @@ public:
     typedef QVector<Flying> FlyingContainer;
     typedef QVectorIterator<Flying> FlyingIterator;
 
-    QString selectedTab;
+    QString selectedTab; // какую закладку видим выделенной
+    QString detectedTab; // контент по шаблону какой закладки мы видим
 
     FlyingContainer flyings;
     int rel_active;
@@ -166,7 +167,7 @@ protected:
 
     void parseDivFlyings();
     void parseDivFlyingActions();
-    void parseDivFlyingBlock();
+    bool parseDivFlyingBlock();
 
 };
 

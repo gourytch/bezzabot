@@ -56,9 +56,13 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         return GoToIncubator();
     }
     Page_Game_Incubator *p = (Page_Game_Incubator *)gpage;
-    qDebug(u8("мы в инкубаторе. rel_active = %1").arg(p->rel_active));
+    qDebug(u8("мы в инкубаторе. ix_active = %1, rel_active = %2")
+           .arg(p->ix_active)
+           .arg(p->rel_active));
 
-    if (_check4bell && p->flyings.at(p->ix_active).was_born) {
+    bool bValidIx = (p->ix_active >= 0 && p->ix_active < p->flyings.count());
+
+    if (_check4bell && bValidIx && p->flyings.at(p->ix_active).was_born) {
         QDateTime pit = _pit_bell[p->rel_active];
         bool go_n_look = false;
         if (pit.isNull()) {
