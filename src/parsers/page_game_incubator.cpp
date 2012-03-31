@@ -467,6 +467,7 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
                 break;
             }
         }
+        if (ms <= time.elapsed()) qDebug("... TIMEOUT");
     } else {
         int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
         qDebug("force sleeping for %d ms", ms);
@@ -486,18 +487,12 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
             QString s = document.evaluateJavaScript(
                         u8("document.getElementById('%1').outerHTML").arg(tab))
                     .toString();
-            if (!s.isEmpty()) {
-                if (s.contains("selected")) {
-                    qDebug("tab was been selected");
-                    break;
-                } else {
-                    qDebug(u8("got non-null string: {%1}").arg(s));
-                }
-            } else {
-                qDebug("still waiting for word 'selected' in class...");
-                usleep(200000);
+            if (s.contains("selected")) {
+                qDebug("tab was been selected");
+                break;
             }
         }
+        if (ms <= time.elapsed()) qDebug("... TIMEOUT");
     }
 
     {
@@ -512,15 +507,13 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
                 if (detectedTab.startsWith(tab)) {
                     qDebug(u8("got desired {%1})").arg(detectedTab));
                     break;
-                } else {
-                    qDebug(u8("we have {%1} but need {%2})")
-                           .arg(detectedTab, tab));
                 }
             }
-            qDebug("still awaiting for a desired fa-block");
-            usleep(200000);
         }
+        if (ms <= time.elapsed()) qDebug("... TIMEOUT");
     }
+    qDebug("... and small delay");
+    delay((qrand() % 500) + 250, false);
 
     qDebug("continue parsing");
     QWebElement e = document.findFirst("DIV#" + tab);
