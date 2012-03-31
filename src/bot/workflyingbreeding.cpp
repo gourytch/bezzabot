@@ -92,8 +92,9 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
             if (cd < BELL_TIMEOUT) {
                 qDebug(u8("%1 истекает! надо продлять").arg(name));
-                if (p->crystal >= p->getBonusPrice2(BELL_IX)) {
-                    qWarning(u8("продлеваем %1").arg(name));
+                int price = p->getBonusPrice2(BELL_IX);
+                if (price <= p->crystal) {
+                    qWarning(u8("продлеваем %1 за %2").arg(name).arg(price));
                     if (!p->doBonusSetCheck(BELL_IX, true)) {
                         qCritical("set check failed!");
                         setAwaiting();
@@ -122,7 +123,8 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                     setAwaiting();
                     return true;
                 } else {
-                    qDebug("... но кристаллов не хватает :(");
+                    qDebug("... но кристаллов не хватает (%d < %d) :(",
+                           p->crystal, price);
                 }
             } else {
                 qDebug(u8("... %1 активен ещё %2 сек (pit = %3)")

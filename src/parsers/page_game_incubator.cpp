@@ -589,7 +589,7 @@ int  Page_Game_Incubator::getBonusPrice1(int bonus_ix) {
 
 int  Page_Game_Incubator::getBonusPrice2(int bonus_ix) {
     Q_ASSERT(bonus_ix >= 0 && bonus_ix < 8);
-    return Tab_Bonus::bonus_price1[bonus_ix];
+    return Tab_Bonus::bonus_price2[bonus_ix];
 }
 
 
