@@ -495,6 +495,9 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         if (ms <= time.elapsed()) qDebug("... TIMEOUT");
     }
 
+    qDebug("... medium delay (FIXME: replace to JS-detector!");
+    delay((qrand() % 1500) + 1500, false);
+
     {
         int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
         qDebug("now awaiting for valid fa-block whitin %d ms", ms);
