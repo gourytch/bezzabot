@@ -123,7 +123,7 @@ void Page_Game_Incubator::parseDivFlyingActions() {
 }
 
 
-bool Page_Game_Incubator::parseDivFlyingBlock() {
+bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     QWebElement flying_block = document.findFirst("DIV#flying_block");
     fa_events0.reset();
     fa_boxgame.reset();
@@ -132,25 +132,25 @@ bool Page_Game_Incubator::parseDivFlyingBlock() {
     detectedTab = QString();
 
     if (flying_block.isNull()) {
-        qCritical("flying_block not found");
+        if (verbose) qCritical("flying_block not found");
         return false;
     }
     if (fa_events0.parse(flying_block)) {
-        qDebug("fa_events0 detected");
+        if (verbose) qDebug("fa_events0 detected");
         detectedTab = "fa_events0";
         return true;
     }
     if (fa_boxgame.parse(flying_block)) {
-        qDebug("fa_boxgame detected");
+        if (verbose) qDebug("fa_boxgame detected");
         detectedTab = "fa_boxgame";
         return true;
     }
     if (fa_bonus.parse(flying_block)) {
-        qDebug("fa_bonus detected");
+        if (verbose) qDebug("fa_bonus detected");
         detectedTab = "fa_bonus";
         return true;
     }
-    qDebug("flying block not parsed");
+    if (verbose) qDebug("flying block not parsed");
     return false;
 }
 
@@ -506,7 +506,7 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         time.start();
         while (time.elapsed() < ms) {
             loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-            if (parseDivFlyingBlock()) {
+            if (parseDivFlyingBlock(false)) {
                 if (detectedTab.startsWith(tab)) {
                     qDebug(u8("got desired {%1})").arg(detectedTab));
                     break;
