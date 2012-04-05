@@ -122,23 +122,19 @@ Page_Game_Mine_Open::Page_Game_Mine_Open (QWebElement& doc) :
     //count = 0;
     digstage = DigNone;
     success_chance = -1;
-    foreach (e, es)
-    {
-        QString s = e.toPlainText ().trimmed ();
-        //        qDebug () << "[" << count++ << "] = " << s;
-        if (s == u8 ("Вы ищете кристаллы"))
-        {
-            parseTimerSpan (doc.findFirst ("SPAN[id=counter_1]"),
-                            &(timer.pit), &(timer.hms));
-            timer.adjust();
-            digstage = DigProcess;
-            break;
-        }
-        if (rx.indexIn (s) > -1)
+
+    QWebElement worktimer = document.findFirst("P.mine_manager SPAN[timer]");
+    if (!worktimer.isNull()) { // нашли рабочий таймер
+        parseTimerSpan (doc.findFirst ("SPAN[id=counter_1]"),
+                        &(timer.pit), &(timer.hms));
+        timer.adjust();
+        digstage = DigProcess;
+    } else {
+        QString redline = document.findFirst("P.red_line_mine").toPlainText();
+        if (rx.indexIn(redline) > -1)
         {
             success_chance = rx.cap (1).toInt ();
             digstage = DigReady;
-            break;
         }
     }
 
