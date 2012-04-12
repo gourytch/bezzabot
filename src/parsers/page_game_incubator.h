@@ -138,6 +138,7 @@ public:
     Tab_Action_Normal fa_events0;
     Tab_Action_Boxgame fa_boxgame;
     Tab_Bonus fa_bonus;
+    Tab_Action_Journey fa_journey;
 
     void reparse();
 

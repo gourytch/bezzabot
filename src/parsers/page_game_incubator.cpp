@@ -124,10 +124,17 @@ void Page_Game_Incubator::parseDivFlyingActions() {
 
 
 bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
-    QWebElement flying_block = document.findFirst("DIV#flying_block");
+//    QWebElement flying_block = document.findFirst("DIV#flying_block");
+    QString html = document.evaluateJavaScript(
+                "document.getElementById('flying_block').outerHTML;")
+            .toString();
+    QWebElement flying_block;
+    flying_block.setOuterXml(html);
+
     fa_events0.reset();
     fa_boxgame.reset();
     fa_bonus.reset();
+    fa_journey.reset();
 
     detectedTab = QString();
 
@@ -148,6 +155,11 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     if (fa_bonus.parse(flying_block)) {
         if (verbose) qDebug("fa_bonus detected");
         detectedTab = "fa_bonus";
+        return true;
+    }
+    if (fa_journey.parse(flying_block)) {
+        if (verbose) qDebug("fa_journey detected");
+        detectedTab = "fa_journey";
         return true;
     }
     if (verbose) qDebug("flying block not parsed");
@@ -185,8 +197,43 @@ bool Page_Game_Incubator::Tab_Action_Normal::parse(QWebElement flying_block) {
 
 QString Page_Game_Incubator::Tab_Action_Normal::toString() const {
     if (!valid) return "?invalid Tab_Action_Normal?";
-    return u8("Events{minutesleft:%1").arg(minutesleft);
+    return u8("Events{minutesleft:%1}").arg(minutesleft);
 }
+
+///
+/// Tab_Action_Journey
+///
+
+void Page_Game_Incubator::Tab_Action_Journey::reset() {
+    block = QWebElement();
+    valid = false;
+    is_cancellable = false;
+    cooldown = PageTimer();
+}
+
+bool Page_Game_Incubator::Tab_Action_Journey::parse(QWebElement flying_block) {
+    reset();
+    block = flying_block;
+    QWebElement e = block.findFirst("DIV.flying_working");
+    if (e.isNull()) return false;
+    QString title = e.attribute("title");
+    if (!title.endsWith(u8("приключение"))) {
+        return false;
+    }
+    cooldown.assign(e.findFirst("SPAN"));
+    is_cancellable = cooldown.defined();
+    return true;
+}
+
+QString Page_Game_Incubator::Tab_Action_Journey::toString() const {
+    if (!valid) return "?invalid Tab_Action_Journey?";
+    return u8("Tab_Action_Journey {cooldown:%1}").arg(cooldown.toString());
+}
+
+bool Page_Game_Incubator::Tab_Action_Journey::doCancelJourney() {
+    return false;
+}
+
 
 
 ///
@@ -434,6 +481,7 @@ bool Page_Game_Incubator::doFinishGame() {
 }
 
 bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
+    QString prevTab = detectedTab;
     {
         QWebElement e = document.findFirst("DIV#" + tab);
         if (e.isNull()) {
@@ -495,8 +543,8 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         if (ms <= time.elapsed()) qDebug("... TIMEOUT");
     }
 
-    qDebug("... medium delay (FIXME: replace to JS-detector!");
-    delay((qrand() % 1500) + 1500, false);
+//    qDebug("... medium delay (FIXME: replace to JS-detector!");
+//    delay((qrand() % 1500) + 1500, false);
 
     {
         int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
@@ -507,8 +555,8 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         while (time.elapsed() < ms) {
             loop.processEvents(QEventLoop::ExcludeUserInputEvents);
             if (parseDivFlyingBlock(false)) {
-                if (detectedTab.startsWith(tab)) {
-                    qDebug(u8("got desired {%1})").arg(detectedTab));
+                if (!detectedTab.isEmpty() && detectedTab != prevTab) {
+                    qDebug(u8("changed to tab {%1})").arg(detectedTab));
                     break;
                 }
             }
