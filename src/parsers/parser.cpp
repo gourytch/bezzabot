@@ -1,3 +1,4 @@
+#include <QThread>
 #include <QWebPage>
 #include <QWebFrame>
 #include <QWebElement>
@@ -162,7 +163,11 @@ Page_Generic* Parser::parse (const QString& text)
 Page_Generic* Parser::parse (QWebElement& doc)
 {
     check();
-    return _producer.getObj(doc);
+    Page_Generic *p = _producer.getObj(doc);
+//    if (p && getForegroundThread()) {
+//        p->moveToThread(getForegroundThread());
+//    }
+    return p;
 /*
     PageKind pagekind = guessPageKind (doc);
     switch (pagekind)

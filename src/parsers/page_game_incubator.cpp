@@ -1,3 +1,4 @@
+#include <QThread>
 #include <QEventLoop>
 #include <QWebElement>
 #include <QWebElementCollection>
@@ -124,30 +125,25 @@ void Page_Game_Incubator::parseDivFlyingActions() {
 
 
 bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
-//    QWebElement flying_block = document.findFirst("DIV#flying_block");
-    QString html = document.evaluateJavaScript(
-                "document.getElementById('flying_block').outerHTML;")
-            .toString();
-    qDebug(u8("=== JS returned ==="));
-    qDebug(html);
-    qDebug(u8("=== ========== ==="));
-    QWebElement tmp;
-    tmp.setInnerXml(html);
-    qDebug(u8("=== INNERXML ==="));
-    qDebug(tmp.toInnerXml());
-    qDebug(u8("=== ========== ==="));
-
-    QWebElement flying_block = tmp.findFirst("DIV#flying_block");
-    qDebug(u8("=== FlyingBlock ==="));
-    qDebug(flying_block.toInnerXml());
-    qDebug(u8("=== ========== ==="));
-
     fa_events0.reset();
     fa_boxgame.reset();
     fa_bonus.reset();
     fa_journey.reset();
-
     detectedTab = QString();
+
+    try {
+#if 1
+    QWebElement flying_block = document.findFirst("DIV#flying_block");
+#else
+    QString html = document.evaluateJavaScript(
+                "document.getElementById('flying_block').outerHTML;")
+            .toString();
+    QWebElement flying_block = tmp.findFirst("DIV#flying_block");
+    qDebug(u8("=== FlyingBlock ==="));
+    qDebug(flying_block.toInnerXml());
+    qDebug(u8("=== ========== ==="));
+#endif
+
 
     if (flying_block.isNull()) {
         if (verbose) qCritical("flying_block is null");
@@ -175,6 +171,15 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     }
     if (verbose) qDebug("flying block not parsed");
     return false;
+    } catch (...) {
+        qDebug("GOT EXCEPTION IN parseDivFlyingBlock (reset all tabs)");
+        fa_events0.reset();
+        fa_boxgame.reset();
+        fa_bonus.reset();
+        fa_journey.reset();
+        detectedTab = QString();
+        return false;
+    }
 }
 
 
@@ -562,20 +567,34 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         qDebug("now awaiting for valid fa-block whitin %d ms", ms);
         QEventLoop loop;
         QTime time;
+
+        //
+        // FIXME !!!
+        /////////////////////
+        qDebug("inject __incubator__ object in html");
         webframe->addToJavaScriptWindowObject("__incubator__", this);
-//        webframe->evaluateJavaScript("document.getElementById('flying_block')"
-//                                     ".sometingChanged"
-//                                     ".connect("
-//                                     "__incubator__.slotParseFlyingBlock);");
+
+        webframe->evaluateJavaScript("document.getElementById('flying_block')"
+                                     ".sometingChanged"
+                                     ".connect("
+                                     "__incubator__.slotParseFlyingBlock);");
+        /////////////////////
+        // END OF FIXME
+        //
         detectedTab = QString();
 
         time.start();
         while (time.elapsed() < ms) {
             loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-            webframe->evaluateJavaScript("__incubator__.slotParseFlyingBlock();");
-            if (!detectedTab.isEmpty() && detectedTab != prevTab) {
-                qDebug(u8("changed to tab {%1})").arg(detectedTab));
-                break;
+            if (_mutex.tryLock()) {
+                if (!detectedTab.isEmpty() && detectedTab != prevTab) {
+                    qDebug(u8("changed to tab {%1})").arg(detectedTab));
+                    _mutex.unlock();
+                    break;
+                }
+                _mutex.unlock();
+            } else {
+                qDebug("locked mutex. skip");
             }
         }
         if (ms <= time.elapsed()) qDebug("... TIMEOUT");
@@ -719,7 +738,8 @@ bool Page_Game_Incubator::doBonusSubmit() {
         qCritical("bonus tab is not active");
         return false;
     }
-    QWebElement submit = document.findFirst("DIV#bonus_zoo_did INPUT[type=submit]");
+    QWebElement submit = document.findFirst(
+                "DIV#bonus_zoo_did INPUT[type=submit]");
     if (submit.isNull()) {
         qCritical("submit not found");
         return false;
@@ -730,7 +750,15 @@ bool Page_Game_Incubator::doBonusSubmit() {
 
 
 void Page_Game_Incubator::slotParseFlyingBlock() {
-    qDebug("Page_Game_Incubator::slotParseFlyingBlock {");
-    parseDivFlyingBlock(true);
+    qDebug("Page_Game_Incubator::slotParseFlyingBlock[thrID=%lx] {",
+           QThread::currentThreadId());
+    if (_mutex.tryLock(100)) {
+        parseDivFlyingBlock(true);
+        _mutex.unlock();
+    } else {
+        int ms = (qrand() % 1000) + 100;
+        qDebug("lock failed. will retry after %d ms", ms);
+        QTimer::singleShot(ms, this, SLOT(slotParseFlyingBlock()));
+    }
     qDebug("} Page_Game_Incubator::slotParseFlyingBlock");
 }

@@ -42,6 +42,7 @@ protected:
     bool    _use_food_peasants;
 
     bool _check4bell;
+    int  _days4bell;
 
     bool GoToIncubator();
 

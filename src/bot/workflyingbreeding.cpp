@@ -17,6 +17,8 @@ void WorkFlyingBreeding::configure(Config *config) {
                                      false, false).toBool();
     _check4bell = config->get("Work_FlyingBreeding/check4bell",
                               false, false).toBool();
+    _days4bell = config->get("Work_FlyingBreeding/days4bell",
+                          false, 3).toInt();
 
     _duration10 = config->get("Work_FlyingBreeding/duration10",
                               false, 0).toInt();
@@ -61,6 +63,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
            .arg(p->rel_active));
 
     bool bValidIx = (p->ix_active >= 0 && p->ix_active < p->flyings.count());
+    int bell_len = _days4bell * 3600 * 24;
 
     if (_check4bell && bValidIx && p->flyings.at(p->ix_active).was_born) {
         QDateTime pit = _pit_bell[p->rel_active];
@@ -68,7 +71,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         if (pit.isNull()) {
             go_n_look = true;
             qDebug("для первичного осмотра...");
-        } else if (QDateTime::currentDateTime().secsTo(pit) < BELL_TIMEOUT) {
+        } else if (QDateTime::currentDateTime().secsTo(pit) < bell_len) {
             go_n_look = true;
             qDebug("по причине истекающего отката...");
         } else if ((qrand() % 10) == 0) {

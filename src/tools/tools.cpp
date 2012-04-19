@@ -87,3 +87,13 @@ int gaussian_rand(int minValue, int maxValue) {
     int drift = maxValue - minValue + 1;
     return (int)(gaussian_rand() * drift + minValue);
 }
+
+QThread *foregroundThread = NULL;
+
+void setForegroundThread() {
+    foregroundThread = QThread::currentThread();
+}
+
+QThread* getForegroundThread() {
+    return foregroundThread;
+}

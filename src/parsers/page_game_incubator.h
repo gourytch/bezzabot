@@ -1,6 +1,7 @@
 #ifndef PAGE_GAME_INCUBATOR_H
 #define PAGE_GAME_INCUBATOR_H
 
+#include <QMutex>
 #include <QWebElement>
 #include <QVector>
 #include <QVectorIterator>
@@ -169,6 +170,8 @@ protected:
     void parseDivFlyings();
     void parseDivFlyingActions();
     bool parseDivFlyingBlock(bool verbose = true);
+
+    QMutex _mutex;
 
 public slots:
 

@@ -1,6 +1,7 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+#include <QThread>
 #include <QString>
 #include <QDebug>
 #include <QDate>
@@ -53,6 +54,10 @@ inline void qCritical(const QString& s) {
 inline void qFatal(const QString& s) {
     qFatal("%s", s.toUtf8().constData());
 }
+
+void setForegroundThread();
+QThread* getForegroundThread();
+
 
 double gaussian_rand();
 
