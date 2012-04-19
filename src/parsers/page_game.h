@@ -424,6 +424,21 @@ public:
 
     bool doFlyingGoEvents(int flyingNo);
 
+    bool isJSInjected();
+
+    void injectJSInsiders();
+
+signals:
+
+    void js_injected();
+    void js_doUpdateInfo_invoked(QString data, QString config);
+    void js_doUpdateInfo_finished();
+
+private slots:
+
+    void slot_js_injected();
+    void slot_update_invoked(QString data, QString config);
+    void slot_update_finished();
 };
 
 #endif // PAGE_GAME_H

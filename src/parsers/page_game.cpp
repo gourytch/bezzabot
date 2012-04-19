@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QMapIterator>
 #include "tools/tools.h"
+#include "types.h"
 #include "page_game.h"
 
 ESTART(WorkGuild)
@@ -1084,4 +1085,65 @@ bool Page_Game::doFlyingGoEvents(int flyingNo) {
     qDebug("submitting eventlink for flyingNo=%d", flyingNo);
     pressSubmit();
     return true;
+}
+
+bool Page_Game::isJSInjected() {
+    bool hasPageObj   = document.evaluateJavaScript("typeof _page_ != 'undefined';").toBool();
+    bool hasOldUpdate = document.evaluateJavaScript("typeof old_doUpdateInfo != 'undefined';").toBool();
+    qDebug(u8("check js-injection for %1").arg(::toString(pagekind)));
+    if (hasPageObj) {
+        qDebug("already injected: has page");
+        if (hasOldUpdate) {
+            qDebug("... and old update-function");
+        } else {
+            qDebug("... ??? but has no old update-function");
+        }
+        return true;
+    }
+    qDebug("not injected yet");
+    return false;
+}
+
+void Page_Game::injectJSInsiders() {
+    if (isJSInjected()) return;
+    qDebug("injectJSInsiders into Page(%p)", this);
+    webframe->addToJavaScriptWindowObject("_page_", this);
+    QString js = webframe->evaluateJavaScript("doUpdateInfo.toString()").toString();
+
+    connect(this, SIGNAL(js_injected()), this, SLOT(slot_js_injected()));
+    connect(this, SIGNAL(js_doUpdateInfo_invoked(QString,QString)), this, SLOT(slot_update_invoked(QString,QString)));
+    connect(this, SIGNAL(js_doUpdateInfo_finished()), this, SLOT(slot_update_finished()));
+
+    js = js.replace("doUpdateInfo", "old_doUpdateInfo");
+    webframe->evaluateJavaScript(js);
+
+    webframe->evaluateJavaScript(
+                "function doUpdateInfo(data, config) {\n"
+//                "  _page_.js_doUpdateInfo_invoked(data, config);\n"
+                "  old_doUpdateInfo(data, config);\n"
+                "  _page_.js_doUpdateInfo_finished();\n"
+                "}\n"
+                "setTimeout(function() {_page_.js_injected();}, 500);\n"
+                );
+    QString txt;
+    txt = webframe->evaluateJavaScript("old_doUpdateInfo.toString();").toString();
+//    qDebug(u8("old_doUpdateInfo:"));
+//    qDebug(txt);
+    txt = webframe->evaluateJavaScript("doUpdateInfo.toString();").toString();
+//    qDebug(u8("new doUpdateInfo:"));
+//    qDebug(txt);
+}
+
+
+void Page_Game::slot_js_injected() {
+    qDebug("js_injection checked");
+}
+
+void Page_Game::slot_update_invoked(QString data, QString config) {
+    qDebug(u8("doUpdateInfo ('%1', '%2') {").arg(data, config));
+}
+
+void Page_Game::slot_update_finished() {
+    qDebug("}// doUpdateInfo");
+
 }

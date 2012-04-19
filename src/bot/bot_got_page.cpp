@@ -4,6 +4,7 @@
 #include "work.h"
 
 void Bot::got_page(Page_Game *gpage) {
+
     if (!gpage->message.isEmpty()) {
         QString s (u8("сообщение: «%1»")
                 .arg(gpage->message.replace('\n', ' ')));

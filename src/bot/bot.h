@@ -190,6 +190,10 @@ private slots:
 
     void delayedAutorun();
 
+    void slot_doUpdateInfo_invoked(QString data, QString config);
+
+    void slot_doUpdateInfo_finished();
+
 public slots:
 
     void configure();
