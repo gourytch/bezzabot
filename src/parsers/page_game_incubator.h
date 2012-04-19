@@ -170,6 +170,10 @@ protected:
     void parseDivFlyingActions();
     bool parseDivFlyingBlock(bool verbose = true);
 
+public slots:
+
+    void slotParseFlyingBlock();
+
 };
 
 #endif // PAGE_GAME_INCUBATOR_H

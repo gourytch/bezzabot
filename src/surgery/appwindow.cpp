@@ -1,3 +1,5 @@
+#include <QTimer>
+#include <QThread>
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QWebElement>
@@ -16,8 +18,8 @@ AppWindow::AppWindow(QWidget *parent) :
     _login      = pConfig->get("login/email", true, "").toString();
     _password   = pConfig->get("login/password", true, "").toString();
 
-    _baseurl    = QString("http://g%1.botva.ru").arg(_server_no);
-//    _baseurl    = QString("http://localhost/");
+//    _baseurl    = QString("http://g%1.botva.ru").arg(_server_no);
+    _baseurl    = QString("http://localhost/");
 
     pWebPage    = new TunedPage();
     pNetMgr     = new NetManager("surgery-{TS}");
@@ -80,7 +82,8 @@ AppWindow::AppWindow(QWidget *parent) :
             SIGNAL(finished(QNetworkReply*)),
             this, SLOT(slotGotReply(QNetworkReply*)));
 
-    qDebug("ready");
+    pWebPage->mainFrame()->addToJavaScriptWindowObject("__ww__", this);
+    qDebug("ready, thread id=0x%lx", QThread::currentThreadId());
     pWebView->load(QUrl(_baseurl));
 }
 
@@ -132,6 +135,7 @@ void AppWindow::actuate(QWebElement e) {
 }
 
 void AppWindow::slotTest1() {
+/*
     QWebElement doc = pWebPage->mainFrame()->documentElement();
     QWebElement body = doc.findFirst("BODY");
     if (body.isNull()) {
@@ -152,6 +156,13 @@ void AppWindow::slotTest1() {
         qDebug("already exists");
     }
     actuate(e);
+*/
+    qDebug("before evaluating, thread id=0x%lx", QThread::currentThreadId());
+//    pWebPage->mainFrame()->evaluateJavaScript("__ww__.justDoIt();");
+//    pWebPage->mainFrame()->evaluateJavaScript("var t = setTimeout("
+//                                              "'__ww__.justDoIt()',3000);");
+    QTimer::singleShot(1000, this, SLOT(justDoIt()));
+    qDebug("after evaluating");
 }
 
 void AppWindow::slotSave() {
@@ -229,3 +240,6 @@ void AppWindow::slotGotReply(QNetworkReply *reply) {
 
 }
 
+void AppWindow::justDoIt() {
+    qDebug("Invoked! thread id=0x%lx", QThread::currentThreadId());
+}

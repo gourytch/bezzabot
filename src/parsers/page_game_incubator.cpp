@@ -128,8 +128,19 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     QString html = document.evaluateJavaScript(
                 "document.getElementById('flying_block').outerHTML;")
             .toString();
-    QWebElement flying_block;
-    flying_block.setOuterXml(html);
+    qDebug(u8("=== JS returned ==="));
+    qDebug(html);
+    qDebug(u8("=== ========== ==="));
+    QWebElement tmp;
+    tmp.setInnerXml(html);
+    qDebug(u8("=== INNERXML ==="));
+    qDebug(tmp.toInnerXml());
+    qDebug(u8("=== ========== ==="));
+
+    QWebElement flying_block = tmp.findFirst("DIV#flying_block");
+    qDebug(u8("=== FlyingBlock ==="));
+    qDebug(flying_block.toInnerXml());
+    qDebug(u8("=== ========== ==="));
 
     fa_events0.reset();
     fa_boxgame.reset();
@@ -139,7 +150,7 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     detectedTab = QString();
 
     if (flying_block.isNull()) {
-        if (verbose) qCritical("flying_block not found");
+        if (verbose) qCritical("flying_block is null");
         return false;
     }
     if (fa_events0.parse(flying_block)) {
@@ -551,14 +562,20 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         qDebug("now awaiting for valid fa-block whitin %d ms", ms);
         QEventLoop loop;
         QTime time;
+        webframe->addToJavaScriptWindowObject("__incubator__", this);
+//        webframe->evaluateJavaScript("document.getElementById('flying_block')"
+//                                     ".sometingChanged"
+//                                     ".connect("
+//                                     "__incubator__.slotParseFlyingBlock);");
+        detectedTab = QString();
+
         time.start();
         while (time.elapsed() < ms) {
             loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-            if (parseDivFlyingBlock(false)) {
-                if (!detectedTab.isEmpty() && detectedTab != prevTab) {
-                    qDebug(u8("changed to tab {%1})").arg(detectedTab));
-                    break;
-                }
+            webframe->evaluateJavaScript("__incubator__.slotParseFlyingBlock();");
+            if (!detectedTab.isEmpty() && detectedTab != prevTab) {
+                qDebug(u8("changed to tab {%1})").arg(detectedTab));
+                break;
             }
         }
         if (ms <= time.elapsed()) qDebug("... TIMEOUT");
@@ -709,4 +726,11 @@ bool Page_Game_Incubator::doBonusSubmit() {
     }
     actuate(submit);
     return true;
+}
+
+
+void Page_Game_Incubator::slotParseFlyingBlock() {
+    qDebug("Page_Game_Incubator::slotParseFlyingBlock {");
+    parseDivFlyingBlock(true);
+    qDebug("} Page_Game_Incubator::slotParseFlyingBlock");
 }

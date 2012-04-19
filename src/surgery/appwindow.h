@@ -67,6 +67,8 @@ public slots:
     void slotHeal();
 
     void slotGotReply(QNetworkReply *reply);
+
+    void justDoIt();
 signals:
 
 };

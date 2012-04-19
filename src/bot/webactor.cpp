@@ -101,6 +101,7 @@ WebActor::WebActor(Bot *bot) :
     settings->setAttribute (QWebSettings::OfflineStorageDatabaseEnabled, true);
     settings->setAttribute (QWebSettings::OfflineWebApplicationCacheEnabled, true);
     settings->setAttribute (QWebSettings::DeveloperExtrasEnabled, true);
+    settings->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
 
     connect (_webpage, SIGNAL (loadStarted ()),
              this, SLOT (onPageStarted ()));
