@@ -18,7 +18,7 @@ void WorkFlyingBreeding::configure(Config *config) {
     _check4bell = config->get("Work_FlyingBreeding/check4bell",
                               false, false).toBool();
     _days4bell = config->get("Work_FlyingBreeding/days4bell",
-                          false, 3).toInt();
+                             false, 3).toInt();
 
     _duration10 = config->get("Work_FlyingBreeding/duration10",
                               false, 0).toInt();
@@ -47,9 +47,8 @@ bool WorkFlyingBreeding::nextStep() {
 
 
 #define BELL_IX 6
-#define BELL_TIMEOUT (4 * 3600)
 #define BELL_CURRENCY 1
-#define BELL_DAYS 1
+const int sec_per_day = 86400;
 
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
@@ -63,10 +62,10 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
            .arg(p->rel_active));
     int numFlyings = p->flyings.count();
     bool bValidIx = (p->ix_active >= 0 && p->ix_active < numFlyings);
-    int bell_len = _days4bell * 3600 * 24;
+    int bell_len = _days4bell * sec_per_day;
 
     if (_check4bell && bValidIx && p->flyings.at(p->ix_active).was_born &&
-        !p->detectedTab.contains("journey")) {
+            !p->detectedTab.contains("journey")) {
         QDateTime pit = _pit_bell[p->rel_active];
         bool go_n_look = false;
         if (pit.isNull()) {
@@ -90,51 +89,8 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         }
 
         if (p->fa_bonus.valid) {
-            qDebug("мы на бонусовой вкладке");
-            int cd = p->getBonusCooldown(BELL_IX);
-            _pit_bell[p->rel_active] = QDateTime::currentDateTime().addSecs(cd);
-            QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
-            if (cd < bell_len) {
-                qDebug(u8("%1 истекает! надо продлять").arg(name));
-                int price = p->getBonusPrice2(BELL_IX);
-                if (price <= p->crystal) {
-                    qWarning(u8("продлеваем %1 за %2").arg(name).arg(price));
-                    if (!p->doBonusSetCheck(BELL_IX, true)) {
-                        qCritical("set check failed!");
-                        setAwaiting();
-                        _bot->GoToWork();
-                        return false;
-                    }
-                    if (!p->doBonusSetCurrency(BELL_CURRENCY)) {
-                        qCritical("set currency failed!");
-                        setAwaiting();
-                        _bot->GoToWork();
-                        return false;
-                    }
-                    if (!p->doBonusSetDuration(BELL_DAYS)) {
-                        qCritical("set duration failed!");
-                        setAwaiting();
-                        _bot->GoToWork();
-                        return false;
-                    }
-                    if (!p->doBonusSubmit()) {
-                        qCritical("submit failed!");
-                        setAwaiting();
-                        _bot->GoToWork();
-                        return false;
-                    }
-                    qDebug("ждём перезагрузки страницы");
-                    setAwaiting();
-                    return true;
-                } else {
-                    qDebug("... но кристаллов не хватает (%d < %d) :(",
-                           p->crystal, price);
-                }
-            } else {
-                qDebug(u8("... %1 активен ещё %2 сек (pit = %3)")
-                       .arg(name)
-                       .arg(cd)
-                       .arg(::toString(_pit_bell[p->rel_active])));
+            if (!processBonusTab(p)) {
+                return false;
             }
         }
     } // check4bell
@@ -211,7 +167,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     if (p->fa_events0.valid) {
         if (_use_small_journey) {
             if (p->fa_events0.minutesleft > 0 &&
-                p->fa_events0.minutesleft >= _duration10) {
+                    p->fa_events0.minutesleft >= _duration10) {
                 qDebug("запустим по маленькому");
                 setAwaiting();
                 if (!p->doStartSmallJourney(_duration10)) {
@@ -224,7 +180,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                 return true;
             }
         }
-//        if (_use_big_journey) {
+        //        if (_use_big_journey) {
         qDebug("запускаем далеко и надолго.");
         setAwaiting();
         if (!p->doStartBigJourney()) {
@@ -234,7 +190,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         }
         qDebug("ожидаем результатов.");
         return true;
-//      }
+        //      }
     }
     qDebug("тут нам больше делать нечего. перейдём на другую страничку");
     setAwaiting();
@@ -403,7 +359,7 @@ void WorkFlyingBreeding::setNextTimegap() {
 void WorkFlyingBreeding::invalidateCooldown() {
     qDebug(u8("сбросим птичий откат"));
     _cooldown = QDateTime();
-//    setNextTimegap();
+    //    setNextTimegap();
 }
 
 //bool WorkFlyingBreeding::checkDoSomething() {
@@ -438,3 +394,102 @@ void WorkFlyingBreeding::invalidateCooldown() {
 //    qDebug(u8("стоит проведать летунов"));
 //    return true;
 //}
+
+
+bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
+    if (!_check4bell) {
+        qDebug("нам не надо проверять колокольчик.");
+        return true;
+    }
+
+    if (!p->fa_bonus.valid) {
+        qDebug("мы не на бонусовой вкладке.");
+        return true;
+    }
+    int activeIx = p->ix_active;
+    int numFlyings = p->flyings.count();
+    bool bValidIx = (0 <= activeIx && activeIx < numFlyings);
+    if (!bValidIx) {
+        qDebug("??? активный индекс %d вне диапазона [0…%d)",
+               activeIx, numFlyings);
+        return true;
+    }
+
+    if (p->flyings.at(activeIx).was_born == false) {
+        qDebug("летун #%d ещё не вылупился", activeIx);
+        return true;
+    }
+
+    int bell_len = _days4bell * sec_per_day;
+
+    qDebug("проверяем колокольчик. запас должен быть не менее %d сут.",
+           _days4bell);
+
+    int dailyPrice = p->getBonusPrice2(BELL_IX);
+    int cd = p->getBonusCooldown(BELL_IX);
+    _pit_bell[p->rel_active] = QDateTime::currentDateTime().addSecs(cd);
+
+    int safe_cd = cd - bell_len;
+    if (safe_cd > 0) {
+        QDateTime safe_pit = QDateTime::currentDateTime().addSecs(safe_cd);
+        qDebug(u8("можно не волноваться до %1").arg(::toString(safe_pit)));
+        return true;
+    }
+
+    int numDays = (sec_per_day - 1 - safe_cd) / sec_per_day;
+
+    QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
+    qDebug(u8("%1 истекает! надо продлять (%2 сут.)")
+           .arg(name).arg(numDays));
+    int totalPrice = numDays * dailyPrice;
+    if (totalPrice < p->crystal) {
+        numDays = p->crystal / dailyPrice;
+        if (numDays > 0) {
+            totalPrice = numDays * dailyPrice;
+            qDebug(u8("кристаллов хватит лишь на оплату %1 дн. (%2 кр)")
+                   .arg(numDays).arg(totalPrice));
+        } else {
+            qDebug(u8("кристаллов не хватит даже на день"));
+        }
+    } else {
+        qDebug(u8("кристаллов на это вполне хватает"));
+    }
+    if (numDays > 0 && totalPrice <= p->crystal) {
+        qWarning(u8("продлеваем %1 за %2 * %3 = %4 кр.")
+                 .arg(name).arg(dailyPrice)
+                 .arg(numDays).arg(totalPrice));
+        if (!p->doBonusSetCheck(BELL_IX, true)) {
+            qCritical("set check failed!");
+            setAwaiting();
+            _bot->GoToWork();
+            return false;
+        }
+        if (!p->doBonusSetCurrency(BELL_CURRENCY)) {
+            qCritical("set currency failed!");
+            setAwaiting();
+            _bot->GoToWork();
+            return false;
+        }
+
+        if (!p->doBonusSetDuration(numDays)) {
+            qCritical("set duration failed!");
+            setAwaiting();
+            _bot->GoToWork();
+            return false;
+        }
+        if (!p->doBonusSubmit()) {
+            qCritical("submit failed!");
+            setAwaiting();
+            _bot->GoToWork();
+            return false;
+        }
+        qDebug("ждём перезагрузки страницы");
+        setAwaiting();
+        return true;
+    } else {
+        qDebug("... но кристаллов не хватает (%d < %d) :(",
+               p->crystal, dailyPrice);
+    }
+    return true;
+}
+

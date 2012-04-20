@@ -2,6 +2,7 @@
 #define WORKFLYINGBREEDING_H
 
 #include <QMap>
+#include "parsers/page_game_incubator.h"
 #include "work.h"
 
 class WorkFlyingBreeding : public Work
@@ -53,6 +54,8 @@ protected:
     void invalidateCooldown();
 
     void setNextTimegap();
+
+    bool processBonusTab(Page_Game_Incubator *p);
 
 public:
 
