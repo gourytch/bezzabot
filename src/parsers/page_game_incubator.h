@@ -131,6 +131,7 @@ public:
 
     QString selectedTab; // какую закладку видим выделенной
     QString detectedTab; // контент по шаблону какой закладки мы видим
+    bool    gotSignal;   // был обработан сигнал из JS
 
     FlyingContainer flyings;
     int rel_active;
@@ -170,6 +171,7 @@ protected:
     void parseDivFlyings();
     void parseDivFlyingActions();
     bool parseDivFlyingBlock(bool verbose = true);
+    void checkInjection();
 
     QMutex _mutex;
 

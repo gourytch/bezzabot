@@ -1107,22 +1107,58 @@ bool Page_Game::isJSInjected() {
 void Page_Game::injectJSInsiders() {
     if (isJSInjected()) return;
     qDebug("injectJSInsiders into Page(%p)", this);
-    webframe->addToJavaScriptWindowObject("_page_", this);
-    QString js = webframe->evaluateJavaScript("doUpdateInfo.toString()").toString();
 
     connect(this, SIGNAL(js_injected()), this, SLOT(slot_js_injected()));
     connect(this, SIGNAL(js_doUpdateInfo_invoked(QString,QString)), this, SLOT(slot_update_invoked(QString,QString)));
     connect(this, SIGNAL(js_doUpdateInfo_finished()), this, SLOT(slot_update_finished()));
 
+    webframe->addToJavaScriptWindowObject("_page_", this);
+    QString js = webframe->evaluateJavaScript("doUpdateInfo.toString()").toString();
     js = js.replace("doUpdateInfo", "old_doUpdateInfo");
     webframe->evaluateJavaScript(js);
 
     webframe->evaluateJavaScript(
+                "function serialize(_obj) {"
+                "  if (typeof _obj === 'undefined') {"
+                "    return 'undefined';"
+                "  }"
+                "  if (typeof _obj.toSource !== 'undefined' && typeof _obj.callee === 'undefined') {"
+                "    return _obj.toSource();"
+                "  }"
+                "  switch (typeof _obj) {"
+                "    case 'number':"
+                "    case 'boolean':"
+                "    case 'function':"
+                "      return _obj;"
+                "      break;"
+                "    case 'string':"
+                "      return '\\'' + _obj + '\\'';"
+                "      break;"
+                "    case 'object':"
+                "      var str;"
+                "      if (_obj.constructor === Array || typeof _obj.callee !== 'undefined') {"
+                "        str = '[';"
+                "        var i, len = _obj.length;"
+                "        for (i = 0; i < len-1; i++) { str += serialize(_obj[i]) + ','; }"
+                "        str += serialize(_obj[i]) + ']';"
+                "      } else {"
+                "        str = '{';"
+                "        var key;"
+                "        for (key in _obj) { str += key + ':' + serialize(_obj[key]) + ','; }"
+                "        str = str.replace(/\\,$/, '') + '}';"
+                "      }"
+                "      return str;"
+                "      break;"
+                "    default:"
+                "      return 'UNKNOWN';"
+                "      break;"
+                "  }"
+                "}"
                 "function doUpdateInfo(data, config) {\n"
-//                "  _page_.js_doUpdateInfo_invoked(data, config);\n"
+                "  _page_.js_doUpdateInfo_invoked(serialize(data), serialize(config));\n"
                 "  old_doUpdateInfo(data, config);\n"
                 "  _page_.js_doUpdateInfo_finished();\n"
-                "}\n"
+                "};\n"
                 "setTimeout(function() {_page_.js_injected();}, 500);\n"
                 );
     QString txt;
@@ -1136,7 +1172,8 @@ void Page_Game::injectJSInsiders() {
 
 
 void Page_Game::slot_js_injected() {
-    qDebug("js_injection checked");
+    qDebug("js_injection checked, this=%p, thrid=%lx",
+           this, QThread::currentThreadId());
 }
 
 void Page_Game::slot_update_invoked(QString data, QString config) {

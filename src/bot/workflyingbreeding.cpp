@@ -61,8 +61,8 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug(u8("мы в инкубаторе. ix_active = %1, rel_active = %2")
            .arg(p->ix_active)
            .arg(p->rel_active));
-
-    bool bValidIx = (p->ix_active >= 0 && p->ix_active < p->flyings.count());
+    int numFlyings = p->flyings.count();
+    bool bValidIx = (p->ix_active >= 0 && p->ix_active < numFlyings);
     int bell_len = _days4bell * 3600 * 24;
 
     if (_check4bell && bValidIx && p->flyings.at(p->ix_active).was_born) {

@@ -58,7 +58,8 @@ QString Page_Game_Incubator::Flying::toString() const {
 }
 
 
-Page_Game_Incubator::Page_Game_Incubator(QWebElement& doc) : Page_Game(doc) {
+Page_Game_Incubator::Page_Game_Incubator(QWebElement& doc) :
+    Page_Game(doc), _mutex(QMutex::Recursive) {
     pagekind = page_Game_Incubator;
     reparse();
 }
@@ -93,9 +94,12 @@ bool Page_Game_Incubator::fit(const QWebElement& doc) {
 /////////////////////
 
 void Page_Game_Incubator::reparse() {
+    _mutex.lock();
     parseDivFlyings();
     parseDivFlyingActions();
     parseDivFlyingBlock();
+    checkInjection();
+    _mutex.unlock();
 }
 
 
@@ -182,6 +186,22 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     }
 }
 
+void Page_Game_Incubator::checkInjection() {
+    injectJSInsiders();
+    webframe->addToJavaScriptWindowObject("__incubator__", this);
+    QString js = webframe->evaluateJavaScript("bBlockLoader.prototype.load.toString();").toString();
+    if (js.contains("__incubator__")) {
+        qDebug("__incubator__ already injected");
+    } else {
+        qDebug("inject __incubator__");
+        js.replace("}, 'json');", "__incubator__.slotParseFlyingBlock();}, 'json');");
+        webframe->evaluateJavaScript(u8("bBlockLoader.prototype.load = %1;").arg(js));
+    }
+    // repeat
+//    js = webframe->evaluateJavaScript("bBlockLoader.prototype.load.toString();").toString();
+//    qDebug("bBlockLoader.prototype.load is:");
+//    qDebug(js);
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -516,6 +536,7 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         qDebug("reset gotReply flag");
         NetManager::shared->gotReply = false;
     }
+    gotSignal = false;
     actuate(tab);
     if (NetManager::shared) {
         int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
@@ -531,7 +552,7 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
                 break;
             }
         }
-        if (ms <= time.elapsed()) qDebug("... TIMEOUT");
+        if (ms <= time.elapsed()) qDebug("... NETMANAGER TIMEOUT");
     } else {
         int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
         qDebug("force sleeping for %d ms", ms);
@@ -556,7 +577,7 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
                 break;
             }
         }
-        if (ms <= time.elapsed()) qDebug("... TIMEOUT");
+        if (ms <= time.elapsed()) qDebug("...JS TOUCHER TIMEOUT");
     }
 
 //    qDebug("... medium delay (FIXME: replace to JS-detector!");
@@ -568,36 +589,30 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         QEventLoop loop;
         QTime time;
 
-        //
-        // FIXME !!!
-        /////////////////////
-        qDebug("inject __incubator__ object in html");
-        webframe->addToJavaScriptWindowObject("__incubator__", this);
+        checkInjection();
 
-        webframe->evaluateJavaScript("document.getElementById('flying_block')"
-                                     ".sometingChanged"
-                                     ".connect("
-                                     "__incubator__.slotParseFlyingBlock);");
-        /////////////////////
-        // END OF FIXME
-        //
         detectedTab = QString();
 
         time.start();
         while (time.elapsed() < ms) {
             loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-            if (_mutex.tryLock()) {
-                if (!detectedTab.isEmpty() && detectedTab != prevTab) {
-                    qDebug(u8("changed to tab {%1})").arg(detectedTab));
-                    _mutex.unlock();
+            if (!gotSignal) continue; // wait for signal
+            qDebug("gotSignal is set");
+            if (_mutex.tryLock(100)) {
+                QString s = detectedTab;
+                _mutex.unlock();
+                if (!s.isEmpty() && s != prevTab) {
+                    qDebug(u8("changed to tab {%1})").arg(s));
+                    break;
+                } else {
+                    qDebug(u8("still on tab {%1} :())").arg(s));
                     break;
                 }
-                _mutex.unlock();
             } else {
                 qDebug("locked mutex. skip");
             }
         }
-        if (ms <= time.elapsed()) qDebug("... TIMEOUT");
+        if (ms <= time.elapsed()) qDebug("... INJECTOR TIMEOUT");
     }
     qDebug("... and small delay");
     delay((qrand() % 500) + 250, false);
@@ -754,6 +769,9 @@ void Page_Game_Incubator::slotParseFlyingBlock() {
            QThread::currentThreadId());
     if (_mutex.tryLock(100)) {
         parseDivFlyingBlock(true);
+        qDebug(u8("selectedTab={%1}, detectedTab={%2}")
+               .arg(selectedTab, detectedTab));
+        gotSignal = true;
         _mutex.unlock();
     } else {
         int ms = (qrand() % 1000) + 100;
