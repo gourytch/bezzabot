@@ -271,11 +271,11 @@ void Bot::onPageFinished (bool ok)
     if (_gpage) {
         state.update_from_page(_gpage);
 
-        _gpage->injectJSInsiders();
-        connect(_gpage, SIGNAL(js_doUpdateInfo_invoked(QString,QString)),
-                this, SLOT(slot_doUpdateInfo_invoked(QString,QString)));
-        connect(_gpage, SIGNAL(js_doUpdateInfo_finished()),
-                this, SLOT(slot_doUpdateInfo_finished()));
+//        _gpage->injectJSInsiders();
+//        connect(_gpage, SIGNAL(js_doUpdateInfo_invoked(QString,QString)),
+//                this, SLOT(slot_doUpdateInfo_invoked(QString,QString)));
+//        connect(_gpage, SIGNAL(js_doUpdateInfo_finished()),
+//                this, SLOT(slot_doUpdateInfo_finished()));
 
     }
 
@@ -854,11 +854,11 @@ void Bot::fillNextQ() {
 }
 
 
-void Bot::slot_doUpdateInfo_invoked(QString data, QString config) {
-    qDebug(u8("invoked doUpdateInfo with data={%1} and config={%2}")
-           .arg(data, config));
-}
+//void Bot::slot_doUpdateInfo_invoked(QString data, QString config) {
+//    qDebug(u8("invoked doUpdateInfo with data={%1} and config={%2}")
+//           .arg(data, config));
+//}
 
-void Bot::slot_doUpdateInfo_finished() {
-    qDebug(u8("finished doUpdateInfo"));
-}
+//void Bot::slot_doUpdateInfo_finished() {
+//    qDebug(u8("finished doUpdateInfo"));
+//}

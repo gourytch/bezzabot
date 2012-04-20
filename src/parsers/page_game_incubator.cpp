@@ -517,7 +517,6 @@ bool Page_Game_Incubator::doFinishGame() {
 }
 
 bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
-    QString prevTab = detectedTab;
     {
         QWebElement e = document.findFirst("DIV#" + tab);
         if (e.isNull()) {
@@ -530,14 +529,21 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         }
         e = QWebElement();
     }
-    qDebug("actuate tab " + tab);
+
+    qDebug("* actuate tab " + tab);
+
+    QString prevTab = detectedTab;
+    checkInjection();
+    detectedTab = QString();
+    gotSignal = false;
 
     if (NetManager::shared) {
         qDebug("reset gotReply flag");
         NetManager::shared->gotReply = false;
     }
-    gotSignal = false;
+
     actuate(tab);
+
     if (NetManager::shared) {
         int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
         qDebug("awaiting for net response whitin %d ms", ms);
@@ -588,10 +594,6 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         qDebug("now awaiting for valid fa-block whitin %d ms", ms);
         QEventLoop loop;
         QTime time;
-
-        checkInjection();
-
-        detectedTab = QString();
 
         time.start();
         while (time.elapsed() < ms) {

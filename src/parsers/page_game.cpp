@@ -1109,8 +1109,8 @@ void Page_Game::injectJSInsiders() {
     qDebug("injectJSInsiders into Page(%p)", this);
 
     connect(this, SIGNAL(js_injected()), this, SLOT(slot_js_injected()));
-    connect(this, SIGNAL(js_doUpdateInfo_invoked(QString,QString)), this, SLOT(slot_update_invoked(QString,QString)));
-    connect(this, SIGNAL(js_doUpdateInfo_finished()), this, SLOT(slot_update_finished()));
+//    connect(this, SIGNAL(js_doUpdateInfo_invoked(QString,QString)), this, SLOT(slot_update_invoked(QString,QString)));
+//    connect(this, SIGNAL(js_doUpdateInfo_finished()), this, SLOT(slot_update_finished()));
 
     webframe->addToJavaScriptWindowObject("_page_", this);
     QString js = webframe->evaluateJavaScript("doUpdateInfo.toString()").toString();

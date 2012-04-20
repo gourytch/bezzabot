@@ -65,7 +65,8 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     bool bValidIx = (p->ix_active >= 0 && p->ix_active < numFlyings);
     int bell_len = _days4bell * 3600 * 24;
 
-    if (_check4bell && bValidIx && p->flyings.at(p->ix_active).was_born) {
+    if (_check4bell && bValidIx && p->flyings.at(p->ix_active).was_born &&
+        !p->detectedTab.contains("journey")) {
         QDateTime pit = _pit_bell[p->rel_active];
         bool go_n_look = false;
         if (pit.isNull()) {
@@ -93,7 +94,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             int cd = p->getBonusCooldown(BELL_IX);
             _pit_bell[p->rel_active] = QDateTime::currentDateTime().addSecs(cd);
             QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
-            if (cd < BELL_TIMEOUT) {
+            if (cd < bell_len) {
                 qDebug(u8("%1 истекает! надо продлять").arg(name));
                 int price = p->getBonusPrice2(BELL_IX);
                 if (price <= p->crystal) {
