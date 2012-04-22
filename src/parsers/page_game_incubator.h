@@ -144,6 +144,8 @@ public:
 
     void reparse();
 
+    bool doSelectFlying(int flyingNo, int timeout=-1);
+
     bool doSelectTab(const QString& tab, int timeout=-1);
 
     // journey

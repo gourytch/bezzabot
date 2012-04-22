@@ -42,7 +42,8 @@ bool WorkFlyingBreeding::nextStep() {
         qDebug("отправляемся в инкубатор.");
         return GoToIncubator();
     }
-    return true;
+    return processPage(_bot->_gpage);
+//    return true;
 }
 
 
@@ -57,12 +58,14 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         return GoToIncubator();
     }
     Page_Game_Incubator *p = (Page_Game_Incubator *)gpage;
-    qDebug(u8("мы в инкубаторе. ix_active = %1, rel_active = %2")
+    qDebug(u8("мы в инкубаторе. ix_active = %1, rel_active = %2, tab = %3")
            .arg(p->ix_active)
-           .arg(p->rel_active));
+           .arg(p->rel_active)
+           .arg(p->detectedTab));
     int numFlyings = p->flyings.count();
     bool bValidIx = (p->ix_active >= 0 && p->ix_active < numFlyings);
     int bell_len = _days4bell * sec_per_day;
+    int dailyPrice = p->getBonusPrice2(BELL_IX);
 
     if (_check4bell && bValidIx && p->flyings.at(p->ix_active).was_born &&
             !p->detectedTab.contains("journey")) {
@@ -71,10 +74,11 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         if (pit.isNull()) {
             go_n_look = true;
             qDebug("для первичного осмотра...");
-        } else if (QDateTime::currentDateTime().secsTo(pit) < bell_len) {
+        } else if (QDateTime::currentDateTime().secsTo(pit) < bell_len &&
+                   dailyPrice <= p->crystal) {
             go_n_look = true;
             qDebug("по причине истекающего отката...");
-        } else if ((qrand() % 10) == 0) {
+        } else if ((qrand() % 100) == 0) {
             go_n_look = true;
             qDebug("просто разнообразия ради...");
         }
@@ -192,10 +196,24 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         return true;
         //      }
     }
-    qDebug("тут нам больше делать нечего. перейдём на другую страничку");
-    setAwaiting();
-    _bot->GoToWork();
-    return false;
+
+    qDebug("проверим других летунов");
+    int ix = findAwaitingFlying();
+    if (ix == -1) {
+        qDebug("... раз все чем-то заняты, вернёмся к основной работе");
+        setAwaiting();
+        _bot->GoToWork();
+        return false;
+    }
+    qDebug("... займём работой летуна #%d", ix);
+    if (!p->doSelectFlying(ix)) {
+        qCritical(u8("летун не выделился. грусть. пойдм отсюда"));
+        setAwaiting();
+        _bot->GoToNeutralUrl();
+        return false;
+    }
+    qDebug("ожидаем перевызова через nextStep()");
+    return true;
 }
 
 
@@ -224,7 +242,37 @@ bool WorkFlyingBreeding::processCommand(Command command) {
 }
 
 
-bool WorkFlyingBreeding::GoToIncubator() {
+int WorkFlyingBreeding::findAwaitingFlying() {
+    int n = _bot->_gpage->flyingslist.size();
+    for (int i = 0; i < n; ++i) {
+        const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
+        if (fi.boxgame.valid) {
+            qDebug(u8("#%1 (%2) ждет открытия ящиков")
+                   .arg(i).arg(fi.caption.title));
+            return i;
+        }
+    }
+    for (int i = 0; i < n; ++i) {
+        const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
+        if (fi.normal.valid) {
+            qDebug(u8("#%1 (%2) не занят ничем")
+                   .arg(i)
+                   .arg(fi.caption.title));
+            return i;
+        }
+        if (fi.journey.valid && !fi.journey.journey_cooldown.active()) {
+            qDebug(u8("#%1 (%2) закончил путешествие")
+                   .arg(i)
+                   .arg(fi.caption.title));
+            return i;
+        }
+    }
+    qDebug(u8("все летуны заняты"));
+    return -1;
+}
+
+
+bool WorkFlyingBreeding::GoToIncubator(bool checkCD) {
     qDebug("проверяем, зачем нам надо в инкубатор");
 
     if (_bot->_gpage->flyingslist.size() == 0) {
@@ -232,14 +280,14 @@ bool WorkFlyingBreeding::GoToIncubator() {
         return false;
     }
 
-    QDateTime now = QDateTime::currentDateTime();
-    if (_cooldown.isValid() && now < _cooldown) {
-        qDebug("и чего, спрашивается, пришли? таймер же активен!");
-        return false;
+    if (checkCD) {
+        QDateTime now = QDateTime::currentDateTime();
+        if (_cooldown.isValid() && now < _cooldown) {
+            qDebug("и чего, спрашивается, пришли? таймер же активен!");
+            return false;
+        }
+        invalidateCooldown();
     }
-
-    invalidateCooldown();
-
     for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
         if (fi.boxgame.valid) {
@@ -454,6 +502,22 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
     } else {
         qDebug(u8("кристаллов на это вполне хватает"));
     }
+
+    // выравниваем по сетке [1,2,3,7,14,28]
+    int unalignedNumDays = numDays;
+    if (numDays >= 28) {
+        numDays = 28;
+    } else if (numDays >= 14) {
+        numDays = 14;
+    } else if (numDays >= 7) {
+        numDays = 7;
+    } else if (numDays >= 3) {
+        numDays = 3;
+    }
+    if (numDays != unalignedNumDays) {
+        qDebug("выровняли до %d", numDays);
+    }
+
     if (numDays > 0 && totalPrice <= p->crystal) {
         qWarning(u8("продлеваем %1 за %2 * %3 = %4 кр.")
                  .arg(name).arg(dailyPrice)

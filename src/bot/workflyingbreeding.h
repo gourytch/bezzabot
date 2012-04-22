@@ -45,7 +45,9 @@ protected:
     bool _check4bell;
     int  _days4bell;
 
-    bool GoToIncubator();
+    int findAwaitingFlying();
+
+    bool GoToIncubator(bool checkCD = true);
 
     void adjustCooldown(Page_Game *gpage);
 

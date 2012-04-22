@@ -93,6 +93,9 @@ bool WorkFishing::processQuery(Query query) {
     switch (query) {
 
     case CanStartWork:
+        if (_bot->state.level > 0 && _bot->state.level < 5) {
+            return false;
+        }
         return checkFishraidCooldown(); // проверим откат, если сможем - сходим
 
     case CanStartSecondaryWork:

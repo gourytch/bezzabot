@@ -516,6 +516,73 @@ bool Page_Game_Incubator::doFinishGame() {
     return true;
 }
 
+
+//////////////////////////////////////////////////////////////////////////////
+////
+////  doSelectFlying
+////
+//////////////////////////////////////////////////////////////////////////////
+bool Page_Game_Incubator::doSelectFlying(int flyingNo, int timeout) {
+    if (flyingNo < 0) {
+        qCritical("flyingNo < 0");
+        return false;
+    }
+    if (flyingNo == ix_active) {
+        qDebug("flying[%d] is already active", flyingNo);
+        return true;
+    }
+    QWebElement e = document.findFirst("DIV#flyings");
+    if (e.isNull()) {
+        qFatal("MISSING DIV#flyings");
+        return false;
+    }
+    QWebElementCollection v = e.findAll("DIV");
+    if (flyingNo >= v.count()) {
+        qCritical("flyingNo >= %d", v.count());
+        return false;
+    }
+    if (v[flyingNo].attribute("rel").isEmpty()) {
+        qCritical("flying[%d] has empty rel attribute", flyingNo);
+        return false;
+    }
+    qDebug("* select from flying #%d to #%d", ix_active, flyingNo);
+    checkInjection();
+    detectedTab = QString();
+    gotSignal = false;
+    actuate(v[flyingNo]);
+
+
+    {
+        int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
+        qDebug("now awaiting for valid fa-block whitin %d ms", ms);
+        QEventLoop loop;
+        QTime time;
+
+        time.start();
+        while (time.elapsed() < ms) {
+            loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+            if (!gotSignal) continue; // wait for signal
+            qDebug("gotSignal is set after %d ms", time.elapsed());
+            break;
+        }
+        if (ms <= time.elapsed()) qDebug("... INJECTOR TIMEOUT");
+    }
+    qDebug("... and small delay");
+    delay((qrand() % 500) + 250, false);
+
+    qDebug("reparse");
+    reparse();
+
+    qDebug("active flying now #%d (rel=%d)", ix_active, rel_active);
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+////
+////   doSelectTab
+////
+//////////////////////////////////////////////////////////////////////////////
+
 bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
     {
         QWebElement e = document.findFirst("DIV#" + tab);
