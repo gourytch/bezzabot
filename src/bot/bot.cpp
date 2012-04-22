@@ -445,15 +445,18 @@ void Bot::handle_Page_LevelUp() {
 
 void Bot::configure() {
     _good = true;
-    int server_id = _config->get("login/server_id", false, -1).toInt();
-    if (server_id < 1 || server_id > 3) {
-        qFatal(QString("missing/bad: login/server_id (%1)").arg(server_id));
-        _config->set("login/server_id", 0);
-        _good = false;
-    } else {
-        _serverNo = server_id;
-        _baseurl = QString("http://g%1.botva.ru/").arg(server_id);
-        qDebug("set base url as " + _baseurl);
+    _baseurl = _config->get("login/baseurl", false).toString();
+    if (_baseurl.isEmpty()) {
+        int server_id = _config->get("login/server_id", false, -1).toInt();
+        if (server_id < 1 || server_id > 3) {
+            qFatal(QString("missing/bad: login/server_id (%1)").arg(server_id));
+            _config->set("login/server_id", 0);
+            _good = false;
+        } else {
+            _serverNo = server_id;
+            _baseurl = QString("http://g%1.botva.ru/").arg(server_id);
+            qDebug("set base url as " + _baseurl);
+        }
     }
 
     QString email = _config->get("login/email", false, "").toString();
