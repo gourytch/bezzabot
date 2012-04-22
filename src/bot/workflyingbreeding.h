@@ -5,11 +5,21 @@
 #include "parsers/page_game_incubator.h"
 #include "work.h"
 
+
 class WorkFlyingBreeding : public Work
 {
     Q_OBJECT
 
 protected:
+
+    struct PetState {
+        int         stat_level[5];
+        int         stat_price[5];
+        QDateTime   bell_pit;
+        QDateTime   feed_pit;
+    };
+
+    QMap<int, PetState> _pet_states;
 
     QMap<int, QDateTime> _pit_bell;
     QMap<int, QDateTime> _pit_feed;

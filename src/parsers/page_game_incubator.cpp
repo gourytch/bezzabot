@@ -77,9 +77,10 @@ QString Page_Game_Incubator::toString (const QString& pfx) const {
             pfx + u8("содержимое инкубатора:\n") +
             s +
             pfx + u8("вкладка: %1\n").arg(selectedTab) +
-            pfx + u8("fa_events0: %1\n").arg(fa_events0.toString()) +
-            pfx + u8("fa_boxgame: %1\n").arg(fa_boxgame.toString()) +
-            pfx + u8("fa_bonus  : %1\n").arg(fa_bonus.toString()) +
+            pfx + u8("fa_events0 : %1\n").arg(fa_events0.toString()) +
+            pfx + u8("fa_boxgame : %1\n").arg(fa_boxgame.toString()) +
+            pfx + u8("fa_bonus   : %1\n").arg(fa_bonus.toString()) +
+            pfx + u8("fa_training: %1\n").arg(fa_training.toString()) +
             pfx + "}";
 }
 
@@ -133,21 +134,10 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     fa_boxgame.reset();
     fa_bonus.reset();
     fa_journey.reset();
+    fa_training.reset();
     detectedTab = QString();
 
-    try {
-#if 1
     QWebElement flying_block = document.findFirst("DIV#flying_block");
-#else
-    QString html = document.evaluateJavaScript(
-                "document.getElementById('flying_block').outerHTML;")
-            .toString();
-    QWebElement flying_block = tmp.findFirst("DIV#flying_block");
-    qDebug(u8("=== FlyingBlock ==="));
-    qDebug(flying_block.toInnerXml());
-    qDebug(u8("=== ========== ==="));
-#endif
-
 
     if (flying_block.isNull()) {
         if (verbose) qCritical("flying_block is null");
@@ -173,17 +163,13 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
         detectedTab = "fa_journey";
         return true;
     }
+    if (fa_training.parse(flying_block)) {
+        if (verbose) qDebug("fa_training detected");
+        detectedTab = "fa_training";
+        return true;
+    }
     if (verbose) qDebug("flying block not parsed");
     return false;
-    } catch (...) {
-        qDebug("GOT EXCEPTION IN parseDivFlyingBlock (reset all tabs)");
-        fa_events0.reset();
-        fa_boxgame.reset();
-        fa_bonus.reset();
-        fa_journey.reset();
-        detectedTab = QString();
-        return false;
-    }
 }
 
 void Page_Game_Incubator::checkInjection() {
@@ -385,6 +371,7 @@ bool Page_Game_Incubator::Tab_Bonus::parse(QWebElement flying_block) {
 
 QString Page_Game_Incubator::Tab_Bonus::toString() const {
     if (!valid) return "?invalid bonus tab?";
+//    return cooldowns.toString();
     QString s;
     for (int i = 0; i < 8; ++i) {
         bool checked = checkboxes[i].attribute("checked") != "";
@@ -400,13 +387,83 @@ QString Page_Game_Incubator::Tab_Bonus::toString() const {
         } else {
             cd = "unset";
         }
-        s += u8("{#%1 %2, %3} ")
+        s += u8("\n        #%1(%2) %3, %4")
                 .arg(i)
+                .arg(Tab_Bonus::bonus_name[i])
                 .arg(u8(checked ? "checked" : "unchecked"))
                 .arg(cd);
     }
-    return cooldowns.toString();
+    return "{" + s + " }";
 }
+
+///
+/// Tab_Training
+///
+/*
+struct Tab_Training {
+    QWebElement block;
+    bool valid;
+
+    int  stat_level[5];
+    long stat_price[5];
+    bool stat_accessible[5];
+
+    void reset();
+    bool parse(QWebElement flying_block);
+    QString toString() const;
+};
+*/
+
+const char *Page_Game_Incubator::Tab_Training::stat_name[5] = {
+    "power", "block", "dexterity", "endurance", "charisma"
+};
+
+
+const char *Page_Game_Incubator::Tab_Training::stat_name_r[5] = {
+    "сила", "защита", "ловкость", "масса", "мастерство"
+};
+
+void Page_Game_Incubator::Tab_Training::reset() {
+    valid = false;
+    block = QWebElement();
+}
+
+
+bool Page_Game_Incubator::Tab_Training::parse(QWebElement flying_block) {
+    reset();
+    block = flying_block.findFirst("DIV#buy_block_1");
+    if (block.isNull()) return false;
+    QWebElementCollection C = block.findAll("TR.row_5");
+    if (C.count() != 5) {
+        qDebug("? invalid TR.row_5 count: %d", C.count());
+        return false;
+    }
+    for (int i = 0; i < 5; ++i) {
+        QWebElementCollection td = C[i].findAll("TD");
+        qDebug(u8("[%1:2]={%2}").arg(i).arg(td[2].toOuterXml()));
+        qDebug(u8("[%1:4]={%2}").arg(i).arg(td[4].toOuterXml()));
+        stat_level[i] = dottedInt(td[2].toPlainText());
+        stat_price[i] = dottedInt(td[4].toPlainText());
+        QWebElement button = td[5].findFirst("FORM INPUT[type=submit]");
+        stat_accessible[i] = !button.isNull();
+    }
+    valid = true;
+    return true;
+}
+
+
+QString Page_Game_Incubator::Tab_Training::toString() const {
+    if (!valid) return "?invalid training tab?";
+    QString s;
+    for (int i = 0; i < 5; ++i) {
+        s += u8("\n      %1: %2 lvl, up for %3 g.")
+                .arg(stat_name[i])
+                .arg(stat_level[i])
+                .arg(stat_price[i]);
+    }
+    return "{" + s + " }";
+}
+
 
 ////////////////////////////////////////////////////////////////////////////
 // doXXXXX
@@ -826,6 +883,30 @@ bool Page_Game_Incubator::doBonusSubmit() {
                 "DIV#bonus_zoo_did INPUT[type=submit]");
     if (submit.isNull()) {
         qCritical("submit not found");
+        return false;
+    }
+    actuate(submit);
+    return true;
+}
+
+
+bool Page_Game_Incubator::doBuyStat(int stat_ix) {
+    if (stat_ix < 0 || stat_ix >= 5) {
+        qCritical("bad training stat_ix = %d", stat_ix);
+        return false;
+    }
+    if (!fa_training.valid) {
+        qCritical("training tab is not active");
+        return false;
+    }
+    QWebElementCollection forms = document.findFirst("DIV#buy_block_1").findAll("FORM");
+    if (forms.count() != 5) {
+        qFatal("forms.count() = %d, must be 5", forms.count());
+        return false;
+    }
+    QWebElement submit = forms[stat_ix].findFirst("INPUT[type=submit]");
+    if (submit.isNull()) {
+        qCritical("submit element not found!");
         return false;
     }
     actuate(submit);

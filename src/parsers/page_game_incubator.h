@@ -90,8 +90,15 @@ public:
     };
 
     struct Tab_Training {
+        static const char *stat_name[5];
+        static const char *stat_name_r[5];
+
         QWebElement block;
         bool valid;
+
+        int  stat_level[5];
+        long stat_price[5];
+        bool stat_accessible[5];
 
         void reset();
         bool parse(QWebElement flying_block);
@@ -141,6 +148,7 @@ public:
     Tab_Action_Boxgame fa_boxgame;
     Tab_Bonus fa_bonus;
     Tab_Action_Journey fa_journey;
+    Tab_Training fa_training;
 
     void reparse();
 
@@ -167,6 +175,9 @@ public:
     bool doBonusSetCurrency(int ix); // 0 - пирашки, 1 - кристаллы
     bool doBonusSetDuration(int days); // установить длительность (делай =1)
     bool doBonusSubmit(); // оплатить за бонусы
+
+    // training
+    bool doBuyStat(int stat_ix);
 
 protected:
 
