@@ -111,6 +111,13 @@ protected:
 
     void reset();
 
+    int mdsav_gold;
+    int mdsav_crystal;
+    int mdsav_fish;
+    int mdsav_green;
+
+    void minidump();
+
 public:
 
     void cancelAuto();
@@ -164,7 +171,6 @@ public:
     bool is_need_to_change_coulon(quint32 id);
 
     bool action_wear_right_coulon(quint32 id);
-
 
 signals:
 

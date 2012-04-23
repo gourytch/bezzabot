@@ -117,6 +117,7 @@ void Bot::reset() {
     _workq.clear();
     _last_url = QString();
     _last_url_counter = 0;
+    mdsav_gold = -1;
 }
 
 void Bot::request_get (const QUrl& url) {
@@ -816,6 +817,7 @@ void Bot::popWork() {
             break;
         }
     }
+    minidump();
 }
 
 void Bot::fillNextQ() {
@@ -865,3 +867,23 @@ void Bot::fillNextQ() {
 //void Bot::slot_doUpdateInfo_finished() {
 //    qDebug(u8("finished doUpdateInfo"));
 //}
+
+void Bot::minidump() {
+    if (mdsav_gold != -1) {
+        qDebug("MINIDUMP:: золота: %d:%+d, кристаллов: %d:%+d, пирашек:%d:%+d, зелени:%d:+%d",
+               state.gold, state.gold - mdsav_gold,
+               state.crystal, state.crystal - mdsav_crystal,
+               state.fish, state.fish - mdsav_fish,
+               state.green, state.green - mdsav_green);
+    } else {
+        qDebug("MINIDUMP:: золота: %d, кристаллов: %d, пирашек:%d, зелени:%d",
+               state.gold,
+               state.crystal,
+               state.fish,
+               state.green);
+    }
+    mdsav_gold = state.gold;
+    mdsav_crystal = state.crystal;
+    mdsav_fish = state.fish;
+    mdsav_green = state.green;
+}

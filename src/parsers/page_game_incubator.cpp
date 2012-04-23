@@ -661,11 +661,6 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
     detectedTab = QString();
     gotSignal = false;
 
-    if (NetManager::shared) {
-        qDebug("reset gotReply flag");
-        NetManager::shared->gotReply = false;
-    }
-
     actuate(tab);
 
     if (NetManager::shared) {
@@ -690,30 +685,6 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
     }
 
     {
-        int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
-        qDebug(u8("now try gentle touching to {%1} whitin %2 ms")
-               .arg(tab).arg(ms));
-        QEventLoop loop;
-        QTime time;
-        time.start();
-        while (time.elapsed() < ms) {
-            loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-            refreshDocument();
-            QString s = document.evaluateJavaScript(
-                        u8("document.getElementById('%1').outerHTML").arg(tab))
-                    .toString();
-            if (s.contains("selected")) {
-                qDebug("tab was been selected");
-                break;
-            }
-        }
-        if (ms <= time.elapsed()) qDebug("...JS TOUCHER TIMEOUT");
-    }
-
-//    qDebug("... medium delay (FIXME: replace to JS-detector!");
-//    delay((qrand() % 1500) + 1500, false);
-
-    {
         int ms = (timeout < 0) ? 10000 : timeout;
         qDebug("finally awaiting for valid fa-block whitin %d ms", ms);
         QEventLoop loop;
@@ -722,27 +693,16 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         time.start();
         while (time.elapsed() < ms) {
             loop.processEvents(QEventLoop::ExcludeUserInputEvents);
-            if (!gotSignal) continue; // wait for signal
-            qDebug("gotSignal is set");
-            if (_mutex.tryLock(100)) {
-                QString s = detectedTab;
-                _mutex.unlock();
-                if (!s.isEmpty() && s != prevTab) {
-                    qDebug(u8("changed to tab {%1})").arg(s));
-                    break;
-                } else {
-                    qDebug(u8("still on tab {%1} :())").arg(s));
-                    break;
-                }
-            } else {
-                qDebug("locked mutex. skip");
+            if (gotSignal) {
+                qDebug("gotSignal is set after %d ms", time.elapsed());
+                break;
             }
         }
         if (ms <= time.elapsed()) qDebug("... INJECTOR TIMEOUT");
     }
 
     if (!gotSignal) {
-        qCritical("gotSignal is not set. evade GPF hazard");
+        qCritical("gotSignal is not set. evade GPF hazard, return false");
         return false;
     }
 
