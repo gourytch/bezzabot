@@ -13,11 +13,32 @@ class WorkFlyingBreeding : public Work
 protected:
 
     struct PetState {
+        int         ix;
+        int         rel;
+        int         level;
+
+        QString     title;
+        QString     kind;
+
+        bool        was_born; // true ::= уже не яйцо
+
+        int         readiness; // развитие яйца 0..100
+        PageTimer   birth_pit; // когда вылупится
+
+        // для вылупившегося
+        int         gold;
+        int         health;
+        int         satiety;
+
+        QDateTime   bell_pit; // когда полностью закончится колокольчик
+        QDateTime   feed_pit; // когда сытость упадёт до 70%
+
         int         stat_level[5];
         int         stat_price[5];
-        QDateTime   bell_pit;
-        QDateTime   feed_pit;
+
+        void update(Page_Game *gpage);
     };
+
 
     QMap<int, PetState> _pet_states;
 

@@ -557,3 +557,42 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
     return true;
 }
 
+/*
+struct PetState {
+    int         ix;
+    int         rel;
+    int         level;
+
+    QString     title;
+    QString     kind;
+
+    bool        was_born; // true ::= уже не яйцо
+
+    int         readiness; // развитие яйца 0..100
+    PageTimer   birth_pit; // когда вылупится
+
+    // для вылупившегося
+    int         gold;
+    int         health;
+    int         satiety;
+
+    QDateTime   bell_pit; // когда полностью закончится колокольчик
+    QDateTime   feed_pit; // когда сытость упадёт до 70%
+
+    int         stat_level[5];
+    int         stat_price[5];
+
+    void update(Page_Game *gpage);
+};
+*/
+
+
+void WorkFlyingBreeding::PetState::update(Page_Game *gpage) {
+    int n = gpage->flyingslist.count();
+    for (int i = 0; i < n; ++i) {
+        const FlyingInfo& fi = gpage->flyingslist.at(i);
+        if (fi.normal.valid) {
+
+        }
+    }
+}
