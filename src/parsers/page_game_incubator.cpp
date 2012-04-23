@@ -714,8 +714,8 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
 //    delay((qrand() % 1500) + 1500, false);
 
     {
-        int ms = (timeout < 0) ? 6000 + (qrand() % 3000) : timeout;
-        qDebug("now awaiting for valid fa-block whitin %d ms", ms);
+        int ms = (timeout < 0) ? 10000 : timeout;
+        qDebug("finally awaiting for valid fa-block whitin %d ms", ms);
         QEventLoop loop;
         QTime time;
 
@@ -740,6 +740,12 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         }
         if (ms <= time.elapsed()) qDebug("... INJECTOR TIMEOUT");
     }
+
+    if (!gotSignal) {
+        qCritical("gotSignal is not set. evade GPF hazard");
+        return false;
+    }
+
     qDebug("... and small delay");
     delay((qrand() % 500) + 250, false);
 
