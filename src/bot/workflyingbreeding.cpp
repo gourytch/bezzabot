@@ -490,7 +490,7 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
     qDebug(u8("%1 истекает! надо продлять (%2 сут.)")
            .arg(name).arg(numDays));
     int totalPrice = numDays * dailyPrice;
-    if (totalPrice < p->crystal) {
+    if (p->crystal < totalPrice) {
         numDays = p->crystal / dailyPrice;
         if (numDays > 0) {
             totalPrice = numDays * dailyPrice;
