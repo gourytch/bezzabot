@@ -1,5 +1,6 @@
 #include <QString>
 #include <QFile>
+#include <QDir>
 #include <QTextStream>
 #include <QDateTime>
 #include <QDebug>
@@ -7,6 +8,12 @@
 #include <cmath>
 #include "tools.h"
 
+bool checkDir(const QString& dirname)
+{
+    QDir d(dirname);
+    if (d.exists()) return true;
+    return d.mkpath(d.absolutePath());
+}
 
 void save (const QString& fname, const QString& text)
 {
@@ -96,4 +103,24 @@ void setForegroundThread() {
 
 QThread* getForegroundThread() {
     return foregroundThread;
+}
+
+QString escape(const QString& text) {
+    QString buf = text;
+    return buf
+            .replace("\\", "\\\\")
+            .replace("\n", "\\n")
+            .replace("\t", "\\t")
+            .replace("=", "\\E")
+            ;
+}
+
+QString unescape(const QString& text) {
+    QString buf = text;
+    return buf
+            .replace("\\E", "=")
+            .replace("\\t", "\t")
+            .replace("\\n", "\n")
+            .replace("\\\\", "\\")
+            ;
 }

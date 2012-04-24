@@ -10,6 +10,7 @@
 #include "tools/logger.h"
 #include "tools/activityhours.h"
 #include "tools/tarball.h"
+#include "tools/varmap.h"
 //#include <QTextCodec>
 
 void ahtest(const char *s) {
@@ -123,10 +124,36 @@ void testGzip() {
     ::save("testGzip_gziped", gzipFile(src));
 }
 
+void testVarMap() {
+    {
+        qDebug("initialize");
+        VarMap vars("test.varmap");
+        vars.clear();
+        vars.set("simple", "foo bar");
+        vars.set("equal_sign", "e = mc²");
+        vars.set("/comp/lex/value", "раз\nдва\nтри\nчетыре\nпять");
+        qDebug("read 1");
+        qDebug(u8("simple = {%1}").arg(vars.get("simple").toString()));
+        qDebug(u8("equal_sign = {%1}").arg(vars.get("equal_sign").toString()));
+        qDebug(u8("/comp/lex/value = {%1}").arg(vars.get("/comp/lex/value").toString()));
+    }
+    {
+        qDebug("reinitialize");
+        VarMap vars("test.varmap");
+        qDebug(u8("simple = {%1}").arg(vars.get("simple").toString()));
+        qDebug(u8("equal_sign = {%1}").arg(vars.get("equal_sign").toString()));
+        qDebug(u8("/comp/lex/value = {%1}").arg(vars.get("/comp/lex/value").toString()));
+    }
+
+}
+
+
 int main (int argc, char ** argv) {
     QApplication app(argc, argv);
     Config::global();
     Logger::global();
+    testVarMap();
+    return 0;
     //////////////////////////////////////
     //////////////////////////////////////
     qDebug("initialize window");

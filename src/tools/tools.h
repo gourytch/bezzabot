@@ -24,6 +24,12 @@ inline QString toString(const QTime& t) {
     return t.toString("hh:mm:ss");
 }
 
+QString escape(const QString& text);
+
+QString unescape(const QString& text);
+
+bool checkDir(const QString& dirname);
+
 void save (const QString& fname, const QString& text);
 
 void save (const QString& fname, const QByteArray& data);

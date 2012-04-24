@@ -24,7 +24,7 @@ WebActor::WebActor(Bot *bot) :
     {
         _cache = new QNetworkDiskCache ();
         QString location = Config::globalCachePath() + "/webkit.cache";
-        Config::checkDir (location);
+        checkDir (location);
         _cache->setCacheDirectory (location);
         _cache->setMaximumCacheSize (CACHE_SIZE);
     }
@@ -251,7 +251,7 @@ void WebActor::onDownloadRequested (const QNetworkRequest& request)
 void WebActor::savePage ()
 {
     QString ts = now ();
-    Config::checkDir (_savepath);
+    checkDir (_savepath);
     Page_Generic *page = parse();
     qDebug("SAVE PAGE TS=" +
            ts + " URL:" +

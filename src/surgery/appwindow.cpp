@@ -168,7 +168,7 @@ void AppWindow::slotTest1() {
 void AppWindow::slotSave() {
     QString ts = now ();
     QString _savepath = Config::globalDataPath() + "/surgery";
-    Config::checkDir (_savepath);
+    checkDir(_savepath);
     QString pfx = _savepath + "/" + ts + "-";
     qDebug("SAVE PAGE TS=" +
            ts + " URL:" +

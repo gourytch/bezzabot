@@ -13,6 +13,7 @@
 //static
 Config*     Config::_global     = NULL;
 QSettings*  Config::_settings   = NULL;
+VarMap*     Config::_overrides  = NULL;
 
 bool        Config::_portable = true;
 bool        Config::_readonly = false;
@@ -73,6 +74,7 @@ void Config::init_check ()
     checkDir (_location_cache);
 
     QString ini_name = _app_name + ".ini";
+
     QRegExp rx("config=(.+)");
     foreach (QString s, appPtr->arguments()) {
         if (rx.indexIn(s) != -1) {
@@ -84,9 +86,17 @@ void Config::init_check ()
     _ini_fname = ini_name.contains('/')
             ? ini_name
             : _location_config + "/" + ini_name;
+
     qDebug("using config file {"  + _ini_fname + "}");
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
     _settings->setIniCodec(codec);
+
+    QString varmap_fname = _ini_fname + ".varmap";
+
+    qDebug("using varmap file {"  + varmap_fname + "}");
+
+    _overrides = new VarMap(varmap_fname);
+
     _global = new Config ();
 
     _readonly = _global->get("readonly").toBool();
@@ -95,10 +105,10 @@ void Config::init_check ()
         if (!_global->get("initialized").toBool()) {
             _global->setTemplate();
         }
-        _global->set("launched",
-                     QDateTime::currentDateTime().
-                     toString("yyyy-MM-dd hh:mm:ss"));
     }
+    _global->set("launched",
+                 QDateTime::currentDateTime().
+                 toString("yyyy-MM-dd hh:mm:ss"));
 }
 
 
@@ -155,6 +165,9 @@ QVariant Config::get (
         const QVariant& defval)
 {
     QString fp = fullpath (path);
+    if (_overrides->contains(fp)) {
+        return _overrides->get(fp);
+    }
     if (strict || _settings->contains (fp))
     {
         return _settings->value (fp, defval);
@@ -174,19 +187,10 @@ void Config::set (
     if (!_readonly) {
         _settings->setValue (fullpath (path), value);
         _settings->sync ();
+    } else {
+        _overrides->set(fullpath(path), value);
+        _overrides->sync();
     }
-}
-
-
-//static
-bool Config::checkDir (const QString& dirname)
-{
-    QDir d (dirname);
-    if (d.exists ())
-    {
-        return true;
-    }
-    return d.mkpath (d.absolutePath ());
 }
 
 //static

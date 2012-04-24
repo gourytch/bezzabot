@@ -49,6 +49,7 @@ MainWindow::MainWindow (QWidget *parent) :
     createTrayIcon();
     setupWebView ();
     setupConnections();
+    restoreGeometry(cfg.get("ui/geometry").toByteArray());
 
     if (noimages) {
         pNoPics->toggle();
@@ -231,6 +232,7 @@ void MainWindow::setupWebView ()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    Config::global().set("ui/geometry", saveGeometry());
     if (hide_in_tray_on_close &&
             isVisible() &&
             pTrayIcon &&
@@ -253,6 +255,11 @@ void MainWindow::setVisible(bool visible) {
     if (pTrayIcon) {
         pActionHide->setEnabled(visible);
         pActionRestore->setEnabled(!visible);
+    }
+    if (visible) {
+        restoreGeometry(Config::global().get("ui/geometry").toByteArray());
+    } else {
+        Config::global().set("ui/geometry", saveGeometry());
     }
     QWidget::setVisible(visible);
 }
@@ -391,20 +398,24 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
      case QSystemTrayIcon::Trigger:
          if (toggle_on_tray_click) {
              if (!isVisible()) {
+                 restoreGeometry(Config::global().get("ui/geometry").toByteArray());
                  show();
                  if (!isActiveWindow()) {
                     activateWindow();
                  }
              } else {
+                 Config::global().set("ui/geometry", saveGeometry());
                  hide();
              }
          }
          break;
      case QSystemTrayIcon::DoubleClick:
          if (isVisible()) {
+             Config::global().set("ui/geometry", saveGeometry());
              hide();
          } else {
              setVisible(true);
+             restoreGeometry(Config::global().get("ui/geometry").toByteArray());
 //             showNormal();
          }
          break;

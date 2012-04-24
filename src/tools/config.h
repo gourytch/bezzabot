@@ -5,6 +5,8 @@
 #include <QString>
 #include <QSettings>
 #include <QDateTime>
+#include "varmap.h"
+
 
 #define ORG_DOMAIN  "zhukoid.net"
 #define ORG_NAME    "zhukoid"
@@ -22,6 +24,7 @@ protected:
 
     static Config*      _global;
     static QSettings*   _settings;
+    static VarMap*      _overrides;
 
 
     static bool     _portable;
@@ -37,7 +40,6 @@ protected:
 
     Config*     _base;
     QString     _id;
-
 
     QString fullpath (const QString& path) const;
 
@@ -72,9 +74,6 @@ public:
     void set (
             const QString& path,
             const QVariant& value);
-
-
-    static bool checkDir (const QString& dirname);
 
     static const QString& appName ();
 

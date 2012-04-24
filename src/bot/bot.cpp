@@ -29,13 +29,13 @@ Bot::Bot(const QString& id, QObject *parent) :
     _id = id;
     _config = new Config (this, _id);
 
-    Config::checkDir (_config->dataPath());
-    Config::checkDir (_config->cachePath());
+    checkDir(_config->dataPath());
+    checkDir(_config->cachePath());
     qDebug("BOT ID : " + _id);
     qDebug("BOTDIR : " + _config->dataPath());
     qDebug("CACHE  : " + _config->cachePath());
 
-    Config::checkDir (_config->dataPath ());
+    checkDir(_config->dataPath ());
     QString cookiefname = _config->dataPath () + "/cookies";
 
     _cookies = new PersistentCookieJar (this, cookiefname);
