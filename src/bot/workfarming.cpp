@@ -50,7 +50,7 @@ bool WorkFarming::nextStep() {
     }
     // _cooldown <= now
     qDebug("пора вернуться на ферму и завершить работу");
-    _cooldown = QDateTime();
+    // _cooldown = QDateTime();
     gotoWork();
     return false;
 }
@@ -71,21 +71,7 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
         qDebug("мы фермерствуем. поставили откат до " +
                _cooldown.toString("yyyy-MM-dd hh:mm:ss"));
         return true;
-
     }
-
-    int h = _activity_hours.seg_length();
-    if (_hours < h) {
-        h = _hours;
-    }
-    if (h <= 0) {
-        qDebug("времени на ферму не осталось. закончим работу.");
-        _bot->GoTo();
-        setAwaiting();
-        return false;
-    }
-
-    qDebug("по предварительным подсчётам нам можно поработать %d час(ов)", h);
 
     // has no work
     if (gpage->pagekind != page_Game_Farm) {
@@ -104,7 +90,28 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
         return true;
     }
 
+    if (!_cooldown.isNull()) { // был выставлен откат
+        qDebug("мы на ферме, завершаем работу");
+        _cooldown = QDateTime();
+        setAwaiting();
+        _bot->GoTo();
+        return false;
+    }
+
     qDebug("мы на ферме, пока без работы");
+
+    int h = _activity_hours.seg_length();
+    if (_hours < h) {
+        h = _hours;
+    }
+    if (h <= 0) {
+        qDebug("времени на ферму не осталось. закончим работу.");
+        _bot->GoTo();
+        setAwaiting();
+        return false;
+    }
+
+    qDebug("по предварительным подсчётам нам можно поработать %d час(ов)", h);
 
     if (p->maxhours < h) {
         h = p->maxhours;
@@ -139,6 +146,7 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
     return false;
 }
 
+
 bool WorkFarming::processQuery(Query query) {
     switch (query) {
     case CanStartWork:
@@ -159,6 +167,7 @@ bool WorkFarming::processQuery(Query query) {
         return false;
     }
 }
+
 
 bool WorkFarming::processCommand(Command command) {
     switch (command) {
