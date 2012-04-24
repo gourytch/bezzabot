@@ -85,12 +85,12 @@ QString Page_Game_Dozor_GotVictim::getName() const {
         scareNames["m1_gb"] = "Зомбус Крокодилус";
 
         scareNames["m2_za"] = "Крылатая Наковальница";
-        scareNames["m2_??"] = "Кар Карычус";
+        scareNames["m2_3a"] = "Кар Карычус";
         scareNames["m2_kz"] = "Пугальё";
 
         scareNames["m3_sk"] = "Свинтус Зомбус";
         scareNames["m3_zk"] = "Барантус Зомбус";
-        scareNames["m3_??"] = "Касперус";
+        scareNames["m3_zb"] = "Касперус";
 
         scareNames["m4_??"] = "Паучог Сногаток";
         scareNames["m4_??"] = "Двурогая Жижа";
