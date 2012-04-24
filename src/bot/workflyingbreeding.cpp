@@ -199,11 +199,32 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
 
     qDebug("проверим других летунов");
     int ix = findAwaitingFlying();
+    qDebug("... раз все чем-то заняты...");
     if (ix == -1) {
-        qDebug("... раз все чем-то заняты, вернёмся к основной работе");
-        setAwaiting();
-        _bot->GoToWork();
-        return false;
+        switch (qrand() % 10) {
+        case 0:
+        case 1:
+        case 2:
+            qDebug("... ... вернёмся к основной работе");
+            setAwaiting();
+            _bot->GoToWork();
+            return false;
+        case 3:
+            qDebug("... ... прогуляемся по нейтральным страничкам");
+            setAwaiting();
+            _bot->GoToNeutralUrl();
+            return false;
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+            qDebug("... ... отдохнём немножко тут");
+            return false;
+
+    }
+
     }
     qDebug("... займём работой летуна #%d", ix);
     if (!p->doSelectFlying(ix)) {

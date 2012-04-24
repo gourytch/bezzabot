@@ -399,20 +399,6 @@ QString Page_Game_Incubator::Tab_Bonus::toString() const {
 ///
 /// Tab_Training
 ///
-/*
-struct Tab_Training {
-    QWebElement block;
-    bool valid;
-
-    int  stat_level[5];
-    long stat_price[5];
-    bool stat_accessible[5];
-
-    void reset();
-    bool parse(QWebElement flying_block);
-    QString toString() const;
-};
-*/
 
 const char *Page_Game_Incubator::Tab_Training::stat_name[5] = {
     "power", "block", "dexterity", "endurance", "charisma"
@@ -440,8 +426,8 @@ bool Page_Game_Incubator::Tab_Training::parse(QWebElement flying_block) {
     }
     for (int i = 0; i < 5; ++i) {
         QWebElementCollection td = C[i].findAll("TD");
-        qDebug(u8("[%1:2]={%2}").arg(i).arg(td[2].toOuterXml()));
-        qDebug(u8("[%1:4]={%2}").arg(i).arg(td[4].toOuterXml()));
+//        qDebug(u8("[%1:2]={%2}").arg(i).arg(td[2].toOuterXml()));
+//        qDebug(u8("[%1:4]={%2}").arg(i).arg(td[4].toOuterXml()));
         stat_level[i] = dottedInt(td[2].toPlainText());
         stat_price[i] = dottedInt(td[4].toPlainText());
         QWebElement button = td[5].findFirst("FORM INPUT[type=submit]");

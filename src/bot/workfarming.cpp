@@ -61,7 +61,6 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
         return false;
     }
 
-
     if (hasWork()) {
         if (isNotMyWork()) {
             qDebug("мы работаем, но не на ферме, а в " +
@@ -181,11 +180,13 @@ bool WorkFarming::processCommand(Command command) {
         return (_sleep_hours.isActive() == false);
 
     case FinishSecondaryWork:
-        if (_bot->_gpage->pagekind != page_Game_Farm) {
-            qDebug("возвращаемся на ферму");
-            gotoWork();
-            return true;
-        }
+//        if (_bot->_gpage->pagekind != page_Game_Farm) {
+//            qDebug("возвращаемся на ферму");
+//            gotoWork();
+//            return true;
+//        }
+        qDebug("фермерствуем дальше");
+        return true;
     default:
         return false;
     }
