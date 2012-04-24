@@ -393,9 +393,14 @@ bool FlyingInfo::Journey::parse(QWebElement &content) {
     valid = false;
     QWebElement e = content.findFirst("CENTER B A");
     if (e.isNull()) return false;
-    QRegExp rx(u8(">((Большое|Маленькое) приключение)<"));
-    if (rx.indexIn(e.toOuterXml()) == -1) return false;
-    title = rx.cap(1);
+    QString xml = e.toOuterXml();
+    if (xml.contains(u8(">Кар Кар<"))) {
+        title = "приключение Кар Кар";
+    } else {
+        QRegExp rx(u8(">((Большое|Маленькое) приключение)<"));
+        if (rx.indexIn(xml) == -1) return false;
+        title = rx.cap(1);
+    }
     e = content.findFirst("SPAN[timer]");
     if (e.isNull()) return false;
     journey_cooldown.assign(e);
