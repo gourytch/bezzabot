@@ -2,14 +2,28 @@
 #define PAGE_GAME_HARBOR_MARKET_H
 
 #include <QMap>
+#include <QVector>
 #include "page_game.h"
 
 class Page_Game_Harbor_Market : public Page_Game
 {
     Q_OBJECT
 
-public:
+    struct Item {
+        QString id;
+        QString name;
+        QString icon;
+        double  price;
+        int     price_type;
+        int     min;
+        int     max;
+        int     step;
+        QString toString() const;
+    };
 
+    QVector<Item> _items;
+
+public:
 
     explicit Page_Game_Harbor_Market(QWebElement& doc);
 
@@ -19,11 +33,13 @@ public:
 
     bool parseGoods();
 
-    bool doSelectLotByName(QString name);
+    bool parseJSItems();
 
-    bool doSelectLotById(QString id);
+    bool parseMessage();
 
-    bool doSelectLotQuantity(int quantity);
+    bool doSelectItem(QString id);
+
+    bool doSelectQuantity(int quantity);
 
     bool doBuy();
 
@@ -33,6 +49,8 @@ public:
 
     QString selectedLotId;
 
+    QString selectedLotOptValue;
+
     QString lotIcon;
 
     int lotQuantity;
@@ -40,6 +58,8 @@ public:
     int lotPrice;
 
     QString lotCurrency;
+
+    int previousBuyResult;
 
 };
 

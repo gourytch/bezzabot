@@ -24,7 +24,11 @@ protected:
     QLineEdit           *pURL;
     QPushButton         *pGo;
     QPushButton         *pSave;
-    QPushButton         *pHeal;
+
+    QPushButton         *pButton1;
+    QPushButton         *pButton2;
+    QPushButton         *pButton3;
+
     QWebView            *pWebView;
     QWebPage            *pWebPage;
     QString             _url;
@@ -63,8 +67,9 @@ public slots:
 
     void slotSave();
 
-    void slotTest1();
-    void slotHeal();
+    void slotClick1();
+    void slotClick2();
+    void slotClick3();
 
     void slotGotReply(QNetworkReply *reply);
 

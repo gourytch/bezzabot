@@ -19,7 +19,8 @@ AppWindow::AppWindow(QWidget *parent) :
     _password   = pConfig->get("login/password", true, "").toString();
 
 //    _baseurl    = QString("http://g%1.botva.ru").arg(_server_no);
-    _baseurl    = QString("http://localhost/");
+//    _baseurl    = QString("http://localhost/");
+    _baseurl    = QString("http://g1.botva.ru/");
 
     pWebPage    = new TunedPage();
     pNetMgr     = new NetManager("surgery-{TS}");
@@ -44,8 +45,9 @@ AppWindow::AppWindow(QWidget *parent) :
 
     QWidget *pStuff = new QWidget();
 
-    pHeal               = new QPushButton("HEAL");
-    QPushButton *pTest1 = new QPushButton("TEST1");
+    pButton1 = new QPushButton("BUTTON1");
+    pButton2 = new QPushButton("BUTTON2");
+    pButton3 = new QPushButton("BUTTON3");
 
     QHBoxLayout *box0 = new QHBoxLayout();
     box0->addWidget(pURL);
@@ -53,8 +55,9 @@ AppWindow::AppWindow(QWidget *parent) :
     box0->addWidget(pSave);
 
     QVBoxLayout *box1 = new QVBoxLayout();
-    box1->addWidget(pHeal);
-    box1->addWidget(pTest1);
+    box1->addWidget(pButton1);
+    box1->addWidget(pButton2);
+    box1->addWidget(pButton3);
     box1->addSpacerItem(new QSpacerItem(1,1));
     pStuff->setLayout(box1);
 
@@ -75,8 +78,9 @@ AppWindow::AppWindow(QWidget *parent) :
     connect(pWebPage, SIGNAL(loadStarted()), this, SLOT(slotLoadStart()));
     connect(pWebPage, SIGNAL(loadFinished(bool)), this, SLOT(slotLoaded(bool)));
 
-    connect(pHeal, SIGNAL(clicked()), this, SLOT(slotHeal()));
-    connect(pTest1, SIGNAL(clicked()), this, SLOT(slotTest1()));
+    connect(pButton1, SIGNAL(clicked()), this, SLOT(slotClick1()));
+    connect(pButton2, SIGNAL(clicked()), this, SLOT(slotClick2()));
+    connect(pButton3, SIGNAL(clicked()), this, SLOT(slotClick3()));
 
     connect(pWebPage->networkAccessManager(),
             SIGNAL(finished(QNetworkReply*)),
@@ -105,7 +109,9 @@ void AppWindow::slotLoaded (bool success) {
     doc = pWebPage->mainFrame()->documentElement();
     _page = Parser::parse(doc);
     _gpage = dynamic_cast<Page_Game*>(_page);
-    pHeal->setEnabled(_gpage != NULL);
+    pButton1->setEnabled(_gpage != NULL);
+    pButton2->setEnabled(_gpage != NULL);
+    pButton3->setEnabled(_gpage != NULL);
     if (checkLogin()) return;
     if (checkGame()) return;
 }
@@ -134,37 +140,6 @@ void AppWindow::actuate(QWebElement e) {
     QString s = e.evaluateJavaScript(js).toString();
 }
 
-void AppWindow::slotTest1() {
-/*
-    QWebElement doc = pWebPage->mainFrame()->documentElement();
-    QWebElement body = doc.findFirst("BODY");
-    if (body.isNull()) {
-        qWarning("NULL");
-        return;
-    }
-    QWebElement e = body.findFirst("#my_anchor");
-    if (e.isNull()) {
-        qDebug("add");
-        body.appendInside(
-                    "<a href='javascript:alert(\"YAHOO!!!\");' "
-//                    "<input type='submit' "
-                    "id='my_anchor' "
-                    "onclick='alert(\"ONCLICK\");' "
-                    ">PUSH ME</a>");
-        e = body.findFirst("#my_anchor");
-    } else {
-        qDebug("already exists");
-    }
-    actuate(e);
-*/
-    qDebug("before evaluating, thread id=0x%lx", QThread::currentThreadId());
-//    pWebPage->mainFrame()->evaluateJavaScript("__ww__.justDoIt();");
-//    pWebPage->mainFrame()->evaluateJavaScript("var t = setTimeout("
-//                                              "'__ww__.justDoIt()',3000);");
-    QTimer::singleShot(1000, this, SLOT(justDoIt()));
-    qDebug("after evaluating");
-}
-
 void AppWindow::slotSave() {
     QString ts = now ();
     QString _savepath = Config::globalDataPath() + "/surgery";
@@ -182,6 +157,7 @@ void AppWindow::slotSave() {
 }
 
 
+/*
 void AppWindow::slotHeal() {
     QWebElement doc = pWebPage->mainFrame()->documentElement();
     QWebElement char_anchor = doc.findFirst("DIV#char A");
@@ -199,6 +175,7 @@ void AppWindow::slotHeal() {
         actuate(btn);
     }
 }
+*/
 
 bool AppWindow::checkLogin() {
     qDebug("checkLogin");
@@ -243,3 +220,49 @@ void AppWindow::slotGotReply(QNetworkReply *reply) {
 void AppWindow::justDoIt() {
     qDebug("Invoked! thread id=0x%lx", QThread::currentThreadId());
 }
+
+////////////////////////////////////////////////////////////////////////////
+
+void AppWindow::slotClick1() {
+    Page_Game_Harbor_Market *p = dynamic_cast<Page_Game_Harbor_Market*>(_gpage);
+    if (!p) {
+        qDebug("for harbour only");
+        return;
+    }
+//    if ( !(p->doSelectItem(u8("Раб людишко")) && p->doSelectQuantity(15))) {
+    if ( !(p->doSelectItem(u8("Оборотное зелье")) && p->doSelectQuantity(5))) {
+        qCritical("failed");
+        return;
+    }
+    qDebug("ok");
+}
+
+
+void AppWindow::slotClick2() {
+    Page_Game_Harbor_Market *p = dynamic_cast<Page_Game_Harbor_Market*>(_gpage);
+    if (!p) {
+        qDebug("for harbour only");
+        return;
+    }
+    if (!p->doBuy()) {
+        qCritical("failed");
+        return;
+    }
+    qDebug("ok");
+}
+
+
+void AppWindow::slotClick3() {
+    Page_Game_Harbor_Market *p = dynamic_cast<Page_Game_Harbor_Market*>(_gpage);
+    if (!p) {
+        qDebug("for harbour only");
+        return;
+    }
+//    if (!p->doSelectAndBuy(u8("Оборотное зелье"), 3)) {
+    if (!p->doSelectAndBuy(u8("Билет на маленькую поляну"), 2)) {
+        qCritical("failed");
+        return;
+    }
+    qDebug("ok");
+}
+

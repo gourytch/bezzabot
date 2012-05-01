@@ -739,14 +739,15 @@ Page_Game::Page_Game (QWebElement& doc) :
                 if (rx2.indexIn(c.toOuterXml())) {
 //                    qDebug(u8("cap={%1}").arg(rx2.cap(1)));
                     r.count = dottedInt(rx2.cap(1));
-                }
-                qDebug(u8("unbarseable t={%1} from c={%2}")
+                } else {
+                    qDebug(u8("unparseable#1 t={%1} from c={%2}")
                        .arg(t, c.toOuterXml()));
-            } else {
+                }
+            } else { // nnn/mmm
                 r.count = rx.cap(1).toInt(&ok);
                 if (!ok) {
                     r.count = -1;
-                    qDebug(u8("unbarseable t={%1} from c={%2}")
+                    qDebug(u8("unparseable#2 t={%1} from c={%2}")
                            .arg(t, c.toOuterXml()));
                 }
             }

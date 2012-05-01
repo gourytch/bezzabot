@@ -47,6 +47,7 @@ void BotState::reset() {
     plant_income = -1;
     plant_capacity = -1;
     plant_slaves = -1;
+    plant_vacancies = -1;
 
     primary_work    = Work_None;
 }
@@ -123,8 +124,9 @@ void BotState::update_from_page(const Page_Game *p) {
     }
 
     if (p->resources.contains(20)) { // i20
+        plant_vacancies = p->resources.value(20).count;
         if (plant_capacity >= 0) {
-            plant_slaves = plant_capacity - p->resources.value(20).count;
+            plant_slaves = plant_capacity - plant_vacancies;
         }
     }
 }
@@ -159,4 +161,5 @@ ECASE(Work_Reading)
 ECASE(Work_Trading)
 ECASE(Work_LuckySquare)
 ECASE(Work_FlyingBreeding)
+ECASE(Work_SlaveHolding)
 EEND

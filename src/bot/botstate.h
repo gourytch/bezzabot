@@ -31,7 +31,8 @@ enum WorkType { // основная работа
     Work_Reading,
     Work_Trading,
     Work_LuckySquare,
-    Work_FlyingBreeding
+    Work_FlyingBreeding,
+    Work_SlaveHolding
 };
 
 QString toString(WorkType v);
@@ -80,6 +81,7 @@ public: // всё, описывающее текущее состояние бо
     int         plant_income;
     int         plant_capacity;
     int         plant_slaves;
+    int         plant_vacancies;
 
     WorkType    primary_work; // текущая работа
 

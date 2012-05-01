@@ -152,8 +152,8 @@ int main (int argc, char ** argv) {
     QApplication app(argc, argv);
     Config::global();
     Logger::global();
-    testVarMap();
-    return 0;
+//    testVarMap();
+//    return 0;
     //////////////////////////////////////
     //////////////////////////////////////
     qDebug("initialize window");
