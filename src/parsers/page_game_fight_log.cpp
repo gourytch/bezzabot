@@ -93,9 +93,9 @@ void Page_Game_Fight_Log::parseLoot(const QString& s) {
     winner = rx.cap(1).trimmed();
     QString txt = rx.cap(2).trimmed().replace("&nbsp;", " ");
 
-    QRegExp rx_gold(u8("^<span\\s+class=['\"]price_num['\"]>\\s*([0123456789.-]+)\\s*</span>"
+    QRegExp rx_gold(u8("^<span\\s+class=['\"]price_num['\"]>\\s*([0123456789.+-]+)\\s*</span>"
                 "\\s*<b [^>]+title=['\"](Золото|Кристаллы)['\"]>\\s*</b>\\s*(.*)$"));
-    QRegExp rx_res(u8("^([0123456789.-]+)\\s*<b [^>]+title=['\"]([^>]+)['\"]>"
+    QRegExp rx_res(u8("^([0123456789.+-]+)\\s*<b [^>]+title=['\"]([^>]+)['\"]>"
                       "\\s*</b>\\s*(.*)$"));
 
     int amount;
