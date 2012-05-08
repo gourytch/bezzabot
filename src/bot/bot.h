@@ -74,6 +74,10 @@ public:
         _awaiting = false;
     }
 
+    bool isAwaiting() const {
+        return _awaiting;
+    }
+
     bool isAFK() const;
 
 protected:

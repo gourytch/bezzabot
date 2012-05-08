@@ -19,9 +19,11 @@ void WorkFlyingBreeding::configure(Config *config) {
                               false, false).toBool();
     _days4bell = config->get("Work_FlyingBreeding/days4bell",
                              false, 3).toInt();
-
     _duration10 = config->get("Work_FlyingBreeding/duration10",
                               false, 0).toInt();
+    _check4feed = config->get("Work_FlyingBreeding/check4feed",
+                              false, false).toBool();
+
     setNextTimegap();
 }
 
@@ -53,6 +55,19 @@ const int sec_per_day = 86400;
 
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
+    if (_check4feed && _bot->state.plant_slaves == -1) {
+        if (gpage->pagekind == page_Game_House_Plantation) {
+            qFatal("мы на плантации, а её объём так и не узнали!");
+            setAwaiting();
+            _bot->GoToNeutralUrl();
+            return false;
+        }
+        qDebug("надо узнать сколько у нас рабов на плантации.");
+        setAwaiting();
+        _bot->GoTo("house.php?info=plant");
+        return true;
+    }
+
     if (gpage->pagekind != page_Game_Incubator) {
         qDebug("мы пока не в инкубаторе. пойдём туда.");
         return GoToIncubator();
@@ -64,40 +79,101 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
            .arg(p->detectedTab));
     int numFlyings = p->flyings.count();
     bool bValidIx = (p->ix_active >= 0 && p->ix_active < numFlyings);
-    int bell_len = _days4bell * sec_per_day;
-    int dailyPrice = p->getBonusPrice2(BELL_IX);
 
-    if (_check4bell && bValidIx && p->flyings.at(p->ix_active).was_born &&
-            !p->detectedTab.contains("journey")) {
-        QDateTime pit = _pit_bell[p->rel_active];
-        bool go_n_look = false;
-        if (pit.isNull()) {
-            go_n_look = true;
-            qDebug("для первичного осмотра...");
-        } else if (QDateTime::currentDateTime().secsTo(pit) < bell_len &&
-                   dailyPrice <= p->crystal) {
-            go_n_look = true;
-            qDebug("по причине истекающего отката...");
-        } else if ((qrand() % 100) == 0) {
-            go_n_look = true;
-            qDebug("просто разнообразия ради...");
-        }
-        if (go_n_look) {
-            qDebug("проверим, как там колокольчик поживает.");
-            if (p->selectedTab != "fa_bonus") {
-                qDebug("зайдём на бонус-вкладку.");
-                if (!p->doSelectTab("fa_bonus")) {
-                    qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.");
+    if (!bValidIx) {
+        qFatal("bad active index: %d", p->ix_active);
+        setAwaiting();
+        _bot->GoToWork();
+        return false;
+    }
+
+    const FlyingInfo &flyingInfo = p->flyingslist.at(p->ix_active);
+    const Page_Game_Incubator::Flying &flying = p->flyings.at(p->ix_active);
+
+    if (bValidIx && flying.was_born &&
+        (p->detectedTab == "fa_events0" ||
+         p->detectedTab == "fa_bonus" ||
+         p->detectedTab == "fa_training" ||
+         p->detectedTab == "fa_feed")) {
+        // мы видим птыца не занятого ничем
+        if (_check4bell) { // надо ли его занять проверкой колокольчика?
+            int bell_len = _days4bell * sec_per_day;
+            int dailyPrice = p->getBonusPrice2(BELL_IX);
+
+            QDateTime pit = _pit_bell[p->rel_active];
+            bool go_n_look = false;
+            if (pit.isNull()) {
+                go_n_look = true;
+                qDebug("для первичного осмотра...");
+            } else if (QDateTime::currentDateTime().secsTo(pit) < bell_len &&
+                       dailyPrice <= p->crystal) {
+                go_n_look = true;
+                qDebug("по причине истекающего отката...");
+            } else if ((qrand() % 100) == 0) {
+                go_n_look = true;
+                qDebug("просто разнообразия ради...");
+            }
+            if (go_n_look) {
+                qDebug("проверим, как там колокольчик поживает.");
+                if (p->selectedTab != "fa_bonus") {
+                    qDebug("зайдём на бонус-вкладку.");
+                    if (!p->doSelectTab("fa_bonus")) {
+                        qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.");
+                    }
                 }
             }
-        }
-
-        if (p->fa_bonus.valid) {
-            if (!processBonusTab(p)) {
-                return false;
+            if (p->fa_bonus.valid) {
+                if (!processBonusTab(p)) {
+                    return false;
+                }
+                if (_bot->isAwaiting()) {
+                    qDebug("мы чего-то там ткнули и теперь надо дождаться ответа");
+                    return true;
+                }
             }
-        }
-    } // check4bell
+        } // check4bell
+
+        if (_check4feed &&
+            flyingInfo.normal.valid &&
+            flyingInfo.normal.feed <= 70 &&
+            _bot->state.plant_slaves >= 30) {
+            QDateTime pit = _pit_feed[p->rel_active];
+            bool go_n_look = false;
+            if (pit.isNull()) {
+                qDebug("надо попробовать покормить (первый раз)...");
+                go_n_look = true;
+            } else if (QDateTime::currentDateTime() < pit) {
+                qDebug("пора попробовать покормить ...");
+                go_n_look = true;
+            } else if ((qrand() % 100) == 0) {
+                go_n_look = true;
+                qDebug("просто разнообразия ради...");
+            }
+            if (go_n_look) {
+                qDebug("пойдём к летуну в питальню.");
+                if (p->selectedTab != "fa_feed") {
+                    qDebug("зайдём на вкладку-кормилку.");
+                    if (!p->doSelectTab("fa_feed")) {
+                        qDebug("перейти на вкладку-кормилку не вышло. жаль, но не страшно.");
+                    }
+                    pit = QDateTime::currentDateTime()
+                            .addSecs(600 + (qrand() % 3600));
+                    qDebug(u8("сразу поставим ему кормилко-откат до %1").arg(::toString(pit)));
+                    _pit_feed[p->rel_active] = pit;
+                }
+            }
+            if (p->fa_feed.valid) {
+                if (!processFeedTab(p)) {
+                    return false;
+                }
+                if (_bot->isAwaiting()) {
+                    qDebug("похоже мы покормили и теперь надо дождаться ответа");
+                    return true;
+                }
+            }
+        } // check4feed
+
+    }
 
     if (p->selectedTab != "fa_events") {
         qDebug("мы на %s. перейдём на events",
@@ -578,6 +654,68 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
     return true;
 }
 
+bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
+    if (!_check4feed) {
+        qDebug("нам не надо проверять сытость.");
+        return true;
+    }
+
+    if (!p->fa_feed.valid) {
+        qDebug("мы не на вкладке-кормушке.");
+        return true;
+    }
+    int activeIx = p->ix_active;
+    int numFlyings = p->flyings.count();
+    bool bValidIx = (0 <= activeIx && activeIx < numFlyings);
+    if (!bValidIx) {
+        qDebug("??? активный индекс %d вне диапазона [0…%d)",
+               activeIx, numFlyings);
+        return true;
+    }
+    const Page_Game_Incubator::Flying &flying = p->flyings.at(activeIx);
+
+    if (flying.was_born == false) {
+        qDebug("летун #%d ещё не вылупился", activeIx);
+        return true;
+    }
+
+    if (!p->message.isEmpty()) {
+        if (p->message == u8("Сыпасибо, хазяина!")) {
+            qDebug(u8("летун %1 покормлен").arg(flying.title));
+        } else if (p->message == u8("Нет денег")) {
+            qDebug(u8("не хватило ресурсов на кормёжку %1").arg(flying.title));
+            return true;
+        }
+    }
+    if (p->fa_feed.satiety > 70) {
+        qDebug(u8("летун %1 сыт на %2%, кормить его пока не надо")
+               .arg(flying.title).arg(p->fa_feed.satiety));
+        return true;
+    }
+
+    qDebug(u8("сытость летуна %1 упала до %2%, надо бы покормить")
+           .arg(flying.title).arg(p->fa_feed.satiety));
+
+    qDebug("будем кормить рабами");
+    if (_bot->state.plant_slaves == -1) {
+        qDebug("мы не знаем, сколько рабов у нас в загашнике. кормим вслепую");
+    } else if (_bot->state.plant_slaves < p->fa_feed.price_slaves) {
+        qDebug("рабов у нас всего %d, а надо %d. не прокормим",
+               _bot->state.plant_slaves, p->fa_feed.price_slaves);
+        return true;
+    }
+    qDebug("у нас %d рабов, этого хватит", _bot->state.plant_slaves);
+    qDebug("кормим");
+    if (p->doFeed()) {
+        qWarning(u8("кормим летуна %1").arg(flying.title));
+        setAwaiting();
+        return true;
+    } else {
+        qCritical(u8("летуна %1 покормить не получилось").arg(flying.title));
+        return true;
+    }
+}
+
 /*
 struct PetState {
     int         ix;
@@ -617,3 +755,4 @@ void WorkFlyingBreeding::PetState::update(Page_Game *gpage) {
         }
     }
 }
+

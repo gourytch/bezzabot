@@ -56,25 +56,13 @@ protected:
     bool    _use_big_journey;
     bool    _duration10;
 
-    bool    _do_training;
-    bool    _do_feeding;
-    bool    _do_powerups;
-
-    bool    _use_powerup_strength;
-    bool    _use_powerup_block;
-    bool    _use_powerup_dexterity;
-    bool    _use_powerup_endurance;
-    bool    _use_powerup_charisma;
-    bool    _use_powerup_goldbag;
-    bool    _use_powerup_redbag;
-    bool    _use_powerup_bell;
-    bool    _use_powerup_clower;
-
     bool    _use_food_crystals;
     bool    _use_food_peasants;
 
     bool _check4bell;
     int  _days4bell;
+
+    bool _check4feed;
 
     int findAwaitingFlying();
 
@@ -89,6 +77,8 @@ protected:
     void setNextTimegap();
 
     bool processBonusTab(Page_Game_Incubator *p);
+
+    bool processFeedTab(Page_Game_Incubator *p);
 
 public:
 

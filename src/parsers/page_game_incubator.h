@@ -117,6 +117,14 @@ public:
     struct Tab_Feed {
         QWebElement block;
         bool valid;
+        int  satiety;
+        int  price_fish;
+        int  price_crystal;
+        int  price_slaves;
+
+        static const int food_fish_id;
+        static const int food_crystal_id;
+        static const int food_slaves_id;
 
         void reset();
         bool parse(QWebElement flying_block);
@@ -149,6 +157,7 @@ public:
     Tab_Bonus fa_bonus;
     Tab_Action_Journey fa_journey;
     Tab_Training fa_training;
+    Tab_Feed fa_feed;
 
     void reparse();
 
@@ -178,6 +187,9 @@ public:
 
     // training
     bool doBuyStat(int stat_ix);
+
+    // feed
+    bool doFeed(int ptype = 50010); // 10=рыба, 2=кри, 50010=рабы
 
 protected:
 

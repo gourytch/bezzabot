@@ -76,11 +76,15 @@ QString Page_Game_Incubator::toString (const QString& pfx) const {
             Page_Game::toString (pfx + "   ") + "\n" +
             pfx + u8("содержимое инкубатора:\n") +
             s +
-            pfx + u8("вкладка: %1\n").arg(selectedTab) +
+            pfx + u8("ix_active :%1\n").arg(ix_active) +
+            pfx + u8("rel_active:%1\n").arg(rel_active) +
+            pfx + u8("selected : %1\n").arg(selectedTab) +
+            pfx + u8("detected : %1\n").arg(detectedTab) +
             pfx + u8("fa_events0 : %1\n").arg(fa_events0.toString()) +
             pfx + u8("fa_boxgame : %1\n").arg(fa_boxgame.toString()) +
             pfx + u8("fa_bonus   : %1\n").arg(fa_bonus.toString()) +
             pfx + u8("fa_training: %1\n").arg(fa_training.toString()) +
+            pfx + u8("fa_feed    : %1\n").arg(fa_feed.toString()) +
             pfx + "}";
 }
 
@@ -166,6 +170,11 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     if (fa_training.parse(flying_block)) {
         if (verbose) qDebug("fa_training detected");
         detectedTab = "fa_training";
+        return true;
+    }
+    if (fa_feed.parse(flying_block)) {
+        if (verbose) qDebug("fa_feed detected");
+        detectedTab = "fa_feed";
         return true;
     }
     if (verbose) qDebug("flying block not parsed");
@@ -450,6 +459,69 @@ QString Page_Game_Incubator::Tab_Training::toString() const {
     return "{" + s + " }";
 }
 
+/*
+struct Tab_Feed {
+    QWebElement block;
+    int  satiety;
+    bool valid;
+
+    void reset();
+    bool parse(QWebElement flying_block);
+    QString toString() const;
+};
+*/
+
+void Page_Game_Incubator:: Tab_Feed::reset() {
+    valid = false;
+    block = QWebElement();
+    price_fish = price_crystal = price_slaves = -1;
+}
+
+
+bool Page_Game_Incubator:: Tab_Feed::parse(QWebElement flying_block) {
+    reset();
+    block = flying_block;
+    if (block.findFirst("DIV#feed_zoo_did").isNull()) return false;
+    QString pct = block.findFirst("CENTER DIV.zoo_about_bar_bg DIV")
+            .toPlainText().trimmed();
+    if (pct.isNull()) {
+        qFatal("{CENTER DIV.zoo_about_bar_bg DIV}.isNull()");
+        return false;
+    }
+    QRegExp rx ("(\\d+)%");
+    if (rx.indexIn(pct) == -1) {
+        qFatal(u8("\\d+% not match for {%1}").arg(pct));
+        return false;
+    }
+    satiety = rx.cap(1).toInt();
+    foreach (QWebElement e, flying_block.findAll("FORM SPAN.price_num")) {
+        int num = e.toPlainText().trimmed().toInt();
+        if (!num) {
+            qFatal(u8("no number in {%1}").arg(e.toOuterXml()));
+            return false;
+        }
+        QString title = e.nextSibling().attribute("title");
+        if (title.isNull()) {
+            qFatal(u8("no title in sibling for {%1}").arg(e.toOuterXml()));
+            return false;
+        }
+        if (title == u8("Пирашки")) price_fish = num;
+        if (title == u8("Кристаллы")) price_crystal = num;
+        if (title == u8("Рабы")) price_slaves = num;
+    }
+    valid = true;
+    return true;
+}
+
+QString Page_Game_Incubator:: Tab_Feed::toString() const {
+    if (!valid) return "?invalid feed tab?";
+
+    return u8("{satiety: %1%, price: fish=%2 | crystal=%3 | slaves=%4}")
+            .arg(satiety)
+            .arg(price_fish)
+            .arg(price_crystal)
+            .arg(price_slaves);
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // doXXXXX
@@ -859,6 +931,51 @@ bool Page_Game_Incubator::doBuyStat(int stat_ix) {
     QWebElement submit = forms[stat_ix].findFirst("INPUT[type=submit]");
     if (submit.isNull()) {
         qCritical("submit element not found!");
+        return false;
+    }
+    actuate(submit);
+    return true;
+}
+
+bool Page_Game_Incubator::doFeed(int ptype) {
+    if (! (ptype == 10 || ptype == 2 || ptype == 50010)) {
+        qCritical("bad ptype=%d", ptype);
+        return false;
+    }
+    if (!fa_feed.valid) {
+        qCritical("feed tab is not active");
+        return false;
+    }
+    QWebElement form = document.findFirst("DIV#feed_zoo_did").findFirst("FORM");
+    if (form.isNull()) {
+        qFatal("feed form not found!");
+        return false;
+    }
+    QWebElementCollection radios = form.findAll("INPUT[name=ptype]");
+    if (radios.count() != 3) {
+        qFatal("radios.count = %d", radios.count());
+        return false;
+    }
+    QString ptype_s = QString::number(ptype);
+    QWebElement radio;
+    bool found = false;
+    foreach (radio, radios) {
+        QString s = radio.attribute("value");
+        qDebug(u8("got ptype={%1}").arg(s));
+        if (s == ptype_s) {
+            qDebug(u8("js-check for {%1}").arg(radio.toOuterXml()));
+            radio.evaluateJavaScript("this.checked = true;");
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        qCritical(u8("radio with value={%1} not found").arg(ptype_s));
+        return false;
+    }
+    QWebElement submit = form.findFirst("INPUT[type=submit]");
+    if (submit.isNull()) {
+        qFatal("submit not found");
         return false;
     }
     actuate(submit);
