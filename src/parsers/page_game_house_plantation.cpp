@@ -17,6 +17,7 @@ Page_Game_House_Plantation::Page_Game_House_Plantation(QWebElement& doc) :
         if (rx.indexIn(text_level) != -1) {
             plant_level = rx.cap(1).toInt();
         } else {
+            qCritical("plant error: не найден текущий уровень");
             plant_level = -1;
         }
     }
@@ -26,6 +27,7 @@ Page_Game_House_Plantation::Page_Game_House_Plantation(QWebElement& doc) :
         if (rx.indexIn(text_info) != -1) {
             plant_income = dottedInt(rx.cap(1));
         } else {
+            qCritical("plant error: не найден текущий доход");
             plant_income = -1;
         }
     }
@@ -35,6 +37,7 @@ Page_Game_House_Plantation::Page_Game_House_Plantation(QWebElement& doc) :
         if (rx.indexIn(text_info) != -1) {
             plant_capacity = rx.cap(1).toInt();
         } else {
+            qCritical("plant error: не найдена ёмкость");
             plant_capacity = -1;
         }
     }
@@ -44,6 +47,7 @@ Page_Game_House_Plantation::Page_Game_House_Plantation(QWebElement& doc) :
         if (rx.indexIn(text_info) != -1) {
             plant_slaves = rx.cap(1).toInt();
         } else {
+            qCritical("plant error: не найденоа заполненность");
             plant_slaves = -1;
         }
     }

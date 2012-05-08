@@ -45,7 +45,7 @@ bool WorkFlyingBreeding::nextStep() {
         return GoToIncubator();
     }
     return processPage(_bot->_gpage);
-//    return true;
+    //    return true;
 }
 
 
@@ -133,10 +133,18 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             }
         } // check4bell
 
-        if (_check4feed &&
-            flyingInfo.normal.valid &&
-            flyingInfo.normal.feed <= 70 &&
-            _bot->state.plant_slaves >= 30) {
+        if (!_check4feed) {
+            // не делаем ничего
+        } else if (!flyingInfo.normal.valid) {
+            qDebug("не вижу, что летун свободен, кормить не стану");
+        } else if (70 < flyingInfo.normal.feed) {
+            qDebug("вижу, что летун сыт на %d%%, кормить не стану",
+                   flyingInfo.normal.feed);
+        } else if (_bot->state.plant_slaves < 30) {
+            qDebug("летун голоден (%d%%), но рабов всего %d, кормить не стану",
+                   flyingInfo.normal.feed,
+                   _bot->state.plant_slaves);
+        } else {
             QDateTime pit = _pit_feed[p->rel_active];
             bool go_n_look = false;
             if (pit.isNull()) {
@@ -247,7 +255,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     if (p->fa_events0.valid) {
         if (_use_small_journey) {
             if (p->fa_events0.minutesleft > 0 &&
-                    p->fa_events0.minutesleft >= _duration10) {
+                p->fa_events0.minutesleft >= _duration10) {
                 qDebug("запустим по маленькому");
                 setAwaiting();
                 if (!p->doStartSmallJourney(_duration10)) {
@@ -299,7 +307,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             qDebug("... ... отдохнём немножко тут");
             return false;
 
-    }
+        }
 
     }
     qDebug("... займём работой летуна #%d", ix);

@@ -107,6 +107,15 @@ void BotState::update_from_page(const Page_Game *p) {
         bigtickets_remains = q->num_bigtickets;
     }
 
+    // из осмотра плантации можно извлечь данные
+    if (p->pagekind == page_Game_House_Plantation) {
+        Page_Game_House_Plantation *q = (Page_Game_House_Plantation*)p;
+        plant_capacity = q->plant_capacity;
+        plant_income = q->plant_income;
+        plant_slaves = q->plant_slaves;
+        plant_vacancies = plant_capacity - plant_slaves;
+    }
+
     if (p->resources.contains(32)) { // i32
         xp_left = p->resources.value(32).count;
     }
