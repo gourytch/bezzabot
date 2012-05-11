@@ -4,6 +4,60 @@
 #include "bot.h"
 #include "tools/tools.h"
 
+ESTART(WorkoutPlan)
+ECASE(Training_Lowest)
+ECASE(Training_Highest)
+ECASE(Training_Cheapest)
+ECASE(Training_Greatest)
+EEND
+
+void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
+    this->ix = ix;
+
+    QString pfx = ix == -1
+            ? u8("Work_FlyingBreeding/config/")
+            : u8("Work_FlyingBreeding/config/%1/").arg(ix);
+
+    days4bell = config->get(pfx + "days4bell", false, -1).toInt();
+    days4bagG = config->get(pfx + "days4bagK", false, -1).toInt();
+    days4bagK = config->get(pfx + "days4bagK", false, -1).toInt();
+
+    use_small_journey = config->get(pfx + "use_small_journey", false, false).toBool();
+    duration10 = config->get(pfx + "duration10", false, -1).toInt();
+
+    check4feed = config->get(pfx + "check4feed", false, false).toBool();
+
+    QString s = config->get(pfx + "workout_plan", false, "lowest")
+            .toString().trimmed().toLower();
+    plan = Training_Lowest;
+    if (s == "lowest" || s == "0") {
+        plan = Training_Lowest;
+    } else if (s == "highest" || s == "1") {
+        plan = Training_Highest;
+    } else if (s == "cheapest" || s == "2") {
+        plan = Training_Cheapest;
+    } else if (s == "greatest" || s == "3") {
+        plan = Training_Greatest;
+    } else {
+        qCritical(u8("unknown workout_plan: {%1}").arg(s));
+    }
+    accumulate = config->get(pfx + "accumulate", false, true).toBool();
+}
+
+
+void WorkFlyingBreeding::FlyingConfig::dumpConfig() const {
+    qDebug(u8("    WorkFlyingBreeding::FlyingConfig, ix=%1").arg(ix));
+    qDebug(u8("      days4bell: %1").arg(days4bell));
+    qDebug(u8("      days4bagG: %1").arg(days4bagG));
+    qDebug(u8("      days4bagK: %1").arg(days4bagK));
+    qDebug(u8("      use_small_journey: %1").arg(use_small_journey ? "true" : "false"));
+    qDebug(u8("      duration10: %1").arg(duration10));
+    qDebug(u8("      check4feed: %1").arg(check4feed ? "true" : "false"));
+    qDebug(u8("      plan: %1").arg(::toString(plan)));
+    qDebug(u8("      accumulate: %1").arg(accumulate));
+}
+
+
 WorkFlyingBreeding::WorkFlyingBreeding(Bot *bot) :
     Work(bot)
 {
@@ -23,9 +77,23 @@ void WorkFlyingBreeding::configure(Config *config) {
                               false, 0).toInt();
     _check4feed = config->get("Work_FlyingBreeding/check4feed",
                               false, false).toBool();
+    for (int i = 0; i < 4; ++i) {
+        _configs[i].configure(config, i);
+    }
 
     setNextTimegap();
 }
+
+void WorkFlyingBreeding::dumpConfig() const {
+    Work::dumpConfig();
+    qDebug(u8(" [WorkFlyingBreeding]"));
+    qDebug(u8("   min_timegap  : %1").arg(_min_timegap));
+    qDebug(u8("   max_timegap  : %1").arg(_max_timegap));
+    for (int i = 0; i < 4; ++i) {
+        _configs[i].dumpConfig();
+    }
+}
+
 
 bool WorkFlyingBreeding::isPrimaryWork() const {
     return false;

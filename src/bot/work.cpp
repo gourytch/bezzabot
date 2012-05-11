@@ -27,8 +27,12 @@ void Work::configure(Config *config) {
             .toString().trimmed();
     _use_postponed_wearing = config->get("Work/use_postponed_wearing",
                                          false, true).toBool();
+}
 
-    qDebug(u8("%1 generic settings:").arg(wname));
+void Work::dumpConfig() const {
+    QString wname = getWorkName();
+    qDebug(u8("%1 settings:").arg(wname));
+    qDebug(u8(" [Work]"));
     qDebug(u8("   enabled        : %1").arg(_enabled ? "true" : "false"));
     qDebug(u8("   activity_hours : %1").arg(_activity_hours.toString()));
     qDebug(u8("   wear_on_begin  : «%1»").arg(_wear_on_begin));

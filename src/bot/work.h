@@ -76,6 +76,8 @@ public:
 
     virtual void configure(Config *config);
 
+    virtual void dumpConfig() const;
+
     virtual bool isEnabled() const;
 
     virtual bool isActive() const;

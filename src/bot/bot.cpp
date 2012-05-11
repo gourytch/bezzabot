@@ -751,6 +751,17 @@ void Bot::initWorks() {
     for (WorkListIterator i(_secworklist);
          i.hasNext();
          i.next()->configure(_config)) {}
+
+    qDebug(" === WORK DUMPCONFIG BEGIN ===");
+    for (WorkListIterator i(_worklist);
+         i.hasNext();
+         i.next()->dumpConfig()) {}
+    qDebug(" --- SECONDARY ---");
+    for (WorkListIterator i(_secworklist);
+         i.hasNext();
+         i.next()->dumpConfig()) {}
+
+    qDebug(" === WORK DUMPCONFIG END ===");
 }
 
 

@@ -5,12 +5,38 @@
 #include "parsers/page_game_incubator.h"
 #include "work.h"
 
+enum WorkoutPlan {
+    Training_Lowest,
+    Training_Highest,
+    Training_Cheapest,
+    Training_Greatest
+};
 
 class WorkFlyingBreeding : public Work
 {
     Q_OBJECT
 
 protected:
+
+    struct FlyingConfig {
+        int     ix;
+
+        int     days4bell; // -1 - no checking
+        int     days4bagG;
+        int     days4bagK;
+
+        int     use_small_journey;
+        int     duration10;
+
+        bool    check4feed;
+
+        WorkoutPlan plan;
+        bool    accumulate; // true: training only before small journeys
+
+        void configure(Config *config, int ix);
+        void dumpConfig() const;
+    };
+
 
     struct PetState {
         int         ix;
@@ -39,7 +65,7 @@ protected:
         void update(Page_Game *gpage);
     };
 
-
+    FlyingConfig _configs[4];
     QMap<int, PetState> _pet_states;
 
     QMap<int, QDateTime> _pit_bell;
@@ -55,9 +81,6 @@ protected:
     bool    _use_small_journey;
     bool    _use_big_journey;
     bool    _duration10;
-
-    bool    _use_food_crystals;
-    bool    _use_food_peasants;
 
     bool _check4bell;
     int  _days4bell;
@@ -85,6 +108,8 @@ public:
     explicit WorkFlyingBreeding(Bot *bot);
 
     virtual void configure(Config *config);
+
+    virtual void dumpConfig() const;
 
     virtual bool isPrimaryWork() const;
 
