@@ -1,4 +1,5 @@
-TOP = ../..
+CUR = $$PWD
+TOP = $$CUR/../../..
 
 CONFIG += qt debug warn_on
 QT += core gui network webkit

@@ -23,7 +23,8 @@ HEADERS += \
     build_id.h \
     activityhours.h \
     tarball.h \
-    varmap.h
+    varmap.h \
+    treemap.h
 
 SOURCES += \
     tools.cpp \
@@ -35,7 +36,8 @@ SOURCES += \
     netmanager.cpp \
     activityhours.cpp \
     tarball.cpp \
-    varmap.cpp
+    varmap.cpp \
+    treemap.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc

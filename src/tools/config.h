@@ -91,6 +91,12 @@ public:
 
     QString cachePath () const;
 
+    static void setFName (const QString &fname);
+
+    static QString getFName ();
+
+    static void shutdown();
+
     static void test ();
 
 };

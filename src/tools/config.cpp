@@ -73,19 +73,21 @@ void Config::init_check ()
     checkDir (_location_data);
     checkDir (_location_cache);
 
-    QString ini_name = _app_name + ".ini";
+    if (_ini_fname.isEmpty()) {
+        QString ini_name = _app_name + ".ini";
 
-    QRegExp rx("config=(.+)");
-    foreach (QString s, appPtr->arguments()) {
-        if (rx.indexIn(s) != -1) {
-            ini_name = rx.cap(1);
-            break;
+        QRegExp rx("config=(.+)");
+        foreach (QString s, appPtr->arguments()) {
+            if (rx.indexIn(s) != -1) {
+                ini_name = rx.cap(1);
+                break;
+            }
         }
-    }
 
-    _ini_fname = ini_name.contains('/')
-            ? ini_name
-            : _location_config + "/" + ini_name;
+        _ini_fname = ini_name.contains('/')
+                ? ini_name
+                : _location_config + "/" + ini_name;
+    }
 
     qDebug("using config file {"  + _ini_fname + "}");
     _settings = new QSettings (_ini_fname, QSettings::IniFormat);
@@ -112,6 +114,24 @@ void Config::init_check ()
 }
 
 
+void Config::shutdown() {
+    if (_global) {
+        delete _global;
+        _global = NULL;
+    }
+    if (_overrides) {
+        _overrides->save();
+        delete _overrides;
+        _overrides = NULL;
+    }
+    if (_settings) {
+        delete _settings;
+        _settings = NULL;
+    }
+
+}
+
+
 Config::Config () : QObject ()
 {
     _base = NULL;
@@ -130,6 +150,7 @@ Config::Config (QObject * parent, const QString& id, Config *base) :
 
 Config::~Config ()
 {
+    if (this == _global) shutdown();
 }
 
 void Config::setTemplate() {
@@ -243,6 +264,14 @@ QString Config::dataPath () const
 QString Config::cachePath () const
 {
     return QDir (globalCachePath () + "/" + _id).absolutePath ();
+}
+
+QString Config::getFName () {
+    return _ini_fname;
+}
+
+void Config::setFName (const QString &fname) {
+    _ini_fname = fname;
 }
 
 //static

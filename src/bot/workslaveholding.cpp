@@ -83,7 +83,6 @@ bool WorkSlaveHolding::processPage(const Page_Game *gpage) {
         setCooldown();
         return false;
     }
-
     if (p->previousBuyResult == 0) {
         qWarning("похоже, что на рынке рабов мы купить не смогли");
         setCooldown();

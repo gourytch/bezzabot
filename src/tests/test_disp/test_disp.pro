@@ -1,4 +1,5 @@
-TOP = ../..
+CUR = $$PWD
+TOP = $$CUR/../../..
 
 CONFIG += debug console
 QT += core
