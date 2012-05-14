@@ -4,6 +4,7 @@ SUBDIRS += \
     surgery \
     testConfig \
     test_disp \
-    test_parsers \
-    testw32
+    test_parsers
+
+#    testw32
 
