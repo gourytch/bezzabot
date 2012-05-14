@@ -89,6 +89,11 @@ void WorkFlyingBreeding::dumpConfig() const {
     qDebug(u8(" [WorkFlyingBreeding]"));
     qDebug(u8("   min_timegap  : %1").arg(_min_timegap));
     qDebug(u8("   max_timegap  : %1").arg(_max_timegap));
+    qDebug(u8("   check4bell   : %1").arg(_check4bell ? "true" : "false"));
+    qDebug(u8("   days4bell   : %1").arg(_days4bell));
+    qDebug(u8("   check4feed   : %1").arg(_check4feed ? "true" : "false"));
+    qDebug(u8("   use_small_journey: %1").arg(_use_small_journey ? "true" : "false"));
+    qDebug(u8("   duration10       : %1").arg(_duration10));
     for (int i = 0; i < 4; ++i) {
         _configs[i].dumpConfig();
     }
