@@ -111,15 +111,15 @@ bool WorkSlaveHolding::processPage(const Page_Game *gpage) {
         qDebug("поправим цену: %d -> %d", _price, correctedPrice);
         _price = correctedPrice;
     }
-    int canbuy = gpage->crystal / _price;
+    int canbuy = (gpage->crystal / _price) * 5;
     if (canbuy == 0) {
-        qDebug("нам не хватит даже на одну пачку :(");
+        qDebug("нам не хватит даже на одну пачку людишек :(");
         setCooldown();
         return false;
 
     }
     if (canbuy < count) {
-        qDebug("кристаллов лишь на %d пачек вместо %d", canbuy, count);
+        qDebug("кристаллов лишь на %d людишек вместо %d", canbuy, count);
         count = canbuy;
     } else {
         qDebug("кристаллов хватает");
