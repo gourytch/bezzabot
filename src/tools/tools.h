@@ -73,4 +73,9 @@ int gaussian_rand(int minValue, int maxValue); // [min..max]
 #define ECASE(x) case x: return #x ;
 #define EEND default: return QString("UNLISTED#%1").arg((int)v); }}
 
+// STRING-TO-ENUM
+#define S2E_START(E) E fromString(const QString& s) {
+#define S2E_CASE(x) if (s == #x) return x; else
+#define S2E_END return (E)-1; }
+
 #endif // TOOLS_H
