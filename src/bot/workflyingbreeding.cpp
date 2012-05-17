@@ -168,30 +168,31 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
          p->detectedTab == "fa_bonus" ||
          p->detectedTab == "fa_training" ||
          p->detectedTab == "fa_feed")) {
-        // мы видим птыца не занятого ничем
+        qDebug("птыц не занят ничем и готов к проверкам [FEED-N00]");
         if (_check4bell) { // надо ли его занять проверкой колокольчика?
             int bell_len = _days4bell * sec_per_day;
             int dailyPrice = p->getBonusPrice2(BELL_IX);
 
             QDateTime pit = _pit_bell[p->rel_active];
             bool go_n_look = false;
+            qDebug("check point 1");
             if (pit.isNull()) {
                 go_n_look = true;
-                qDebug("для первичного осмотра...");
+                qDebug("для первичного осмотра...[FEED-N01]");
             } else if (QDateTime::currentDateTime().secsTo(pit) < bell_len &&
                        dailyPrice <= p->crystal) {
                 go_n_look = true;
-                qDebug("по причине истекающего отката...");
+                qDebug("по причине истекающего отката...[FEED-N02]");
             } else if ((qrand() % 100) == 0) {
                 go_n_look = true;
-                qDebug("просто разнообразия ради...");
+                qDebug("просто разнообразия ради...[FEED-N03]");
             }
             if (go_n_look) {
-                qDebug("проверим, как там колокольчик поживает.");
+                qDebug("проверим, как там колокольчик поживает.[FEED-A00]");
                 if (p->selectedTab != "fa_bonus") {
-                    qDebug("зайдём на бонус-вкладку.");
+                    qDebug("зайдём на бонус-вкладку.[FEED-A01]");
                     if (!p->doSelectTab("fa_bonus")) {
-                        qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.");
+                        qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.[FEED-E00]");
                     }
                 }
             }
@@ -200,46 +201,50 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                     return false;
                 }
                 if (_bot->isAwaiting()) {
-                    qDebug("мы чего-то там ткнули и теперь надо дождаться ответа");
+                    qDebug("мы чего-то там ткнули и теперь надо дождаться ответа [FEED-T00]");
                     return true;
                 }
             }
         } // check4bell
 
+        qDebug("check point 2");
         if (!_check4feed) {
             // не делаем ничего
         } else if (!flyingInfo.normal.valid) {
-            qDebug("не вижу, что летун свободен, кормить не стану");
+            qDebug("не вижу, что летун свободен, кормить не стану [FEED-N10]");
         } else if (70 < flyingInfo.normal.feed) {
-            qDebug("вижу, что летун сыт на %d%%, кормить не стану",
+            qDebug("вижу, что летун сыт на %d%%, кормить не стану [FEED-N11]",
                    flyingInfo.normal.feed);
         } else if (_bot->state.plant_slaves < 30) {
-            qDebug("летун голоден (%d%%), но рабов всего %d, кормить не стану",
+            qDebug("летун голоден (%d%%), но рабов всего %d, кормить не стану [FEED-N12]",
                    flyingInfo.normal.feed,
                    _bot->state.plant_slaves);
         } else {
             QDateTime pit = _pit_feed[p->rel_active];
             bool go_n_look = false;
             if (pit.isNull()) {
-                qDebug("надо попробовать покормить (первый раз)...");
+                qDebug("надо попробовать покормить (первый раз)... [FEED-A10]");
                 go_n_look = true;
             } else if (QDateTime::currentDateTime() < pit) {
-                qDebug("пора попробовать покормить ...");
+                qDebug("пора попробовать покормить ... [FEED-A11]");
                 go_n_look = true;
             } else if ((qrand() % 100) == 0) {
                 go_n_look = true;
-                qDebug("просто разнообразия ради...");
-            }
+                qDebug("просто разнообразия ради... [FEED-A12]");
+            } else if (p->selectedTab == "fa_feed") {
+                go_n_look = true;
+                qDebug("стоим возле кормушки... [FEED-A13]");
+        }
             if (go_n_look) {
-                qDebug("пойдём к летуну в питальню.");
+                qDebug("пойдём к летуну в питальню. [FEED-D10]");
                 if (p->selectedTab != "fa_feed") {
-                    qDebug("зайдём на вкладку-кормилку.");
+                    qDebug("зайдём на вкладку-кормилку. [FEED-D11]");
                     if (!p->doSelectTab("fa_feed")) {
-                        qDebug("перейти на вкладку-кормилку не вышло. жаль, но не страшно.");
+                        qDebug("перейти на вкладку-кормилку не вышло. жаль, но не страшно. [FEED-E10]");
                     }
                     pit = QDateTime::currentDateTime()
                             .addSecs(600 + (qrand() % 3600));
-                    qDebug(u8("сразу поставим ему кормилко-откат до %1").arg(::toString(pit)));
+                    qDebug(u8("сразу поставим ему кормилко-откат до %1 [FEED-D12]").arg(::toString(pit)));
                     _pit_feed[p->rel_active] = pit;
                 }
             }
@@ -248,12 +253,12 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                     return false;
                 }
                 if (_bot->isAwaiting()) {
-                    qDebug("похоже мы покормили и теперь надо дождаться ответа");
+                    qDebug("похоже мы покормили и теперь надо дождаться ответа [FEED-T10]");
                     return true;
                 }
             }
         } // check4feed
-
+        qDebug("check point 3");
     }
 
     if (p->selectedTab != "fa_events") {
