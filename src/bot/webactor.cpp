@@ -62,6 +62,7 @@ WebActor::WebActor(Bot *bot) :
         }
     }
 
+    checkDir(_savepath);
     _use_tarball = Config::global()
             .get("connection/use_tarball", false, true).toBool();
     if (_use_tarball) {

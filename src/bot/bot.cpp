@@ -8,6 +8,7 @@
 #include "tools/persistentcookiejar.h"
 #include "tools/tools.h"
 #include "tools/timebomb.h"
+#include "tools/logger.h"
 #include "parsers/all_pages.h"
 #include "farmersgroupsprices.h"
 
@@ -28,6 +29,7 @@ Bot::Bot(const QString& id, QObject *parent) :
 {
     _id = id;
     _config = new Config (this, _id);
+    Logger& logger = Logger::global();
 
     checkDir(_config->dataPath());
     checkDir(_config->cachePath());
