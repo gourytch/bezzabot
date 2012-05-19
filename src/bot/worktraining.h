@@ -18,6 +18,8 @@ public:
 
     virtual void configure(Config *config);
 
+    virtual void dumpConfig() const;
+
     virtual bool isPrimaryWork() const;
 
     virtual WorkType getWorkType() const;

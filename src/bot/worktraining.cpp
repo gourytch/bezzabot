@@ -34,6 +34,9 @@ void WorkTraining::configure(Config *config) {
         _uselist[3] |= (s == u8("endurance")) || (s == u8("масса"));
         _uselist[4] |= (s == u8("charisma")) || (s == u8("мастерство"));
     }
+}
+void WorkTraining::dumpConfig() const {
+    Work::dumpConfig();
     qDebug(u8("Расписание тренировок:"));
     qDebug(u8("  Сила      : %1").arg(u8(_uselist[0] ? "активно" : "неактивно")));
     qDebug(u8("  Защита    : %1").arg(u8(_uselist[1] ? "активно" : "неактивно")));
