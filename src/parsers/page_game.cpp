@@ -769,7 +769,7 @@ Page_Game::Page_Game (QWebElement& doc) :
 
 bool Page_Game::parseFlyingList() {
     flyingslist.clear();
-    QWebElement e = document.findFirst("DIV[class=resources] DIV.flyings");
+    QWebElement e = document.findFirst("DIV#accordion DIV.flyings");
     if (e.isNull()) return false;
     FlyingInfo info;
     foreach (QWebElement div_title, e.findAll("DIV.title")) {
