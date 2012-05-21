@@ -764,16 +764,20 @@ Page_Game::Page_Game (QWebElement& doc) :
     coulons.assign(document.findFirst("DIV[id=coulons_bar]"));
 
     // летучки
-    e = accordion.findFirst("DIV.flyings");
-    if (!e.isNull()) {
-        FlyingInfo info;
-        foreach (QWebElement div_title, e.findAll("DIV.title")) {
-            info.init();
-            if (info.parse(div_title)) flyingslist.append(info);
-        }
-    }
+    parseFlyingList();
 }
 
+bool Page_Game::parseFlyingList() {
+    flyingslist.clear();
+    QWebElement e = document.findFirst("DIV[class=resources] DIV.flyings");
+    if (e.isNull()) return false;
+    FlyingInfo info;
+    foreach (QWebElement div_title, e.findAll("DIV.title")) {
+        info.init();
+        if (info.parse(div_title)) flyingslist.append(info);
+    }
+    return true;
+}
 
 QString toString(const QString& pfx, const PageResource& r) {
     return pfx + QString("{id=%1, count=%2, href=%3, title=%4}")

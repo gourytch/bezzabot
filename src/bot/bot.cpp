@@ -29,7 +29,7 @@ Bot::Bot(const QString& id, QObject *parent) :
 {
     _id = id;
     _config = new Config (this, _id);
-    Logger& logger = Logger::global();
+    (void)Logger::global();
 
     checkDir(_config->dataPath());
     checkDir(_config->cachePath());

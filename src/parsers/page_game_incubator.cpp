@@ -100,6 +100,7 @@ bool Page_Game_Incubator::fit(const QWebElement& doc) {
 
 void Page_Game_Incubator::reparse() {
     _mutex.lock();
+    parseFlyingList(); // из Page_Game
     parseDivFlyings();
     parseDivFlyingActions();
     parseDivFlyingBlock();
@@ -683,7 +684,7 @@ bool Page_Game_Incubator::doSelectFlying(int flyingNo, int timeout) {
         if (ms <= time.elapsed()) qDebug("... INJECTOR TIMEOUT");
     }
     qDebug("... and small delay");
-    delay((qrand() % 500) + 250, false);
+    delay((qrand() % 2500) + 750, false);
 
     qDebug("reparse");
     reparse();
@@ -765,7 +766,7 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
     }
 
     qDebug("... and small delay");
-    delay((qrand() % 500) + 250, false);
+    delay((qrand() % 2500) + 700, false);
 
     qDebug("continue parsing");
     QWebElement e = document.findFirst("DIV#" + tab);

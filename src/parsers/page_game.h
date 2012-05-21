@@ -428,6 +428,8 @@ public:
 
     void injectJSInsiders();
 
+    bool parseFlyingList();
+
 signals:
 
     void js_injected();

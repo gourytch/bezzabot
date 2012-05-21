@@ -65,26 +65,22 @@ TreeMap::Directory *TreeMap::getDir(const QString& path) {
     return const_cast<Directory *>(p);
 }
 
-
 void TreeMap::mkdir(const QString& path) {
-
 }
 
 
 bool TreeMap::hasValue(const QString& path) const {
-
+    return false;
 }
 
 
 bool TreeMap::hasDir(const QString& path) const {
-
+    return false;
 }
 
 
 void TreeMap::get(const QString& path, const QVariant& defval) const {
-
 }
 
 void TreeMap::set(const QString& path, const QVariant& value) const {
-
 }
