@@ -661,6 +661,9 @@ bool Page_Game_Incubator::doSelectFlying(int flyingNo, int timeout) {
         qCritical("flying[%d] has empty rel attribute", flyingNo);
         return false;
     }
+    qDebug("small delay before ");
+    delay((qrand() % 1500) + 550, false);
+
     qDebug("* select from flying #%d to #%d", ix_active, flyingNo);
     checkInjection();
     detectedTab = QString();
@@ -719,6 +722,9 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
     checkInjection();
     detectedTab = QString();
     gotSignal = false;
+
+    qDebug("small delay before ");
+    delay((qrand() % 1500) + 550, false);
 
     actuate(tab);
 
