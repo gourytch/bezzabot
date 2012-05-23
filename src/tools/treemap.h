@@ -12,7 +12,7 @@ class TreeMap : public QObject
 {
     Q_OBJECT
 
-protected:
+public:
 
     struct Directory {
         typedef QMap<QString, Directory*> MapDirs;
@@ -23,36 +23,37 @@ protected:
         MapDirs     directories;
         MapVars     values;
 
-        Directory(const QString& _name = QString(), Directory *_base = NULL) :
-            name(_name), base(_base) {}
-
-        ~Directory() {
-            for (QMapIterator<QString, Directory*> i(directories);
-                 i.hasNext(); delete i.next()) {}
-        }
-
+        Directory(const QString& _name = QString(), Directory *_base = NULL);
+        ~Directory();
         QString getPath() const;
         bool hasValue(const QString &name) const;
         bool hasDirectory(const QString &name) const;
-        const Directory* getDirectory(const QString &name) const;
+        const Directory* getConstDirectory(const QString &name) const;
         Directory* getDirectory(const QString &name);
         QVariant getValue(const QString &name, const QVariant& defval = QVariant()) const;
         void setValue(const QString &name, const QVariant& value);
+
+        QString toXml() const;
     };
 
+protected:
+
     Directory root;
+
+public:
 
     const Directory *getConstDir(const QString& path) const;
     Directory *getDir(const QString& path);
 
-public:
     explicit TreeMap(QObject *parent = 0);
 
     void mkdir(const QString& path);
     bool hasValue(const QString& path) const;
     bool hasDir(const QString& path) const;
-    void get(const QString& path, const QVariant& defval) const;
-    void set(const QString& path, const QVariant& value) const;
+    QVariant get(const QString& path, const QVariant& defval) const;
+    void set(const QString& path, const QVariant& value);
+
+    QString toXml() const;
 
 signals:
 
