@@ -26,6 +26,7 @@ private Q_SLOTS:
     void testReplace();
     void testRemove();
     void testDefaults();
+    void testSave();
 };
 
 treemapTest::treemapTest()
@@ -136,7 +137,11 @@ void treemapTest::testAdd() {
 
 
 void treemapTest::testReplace() {
-
+    TreeMap m;
+    m.set("/foo/bar/baz", 123);
+    QVERIFY(m.get("/foo/bar/baz") == 123);
+    m.set("/foo/bar/baz", "kaka");
+    QVERIFY(m.get("/foo/bar/baz") == "kaka");
 }
 
 
@@ -149,6 +154,17 @@ void treemapTest::testDefaults() {
 
 }
 
+void treemapTest::testSave() {
+    TreeMap m;
+    m.set("/rootkey", "rootvalue");
+    m.set("/foo/bar/baz/key_int", 1234567);
+    m.set("/foo/bar/baz/key_double", 3.14);
+    m.set("/foo/bar/baz/key_string", "kaka byaka");
+    m.set("/foo/bar/baz/key_size", QSize(800, 600));
+    m.set("/foo/bar/baz/key_point", QPoint(512, 256));
+    m.set("/foo/bar/baz/key_size", QSizeF(1020.98, 329.23));
+    m.save("testtree.def");
+}
 
 QTEST_APPLESS_MAIN(treemapTest)
 

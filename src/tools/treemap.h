@@ -34,6 +34,7 @@ public:
         void setValue(const QString &name, const QVariant& value);
 
         QString toXml() const;
+        QString saveSection() const;
     };
 
 protected:
@@ -48,12 +49,18 @@ public:
     explicit TreeMap(QObject *parent = 0);
 
     void mkdir(const QString& path);
+
     bool hasValue(const QString& path) const;
     bool hasDir(const QString& path) const;
-    QVariant get(const QString& path, const QVariant& defval) const;
+
+    QVariant get(const QString& path, const QVariant& defval = QVariant()) const;
     void set(const QString& path, const QVariant& value);
 
     QString toXml() const;
+
+    void load(const QString& fname);
+
+    void save(const QString& fname);
 
 signals:
 

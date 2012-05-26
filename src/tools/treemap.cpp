@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QMapIterator>
 #include "treemap.h"
+#include "tools.h"
 
 QStringList splitPath(const QString& path) {
     return path.split('/', QString::SkipEmptyParts);
@@ -59,7 +60,7 @@ bool TreeMap::Directory::hasDirectory(const QString &name) const {
 
 TreeMap::Directory* TreeMap::Directory::getDirectory(const QString &name) {
     if (!hasDirectory(name)) {
-        qDebug() << "DIR[" << this->name << "] MAKE SUBDIR [" << name << "]";
+//        qDebug() << "DIR[" << this->name << "] MAKE SUBDIR [" << name << "]";
         directories.insert(name, new Directory(name, this));
     }
     return directories.value(name);
@@ -79,9 +80,9 @@ QVariant TreeMap::Directory::getValue(const QString &name, const QVariant& defva
 
 
 void TreeMap::Directory::setValue(const QString &name, const QVariant& value) {
-    if (!values.contains(name)) {
-        qDebug() << "DIR[" << this->name << "] MAKE VALUE [" << name << "]";
-    }
+//    if (!values.contains(name)) {
+//        qDebug() << "DIR[" << this->name << "] MAKE VALUE [" << name << "]";
+//    }
     values.insert(name, value);
 }
 
@@ -113,6 +114,26 @@ QString TreeMap::Directory::toXml() const {
 }
 
 
+QString TreeMap::Directory::saveSection() const {
+    QString txt = "";
+    if (!values.isEmpty()) {
+        txt.append(QString("[%1]\n").arg(getPath()));
+        for (QMapIterator<QString, QVariant> i(values); i.hasNext(); ) {
+            i.next();
+            txt.append(QString("%1 = %2\n").arg(i.key(), i.value().toString()));
+        }
+        txt.append("\n");
+    }
+
+    for (QMapIterator<QString, Directory*> i(directories); i.hasNext(); ) {
+        i.next();
+        txt.append(i.value()->saveSection());
+    }
+
+    return txt;
+}
+
+
 TreeMap::TreeMap(QObject *parent) : QObject(parent), root("#") {
 }
 
@@ -130,14 +151,14 @@ const TreeMap::Directory *TreeMap::getConstDir(const QString& path) const {
 
 TreeMap::Directory *TreeMap::getDir(const QString& path) {
     Directory *p = &root;
-    qDebug() << "getDir(" << path << ") {";
+//    qDebug() << "getDir(" << path << ") {";
     QStringList tokens = path.split('/', QString::SkipEmptyParts);
     for (QStringListIterator i(tokens); i.hasNext(); ) {
         QString token = i.next();
-        qDebug() << "  ... token {" << token << "}";
+//        qDebug() << "  ... token {" << token << "}";
         p = p->getDirectory(token);
     }
-    qDebug() << "} // getDir(" << path << ")";
+//    qDebug() << "} // getDir(" << path << ")";
     return p;
 }
 
@@ -174,4 +195,15 @@ void TreeMap::set(const QString& path, const QVariant& value) {
 QString TreeMap::toXml() const {
     return QString("<?xml version=\"1.0\" encoding=\"UTF-8\"?><tree>%1</tree>")
             .arg(root.toXml());
+}
+
+void TreeMap::load(const QString& fname) {
+}
+
+void TreeMap::save(const QString& fname) {
+    QString txt;
+    txt.append("# TREE MAP\n");
+    txt.append(root.saveSection());
+    txt.append("# ### END ### #\n");
+    ::save(fname, txt);
 }
