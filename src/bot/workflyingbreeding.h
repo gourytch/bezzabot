@@ -6,6 +6,7 @@
 #include "work.h"
 
 enum WorkoutPlan {
+    Training_None,
     Training_Lowest,
     Training_Highest,
     Training_Cheapest,
@@ -38,6 +39,11 @@ protected:
     };
 
 
+    struct StatStruct {
+        int level;
+        int price;
+    };
+
     struct PetState {
         int         ix;
         int         rel;
@@ -59,10 +65,10 @@ protected:
         QDateTime   bell_pit; // когда полностью закончится колокольчик
         QDateTime   feed_pit; // когда сытость упадёт до 70%
 
-        int         stat_level[5];
-        int         stat_price[5];
+        StatStruct stat[5];
 
         void update(Page_Game *gpage);
+
     };
 
     FlyingConfig _configs[4];
@@ -102,6 +108,10 @@ protected:
     bool processBonusTab(Page_Game_Incubator *p);
 
     bool processFeedTab(Page_Game_Incubator *p);
+
+    bool processTrainingTab(Page_Game_Incubator *p);
+
+    bool canTraining(Page_Game_Incubator *p, int ix, bool flush);
 
 public:
 

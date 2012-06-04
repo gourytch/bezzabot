@@ -5,6 +5,7 @@
 #include "tools/tools.h"
 
 ESTART(WorkoutPlan)
+ECASE(Training_None)
 ECASE(Training_Lowest)
 ECASE(Training_Highest)
 ECASE(Training_Cheapest)
@@ -162,6 +163,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
 
     const FlyingInfo &flyingInfo = p->flyingslist.at(p->ix_active);
     const Page_Game_Incubator::Flying &flying = p->flyings.at(p->ix_active);
+    qDebug(u8("проверяем птыца %1").arg(flyingInfo.caption.title));
 
     if (bValidIx && flying.was_born &&
         (p->detectedTab == "fa_events0" ||
@@ -207,59 +209,76 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             }
         } // check4bell
 
+        bool go_n_look = false;
+        QDateTime pit = _pit_feed[p->rel_active];
         qDebug("check point 2");
         if (!_check4feed) {
             // не делаем ничего
+        } else if (_bot->state.plant_slaves < 30) {
+            qDebug("мало рабов (%d), кормить не стану [FEED-N10]",
+                   _bot->state.plant_slaves);
+        } else if (p->selectedTab == "fa_feed") {
+                qDebug("стоим возле кормушки... [FEED-A13]");
+                go_n_look = true;
         } else if (!flyingInfo.normal.valid) {
-            qDebug("не вижу, что летун свободен, кормить не стану [FEED-N10]");
+            qDebug(u8("не вижу, что летун %1 свободен")
+                   .arg(flyingInfo.caption.title));
+            if (pit.isNull()) {
+                qDebug("... но мы его ещё не кормили");
+                go_n_look = true;
+            } else if (pit < QDateTime::currentDateTime()) {
+                qDebug("... но мы его давно не кормили");
+                go_n_look = true;
+            } else if (qrand() % 3 == 0) {
+                qDebug("... но на всякий случай надо глянуть");
+                go_n_look = true;
+            }
+        } else if (100 < flyingInfo.normal.feed) {
+            qDebug("что летун сыт на %d%%, как такое может быть? [FEED-E01]",
+                   flyingInfo.normal.feed);
+            qDebug("перейду-ка на безопасную страничку и вернусь обратно");
+            _bot->setAwaiting();
+            _bot->GoToNeutralUrl();
+            return true;
         } else if (70 < flyingInfo.normal.feed) {
             qDebug("вижу, что летун сыт на %d%%, кормить не стану [FEED-N11]",
                    flyingInfo.normal.feed);
-        } else if (_bot->state.plant_slaves < 30) {
-            qDebug("летун голоден (%d%%), но рабов всего %d, кормить не стану [FEED-N12]",
-                   flyingInfo.normal.feed,
-                   _bot->state.plant_slaves);
         } else {
-            QDateTime pit = _pit_feed[p->rel_active];
-            bool go_n_look = false;
             if (pit.isNull()) {
                 qDebug("надо попробовать покормить (первый раз)... [FEED-A10]");
                 go_n_look = true;
-            } else if (QDateTime::currentDateTime() < pit) {
+            } else if (pit < QDateTime::currentDateTime()) {
                 qDebug("пора попробовать покормить ... [FEED-A11]");
                 go_n_look = true;
-            } else if ((qrand() % 100) == 0) {
+            } else if ((qrand() % 10) == 0) {
                 go_n_look = true;
                 qDebug("просто разнообразия ради... [FEED-A12]");
-            } else if (p->selectedTab == "fa_feed") {
-                go_n_look = true;
-                qDebug("стоим возле кормушки... [FEED-A13]");
+            }
         }
-            if (go_n_look) {
-                qDebug("пойдём к летуну в питальню. [FEED-D10]");
-                if (p->selectedTab != "fa_feed") {
-                    qDebug("зайдём на вкладку-кормилку. [FEED-D11]");
-                    if (!p->doSelectTab("fa_feed")) {
-                        qDebug("перейти на вкладку-кормилку не вышло. жаль, но не страшно. [FEED-E10]");
-                    }
-                    pit = QDateTime::currentDateTime()
-                            .addSecs(600 + (qrand() % 3600));
-                    qDebug(u8("сразу поставим ему кормилко-откат до %1 [FEED-D12]").arg(::toString(pit)));
-                    _pit_feed[p->rel_active] = pit;
+        if (go_n_look) {
+            qDebug("пойдём к летуну в питальню. [FEED-D10]");
+            if (p->selectedTab != "fa_feed") {
+                qDebug("зайдём на вкладку-кормилку. [FEED-D11]");
+                if (!p->doSelectTab("fa_feed")) {
+                    qDebug("перейти на вкладку-кормилку не вышло. жаль, но не страшно. [FEED-E10]");
                 }
+                pit = QDateTime::currentDateTime()
+                        .addSecs(600 + (qrand() % 3600));
+                qDebug(u8("сразу поставим ему кормилко-откат до %1 [FEED-D12]").arg(::toString(pit)));
+                _pit_feed[p->rel_active] = pit;
             }
-            if (p->fa_feed.valid) {
-                if (!processFeedTab(p)) {
-                    return false;
-                }
-                if (_bot->isAwaiting()) {
-                    qDebug("похоже мы покормили и теперь надо дождаться ответа [FEED-T10]");
-                    return true;
-                }
+        }
+        if (p->fa_feed.valid) {
+            if (!processFeedTab(p)) {
+                return false;
             }
-        } // check4feed
-        qDebug("check point 3");
-    }
+            if (_bot->isAwaiting()) {
+                qDebug("похоже мы покормили и теперь надо дождаться ответа [FEED-T10]");
+                return true;
+            }
+        }
+    } // check4feed
+    qDebug("check point 3");
 
     if (p->selectedTab != "fa_events") {
         qDebug("мы на %s. перейдём на events",
@@ -773,6 +792,15 @@ bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
             return true;
         }
     }
+    if (p->fa_feed.satiety < 0 || 100 < p->fa_feed.satiety) {
+        qDebug(u8("сытость у летуна %1 какая-то неправильная (%2).")
+               .arg(flying.title).arg(p->fa_feed.satiety));
+        qDebug("перейду-ка на безопасную страничку и вернусь обратно");
+        _bot->setAwaiting();
+        _bot->GoToNeutralUrl();
+        return true;
+    }
+
     if (p->fa_feed.satiety > 70) {
         qDebug(u8("летун %1 сыт на %2%, кормить его пока не надо")
                .arg(flying.title).arg(p->fa_feed.satiety));
@@ -802,34 +830,75 @@ bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
     }
 }
 
-/*
-struct PetState {
-    int         ix;
-    int         rel;
-    int         level;
 
-    QString     title;
-    QString     kind;
+bool WorkFlyingBreeding::processTrainingTab(Page_Game_Incubator *p) {
+    if (!p->fa_feed.valid) {
+        qDebug("мы не на вкладке-кормушке.");
+        return true;
+    }
+    int activeIx = p->ix_active;
+    int numFlyings = p->flyings.count();
+    bool bValidIx = (0 <= activeIx && activeIx < numFlyings);
+    if (!bValidIx) {
+        qDebug("??? активный индекс %d вне диапазона [0…%d)",
+               activeIx, numFlyings);
+        return true;
+    }
+    const Page_Game_Incubator::Flying &flying = p->flyings.at(activeIx);
 
-    bool        was_born; // true ::= уже не яйцо
+    if (flying.was_born == false) {
+        qDebug("летун #%d ещё не вылупился", activeIx);
+        return true;
+    }
 
-    int         readiness; // развитие яйца 0..100
-    PageTimer   birth_pit; // когда вылупится
 
-    // для вылупившегося
-    int         gold;
-    int         health;
-    int         satiety;
+    qDebug("летун #%d: план тренировок: %s",
+           activeIx, qPrintable(::toString(_configs[activeIx].plan)));
+    if (_configs[activeIx].plan == Training_None) {
+        qDebug("выйдем с тренировки");
+        return true;
+    }
 
-    QDateTime   bell_pit; // когда полностью закончится колокольчик
-    QDateTime   feed_pit; // когда сытость упадёт до 70%
+    return true;
+}
 
-    int         stat_level[5];
-    int         stat_price[5];
 
-    void update(Page_Game *gpage);
-};
-*/
+bool WorkFlyingBreeding::canTraining(Page_Game_Incubator *p, int ix, bool flush) {
+    int numFlyings = p->flyings.count();
+    bool bValidIx = (0 <= ix && ix < numFlyings);
+    if (!bValidIx) {
+        qDebug("??? индекс %d вне диапазона [0…%d)",
+               ix, numFlyings);
+        return false;
+    }
+    const Page_Game_Incubator::Flying &flying = p->flyings.at(ix);
+    const PetState& state = _pet_states[ix];
+    const FlyingConfig& cfg = _configs[ix];
+
+    if (flying.was_born == false) {
+        qDebug("летун #%d ещё не вылупился", ix);
+        return false;
+    }
+
+    if (cfg.plan == Training_None) {
+        qDebug("тренировок не назначено");
+        return false;
+    }
+
+    int min_price = state.stat[0].price;
+    for (int i = 1; i < 5; ++i) {
+        if (state.stat[i].price < min_price) {
+            min_price = state.stat[i].price;
+        }
+    }
+    if (state.gold < min_price) {
+        qDebug("для тренировок нужно как минимум %d з., у летуна %d",
+               min_price, state.gold);
+        return false;
+    }
+    //CONTINUE FROM HERE
+    return true;
+}
 
 
 void WorkFlyingBreeding::PetState::update(Page_Game *gpage) {

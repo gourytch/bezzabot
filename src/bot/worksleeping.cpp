@@ -100,8 +100,7 @@ bool WorkSleeping::processCommand(Command command) {
                 }
             }
             _wakeupTime = now.addSecs(secs);
-            qWarning(u8("ложимся спать до %2")
-                     .arg(_wakeupTime.toString("yyyy-MM-dd hh:mm:ss")));
+            qWarning(u8("ложимся спать до %2").arg(::toString(_wakeupTime)));
             return true;
         } else {
             qWarning(u8("спать не хочется"));
