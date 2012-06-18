@@ -50,8 +50,7 @@ void dump(const QVariant& qv) {
 
 void examine() {
     dump(12345);
-    dump(3.14);
-    dump(3.14159265D);
+    dump(3.14159265);
     dump("Kaka");
     dump(QString("Byaka"));
     dump(QSize(1024, 768));
