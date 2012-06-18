@@ -5,7 +5,8 @@ SUBDIRS += \
     testConfig \
     test_disp \
     test_parsers \
-    test_treemap
+    test_treemap \
+    examineQVariant
 
 #    testw32
 

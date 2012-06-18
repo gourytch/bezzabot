@@ -24,7 +24,8 @@ HEADERS += \
     activityhours.h \
     tarball.h \
     varmap.h \
-    treemap.h
+    treemap.h \
+    vartools.h
 
 SOURCES += \
     tools.cpp \
@@ -37,7 +38,8 @@ SOURCES += \
     activityhours.cpp \
     tarball.cpp \
     varmap.cpp \
-    treemap.cpp
+    treemap.cpp \
+    vartools.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc

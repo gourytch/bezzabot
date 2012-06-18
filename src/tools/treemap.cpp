@@ -7,9 +7,11 @@
 #include "treemap.h"
 #include "tools.h"
 
+
 QStringList splitPath(const QString& path) {
     return path.split('/', QString::SkipEmptyParts);
 }
+
 
 QString dirname(const QString& path) {
     QStringList entries = splitPath(path);
@@ -20,6 +22,7 @@ QString dirname(const QString& path) {
     }
     return r;
 }
+
 
 QString basename(const QString& path) {
     QStringList entries = splitPath(path);

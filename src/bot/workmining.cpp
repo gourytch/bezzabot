@@ -471,6 +471,9 @@ bool WorkMining::processQuery(Query query) {
 
     case CanStartSecondaryWork:
     {
+        if (!_bot->_gpage->timer_work.active(10)) {
+            return false; // займёмся своим делом в ближайшее время
+        }
         if (_bot->_gpage->pagekind == page_Game_Mine_Open) {
             Page_Game_Mine_Open *p = (Page_Game_Mine_Open*)(_bot->_gpage);
             if (p->digstage == DigReady) {
