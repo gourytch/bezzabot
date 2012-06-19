@@ -63,19 +63,33 @@ public:
 
 
     bool _awaiting;
+    QDateTime _awaitingSince;
+    int       _maxAwaitingTimeout;
 
     bool _page_busy;
 
     void setAwaiting() {
         _awaiting = true;
+        _awaitingSince = QDateTime::currentDateTime();
     }
 
     void unsetAwaiting() {
         _awaiting = false;
+        _awaitingSince = QDateTime();
     }
 
     bool isAwaiting() const {
         return _awaiting;
+    }
+
+    bool checkAwaiting() {
+        if (!_awaiting) return false;
+        if (_awaitingSince.secsTo(QDateTime::currentDateTime()) < _maxAwaitingTimeout) {
+            return true;
+        }
+        qCritical("awaiting timeout");
+        unsetAwaiting();
+        return false;
     }
 
     bool isAFK() const;

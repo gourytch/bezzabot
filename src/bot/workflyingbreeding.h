@@ -92,6 +92,7 @@ protected:
     int  _days4bell;
 
     bool _check4feed;
+    bool _safeSwitch;
 
     int findAwaitingFlying();
 

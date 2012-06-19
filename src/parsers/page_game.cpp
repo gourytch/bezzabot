@@ -289,6 +289,7 @@ bool FlyingInfo::Caption::parse(QWebElement &div_title) {
     valid = false;
     QWebElement e = div_title.findFirst("A");
     if (e.isNull()) return false;
+    actionObj = e;
     href = e.attribute("href");
     e = e.firstChild();
     if (e.tagName() != "B") return false;
@@ -1062,7 +1063,8 @@ bool Page_Game::doFlyingBoxgame(int flyingNo) {
         qCritical("accordion tab not visible");
         return false;
     }
-    submit = document.findAll("DIV.flyings DIV.content")[flyingNo]
+    submit = document.findFirst("DIV#accordion DIV.flyings")
+            .findAll("DIV.content")[flyingNo]
             .findFirst("FORM INPUT[type=submit]");
     if (submit.isNull()) {
         qCritical("boxbutton missing");
@@ -1079,6 +1081,7 @@ bool Page_Game::doFlyingGoEvents(int flyingNo) {
         return false;
     }
     const FlyingInfo & fi = flyingslist.at(flyingNo);
+    qDebug("... flying info: " + fi.toString());
     if (!(fi.normal.valid || fi.boxgame.valid || fi.journey.valid)) {
         qCritical("normal/boxgame/journey is not active for flyingNo=%d", flyingNo);
         return false;
@@ -1087,12 +1090,22 @@ bool Page_Game::doFlyingGoEvents(int flyingNo) {
         qCritical("accordion tab not visible");
         return false;
     }
-    submit = document.findAll("DIV.flyings DIV.title")[flyingNo].findFirst("A");
+
+    QWebElementCollection all = document.findFirst("DIV#accordion DIV.flyings")
+            .findAll("DIV.title");
+    if (all.count() != flyingslist.size()) {
+        qFatal("titles=%d, flyinglist=%d", all.count(), flyingslist.count());
+        return false;
+    }
+    submit = all[flyingNo].findFirst("A");
+//    submit = fi.caption.actionObj;
     if (submit.isNull()) {
         qCritical("link missing for flyingNo=%d", flyingNo);
         return false;
     }
-    qDebug("submitting eventlink for flyingNo=%d", flyingNo);
+    qDebug(u8("submitting eventlink for flyingNo=%1 (%2)")
+           .arg(flyingNo).arg(fi.caption.title));
+    qDebug("submit=" + submit.toInnerXml());
     pressSubmit();
     return true;
 }

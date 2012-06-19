@@ -73,7 +73,7 @@ Bot::Bot(const QString& id, QObject *parent) :
     _started = false;
     _regular = true;
     _page = NULL;
-    _awaiting = false;
+    unsetAwaiting();
     _page_busy = false;
 
     reset();
@@ -115,20 +115,20 @@ void Bot::reset() {
     state.reset();
     _reload_attempt = 0;
     _page_busy = false;
-    _awaiting = false;
     _workq.clear();
     _last_url = QString();
     _last_url_counter = 0;
     mdsav_gold = -1;
+    unsetAwaiting();
 }
 
 void Bot::request_get (const QUrl& url) {
-    _awaiting = true;
+    setAwaiting();
     emit rq_get(url);
 }
 
 void Bot::request_post (const QUrl& url, const QStringList& params) {
-    _awaiting = true;
+    setAwaiting();
     emit rq_post(url, params);
 }
 
@@ -159,7 +159,7 @@ void Bot::cancelAuto() {
 
 void Bot::GoTo(const QString& link, bool instant) {
     cancelAuto();
-    _awaiting = true;
+    setAwaiting();
     _linkToGo = link.isNull()
             ? _baseurl
             : link.startsWith("http")
@@ -186,7 +186,7 @@ void Bot::GoReload() {
     cancelAuto();
     _reload_attempt++;
     if (_reload_attempt > 5) _reload_attempt = 5;
-    _awaiting = true;
+    setAwaiting();
     int ra2 = _reload_attempt * _reload_attempt;
     int ra3 = ra2 * _reload_attempt;
     int s = 5 +
@@ -263,7 +263,7 @@ void Bot::onPageFinished (bool ok)
     _page = _actor->parse();
     _gpage = dynamic_cast<Page_Game*>(_page);
 
-    _awaiting = false;
+    unsetAwaiting();
 
     qDebug("page kind: " + ::toString(_page->pagekind));
 
@@ -392,7 +392,7 @@ void Bot::step()
     {
         _step_timer.stop();
     }
-    if (!_awaiting && !_page_busy && !_actor->busy()) {
+    if (!checkAwaiting() && !_page_busy && !_actor->busy()) {
         ++_step_counter;
 //        qDebug("bot step #%d", _step_counter);
         one_step();
@@ -426,7 +426,7 @@ void Bot::handle_Page_Error () {
 void Bot::handle_Page_UnderConstruction() {
     int sec = 1800 + (qrand() % 3600);
     qWarning("hangle UnderConstruction page. reload index at %d sec", sec);
-    _awaiting = true;
+    setAwaiting();
     Timebomb::global()->launch(sec * 1000UL, this, SLOT(delayedReload()));
 }
 
@@ -434,7 +434,7 @@ void Bot::handle_Page_Login () {
     qDebug("hangle login page");
     Page_Login *p = static_cast<Page_Login*>(_page);
     if (p->doLogin(_serverNo, _login, _password, true)) {
-        _awaiting = true;
+        setAwaiting();
     }
 }
 
@@ -503,6 +503,8 @@ void Bot::configure() {
     _last_url_count_for_unloop = _config->get("watchdog/loop_soft_unloop_count", false, 10).toInt();
     _last_url_count_for_forced_unloop = _config->get("watchdog/loop_forced_unloop_count", false, 13).toInt();
     _last_url_count_for_quit = _config->get("watchdog/loop_fatal_count", false, 15).toInt();
+
+    _maxAwaitingTimeout = _config->get("watchdog/max_awaiting_timeout", false, 60).toInt();
 
     _neutral_urls.append("dressingroom.php");
     _neutral_urls.append("house.php");

@@ -78,6 +78,8 @@ void WorkFlyingBreeding::configure(Config *config) {
                               false, 0).toInt();
     _check4feed = config->get("Work_FlyingBreeding/check4feed",
                               false, false).toBool();
+    _safeSwitch = config->get("Work_FlyingBreeding/safe_switch",
+                              false, true).toBool();
     for (int i = 0; i < 4; ++i) {
         _configs[i].configure(config, i);
     }
@@ -407,6 +409,23 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         }
 
     }
+    if (_safeSwitch) {
+        qDebug("... обновим состояние flyinglist");
+        if (!_bot->_gpage->parseFlyingList()) {
+            qDebug("... что-то плохо обновили :(");
+            setAwaiting();
+            _bot->GoToNeutralUrl();
+            return false;
+        }
+        qDebug("... переключаемся с помощью GoToIncubator()");
+        if (!GoToIncubator(false)) {
+            qDebug("... не переключились");
+            return false;
+        }
+        qDebug("... ожидаем");
+        return true;
+    }
+
     qDebug("... займём работой летуна #%d", ix);
     if (!p->doSelectFlying(ix)) {
         qCritical(u8("летун не выделился. грусть. пойдм отсюда"));
