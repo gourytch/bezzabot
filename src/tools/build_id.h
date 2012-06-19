@@ -1,6 +1,6 @@
 #ifndef BUILD_ID_H
 #define BUILD_ID_H
 
-#define BUILD_ID "20120618_122810"
+#define BUILD_ID "20120619_112548"
 
 #endif // BUILD_ID_H
