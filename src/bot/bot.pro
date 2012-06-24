@@ -31,7 +31,8 @@ SOURCES += \
     workscaryfighting.cpp \
     workflyingbreeding.cpp \
     worktraining.cpp \
-    workslaveholding.cpp
+    workslaveholding.cpp \
+    workalchemy.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -50,7 +51,8 @@ HEADERS  += \
     workscaryfighting.h \
     workflyingbreeding.h \
     worktraining.h \
-    workslaveholding.h
+    workslaveholding.h \
+    workalchemy.h
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools

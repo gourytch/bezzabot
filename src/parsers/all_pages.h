@@ -25,5 +25,7 @@
 #include "page_game_harbor_market.h"
 #include "page_game_training.h"
 #include "page_game_house_plantation.h"
+#include "page_game_alchemy_entrance.h"
+#include "page_game_alchemy_lab.h"
 
 #endif // ALL_PAGES_H

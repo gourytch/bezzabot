@@ -372,6 +372,7 @@ public:
     QString     chartitle;
     QString     message;
     WorkGuild   workguild;
+    bool        alchemicalguild;
     int         gold;
     int         safe_gold;
     int         free_gold;

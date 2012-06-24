@@ -87,7 +87,7 @@ AppWindow::AppWindow(QWidget *parent) :
             this, SLOT(slotGotReply(QNetworkReply*)));
 
     pWebPage->mainFrame()->addToJavaScriptWindowObject("__ww__", this);
-    qDebug("ready, thread id=0x%lx", QThread::currentThreadId());
+    qDebug("ready, thread id=%p", QThread::currentThreadId());
     pWebView->load(QUrl(_baseurl));
 }
 
@@ -218,7 +218,7 @@ void AppWindow::slotGotReply(QNetworkReply *reply) {
 }
 
 void AppWindow::justDoIt() {
-    qDebug("Invoked! thread id=0x%lx", QThread::currentThreadId());
+    qDebug("Invoked! thread id=%p", QThread::currentThreadId());
 }
 
 ////////////////////////////////////////////////////////////////////////////

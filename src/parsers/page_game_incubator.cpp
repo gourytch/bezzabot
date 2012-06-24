@@ -991,7 +991,7 @@ bool Page_Game_Incubator::doFeed(int ptype) {
 
 
 void Page_Game_Incubator::slotParseFlyingBlock() {
-    qDebug("Page_Game_Incubator::slotParseFlyingBlock[thrID=%lx] {",
+    qDebug("Page_Game_Incubator::slotParseFlyingBlock[thrID=%p] {",
            QThread::currentThreadId());
     if (_mutex.tryLock(100)) {
         parseDivFlyingBlock(true);

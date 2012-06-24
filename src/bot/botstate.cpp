@@ -171,4 +171,5 @@ ECASE(Work_Trading)
 ECASE(Work_LuckySquare)
 ECASE(Work_FlyingBreeding)
 ECASE(Work_SlaveHolding)
+ECASE(Work_Alchemy)
 EEND

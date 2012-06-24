@@ -32,7 +32,8 @@ enum WorkType { // основная работа
     Work_Trading,
     Work_LuckySquare,
     Work_FlyingBreeding,
-    Work_SlaveHolding
+    Work_SlaveHolding,
+    Work_Alchemy
 };
 
 QString toString(WorkType v);

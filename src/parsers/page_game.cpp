@@ -611,6 +611,7 @@ Page_Game::Page_Game (QWebElement& doc) :
     }
 //    message = doc.findFirst("DIV[class=message]").toPlainText ().trimmed ();
     workguild = WorkGuild_None;
+    alchemicalguild = false;
     foreach (QWebElement e, doc.findFirst("DIV.guilds").findAll("A")) {
         QString title = e.attribute("title");
         if (title == u8("Шахтеры")) {
@@ -629,6 +630,8 @@ Page_Game::Page_Game (QWebElement& doc) :
 //      } else if (title == u8("Краснокожие")) {
 //      } else if (title == u8("Клыкуны")) {
 //      } else if (title == u8("Теневоды")) {
+        } else if (title == u8("Братство Алхимиков")) {
+            alchemicalguild = true;
         } // FIXME добавить сюда обработку на все остальные гильдии
     }
 
@@ -1195,7 +1198,7 @@ void Page_Game::injectJSInsiders() {
 
 
 void Page_Game::slot_js_injected() {
-    qDebug("js_injection checked, this=%p, thrid=%lx",
+    qDebug("js_injection checked, this=%p, thrid=%p",
            this, QThread::currentThreadId());
 }
 

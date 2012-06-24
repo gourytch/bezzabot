@@ -84,6 +84,7 @@ public:
 
     bool checkAwaiting() {
         if (!_awaiting) return false;
+        if (_page_busy) return true;
         if (_awaitingSince.secsTo(QDateTime::currentDateTime()) < _maxAwaitingTimeout) {
             return true;
         }
