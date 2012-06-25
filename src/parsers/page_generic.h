@@ -42,6 +42,8 @@ public:
 
     void pressSubmit (int delay_min = -1, int delay_max = -1);
 
+    void pressReload (int delay_min = -1, int delay_max = -1);
+
     void delay(int ms, bool exclusive);
 
     void actuate(QWebElement e);
@@ -54,10 +56,13 @@ public:
 
     bool refreshDocument();
 
+    void doReload();
 
 protected slots:
 
     void slot_submit();
+
+    void slot_reload();
 
 };
 

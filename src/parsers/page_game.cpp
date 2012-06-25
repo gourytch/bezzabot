@@ -1199,7 +1199,7 @@ void Page_Game::injectJSInsiders() {
 
 void Page_Game::slot_js_injected() {
     qDebug("js_injection checked, this=%p, thrid=%p",
-           this, QThread::currentThreadId());
+           this, (void*)QThread::currentThreadId());
 }
 
 void Page_Game::slot_update_invoked(QString data, QString config) {

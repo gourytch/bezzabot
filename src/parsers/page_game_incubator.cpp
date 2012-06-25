@@ -561,6 +561,13 @@ bool Page_Game_Incubator::doStartSmallJourney(int duration10) {
                 qCritical("select not found");
                 return false;
             }
+
+            if (submit.attribute("class").contains("cmd_blocked")) {
+                qCritical("кнопка запуска заблокирована - перегрузим страничку");
+                pressReload();
+                return true;
+            }
+
             selectedOpt.evaluateJavaScript("this.selected = true;");
             qWarning("Запускаю летуна в малое путешествие на %s минут",
                      qPrintable(selectedOpt.attribute("value").trimmed()));
@@ -992,7 +999,7 @@ bool Page_Game_Incubator::doFeed(int ptype) {
 
 void Page_Game_Incubator::slotParseFlyingBlock() {
     qDebug("Page_Game_Incubator::slotParseFlyingBlock[thrID=%p] {",
-           QThread::currentThreadId());
+           (void*)QThread::currentThreadId());
     if (_mutex.tryLock(100)) {
         parseDivFlyingBlock(true);
         qDebug(u8("selectedTab={%1}, detectedTab={%2}")

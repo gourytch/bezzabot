@@ -83,6 +83,21 @@ void Page_Generic::pressSubmit(int delay_min, int delay_max) {
     Timebomb::global()->launch(ms, this, SLOT(slot_submit()));
 }
 
+
+void Page_Generic::pressReload(int delay_min, int delay_max) {
+    if (delay_min == -1) {
+        delay_min = Config::global().get("page/delay_min", false, 1000).toInt();
+    }
+    if (delay_max == -1) {
+        delay_max = Config::global().get("page/delay_max", false, 15000).toInt();
+    }
+    int ms = delay_min >= delay_max
+            ? delay_min
+            : delay_min + qrand() % (delay_max - delay_min);
+    Timebomb::global()->launch(ms, this, SLOT(slot_reload()));
+}
+
+
 void Page_Generic::slot_submit() {
     if (submit.isNull()) {
         qCritical("NULL SUBMIT");
@@ -90,6 +105,12 @@ void Page_Generic::slot_submit() {
         actuate(submit);
     }
 }
+
+
+void Page_Generic::slot_reload() {
+    doReload();
+}
+
 
 void Page_Generic::delay(int ms, bool exclusive) {
     QTime time;
@@ -194,6 +215,7 @@ bool Page_Generic::isDisplayed(QWebElement e) {
     return (e.parent().isNull()) ? true : isDisplayed(e.parent());
 }
 
+
 bool Page_Generic::refreshDocument() {
     if (webpage == NULL) {
         return false;
@@ -201,4 +223,9 @@ bool Page_Generic::refreshDocument() {
     webframe = webpage->mainFrame();
     document = webframe->documentElement();
     return true;
+}
+
+void Page_Generic::doReload() {
+    qDebug("invoke reload page");
+    webpage->triggerAction(QWebPage::Reload);
 }

@@ -87,7 +87,6 @@ AppWindow::AppWindow(QWidget *parent) :
             this, SLOT(slotGotReply(QNetworkReply*)));
 
     pWebPage->mainFrame()->addToJavaScriptWindowObject("__ww__", this);
-    qDebug("ready, thread id=%p", QThread::currentThreadId());
     pWebView->load(QUrl(_baseurl));
 }
 
@@ -109,7 +108,7 @@ void AppWindow::slotLoaded (bool success) {
     doc = pWebPage->mainFrame()->documentElement();
     _page = Parser::parse(doc);
     _gpage = dynamic_cast<Page_Game*>(_page);
-    pButton1->setEnabled(_gpage != NULL);
+//    pButton1->setEnabled(_gpage != NULL);
     pButton2->setEnabled(_gpage != NULL);
     pButton3->setEnabled(_gpage != NULL);
     if (checkLogin()) return;
@@ -218,51 +217,21 @@ void AppWindow::slotGotReply(QNetworkReply *reply) {
 }
 
 void AppWindow::justDoIt() {
-    qDebug("Invoked! thread id=%p", QThread::currentThreadId());
+    qDebug("Invoked! thread id=%p", (void*)QThread::currentThreadId());
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
 void AppWindow::slotClick1() {
-    Page_Game_Harbor_Market *p = dynamic_cast<Page_Game_Harbor_Market*>(_gpage);
-    if (!p) {
-        qDebug("for harbour only");
-        return;
-    }
-//    if ( !(p->doSelectItem(u8("Раб людишко")) && p->doSelectQuantity(15))) {
-    if ( !(p->doSelectItem(u8("Оборотное зелье")) && p->doSelectQuantity(5))) {
-        qCritical("failed");
-        return;
-    }
-    qDebug("ok");
+    _page->doReload();
+    qDebug("should be reloaded");
 }
 
 
 void AppWindow::slotClick2() {
-    Page_Game_Harbor_Market *p = dynamic_cast<Page_Game_Harbor_Market*>(_gpage);
-    if (!p) {
-        qDebug("for harbour only");
-        return;
-    }
-    if (!p->doBuy()) {
-        qCritical("failed");
-        return;
-    }
-    qDebug("ok");
 }
 
 
 void AppWindow::slotClick3() {
-    Page_Game_Harbor_Market *p = dynamic_cast<Page_Game_Harbor_Market*>(_gpage);
-    if (!p) {
-        qDebug("for harbour only");
-        return;
-    }
-//    if (!p->doSelectAndBuy(u8("Оборотное зелье"), 3)) {
-    if (!p->doSelectAndBuy(u8("Билет на маленькую поляну"), 2)) {
-        qCritical("failed");
-        return;
-    }
-    qDebug("ok");
 }
 
