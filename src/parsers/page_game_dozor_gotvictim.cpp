@@ -117,6 +117,10 @@ QString Page_Game_Dozor_GotVictim::getName() const {
 
         scareNames["m50_??"] = "Каменный Големус";
         scareNames["m50_??"] = "Смертушка";
+
+        scareNames["ava_bandit1"] = "Рэкетус";
+        scareNames["ava_bandit2"] = "Балбес";
+        scareNames["ava_bandit3"] = "Бывалый";
     }
 
     if (is_scary) {
