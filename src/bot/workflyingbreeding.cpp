@@ -152,7 +152,6 @@ const int sec_per_day = 86400;
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
     updateStates();
-
     if (_check4feed && _bot->state.plant_slaves == -1) {
         if (gpage->pagekind == page_Game_House_Plantation) {
             qFatal("мы на плантации, а её объём так и не узнали!");
@@ -192,6 +191,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     const PetState& state = _pet_states[activeIx];
 
     qDebug(u8("проверяем птыца %1").arg(flyingInfo.caption.title));
+    qDebug("PetState=" + state.toString());
 
     if (bValidIx && flying.was_born &&
         (p->detectedTab == "fa_events0" ||
@@ -313,50 +313,66 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
 
     /////////// TRAINING /////////////
     {
+        qDebug("initial PetState=" + state.toString());
         bool can_training = canTraining(p, activeIx);
         bool go_n_look = false;
         bool need_training = false;
-        if (state.stat[0].level == -1) { // неинициализированное
-            qDebug("статы мы ещё не видели - надо сходить посмотреть");
-            go_n_look = true;
-        } else if (cfg.accumulate) {
-            if (can_training) {
-                if ((state.minutesleft > 0) && cfg.hours4sj.isActive()) {
-                    qDebug("стоит потренироваться перед малым путешествием");
-                    go_n_look = true;
-                    need_training = true;
-                } else if (cfg.hours4kk.isActive()) {
-                    qDebug("стоит потренироваться перед каркаром");
-                    go_n_look = true;
-                    need_training = true;
-                }
-            }
-        } else {
-            if (can_training) {
-                qDebug("стоит потренироваться");
+        bool recheck = true;
+        while (recheck) {
+            recheck = false;
+            if (state.stat[0].level == -1) { // неинициализированное
+                qDebug("статы мы ещё не видели - надо сходить посмотреть");
                 go_n_look = true;
-                need_training = true;
-            }
-        }
-        if (go_n_look) {
-            if (!p->fa_training.valid) {
-                qDebug("переходим к тренировке");
-                if (!p->doSelectTab("fa_training")) {
-                    qDebug("перейти на тренировочную вкладку не вышло. [FEED-E10]");
+                recheck = true;
+            } else if (cfg.accumulate) {
+                if (can_training) {
+                    if ((state.minutesleft > 0) && cfg.hours4sj.isActive()) {
+                        qDebug("стоит потренироваться перед малым путешествием");
+                        go_n_look = true;
+                        need_training = true;
+                    } else if (cfg.hours4kk.isActive()) {
+                        qDebug("стоит потренироваться перед каркаром");
+                        go_n_look = true;
+                        need_training = true;
+                    }
                 }
-                updateStates();
+            } else {
+                if (can_training) {
+                    qDebug("стоит потренироваться");
+                    go_n_look = true;
+                    need_training = true;
+                }
             }
-        }
-        if (p->fa_training.valid && need_training) {
-            qDebug("можно приступить к тренировке");
-            if (!processTrainingTab(p)) {
-                qDebug("плохо кончили. идём в нейтраль");
-                _bot->GoToNeutralUrl();
-                return false;
+            if (go_n_look) {
+                if (!p->fa_training.valid) {
+                    qDebug("переходим на вкладку тренировки");
+                    if (!p->doSelectTab("fa_training")) {
+                        qDebug("перейти на тренировочную вкладку не вышло. [FEED-E10]");
+                    }
+                    updateStates();
+                    qDebug("new PetState=" + state.toString());
+                }
             }
-            if (_bot->isAwaiting()) {
-                qDebug("теперь надо дождаться ответа [FEED-T10]");
-                return true;
+            if (recheck && state.stat[0].level == -1) {
+                qDebug("должны были пойти на перепроверку, но перепроверять нечего :(");
+                break;
+            }
+        } // while recheck
+
+        if (p->fa_training.valid) {
+            if (need_training) {
+                qDebug("можно приступить к тренировке");
+                if (!processTrainingTab(p)) {
+                    qDebug("плохо кончили. идём в нейтраль");
+                    _bot->GoToNeutralUrl();
+                    return false;
+                }
+                if (_bot->isAwaiting()) {
+                    qDebug("теперь надо дождаться ответа [FEED-T10]");
+                    return true;
+                }
+            } else {
+                qDebug("тренировка не нужна");
             }
         }
     }
@@ -1122,37 +1138,38 @@ void WorkFlyingBreeding::PetState::update(Page_Game *gpage, int ix) {
     }
 
     Page_Game_Incubator *p = dynamic_cast<Page_Game_Incubator*>(gpage);
-    if (p == NULL) return;
-    rel = p->rel_active;
+    if (p) {
+        rel = p->rel_active;
 
-    if (p->fa_events0.valid) {
-        minutesleft = p->fa_events0.minutesleft;
-    }
-    if (p->fa_training.valid) {
-        for (int i = 0; i < 5; ++i) {
-            stat[i].level = p->fa_training.stat_level[i];
-            stat[i].price = p->fa_training.stat_price[i];
-            stat[i].enabled = p->fa_training.stat_accessible[i];
+        if (p->fa_events0.valid) {
+            minutesleft = p->fa_events0.minutesleft;
         }
-    }
-    if (p->fa_feed.valid) {
-        satiety = p->fa_feed.satiety;
+        if (p->fa_training.valid) {
+            for (int i = 0; i < 5; ++i) {
+                stat[i].level = p->fa_training.stat_level[i];
+                stat[i].price = p->fa_training.stat_price[i];
+                stat[i].enabled = p->fa_training.stat_accessible[i];
+            }
+        }
+        if (p->fa_feed.valid) {
+            satiety = p->fa_feed.satiety;
+        }
     }
 }
 
 
 QString WorkFlyingBreeding::PetState::toString() const {
     QString ret = u8("{ix=%1, rel=%2, level=%3; title=%4, kind=%5; "
-                     "gold=%6, health=%7, satiety=%8, minutesleft=%9; stat={")
+                     "gold=%6, health=%7, satiety=%8, minutesleft=%9; stat={\n")
             .arg(ix).arg(rel).arg(level).arg(title).arg(kind)
             .arg(gold).arg(health).arg(satiety).arg(minutesleft);
     for (int i = 0; i < 5; ++i) {
-        ret.append(u8("[%1]{level=%2, price=%3, enabled=%4}")
+        ret.append(u8("   [%1]{level=%2, price=%3, enabled=%4}\n")
                    .arg(i).arg(stat[i].level)
                    .arg(stat[i].price)
                    .arg(stat[i].enabled ? "true" : "false"));
     }
-    ret.append("}");
+    ret.append("}}");
     return ret;
 }
 
