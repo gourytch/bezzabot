@@ -1,13 +1,13 @@
 #ifndef WORKTRAINING_H
 #define WORKTRAINING_H
 #include "work.h"
-
+#include "tools/tools.h"
 
 class WorkTraining : public Work
 {
     Q_OBJECT
 
-    bool _uselist[5];
+    WorkoutSet _uselist;
     long _price[5];
     long _gold_over;
     bool canTraining();

@@ -1,6 +1,7 @@
 #include <QDateTime>
 #include "workflyingbreeding.h"
 #include "parsers/page_game_incubator.h"
+#include "parsers/page_game_training.h"
 #include "bot.h"
 #include "tools/tools.h"
 
@@ -15,20 +16,25 @@ EEND
 void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
     this->ix = ix;
 
-    QString pfx = ix == -1
-            ? u8("Work_FlyingBreeding/config/")
-            : u8("Work_FlyingBreeding/config/%1/").arg(ix);
+    QString pfx = "Work_FlyingBreeding/";
+    QString sfx = ix == -1
+            ? u8("")
+            : u8("~%1").arg(ix);
 
-    days4bell = config->get(pfx + "days4bell", false, -1).toInt();
-    days4bagG = config->get(pfx + "days4bagK", false, -1).toInt();
-    days4bagK = config->get(pfx + "days4bagK", false, -1).toInt();
+    days4bell = config->get(pfx + "days4bell" + sfx, false, -1).toInt();
+    days4bagG = config->get(pfx + "days4bagK" + sfx, false, -1).toInt();
+    days4bagK = config->get(pfx + "days4bagK" + sfx, false, -1).toInt();
 
-    use_small_journey = config->get(pfx + "use_small_journey", false, false).toBool();
-    duration10 = config->get(pfx + "duration10", false, -1).toInt();
+    smart_journeys = config->get(pfx + "smart_journeys" + sfx, false, true).toBool();
+    use_small_journey = config->get(pfx + "use_small_journey" + sfx, false, false).toBool();
+    use_big_journey = config->get(pfx + "use_big_journey" + sfx, false, true).toBool();
+    use_karkar = config->get(pfx + "use_karkar" + sfx, false, false).toBool();
 
-    check4feed = config->get(pfx + "check4feed", false, false).toBool();
+    duration10 = config->get(pfx + "duration10" + sfx, false, -1).toInt();
 
-    QString s = config->get(pfx + "workout_plan", false, "lowest")
+    check4feed = config->get(pfx + "check4feed" + sfx, false, true).toBool();
+
+    QString s = config->get(pfx + "workout_plan" + sfx, false, "lowest")
             .toString().trimmed().toLower();
     plan = Training_Lowest;
     if (s == "lowest" || s == "0") {
@@ -42,7 +48,14 @@ void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
     } else {
         qCritical(u8("unknown workout_plan: {%1}").arg(s));
     }
-    accumulate = config->get(pfx + "accumulate", false, true).toBool();
+
+    parseWorkoutSet(config->get(pfx + "workout_set" + sfx).toString(), &workout_set);
+
+    accumulate = config->get(pfx + "accumulate" + sfx, false, true).toBool();
+
+    hours4sj.assign(config->get(pfx + "hours4sj" + sfx, false, "0-23").toString());
+    hours4bj.assign(config->get(pfx + "hours4bj" + sfx, false, "0-23").toString());
+    hours4kk.assign(config->get(pfx + "hours4kk" + sfx, false, "0-23").toString());
 }
 
 
@@ -51,10 +64,17 @@ void WorkFlyingBreeding::FlyingConfig::dumpConfig() const {
     qDebug(u8("      days4bell: %1").arg(days4bell));
     qDebug(u8("      days4bagG: %1").arg(days4bagG));
     qDebug(u8("      days4bagK: %1").arg(days4bagK));
+    qDebug(u8("      smart_journeys: %1").arg(smart_journeys ? "true" : "false"));
     qDebug(u8("      use_small_journey: %1").arg(use_small_journey ? "true" : "false"));
+    qDebug(u8("      use_big_journey  : %1").arg(use_big_journey ? "true" : "false"));
+    qDebug(u8("      use_karkar       : %1").arg(use_karkar ? "true" : "false"));
+    qDebug(u8("      hours4sj: %1").arg(hours4sj.toString()));
+    qDebug(u8("      hours4bj: %1").arg(hours4bj.toString()));
+    qDebug(u8("      hours4kk: %1").arg(hours4kk.toString()));
     qDebug(u8("      duration10: %1").arg(duration10));
     qDebug(u8("      check4feed: %1").arg(check4feed ? "true" : "false"));
-    qDebug(u8("      plan: %1").arg(::toString(plan)));
+    qDebug(u8("      workout_plan: %1").arg(::toString(plan)));
+    qDebug(u8("      workout_set : %1").arg(::toString(&workout_set)));
     qDebug(u8("      accumulate: %1").arg(accumulate));
 }
 
@@ -131,6 +151,8 @@ const int sec_per_day = 86400;
 
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
+    updateStates();
+
     if (_check4feed && _bot->state.plant_slaves == -1) {
         if (gpage->pagekind == page_Game_House_Plantation) {
             qFatal("мы на плантации, а её объём так и не узнали!");
@@ -149,22 +171,26 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         return GoToIncubator();
     }
     Page_Game_Incubator *p = (Page_Game_Incubator *)gpage;
+    int activeIx = p->ix_active;
     qDebug(u8("мы в инкубаторе. ix_active = %1, rel_active = %2, tab = %3")
            .arg(p->ix_active)
            .arg(p->rel_active)
            .arg(p->detectedTab));
     int numFlyings = p->flyings.count();
-    bool bValidIx = (p->ix_active >= 0 && p->ix_active < numFlyings);
+    bool bValidIx = (activeIx >= 0 && activeIx < numFlyings);
 
     if (!bValidIx) {
-        qFatal("bad active index: %d", p->ix_active);
+        qFatal("bad active index: %d", activeIx);
         setAwaiting();
         _bot->GoToWork();
         return false;
     }
 
-    const FlyingInfo &flyingInfo = p->flyingslist.at(p->ix_active);
-    const Page_Game_Incubator::Flying &flying = p->flyings.at(p->ix_active);
+    const FlyingInfo &flyingInfo = p->flyingslist.at(activeIx);
+    const Page_Game_Incubator::Flying &flying = p->flyings.at(activeIx);
+    const FlyingConfig &cfg = _configs[activeIx];
+    const PetState& state = _pet_states[activeIx];
+
     qDebug(u8("проверяем птыца %1").arg(flyingInfo.caption.title));
 
     if (bValidIx && flying.was_born &&
@@ -198,6 +224,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                     if (!p->doSelectTab("fa_bonus")) {
                         qDebug("перейти на бонус-вкладку не вышло. жаль, но не страшно.[FEED-E00]");
                     }
+                    updateStates();
                 }
             }
             if (p->fa_bonus.valid) {
@@ -220,8 +247,8 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             qDebug("мало рабов (%d), кормить не стану [FEED-N10]",
                    _bot->state.plant_slaves);
         } else if (p->selectedTab == "fa_feed") {
-                qDebug("стоим возле кормушки... [FEED-A13]");
-                go_n_look = true;
+            qDebug("стоим возле кормушки... [FEED-A13]");
+            go_n_look = true;
         } else if (!flyingInfo.normal.valid) {
             qDebug(u8("не вижу, что летун %1 свободен")
                    .arg(flyingInfo.caption.title));
@@ -264,6 +291,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                 if (!p->doSelectTab("fa_feed")) {
                     qDebug("перейти на вкладку-кормилку не вышло. жаль, но не страшно. [FEED-E10]");
                 }
+                updateStates();
                 pit = QDateTime::currentDateTime()
                         .addSecs(600 + (qrand() % 3600));
                 qDebug(u8("сразу поставим ему кормилко-откат до %1 [FEED-D12]").arg(::toString(pit)));
@@ -280,8 +308,62 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             }
         }
     } // check4feed
+
     qDebug("check point 3");
 
+    /////////// TRAINING /////////////
+    {
+        bool can_training = canTraining(p, activeIx);
+        bool go_n_look = false;
+        bool need_training = false;
+        if (state.stat[0].level == -1) { // неинициализированное
+            qDebug("статы мы ещё не видели - надо сходить посмотреть");
+            go_n_look = true;
+        } else if (cfg.accumulate) {
+            if (can_training) {
+                if ((state.minutesleft > 0) && cfg.hours4sj.isActive()) {
+                    qDebug("стоит потренироваться перед малым путешествием");
+                    go_n_look = true;
+                    need_training = true;
+                } else if (cfg.hours4kk.isActive()) {
+                    qDebug("стоит потренироваться перед каркаром");
+                    go_n_look = true;
+                    need_training = true;
+                }
+            }
+        } else {
+            if (can_training) {
+                qDebug("стоит потренироваться");
+                go_n_look = true;
+                need_training = true;
+            }
+        }
+        if (go_n_look) {
+            if (!p->fa_training.valid) {
+                qDebug("переходим к тренировке");
+                if (!p->doSelectTab("fa_training")) {
+                    qDebug("перейти на тренировочную вкладку не вышло. [FEED-E10]");
+                }
+                updateStates();
+            }
+        }
+        if (p->fa_training.valid && need_training) {
+            qDebug("можно приступить к тренировке");
+            if (!processTrainingTab(p)) {
+                qDebug("плохо кончили. идём в нейтраль");
+                _bot->GoToNeutralUrl();
+                return false;
+            }
+            if (_bot->isAwaiting()) {
+                qDebug("теперь надо дождаться ответа [FEED-T10]");
+                return true;
+            }
+        }
+    }
+
+    /////////// TRAINING /////////////
+
+    qDebug("check point 4");
     if (p->selectedTab != "fa_events") {
         qDebug("мы на %s. перейдём на events",
                qPrintable(p->selectedTab));
@@ -295,6 +377,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             _bot->GoToWork();
             return false;
         }
+        updateStates();
         if (p->selectedTab != "fa_events") {
             qDebug("всё равно мы не там где надо. :(");
             _cooldown = QDateTime::currentDateTime()
@@ -439,6 +522,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
 
 
 bool WorkFlyingBreeding::processQuery(Query query) {
+    updateStates();
     switch (query) {
     case CanStartWork: {
         return canStartWork();
@@ -851,38 +935,87 @@ bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
 
 
 bool WorkFlyingBreeding::processTrainingTab(Page_Game_Incubator *p) {
-    if (!p->fa_feed.valid) {
-        qDebug("мы не на вкладке-кормушке.");
+    if (!p->fa_training.valid) {
+        qDebug("мы не на вкладке-тренировалке.");
         return true;
     }
     int activeIx = p->ix_active;
-    int numFlyings = p->flyings.count();
-    bool bValidIx = (0 <= activeIx && activeIx < numFlyings);
-    if (!bValidIx) {
-        qDebug("??? активный индекс %d вне диапазона [0…%d)",
-               activeIx, numFlyings);
+
+    if (!canTraining(p, activeIx)) {
+        qDebug("завершаем обработку таба, коль тренировать не можем");
         return true;
     }
+
     const Page_Game_Incubator::Flying &flying = p->flyings.at(activeIx);
+    const FlyingConfig &cfg = _configs[activeIx];
+    const PetState& state = _pet_states[activeIx];
 
-    if (flying.was_born == false) {
-        qDebug("летун #%d ещё не вылупился", activeIx);
+    qDebug(u8("летун #%1/%2 : план тренировок: %3, set: %4")
+           .arg(activeIx)
+           .arg(flying.title)
+           .arg(::toString(cfg.plan))
+           .arg(::toString(&(cfg.workout_set))));
+
+    qDebug(u8("ищем стат для тренировки..."));
+    int stat_no = -1;
+    int stat_price = -1;
+    int stat_level = -1;
+
+    for (int i = 0; i < 5; ++i) {
+        if (!cfg.workout_set[i]) continue;
+        if (!state.stat[i].enabled) continue;
+        int price = state.stat[i].price;
+        int level = state.stat[i].level;
+
+        if (state.gold < price) continue;
+
+        if (stat_no == -1) {
+            stat_no = i;
+            stat_price = price;
+            stat_level = level;
+            continue;
+        }
+        switch (cfg.plan) {
+        case Training_Cheapest:
+            if (stat_price <= price) continue;
+            break;
+        case Training_Lowest:
+            if (stat_level <= level) continue;
+            break;
+        case Training_Highest:
+            if (stat_level >= level) continue;
+            break;
+        case Training_Greatest:
+            if (stat_price >= price) continue;
+            break;
+        default:
+            continue;
+        }
+        stat_no = i;
+        stat_price = price;
+        stat_level = level;
+        break;
+    }
+    if (stat_no == -1) {
+        qDebug("... не смогли найти чего потренировать");
         return true;
     }
+    qDebug(u8("... решили тренировать %1 (level=%2) за %3 з.")
+           .arg(u8(Page_Game_Training::stat_name[stat_no]))
+           .arg(stat_level)
+           .arg(stat_price));
 
-
-    qDebug("летун #%d: план тренировок: %s",
-           activeIx, qPrintable(::toString(_configs[activeIx].plan)));
-    if (_configs[activeIx].plan == Training_None) {
-        qDebug("выйдем с тренировки");
+    if (!p->doBuyStat(stat_no)) {
+        qDebug("... покупка не удалась :(");
         return true;
     }
-
+    qDebug("... будем ждать результатов тренировки");
+    setAwaiting();
     return true;
 }
 
 
-bool WorkFlyingBreeding::canTraining(Page_Game_Incubator *p, int ix, bool flush) {
+bool WorkFlyingBreeding::canTraining(Page_Game_Incubator *p, int ix) {
     int numFlyings = p->flyings.count();
     bool bValidIx = (0 <= ix && ix < numFlyings);
     if (!bValidIx) {
@@ -894,13 +1027,25 @@ bool WorkFlyingBreeding::canTraining(Page_Game_Incubator *p, int ix, bool flush)
     const PetState& state = _pet_states[ix];
     const FlyingConfig& cfg = _configs[ix];
 
+    qDebug(u8("смотрим насчёт тренировок у летуна #%1: %2")
+           .arg(ix).arg(flying.title));
+
     if (flying.was_born == false) {
-        qDebug("летун #%d ещё не вылупился", ix);
+        qDebug("... он ещё не вылупился");
         return false;
     }
 
     if (cfg.plan == Training_None) {
-        qDebug("тренировок не назначено");
+        qDebug("... тренировок ему не назначено");
+        return false;
+    }
+
+    if (!(cfg.workout_set[0] ||
+          cfg.workout_set[1] ||
+          cfg.workout_set[2] ||
+          cfg.workout_set[3] ||
+          cfg.workout_set[4])) {
+        qDebug("... тренировать ему нечего");
         return false;
     }
 
@@ -911,22 +1056,103 @@ bool WorkFlyingBreeding::canTraining(Page_Game_Incubator *p, int ix, bool flush)
         }
     }
     if (state.gold < min_price) {
-        qDebug("для тренировок нужно как минимум %d з., у летуна %d",
+        qDebug("... для тренировок ему нужно как минимум %d з., а есть %d",
                min_price, state.gold);
         return false;
     }
-    //CONTINUE FROM HERE
+    qDebug("... может что-нибудь себе потренировать");
     return true;
 }
 
-
-void WorkFlyingBreeding::PetState::update(Page_Game *gpage) {
-    int n = gpage->flyingslist.count();
-    for (int i = 0; i < n; ++i) {
-        const FlyingInfo& fi = gpage->flyingslist.at(i);
-        if (fi.normal.valid) {
-
+void WorkFlyingBreeding::updateStates() {
+    Page_Game *p = _bot->_gpage;
+    if (p == NULL) return;
+    if (_pet_states.empty()) {
+        for (int i = 0; i < p->flyingslist.count(); ++i) {
+            _pet_states.append(PetState());
         }
     }
+    for (int i = 0; i < _pet_states.count(); ++i) {
+        _pet_states[i].update(p, i);
+    }
+}
+
+
+WorkFlyingBreeding::PetState::PetState() {
+    ix      = -1;
+    rel     = -1;
+    level   = -1;
+    was_born    = false;
+    readiness   = -1;
+    gold    = -1;
+    health  = -1;
+    satiety = -1;
+    minutesleft = -1;
+    for (int i = 0; i < 5; ++i) {
+        stat[i].level   = -1;
+        stat[i].price   = -1;
+        stat[i].enabled = false;
+    }
+}
+
+
+void WorkFlyingBreeding::PetState::update(Page_Game *gpage, int ix) {
+    int n = gpage->flyingslist.count();
+    if (ix < 0 || n <= ix) {
+        return;
+    }
+
+    const FlyingInfo& fi = gpage->flyingslist.at(ix);
+    this->ix = ix;
+
+    title = fi.caption.title;
+    kind  = fi.caption.icon;
+
+    if (fi.boxgame.valid || fi.journey.valid || fi.normal.valid) {
+        was_born = true;
+    }
+    if (fi.normal.valid) {
+        health = fi.normal.hits;
+        gold   = fi.normal.gold;
+        satiety= fi.normal.feed;
+    }
+    if (fi.egg.valid) {
+        was_born = false;
+        readiness = fi.egg.condition;
+    }
+
+    Page_Game_Incubator *p = dynamic_cast<Page_Game_Incubator*>(gpage);
+    if (p == NULL) return;
+    rel = p->rel_active;
+
+    if (p->fa_events0.valid) {
+        minutesleft = p->fa_events0.minutesleft;
+    }
+    if (p->fa_training.valid) {
+        for (int i = 0; i < 5; ++i) {
+            stat[i].level = p->fa_training.stat_level[i];
+            stat[i].price = p->fa_training.stat_price[i];
+            stat[i].enabled = p->fa_training.stat_accessible[i];
+        }
+    }
+    if (p->fa_feed.valid) {
+        satiety = p->fa_feed.satiety;
+    }
+}
+
+
+QString WorkFlyingBreeding::PetState::toString() const {
+    QString ret = u8("{ix=%1, rel=%2, level=%3; title=%4, kind=%5; "
+                     "gold=%6, health=%7, satiety=%8, minutesleft=%9; stat={")
+            .arg(ix).arg(rel).arg(level).arg(title).arg(kind)
+            .arg(gold).arg(health).arg(satiety).arg(minutesleft);
+    for (int i = 0; i < 5; ++i) {
+        ret.append(u8("[%1]{level=%2, price=%3, enabled=%4}")
+                   .arg(i).arg(stat[i].level)
+                   .arg(stat[i].price)
+                   .arg(stat[i].enabled ? "true" : "false"));
+    }
+    ret.append("}");
+    return ret;
 }
 

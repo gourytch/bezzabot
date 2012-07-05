@@ -24,25 +24,14 @@ void WorkTraining::configure(Config *config) {
 
     for (int i = 0; i < 5; ++i) {
         _price[i] = 0;
-        _uselist[i] = false;
     }
-    foreach (QString ss, L) {
-        QString s = ss.trimmed();
-        _uselist[0] |= (s == u8("power")) || (s == u8("сила"));
-        _uselist[1] |= (s == u8("block")) || (s == u8("защита"));
-        _uselist[2] |= (s == u8("dexterity")) || (s == u8("ловкость"));
-        _uselist[3] |= (s == u8("endurance")) || (s == u8("масса"));
-        _uselist[4] |= (s == u8("charisma")) || (s == u8("мастерство"));
-    }
+    parseWorkoutSet(config->get("Work_Training/train").toString(), &_uselist);
 }
+
+
 void WorkTraining::dumpConfig() const {
     Work::dumpConfig();
-    qDebug(u8("Расписание тренировок:"));
-    qDebug(u8("  Сила      : %1").arg(u8(_uselist[0] ? "активно" : "неактивно")));
-    qDebug(u8("  Защита    : %1").arg(u8(_uselist[1] ? "активно" : "неактивно")));
-    qDebug(u8("  Ловкость  : %1").arg(u8(_uselist[2] ? "активно" : "неактивно")));
-    qDebug(u8("  Масса     : %1").arg(u8(_uselist[3] ? "активно" : "неактивно")));
-    qDebug(u8("  Мастерство: %1").arg(u8(_uselist[4] ? "активно" : "неактивно")));
+    qDebug(u8("Расписание тренировок: ") + ::toString(&_uselist));
     qDebug(u8("сохраняем %1 золота при тренировке").arg(_gold_over));
 }
 

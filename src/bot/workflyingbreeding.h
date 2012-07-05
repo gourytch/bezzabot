@@ -4,6 +4,7 @@
 #include <QMap>
 #include "parsers/page_game_incubator.h"
 #include "work.h"
+#include "tools/tools.h"
 
 enum WorkoutPlan {
     Training_None,
@@ -26,13 +27,21 @@ protected:
         int     days4bagG;
         int     days4bagK;
 
-        int     use_small_journey;
+        ActivityHours hours4sj;
+        ActivityHours hours4bj;
+        ActivityHours hours4kk;
+
+        bool    use_small_journey;
+        bool    use_big_journey;
+        bool    use_karkar;
         int     duration10;
 
         bool    check4feed;
 
         WorkoutPlan plan;
+        WorkoutSet workout_set;
         bool    accumulate; // true: training only before small journeys
+        bool    smart_journeys;
 
         void configure(Config *config, int ix);
         void dumpConfig() const;
@@ -42,6 +51,7 @@ protected:
     struct StatStruct {
         int level;
         int price;
+        bool enabled;
     };
 
     struct PetState {
@@ -62,17 +72,23 @@ protected:
         int         health;
         int         satiety;
 
+        int         minutesleft;
+
         QDateTime   bell_pit; // когда полностью закончится колокольчик
         QDateTime   feed_pit; // когда сытость упадёт до 70%
 
         StatStruct stat[5];
 
-        void update(Page_Game *gpage);
+        PetState();
+
+        void update(Page_Game *gpage, int ix);
+
+        QString toString() const;
 
     };
 
     FlyingConfig _configs[4];
-    QMap<int, PetState> _pet_states;
+    QVector<PetState>   _pet_states;
 
     QMap<int, QDateTime> _pit_bell;
     QMap<int, QDateTime> _pit_feed;
@@ -112,7 +128,9 @@ protected:
 
     bool processTrainingTab(Page_Game_Incubator *p);
 
-    bool canTraining(Page_Game_Incubator *p, int ix, bool flush);
+    bool canTraining(Page_Game_Incubator *p, int ix);
+
+    void updateStates();
 
 public:
 

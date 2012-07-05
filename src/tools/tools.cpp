@@ -124,3 +124,30 @@ QString unescape(const QString& text) {
             .replace("\\\\", "\\")
             ;
 }
+
+
+void parseWorkoutSet(const QString& s, WorkoutSet* set) {
+    QStringList L = s.toLower().split(QRegExp("\\s*(\\s+|,)\\s*"));
+
+    for (int i = 0; i < 5; ++i) {
+        (*set)[i] = false;
+    }
+    foreach (QString ss, L) {
+        QString t = ss.trimmed();
+        (*set)[0] |= (t == u8("power")) || (t == u8("сила"));
+        (*set)[1] |= (t == u8("block")) || (t == u8("защита"));
+        (*set)[2] |= (t == u8("dexterity")) || (t == u8("ловкость"));
+        (*set)[3] |= (t == u8("endurance")) || (t == u8("масса"));
+        (*set)[4] |= (t == u8("charisma")) || (t == u8("мастерство"));
+    }
+}
+
+QString toString(const WorkoutSet* set) {
+    QString L;
+    if ((*set)[0]) L.append(" power");
+    if ((*set)[1]) L.append(" block");
+    if ((*set)[2]) L.append(" dexterity");
+    if ((*set)[3]) L.append(" endurance");
+    if ((*set)[4]) L.append(" charisma");
+    return L.trimmed();
+}

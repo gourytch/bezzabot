@@ -64,6 +64,10 @@ inline void qFatal(const QString& s) {
 void setForegroundThread();
 QThread* getForegroundThread();
 
+typedef bool WorkoutSet[5];
+
+void parseWorkoutSet(const QString& s, WorkoutSet* set);
+QString toString(const WorkoutSet* set);
 
 double gaussian_rand();
 
