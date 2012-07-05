@@ -29,9 +29,9 @@ void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
     use_small_journey = config->get(pfx + "use_small_journey" + sfx, false, false).toBool();
     use_big_journey = config->get(pfx + "use_big_journey" + sfx, false, true).toBool();
     use_karkar = config->get(pfx + "use_karkar" + sfx, false, false).toBool();
+    karkar_length = config->get(pfx + "karkar_length" + sfx, false, 1).toInt();
 
     duration10 = config->get(pfx + "duration10" + sfx, false, -1).toInt();
-
     check4feed = config->get(pfx + "check4feed" + sfx, false, true).toBool();
 
     QString s = config->get(pfx + "workout_plan" + sfx, false, "lowest")
@@ -72,6 +72,7 @@ void WorkFlyingBreeding::FlyingConfig::dumpConfig() const {
     qDebug(u8("      hours4bj: %1").arg(hours4bj.toString()));
     qDebug(u8("      hours4kk: %1").arg(hours4kk.toString()));
     qDebug(u8("      duration10: %1").arg(duration10));
+    qDebug(u8("      karkar_length: %1").arg(karkar_length));
     qDebug(u8("      check4feed: %1").arg(check4feed ? "true" : "false"));
     qDebug(u8("      workout_plan: %1").arg(::toString(plan)));
     qDebug(u8("      workout_set : %1").arg(::toString(&workout_set)));
@@ -451,7 +452,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     }
 
     if (p->fa_events0.valid) {
-        if (_use_small_journey) {
+        if (cfg.use_small_journey && cfg.hours4sj.isActive()) {
             if (p->fa_events0.minutesleft > 0 &&
                 p->fa_events0.minutesleft >= _duration10) {
                 qDebug("запустим по маленькому");
@@ -466,17 +467,22 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                 return true;
             }
         }
-        //        if (_use_big_journey) {
-        qDebug("запускаем далеко и надолго.");
-        setAwaiting();
-        if (!p->doStartBigJourney()) {
-            qCritical(u8("не выщло. печаль. пойдм отсюда"));
-            _bot->GoToNeutralUrl();
+        if (cfg.use_big_journey && cfg.hours4bj.isActive()) {
+            qDebug("запускаем далеко и надолго.");
+            setAwaiting();
+            if (!p->doStartBigJourney()) {
+                qCritical(u8("не выщло. печаль. пойдм отсюда"));
+                _bot->GoToNeutralUrl();
+                return false;
+            }
+            qDebug("ожидаем результатов.");
+            return true;
+        }
+        if (cfg.use_karkar && cfg.hours4kk.isActive()) {
+            qDebug("каркарим (ну. должны были каркарить, пока не умеем)");
+            _bot->GoToWork();
             return false;
         }
-        qDebug("ожидаем результатов.");
-        return true;
-        //      }
     }
 
     qDebug("проверим других летунов");

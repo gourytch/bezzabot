@@ -35,6 +35,7 @@ protected:
         bool    use_big_journey;
         bool    use_karkar;
         int     duration10;
+        int     karkar_length;
 
         bool    check4feed;
 
