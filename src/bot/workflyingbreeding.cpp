@@ -327,11 +327,12 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                 recheck = true;
             } else if (cfg.accumulate) {
                 if (can_training) {
-                    if ((state.minutesleft > 0) && cfg.hours4sj.isActive()) {
+                    if ((state.minutesleft > 0) &&
+                        cfg.use_small_journey && cfg.hours4sj.isActive()) {
                         qDebug("стоит потренироваться перед малым путешествием");
                         go_n_look = true;
                         need_training = true;
-                    } else if (cfg.hours4kk.isActive()) {
+                    } else if (cfg.use_karkar && cfg.hours4kk.isActive()) {
                         qDebug("стоит потренироваться перед каркаром");
                         go_n_look = true;
                         need_training = true;
@@ -714,7 +715,8 @@ bool WorkFlyingBreeding::canStartWork() {
 
     if (_bot->_gpage == NULL) return false;
 
-    if (_bot->_gpage->flyingslist.size() == 0) return false;
+    int n = _bot->_gpage->flyingslist.size();
+    if (n == 0) return false;
 
     adjustCooldown(_bot->_gpage);
 
@@ -722,7 +724,13 @@ bool WorkFlyingBreeding::canStartWork() {
     if (_cooldown.isValid() && now < _cooldown) {
         return false;
     }
-    return true;
+    for (int i = 0; i < n; ++i) {
+        const FlyingConfig& cfg = _configs[i];
+        if (cfg.use_big_journey && cfg.hours4bj.isActive()) return true;
+        if (cfg.use_small_journey && cfg.hours4sj.isActive()) return true;
+        if (cfg.use_karkar && cfg.hours4kk.isActive()) return true;
+    }
+    return false;
 }
 
 
