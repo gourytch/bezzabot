@@ -67,7 +67,7 @@ public:
     }
 
     QVariant get (
-            const QString& path, // in form "group/[subgroup/…]/key"
+            const QString& path, // in form "group/[subgroup/…]/key[~suffix]"
             bool  strict = false, // true ::= in this config, not in parent one
             const QVariant& defval = QVariant ());
 

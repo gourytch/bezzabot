@@ -189,14 +189,29 @@ QVariant Config::get (
     if (_overrides->contains(fp)) {
         return _overrides->get(fp);
     }
-    if (strict || _settings->contains (fp))
+    int ix = fp.indexOf("~");
+    QString basefp = ix > 0 ? path.left(ix) : QString();
+    if (_settings->contains (fp))
     {
         return _settings->value (fp, defval);
+    }
+    if (!basefp.isEmpty() && _settings->contains(basefp)) {
+        return _settings->value (basefp, defval);
+    }
+    if (strict) {
+        return defval;
+    }
+    ix = path.lastIndexOf("/");
+    QString name = ix != -1 ? path.mid(ix + 1) : path;
+    QVariant v = get("DEFAULT/" + name, true, QVariant());
+    if (v.isValid()) {
+        return v;
     }
     if (_base)
     {
         return _base->get (path, strict, defval);
     }
+
     return defval;
 }
 
@@ -291,6 +306,10 @@ void Config::test ()
     local.set ("baz/buzz1", "local baz/buzz1");
     local.set ("baz/biz/z1", "local baz/biz/z1");
 
+    global.set ("/subvars/z", "base /subvars/z");
+    global.set ("/subvars/z~1", "sub /subvars/z #1");
+    global.set ("/subvars/z~2", "sub /subvars/z #2");
+
     qDebug () << "ini-file : " << _ini_fname ;
     qDebug () << "foo : " << local.get ("foo") ;
     qDebug () << "bar : " << local.get ("bar") ;
@@ -303,5 +322,10 @@ void Config::test ()
     qDebug () << "baz/biz/z2 (strict): " << local.get ("baz/biz/z2", true) ;
     qDebug () << "zzz/zz/z : " << local.get ("zzz/zz/z") ;
     qDebug () << "zzz/zz/z : (strict)" << local.get ("zzz/zz/z", true) ;
+
+    qDebug () << "subvars/z"    << global.get ("/subvars/z", true);
+    qDebug () << "subvars/z #1" << global.get ("/subvars/z~1", true);
+    qDebug () << "subvars/z #2" << global.get ("/subvars/z~2", true);
+    qDebug () << "subvars/z #3" << global.get ("/subvars/z~3", true);
 
 }

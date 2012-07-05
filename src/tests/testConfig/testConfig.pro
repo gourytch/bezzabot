@@ -4,7 +4,7 @@ TOP = $$CUR/../../..
 QT       += network webkit testlib
 
 TARGET = tst_testconfig
-CONFIG   += console
+# CONFIG   += console
 CONFIG   -= app_bundle
 
 TEMPLATE = app

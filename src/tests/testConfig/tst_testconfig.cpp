@@ -15,12 +15,14 @@ public:
 private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
+
     void testNoSlash();
     void testWithSlash();
     void testDefVal();
     void testValuesFromDEFAULT();
     void testValuesFromGroup();
     void testValuesFromParentGroup();
+    void testTilda();
 
 };
 
@@ -57,7 +59,12 @@ void TestConfig::initTestCase()
                 "\n"
                 "[BASE/SUB]\n"
                 "k2 = value12\n"
-                "k6_in_sub = value13\n");
+                "k6_in_sub = value13\n"
+                "[TILDATEST]\n"
+                "var = value_TILDATEST/var\n"
+                "var~foo = value_TILDATEST/var~foo\n"
+                "var~bar = value_TILDATEST/var~bar\n"
+                );
     f.close();
 
     Config::setFName(fname);
@@ -67,6 +74,7 @@ void TestConfig::initTestCase()
 void TestConfig::cleanupTestCase()
 {
 }
+
 
 void TestConfig::testNoSlash() {
     Config& global = Config::global();
@@ -119,6 +127,16 @@ void TestConfig::testValuesFromGroup() {
 
 void TestConfig::testValuesFromParentGroup() {
 
+}
+
+void TestConfig::testTilda() {
+    Config& global = Config::global();
+    QVERIFY(global.get("/TILDATEST/var") == "value_TILDATEST/var");
+    QVERIFY(global.get("/TILDATEST/var~foo") == "value_TILDATEST/var~foo");
+    QVERIFY(global.get("/TILDATEST/var~bar") == "value_TILDATEST/var~bar");
+    QVERIFY(global.get("/TILDATEST/var~baz") == "value_TILDATEST/var");
+    QVERIFY(global.get("/TILDATEST/k2") == "value5");
+    QVERIFY(global.get("/TILDATEST/k2~foo") == "value5");
 }
 
 QTEST_MAIN(TestConfig);
