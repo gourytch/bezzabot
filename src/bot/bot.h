@@ -15,6 +15,7 @@
 #include "webactor.h"
 #include "tools/persistentcookiejar.h"
 #include "tools/config.h"
+#include "tools/timebomb.h"
 #include "parsers/page_generic.h"
 #include "parsers/page_game.h"
 #include "botstate.h"
@@ -85,6 +86,7 @@ public:
     bool checkAwaiting() {
         if (!_awaiting) return false;
         if (_page_busy) return true;
+        if (Timebomb::global()->isActive()) return true;
         if (_awaitingSince.secsTo(QDateTime::currentDateTime()) < _maxAwaitingTimeout) {
             return true;
         }

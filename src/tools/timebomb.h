@@ -34,6 +34,9 @@ public:
     void unbind();
     void launch(int ms, QObject *receiver, const char *member);
     void cancel();
+    bool isActive() const {
+        return (_timer != NULL);
+    }
 
     QProgressBar *bar() {
         return _bar;

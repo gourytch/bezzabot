@@ -174,7 +174,7 @@ void Bot::GoTo(const QString& link, bool instant) {
                 : _goto_delay_min + (qrand() % (_goto_delay_max - _goto_delay_min));
         if (afk) {
             QDateTime t = QDateTime::currentDateTime().addMSecs(ms);
-            qDebug(u8("delayed at %1 ms, till %2")
+            qDebug(u8("afk: delayed at %1 ms, till %2")
                    .arg(ms)
                    .arg(::toString(t)));
         }
