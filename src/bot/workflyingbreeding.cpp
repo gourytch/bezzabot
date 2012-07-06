@@ -1070,27 +1070,25 @@ bool WorkFlyingBreeding::canTraining(Page_Game_Incubator *p, int ix) {
         return false;
     }
 
-    if (!(cfg.workout_set[0] ||
-          cfg.workout_set[1] ||
-          cfg.workout_set[2] ||
-          cfg.workout_set[3] ||
-          cfg.workout_set[4])) {
+    int min_price = -1;
+    for (int i = 0; i < 5; ++i) {
+        if (!cfg.workout_set[i]) continue;
+        if (min_price == -1 || state.stat[i].price < min_price) {
+            min_price = state.stat[i].price;
+        }
+    }
+
+    if (min_price == -1) {
         qDebug("... тренировать ему нечего");
         return false;
     }
 
-    int min_price = state.stat[0].price;
-    for (int i = 1; i < 5; ++i) {
-        if (state.stat[i].price < min_price) {
-            min_price = state.stat[i].price;
-        }
-    }
     if (state.gold < min_price) {
         qDebug("... для тренировок ему нужно как минимум %d з., а есть %d",
                min_price, state.gold);
         return false;
     }
-    qDebug("... может что-нибудь себе потренировать");
+    qDebug("... может что-нибудь себе потренировать минимум на %d з.", min_price);
     return true;
 }
 
