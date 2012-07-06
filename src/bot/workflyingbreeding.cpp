@@ -315,7 +315,6 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     /////////// TRAINING /////////////
     {
         qDebug("initial PetState=" + state.toString());
-        bool can_training = canTraining(p, activeIx);
         bool go_n_look = false;
         bool need_training = false;
         bool recheck = true;
@@ -326,30 +325,39 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                 go_n_look = true;
                 recheck = true;
             } else if (cfg.accumulate) {
-                if (can_training) {
-                    if ((state.minutesleft > 0) &&
+                if ((state.minutesleft > 0) &&
                         cfg.use_small_journey && cfg.hours4sj.isActive()) {
+                    if (canTraining(p, activeIx)) {
                         qDebug("стоит потренироваться перед малым путешествием");
                         go_n_look = true;
                         need_training = true;
-                    } else if (cfg.use_karkar && cfg.hours4kk.isActive()) {
+                    } else {
+                        qDebug("перед малым путешествием тренироваться не будем");
+                    }
+                } else if (cfg.use_karkar && cfg.hours4kk.isActive()) {
+                    if (canTraining(p, activeIx)) {
                         qDebug("стоит потренироваться перед каркаром");
                         go_n_look = true;
                         need_training = true;
+                    } else {
+                        qDebug("перед каркаром тренироваться не будем");
                     }
+                } else {
+                    qDebug("тренироваться не будем - копить будем");
                 }
             } else {
-                if (can_training) {
+                if (canTraining(p, activeIx)) {
                     qDebug("стоит потренироваться");
                     go_n_look = true;
                     need_training = true;
                 }
             }
+
             if (go_n_look) {
                 if (!p->fa_training.valid) {
                     qDebug("переходим на вкладку тренировки");
                     if (!p->doSelectTab("fa_training")) {
-                        qDebug("перейти на тренировочную вкладку не вышло. [FEED-E10]");
+                        qDebug("перейти на тренировочную вкладку не вышло. [FGYM-E10]");
                     }
                     updateStates();
                     qDebug("new PetState=" + state.toString());
@@ -370,7 +378,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                     return false;
                 }
                 if (_bot->isAwaiting()) {
-                    qDebug("теперь надо дождаться ответа [FEED-T10]");
+                    qDebug("теперь надо дождаться ответа [FGYM-T10]");
                     return true;
                 }
             } else {
