@@ -1038,13 +1038,15 @@ bool WorkFlyingBreeding::processTrainingTab(Page_Game_Incubator *p) {
         qDebug("... не смогли найти чего потренировать");
         return true;
     }
-    qDebug(u8("... решили тренировать %1 (level=%2) за %3 з.")
-           .arg(u8(Page_Game_Training::stat_name[stat_no]))
-           .arg(stat_level)
-           .arg(stat_price));
+    qWarning(u8("... летун №%1, %2 решил тренировать %3 (level=%4) за %5 з.")
+             .arg(activeIx)
+             .arg(flying.title)
+             .arg(u8(Page_Game_Training::stat_name[stat_no]))
+             .arg(stat_level)
+             .arg(stat_price));
 
     if (!p->doBuyStat(stat_no)) {
-        qDebug("... покупка не удалась :(");
+        qCritical("... тренировка не удалась :(");
         return true;
     }
     qDebug("... будем ждать результатов тренировки");
