@@ -589,6 +589,7 @@ int WorkFlyingBreeding::findAwaitingFlying() {
         }
     }
     for (int i = 0; i < n; ++i) {
+        if (!_configs[i].isServed()) continue;
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
         if (fi.normal.valid) {
             qDebug(u8("#%1 (%2) не занят ничем")
@@ -643,22 +644,18 @@ bool WorkFlyingBreeding::GoToIncubator(bool checkCD) {
     for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
         const FlyingConfig& cfg = _configs[i];
+        if (!cfg.isServed()) continue;
         if (fi.normal.valid) {
-            if (cfg.isServed()) {
-                qDebug(u8("пойдём отправлять летуна %1")
-                       .arg(fi.caption.title));
-                setAwaiting();
-                if (!_bot->_gpage->doFlyingGoEvents(i)) {
-                    qCritical("не смогли перейти на отправление :(");
-                    _bot->GoToNeutralUrl();
-                    return false;
-                }
-                qDebug("ждём страничку с взлётной полосой");
-                return true;
-            } else {
-                qDebug(u8("летун %1 сейчас не обслуживается")
-                       .arg(fi.caption.title));
+            qDebug(u8("пойдём отправлять летуна %1")
+                   .arg(fi.caption.title));
+            setAwaiting();
+            if (!_bot->_gpage->doFlyingGoEvents(i)) {
+                qCritical("не смогли перейти на отправление :(");
+                _bot->GoToNeutralUrl();
+                return false;
             }
+            qDebug("ждём страничку с взлётной полосой");
+            return true;
         }
         if (fi.journey.valid && !fi.journey.journey_cooldown.active()) {
             qDebug(u8("откат летуна %1 иссяк, пойдём его отправлять")
