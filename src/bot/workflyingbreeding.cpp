@@ -970,7 +970,7 @@ bool WorkFlyingBreeding::processTrainingTab(Page_Game_Incubator *p) {
         return true;
     }
     int activeIx = p->ix_active;
-
+    updateStates();
     if (!canTraining(p, activeIx)) {
         qDebug("завершаем обработку таба, коль тренировать не можем");
         return true;
@@ -1095,6 +1095,7 @@ bool WorkFlyingBreeding::canTraining(Page_Game_Incubator *p, int ix) {
 void WorkFlyingBreeding::updateStates() {
     Page_Game *p = _bot->_gpage;
     if (p == NULL) return;
+    p->parseFlyingList();
     if (_pet_states.empty()) {
         for (int i = 0; i < p->flyingslist.count(); ++i) {
             _pet_states.append(PetState());
@@ -1150,7 +1151,7 @@ void WorkFlyingBreeding::PetState::update(Page_Game *gpage, int ix) {
     }
 
     Page_Game_Incubator *p = dynamic_cast<Page_Game_Incubator*>(gpage);
-    if (p) {
+    if (p && this->ix == p->ix_active) {
         rel = p->rel_active;
 
         if (p->fa_events0.valid) {
