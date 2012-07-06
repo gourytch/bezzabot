@@ -110,15 +110,15 @@ struct PageCoulon {
         active(v.active) {
     }
 
-    const PageCoulon& operator=(const PageCoulon& v) {
-        id = v.id;
-        kind = v.kind;
-        name = v.name;
-        cur_lvl = v.cur_lvl;
-        max_lvl = v.max_lvl;
-        active = v.active;
-        return *this;
-    }
+//    const PageCoulon& operator=(const PageCoulon& v) {
+//        id = v.id;
+//        kind = v.kind;
+//        name = v.name;
+//        cur_lvl = v.cur_lvl;
+//        max_lvl = v.max_lvl;
+//        active = v.active;
+//        return *this;
+//    }
 
     bool assign(const QWebElement& e);
 
@@ -190,17 +190,17 @@ struct FlyingInfo {
             title   = QString();
         }
 
-        Caption(const Caption& that) {
-            *this = that;
-        }
+//        Caption(const Caption& that) {
+//            *this = that;
+//        }
 
-        const Caption& operator=(const Caption& that) {
-            valid   = that.valid;
-            href    = that.href;
-            icon    = that.icon;
-            title   = that.title;
-            return *this;
-        }
+//        const Caption& operator=(const Caption& that) {
+//            valid   = that.valid;
+//            href    = that.href;
+//            icon    = that.icon;
+//            title   = that.title;
+//            return *this;
+//        }
 
         bool parse(QWebElement &div_title);
 
@@ -222,18 +222,18 @@ struct FlyingInfo {
             cleanings_cooldown  = PageTimer();
         }
 
-        Egg(const Egg& that) {
-            *this = that;
-        }
+//        Egg(const Egg& that) {
+//            *this = that;
+//        }
 
-        const Egg& operator=(const Egg& that) {
-            valid               = that.valid;
-            condition           = that.condition;
-            cleanings_performed = that.cleanings_performed;
-            cleanings_total     = that.cleanings_total;
-            cleanings_cooldown  = that.cleanings_cooldown;
-            return *this;
-        }
+//        const Egg& operator=(const Egg& that) {
+//            valid               = that.valid;
+//            condition           = that.condition;
+//            cleanings_performed = that.cleanings_performed;
+//            cleanings_total     = that.cleanings_total;
+//            cleanings_cooldown  = that.cleanings_cooldown;
+//            return *this;
+//        }
 
         bool parse(QWebElement &content);
 
@@ -265,20 +265,20 @@ struct FlyingInfo {
             train_url = QString();
         }
 
-        Normal(const Normal& that) {
-            *this = that;
-        }
+//        Normal(const Normal& that) {
+//            *this = that;
+//        }
 
-        const Normal& operator=(const Normal& that) {
-            valid = that.valid;
-            feed = that.feed;
-            hits = that.hits;
-            gold = that.gold;
-            feed_url = that.feed_url;
-            heal_url = that.heal_url;
-            train_url = that.train_url;
-            return *this;
-        }
+//        const Normal& operator=(const Normal& that) {
+//            valid = that.valid;
+//            feed = that.feed;
+//            hits = that.hits;
+//            gold = that.gold;
+//            feed_url = that.feed_url;
+//            heal_url = that.heal_url;
+//            train_url = that.train_url;
+//            return *this;
+//        }
 
         bool parse(QWebElement &content);
 
@@ -298,16 +298,16 @@ struct FlyingInfo {
             journey_cooldown = PageTimer();
         }
 
-        Journey(const Journey& that) {
-            *this = that;
-        }
+//        Journey(const Journey& that) {
+//            *this = that;
+//        }
 
-        const Journey& operator=(const Journey& that) {
-            valid = that.valid;
-            title = that.title;
-            journey_cooldown = that.journey_cooldown;
-            return *this;
-        }
+//        const Journey& operator=(const Journey& that) {
+//            valid = that.valid;
+//            title = that.title;
+//            journey_cooldown = that.journey_cooldown;
+//            return *this;
+//        }
 
         bool parse(QWebElement &content);
 
@@ -323,14 +323,14 @@ struct FlyingInfo {
             valid = false;
         }
 
-        Boxgame(const Boxgame& that) {
-            *this = that;
-        }
+//        Boxgame(const Boxgame& that) {
+//            *this = that;
+//        }
 
-        const Boxgame& operator=(const Boxgame& that) {
-            valid = that.valid;
-            return *this;
-        }
+//        const Boxgame& operator=(const Boxgame& that) {
+//            valid = that.valid;
+//            return *this;
+//        }
 
         bool parse(QWebElement &content);
 
@@ -349,9 +349,9 @@ struct FlyingInfo {
 
     FlyingInfo();
 
-    FlyingInfo(const FlyingInfo& that);
+//    FlyingInfo(const FlyingInfo& that);
 
-    const FlyingInfo& operator=(const FlyingInfo& that);
+//    const FlyingInfo& operator=(const FlyingInfo& that);
 
     void init();
 

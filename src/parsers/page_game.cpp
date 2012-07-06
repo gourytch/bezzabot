@@ -371,7 +371,13 @@ bool FlyingInfo::Normal::parse(QWebElement &content) {
     train_url   = anchors[2].attribute("href");
     QRegExp rx(">\\s*(\\d+)%\\s*<");
     if (rx.indexIn(anchors[0].toOuterXml()) == -1) return false;
-    feed = rx.cap(1).trimmed().toInt();
+    feed = dottedInt(rx.cap(1));
+    if (feed < 0 || feed > 100) {
+        qCritical(u8("bad food level: %1; xml text: {%2}, cap: {%3}")
+                  .arg(feed)
+                  .arg(anchors[0].toOuterXml())
+                  .arg(rx.cap(1)));
+    }
     if (rx.indexIn(anchors[1].toOuterXml()) == -1) return false;
     hits = rx.cap(1).trimmed().toInt();
     rx = QRegExp(">\\s*([0123456789.]+)\\s*<");
@@ -439,9 +445,9 @@ FlyingInfo::FlyingInfo() {
 }
 
 
-FlyingInfo::FlyingInfo(const FlyingInfo& that) {
-    *this = that;
-}
+//FlyingInfo::FlyingInfo(const FlyingInfo& that) {
+//    *this = that;
+//}
 
 
 void FlyingInfo::init() {
@@ -454,16 +460,16 @@ void FlyingInfo::init() {
 }
 
 
-const FlyingInfo& FlyingInfo::operator=(const FlyingInfo& that) {
-    valid   = that.valid;
-    caption = that.caption;
-    egg     = that.egg;
-    normal  = that.normal;
-    journey = that.journey;
-    boxgame = that.boxgame;
+//const FlyingInfo& FlyingInfo::operator=(const FlyingInfo& that) {
+//    valid   = that.valid;
+//    caption = that.caption;
+//    egg     = that.egg;
+//    normal  = that.normal;
+//    journey = that.journey;
+//    boxgame = that.boxgame;
 
-    return *this;
-}
+//    return *this;
+//}
 
 
 bool FlyingInfo::parse(QWebElement& element) {

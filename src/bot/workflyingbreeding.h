@@ -46,6 +46,12 @@ protected:
 
         void configure(Config *config, int ix);
         void dumpConfig() const;
+
+        bool isServed() const {
+            return ((use_big_journey && hours4bj.isActive()) ||
+                    (use_small_journey && hours4sj.isActive()) ||
+                    (use_karkar && hours4kk.isActive()));
+        }
     };
 
 

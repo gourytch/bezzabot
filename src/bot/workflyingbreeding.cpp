@@ -186,8 +186,8 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         return false;
     }
 
-    const FlyingInfo &flyingInfo = p->flyingslist.at(activeIx);
-    const Page_Game_Incubator::Flying &flying = p->flyings.at(activeIx);
+    const FlyingInfo flyingInfo = p->flyingslist.at(activeIx);
+    const Page_Game_Incubator::Flying flying = p->flyings.at(activeIx);
     const FlyingConfig &cfg = _configs[activeIx];
     const PetState& state = _pet_states[activeIx];
 
@@ -642,17 +642,23 @@ bool WorkFlyingBreeding::GoToIncubator(bool checkCD) {
 
     for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
+        const FlyingConfig& cfg = _configs[i];
         if (fi.normal.valid) {
-            qDebug(u8("пойдём отправлять летуна %1")
-                   .arg(fi.caption.title));
-            setAwaiting();
-            if (!_bot->_gpage->doFlyingGoEvents(i)) {
-                qCritical("не смогли перейти на отправление :(");
-                _bot->GoToNeutralUrl();
-                return false;
+            if (cfg.isServed()) {
+                qDebug(u8("пойдём отправлять летуна %1")
+                       .arg(fi.caption.title));
+                setAwaiting();
+                if (!_bot->_gpage->doFlyingGoEvents(i)) {
+                    qCritical("не смогли перейти на отправление :(");
+                    _bot->GoToNeutralUrl();
+                    return false;
+                }
+                qDebug("ждём страничку с взлётной полосой");
+                return true;
+            } else {
+                qDebug(u8("летун %1 сейчас не обслуживается")
+                       .arg(fi.caption.title));
             }
-            qDebug("ждём страничку с взлётной полосой");
-            return true;
         }
         if (fi.journey.valid && !fi.journey.journey_cooldown.active()) {
             qDebug(u8("откат летуна %1 иссяк, пойдём его отправлять")
@@ -681,12 +687,20 @@ void WorkFlyingBreeding::adjustCooldown(Page_Game *gpage) {
     QDateTime now = QDateTime::currentDateTime();
     for (int i = 0; i <  gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
-        if (fi.normal.valid || fi.boxgame.valid) {
-            // можно что-то сделать прямо сейчас
+        const FlyingConfig &cfg = _configs[i];
+
+        if (fi.boxgame.valid) {
+            // можно что-то прямо сейчас открыть ящик
             cd = now;
             break;
         }
-        if (fi.journey.valid) {
+        if (fi.normal.valid && cfg.isServed()) {
+            // прямо сейчас можно пойти запускать
+            cd = now;
+            break;
+        }
+
+        if (fi.journey.valid && cfg.isServed()) {
             if (!fi.journey.journey_cooldown.active()) {
                 // истекло время путешествия
                 cd = now;
@@ -734,9 +748,10 @@ bool WorkFlyingBreeding::canStartWork() {
     }
     for (int i = 0; i < n; ++i) {
         const FlyingConfig& cfg = _configs[i];
-        if (cfg.use_big_journey && cfg.hours4bj.isActive()) return true;
-        if (cfg.use_small_journey && cfg.hours4sj.isActive()) return true;
-        if (cfg.use_karkar && cfg.hours4kk.isActive()) return true;
+        const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
+        if (fi.normal.valid && cfg.isServed()) return true;
+        if (fi.journey.valid && !fi.journey.journey_cooldown.active() &&
+            cfg.isServed()) return true;
     }
     return false;
 }
@@ -1141,7 +1156,7 @@ void WorkFlyingBreeding::PetState::update(Page_Game *gpage, int ix) {
         return;
     }
 
-    const FlyingInfo& fi = gpage->flyingslist.at(ix);
+    const FlyingInfo fi = gpage->flyingslist.at(ix);
     this->ix = ix;
 
     title = fi.caption.title;
