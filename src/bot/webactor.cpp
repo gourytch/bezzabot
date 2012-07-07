@@ -230,6 +230,7 @@ void WebActor::onPageFinished (bool ok)
     qDebug("WebActor::onPageFinished(%s)", ok ? "true" : "false");
     _finished   = true;
     _success    = ok;
+
     if (!_strict || _success)
     {
         emit save_page ();
@@ -290,5 +291,7 @@ Page_Generic* WebActor::parse ()
 {
     QWebElement doc = _webpage->mainFrame ()->documentElement ();
     //::save ("sample.xml", doc.toOuterXml ());
-    return Parser::parse (doc);
+    Page_Generic *p = Parser::parse (doc);
+    connect(p, SIGNAL(save_page()), this, SLOT(savePage()));
+    return p;
 }

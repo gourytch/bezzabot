@@ -22,9 +22,6 @@ protected:
 
 public:
 
-
-    static PageKind guessPageKind (const QWebElement& doc);
-
     static Page_Generic* parse (const QString& text);
 
     static Page_Generic* parse (QWebElement& doc);

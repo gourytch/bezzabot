@@ -696,6 +696,9 @@ bool Page_Game_Incubator::doSelectFlying(int flyingNo, int timeout) {
     qDebug("... and small delay");
     delay((qrand() % 2500) + 750, false);
 
+    qDebug("emit save_page in doSelectFlying(%d, %d)", flyingNo, timeout);
+    emit save_page();
+
     qDebug("reparse");
     reparse();
 
@@ -792,6 +795,9 @@ bool Page_Game_Incubator::doSelectTab(const QString& tab, int timeout) {
         qDebug("e = {%s}", qPrintable(e.toOuterXml()));
         return false;
     }
+    qDebug(u8("emit save_page in doSelectTab(\"%1\", %2)")
+           .arg(tab).arg(timeout));
+    emit save_page();
     qDebug("TAB SELECTED: %s, reparse and return", qPrintable(tab));
     reparse();
     return true;

@@ -5,7 +5,7 @@ WorkAlchemy::WorkAlchemy(Bot *bot) : Work(bot) {
 }
 
 
-void WorkAlchemy::configure(Config *config) {
+void WorkAlchemy::configure(Config * /*config*/) {
 
 }
 
@@ -29,16 +29,16 @@ bool WorkAlchemy::nextStep() {
 }
 
 
-bool WorkAlchemy::processPage(const Page_Game *gpage) {
+bool WorkAlchemy::processPage(const Page_Game * /*gpage*/) {
     return false;
 }
 
 
-bool WorkAlchemy::processQuery(Query query) {
+bool WorkAlchemy::processQuery(Query /*query*/) {
     return false;
 }
 
 
-bool WorkAlchemy::processCommand(Command command){
+bool WorkAlchemy::processCommand(Command /*command*/){
     return false;
 }

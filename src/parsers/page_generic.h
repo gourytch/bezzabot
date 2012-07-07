@@ -58,6 +58,10 @@ public:
 
     void doReload();
 
+signals:
+
+    void save_page();
+
 protected slots:
 
     void slot_submit();

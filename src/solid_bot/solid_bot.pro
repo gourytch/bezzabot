@@ -154,7 +154,7 @@ RESOURCES += \
     $$SRC/bot/bot.qrc
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
-MOC_DIR = $$TOP/obj/$$TARGET/moc
+MOC_DIR = $$OBJECTS_DIR/moc
 DESTDIR = $$TOP/bin
 
 
