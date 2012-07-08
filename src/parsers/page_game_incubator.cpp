@@ -140,6 +140,7 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     fa_bonus.reset();
     fa_journey.reset();
     fa_training.reset();
+    fa_feed.reset();
     detectedTab = QString();
 
     QWebElement flying_block = document.findFirst("DIV#flying_block");
@@ -472,14 +473,14 @@ struct Tab_Feed {
 };
 */
 
-void Page_Game_Incubator:: Tab_Feed::reset() {
+void Page_Game_Incubator::Tab_Feed::reset() {
     valid = false;
     block = QWebElement();
     price_fish = price_crystal = price_slaves = -1;
 }
 
 
-bool Page_Game_Incubator:: Tab_Feed::parse(QWebElement flying_block) {
+bool Page_Game_Incubator::Tab_Feed::parse(QWebElement flying_block) {
     reset();
     block = flying_block;
     if (block.findFirst("DIV#feed_zoo_did").isNull()) return false;

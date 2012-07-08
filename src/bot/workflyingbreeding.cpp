@@ -913,15 +913,6 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
 }
 
 bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
-    if (!_check4feed) {
-        qDebug("нам не надо проверять сытость.");
-        return true;
-    }
-
-    if (!p->fa_feed.valid) {
-        qDebug("мы не на вкладке-кормушке.");
-        return true;
-    }
     int activeIx = p->ix_active;
     int numFlyings = p->flyings.count();
     bool bValidIx = (0 <= activeIx && activeIx < numFlyings);
@@ -930,7 +921,21 @@ bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
                activeIx, numFlyings);
         return true;
     }
+
     const Page_Game_Incubator::Flying &flying = p->flyings.at(activeIx);
+    const FlyingConfig &cfg = _configs[activeIx];
+    const FlyingInfo &fi = p->flyingslist.at(activeIx);
+
+
+    if (!cfg.check4feed) {
+        qDebug("нам не надо проверять сытость.");
+        return true;
+    }
+
+    if (!p->fa_feed.valid) {
+        qDebug("мы не на вкладке-кормушке.");
+        return true;
+    }
 
     if (flying.was_born == false) {
         qDebug("летун #%d ещё не вылупился", activeIx);
@@ -952,6 +957,21 @@ bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
         _bot->setAwaiting();
         _bot->GoToNeutralUrl();
         return true;
+    }
+    if (fi.normal.valid) {
+        qDebug(u8("дополнительная проверка сытости. "
+                  "fa_feed.satiety=%1, fi.feed=%2")
+               .arg(p->fa_feed.satiety)
+               .arg(fi.normal.feed));
+        if (p->fa_feed.satiety != fi.normal.feed) {
+            qCritical(u8("несогласованность уровней!"));
+            qDebug("перейду-ка на безопасную страничку и вернусь обратно");
+            _bot->setAwaiting();
+            _bot->GoToNeutralUrl();
+            return true;
+        }
+    } else {
+        qDebug(u8("сверить сытость не могу: fi.normal.valid = false"));
     }
 
     if (p->fa_feed.satiety > 70) {
