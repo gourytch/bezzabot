@@ -17,6 +17,7 @@ void WorkScaryFighting::configure(Config *config) {
     _level = config->get("Work_ScaryFighting/level", false, 1).toInt();
     _pet_index = config->get("Work_ScaryFighting/pet_index", false, -1).toInt();
     _save_pet = config->get("Work_ScaryFighting/save_pet", false, false).toBool();
+    _use_coulons = config->get("Work_ScaryFighting/use_coulons", false, true).toBool();
 }
 
 bool WorkScaryFighting::isPrimaryWork() const {
@@ -95,6 +96,21 @@ bool WorkScaryFighting::processPage(const Page_Game *gpage) {
                        _pet_index, p->petlist.size());
             }
         }
+        if (_use_coulons) {
+            qDebug("определяемся с побрякушками");
+            quint32 qid;
+            qid = _bot->guess_coulon_to_wear(Work_ScaryFighting, 300);
+            bool rewear = _bot->is_need_to_change_coulon(qid);
+            if (rewear) {
+                qDebug("надо одеть кулон #%d", qid);
+                if (_bot->action_wear_right_coulon(qid)) {
+                    qWarning("одели кулон #%d", qid);
+                } else {
+                    qCritical("не смогли надеть кулон #%d", qid);
+                }
+            }
+        }
+
         qWarning("идём искать монстра, level=%d", _level);
         if (!p->doScarySearch(_level)) {
             qCritical("проблема с поиском страшилки!");

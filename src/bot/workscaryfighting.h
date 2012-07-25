@@ -16,6 +16,8 @@ class WorkScaryFighting : public Work
 
     bool _save_pet;
 
+    bool _use_coulons;
+
     QDateTime _cooldown;
 
 public:
