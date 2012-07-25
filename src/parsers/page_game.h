@@ -8,6 +8,8 @@
 
 #include "page_generic.h"
 
+const quint32 NULL_COULON = 0xDEADBEEF;
+
 enum WorkGuild {
     WorkGuild_None,
     WorkGuild_Miners,
@@ -133,6 +135,8 @@ struct PageCoulons {
     const PageCoulon* byId(quint32 id) const;
     const PageCoulon* byName(const QString& name) const;
     const PageCoulon* active() const;
+    QString stringById(quint32 id) const;
+
 };
 
 enum PetKind {

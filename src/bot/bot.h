@@ -20,8 +20,6 @@
 #include "parsers/page_game.h"
 #include "botstate.h"
 
-const quint32 NULL_COULON = 0xDEADBEEF;
-
 class Work;
 
 class Bot : public QObject // QThread

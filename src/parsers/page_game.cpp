@@ -272,6 +272,12 @@ const PageCoulon* PageCoulons::byName(const QString& name) const {
     return NULL;
 }
 
+QString PageCoulons::stringById(quint32 id) const {
+    if (id == NULL_COULON) return "NULL_COULON";
+    const PageCoulon* coulon = byId(id);
+    return coulon ? coulon->toString() : "NONEXISTENT_COULON";
+}
+
 const PageCoulon* PageCoulons::active() const {
     for (int i = 0; i < coulons.size(); ++i) {
         if (coulons[i].active) {

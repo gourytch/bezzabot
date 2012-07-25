@@ -555,6 +555,10 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
     quint32 id_regenetz = 0;
     int lvl_regenetz = -1;
 
+    static const QString name_antixap = u8("Антихап");
+    quint32 id_antixap = 0;
+    int lvl_antixap = -1;
+
     quint32 active_id = 0;
 
     QDateTime now = QDateTime::currentDateTime();
@@ -570,21 +574,31 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
         }
         if (name_ckhrist == k.name && lvl_ckhrist < k.cur_lvl) {
             id_ckhrist = k.id;
+            lvl_ckhrist = k.cur_lvl;
         }
         if (name_antimag == k.name && lvl_antimag < k.cur_lvl) {
             id_antimag = k.id;
+            lvl_antimag = k.cur_lvl;
         }
         if (name_skorokhod == k.name && lvl_skorokhod < k.cur_lvl) {
             id_skorokhod = k.id;
+            lvl_skorokhod = k.cur_lvl;
         }
         if (name_stakhanka == k.name && lvl_stakhanka < k.cur_lvl) {
             id_stakhanka = k.id;
+            lvl_stakhanka = k.cur_lvl;
         }
         if (name_nevidimtcha == k.name && lvl_nevidimtcha < k.cur_lvl) {
             id_nevidimtcha = k.id;
+            lvl_nevidimtcha = k.cur_lvl;
         }
         if (name_regenetz == k.name && lvl_regenetz < k.cur_lvl) {
             id_regenetz = k.id;
+            lvl_regenetz = k.cur_lvl;
+        }
+        if (name_antixap == k.name && lvl_antixap < k.cur_lvl) {
+            id_antixap = k.id;
+            lvl_antixap = k.cur_lvl;
         }
     }
 
@@ -602,7 +616,7 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
                 return id_ckhrist;
             }
         }
-        break; // копика нет. жаль.
+        break; // копика нет. или одевать его небезопасно
 
     case Work_Watching: // планируем пойти в дозор
         if (safetime) { // время ещё есть
@@ -642,21 +656,28 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
     }
 
     // если ничего не подошло, безальтернативно защищаемся
-    if (id_nevidimtcha == 0 && id_antimag == 0) {
-        qDebug(u8("возвращаем что висит (#%1)").arg(active_id));
+    if (id_nevidimtcha == 0 && id_antimag == 0 && id_antixap == 0) {
+        qDebug(u8("защищаться нечем - возвращаем что висит: %1")
+               .arg(_gpage->coulons.stringById(active_id)));
         return active_id; // всё равно щититься нечем, оставим как есть
     }
-    if (state.free_crystal > 0 && id_antimag != 0) {
+    if (state.free_crystal > 0) {
         // кристаллы жальчей чем деньги
-        qDebug(u8("возвращаем антимаг (#%1)").arg(id_antimag));
-        return id_antimag;
+        if (id_antixap != 0) {
+            qDebug(u8("возвращаем антимаг (#%1)").arg(id_antimag));
+            return id_antimag;
+        }
+        if (id_antimag != 0) {
+            qDebug(u8("возвращаем антимаг (#%1)").arg(id_antimag));
+            return id_antimag;
+        }
     }
     if (id_nevidimtcha != 0) {
         qDebug(u8("возвращаем невидимчу (#%1)").arg(id_nevidimtcha));
         return id_nevidimtcha;
     }
-    qDebug(u8("ничего путейного нет, возвращаем старый #%1")
-           .arg(active_id));
+    qDebug(u8("ничего путейного нет, возвращаем что надето: %1")
+           .arg(_gpage->coulons.stringById(active_id)));
     return active_id;
 }
 
@@ -677,13 +698,14 @@ quint32 Bot::search_coulon_by_name(const QString& name) {
     if (id == NULL_COULON) {
         qDebug("вернём NULL");
     } else {
-        qDebug("вернём #%d (lvl %d)", id, lvl);
+        qDebug(u8("вернём: %1").arg(_gpage->coulons.stringById(id)));
     }
     return id;
 }
 
 bool Bot::is_need_to_change_coulon(quint32 id) {
-    qDebug(u8("проверка необходимости смены кулона на #%1").arg(id));
+    qDebug(u8("проверка необходимости смены кулона на %1")
+           .arg(_gpage->coulons.stringById(id)));
     if (id == NULL_COULON) {
         qDebug(u8("NULL-кулон. оставляем всё как есть"));
         return false;
@@ -692,7 +714,8 @@ bool Bot::is_need_to_change_coulon(quint32 id) {
     const PageCoulon *k = _gpage->coulons.active();
     if (k) {
         aid = k->id;
-        qDebug(u8("найден активный кулон #%1").arg(aid));
+        qDebug(u8("найден активный кулон %1")
+               .arg(_gpage->coulons.stringById(aid)));
     } else {
         qDebug(u8("активный кулон не найден"));
     }
@@ -709,7 +732,7 @@ bool Bot::action_wear_right_coulon(quint32 id) {
         qDebug(u8("NULL-кулон. не переодеваем его"));
         return false;
     }
-    qWarning(u8("переодеваем кулон на #%1").arg(id));
+    qWarning(u8("переодеваем кулон на %1").arg(_gpage->coulons.stringById(id)));
     if (id == 0) {
         qDebug(u8("снимаем надетый кулон"));
         quint32 aid = 0;
@@ -719,7 +742,7 @@ bool Bot::action_wear_right_coulon(quint32 id) {
             qDebug("уже надето ничего его и оставим :)");
             return true;
         }
-        qDebug(u8("будем кликать на кулон %1").arg(aid));
+        qDebug(u8("будем кликать на кулон %1").arg(_gpage->coulons.stringById(aid)));
         id = aid;
     }
     if (_gpage->doClickOnCoulon(id)) {

@@ -177,14 +177,14 @@ bool Page_Game_Harbor_Market::doBuy() {
         qFatal("select-type not found");
         return false;
     } else {
-        qDebug(u8("select-type:: %1").arg(select_type.toOuterXml()));
+//        qDebug(u8("select-type:: %1").arg(select_type.toOuterXml()));
     }
     QWebElement input_amount = document.findFirst("INPUT[name=amount]");
     if (input_amount.isNull()) {
         qFatal("input-amount not found");
         return false;
     } else {
-        qDebug(u8("input-amount:: %1").arg(input_amount.toOuterXml()));
+//        qDebug(u8("input-amount:: %1").arg(input_amount.toOuterXml()));
     }
 
     QString v_type = select_type.attribute("value");
