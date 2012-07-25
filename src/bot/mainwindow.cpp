@@ -31,6 +31,7 @@ MainWindow::MainWindow (QWidget *parent) :
         id = "DUMMYBOT";
     }
 
+    trayicon_enabled        = cfg.get("ui/trayicon_enabled", false, true).toBool();
     hide_in_tray_on_close   = cfg.get("ui/hide_on_close", false, false).toBool();
     toggle_on_tray_click    = cfg.get("ui/tray_toggle", false, true).toBool();
     balloon_ttl             = cfg.get("ui/balloon_ttl", false, 3000).toInt();
@@ -46,7 +47,12 @@ MainWindow::MainWindow (QWidget *parent) :
     pBot = new Bot (id,  this);
     pActor = pBot->actor ();
 
-    createTrayIcon();
+    if (trayicon_enabled) {
+        createTrayIcon();
+    } else {
+        pTrayIcon = NULL;
+        pTrayMenu = NULL;
+    }
     setupWebView ();
     setupConnections();
     restoreGeometry(cfg.get("ui/geometry").toByteArray());
