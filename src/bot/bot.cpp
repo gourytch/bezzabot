@@ -559,6 +559,10 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
     quint32 id_antixap = 0;
     int lvl_antixap = -1;
 
+    static const QString name_maslyanka = u8("Маслянка");
+    quint32 id_maslyanka = 0;
+    int lvl_maslyanka = -1;
+
     quint32 active_id = 0;
 
     QDateTime now = QDateTime::currentDateTime();
@@ -600,6 +604,10 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
             id_antixap = k.id;
             lvl_antixap = k.cur_lvl;
         }
+        if (name_maslyanka == k.name && lvl_maslyanka < k.cur_lvl) {
+            id_maslyanka = k.id;
+            lvl_maslyanka = k.cur_lvl;
+        }
     }
 
     qDebug("несохранённого: %d з, %d кр, надет #%d, immtime: %d, imm: %s",
@@ -636,6 +644,15 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
         }
         break; // нету стаханки
 
+    case Work_ScaryFighting: // будем биться со страшилками
+        if (safetime) { // время ещё есть
+            if (id_maslyanka > 0) { // есть маслянка!
+                qDebug(u8("возвращаем маслянку (#%1)").arg(id_maslyanka));
+                return id_maslyanka;
+            }
+        }
+        break; // нету маслянки либо надевать её небезопасно
+
     case Work_Training: // планируем потренироваться
         //тут предпочтения вряд ли будут
         // - делаем то же, как если бы не делали ничего
@@ -664,8 +681,8 @@ quint32 Bot::guess_coulon_to_wear(WorkType work, int seconds) {
     if (state.free_crystal > 0) {
         // кристаллы жальчей чем деньги
         if (id_antixap != 0) {
-            qDebug(u8("возвращаем антимаг (#%1)").arg(id_antimag));
-            return id_antimag;
+            qDebug(u8("возвращаем антихап (#%1)").arg(id_antixap));
+            return id_antixap;
         }
         if (id_antimag != 0) {
             qDebug(u8("возвращаем антимаг (#%1)").arg(id_antimag));
