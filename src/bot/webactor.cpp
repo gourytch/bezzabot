@@ -20,17 +20,23 @@ int WebActor::_count = 0;
 WebActor::WebActor(Bot *bot) :
     QObject (bot)
 {
+    _bot = bot;
     if (!_cache)
     {
         _cache = new QNetworkDiskCache ();
-        QString location = Config::globalCachePath() + "/webkit.cache";
+        bool private_cache = Config::global()
+                .get("connection/private_cache", false, true).toBool();
+        QString location;
+        if (private_cache) {
+            location = _bot->config()->cachePath();
+        } else {
+            location = Config::globalCachePath() + "/webkit.cache";
+        }
         checkDir (location);
         _cache->setCacheDirectory (location);
         _cache->setMaximumCacheSize (CACHE_SIZE);
     }
     _count++;
-
-    _bot = bot;
 
     _savepath = _bot->config()->dataPath () + "/webpages";
     _strict   = Config::global().get("connection/strict", false, false).toBool();
@@ -93,7 +99,8 @@ WebActor::WebActor(Bot *bot) :
         manager->setProxy(*_proxy);
     }
     QWebSettings *settings = _webpage->settings ();
-    settings->setMaximumPagesInCache (10);
+    settings->setMaximumPagesInCache(
+                Config::global().get("connection/cached_pages", 20).toInt());
     settings->enablePersistentStorage ();
     settings->setOfflineStorageDefaultQuota (
                 Config::global().get("connection/cache_size", CACHE_SIZE).toInt());
