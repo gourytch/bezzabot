@@ -33,7 +33,8 @@ SOURCES += \
     worktraining.cpp \
     workslaveholding.cpp \
     workalchemy.cpp \
-    workhealing.cpp
+    workhealing.cpp \
+    workcrystalgrinding.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -54,7 +55,8 @@ HEADERS  += \
     worktraining.h \
     workslaveholding.h \
     workalchemy.h \
-    workhealing.h
+    workhealing.h \
+    workcrystalgrinding.h
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools

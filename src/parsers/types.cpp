@@ -73,4 +73,7 @@ ECASE(page_Game_News)
 ECASE(page_Game_LuckySquare)
 ECASE(page_Game_Incubator)
 ECASE(page_Game_LevelUp)
+ECASE(page_Game_Alchemy_Entrance)
+ECASE(page_Game_Alchemy_Lab)
+ECASE(page_Game_Grinder)
 EEND

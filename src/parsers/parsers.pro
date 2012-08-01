@@ -34,7 +34,8 @@ HEADERS += \
     page_game_training.h \
     page_game_house_plantation.h \
     page_game_alchemy_entrance.h \
-    page_game_alchemy_lab.h
+    page_game_alchemy_lab.h \
+    page_game_grinder.h
 
 SOURCES += \
     types.cpp \
@@ -64,7 +65,8 @@ SOURCES += \
     page_game_training.cpp \
     page_game_house_plantation.cpp \
     page_game_alchemy_entrance.cpp \
-    page_game_alchemy_lab.cpp
+    page_game_alchemy_lab.cpp \
+    page_game_grinder.cpp
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
