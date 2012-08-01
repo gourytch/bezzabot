@@ -12,6 +12,12 @@ int Logger::_count = 0;
 Logger *Logger::_instance = NULL;
 QtMsgHandler Logger::_prev_handler = NULL;
 
+QTextEncoder *Logger::_console_encoder = NULL;
+QTextEncoder *Logger::_log_encoder     = NULL;
+QTextCodec   *Logger::_console_codec   = NULL;
+QTextCodec   *Logger::_log_codec       = NULL;
+
+
 Logger::Logger(QObject *parent) :
     QObject(parent) {
     ++_count;
@@ -39,6 +45,29 @@ Logger::Logger(QObject *parent) :
         _stream = NULL;
     } else {
         _stream = new QTextStream(_file);
+    }
+
+    QString s = cfg.get("log/console_encoding").toString();
+    if (!s.isEmpty()) {
+        _console_codec = QTextCodec::codecForName(qPrintable(s));
+        if (_console_codec) {
+            _console_encoder = new QTextEncoder(_console_codec);
+        } else {
+            qDebug("null console codec for " + s);
+        }
+    }
+
+    s = cfg.get("log/log_encoding").toString();
+    if (!s.isEmpty()) {
+        _log_codec = QTextCodec::codecForName(qPrintable(s));
+        if (_log_codec) {
+            _log_encoder = new QTextEncoder(_log_codec);
+            if (_stream) {
+                _stream->setCodec(_log_codec);
+            }
+        } else {
+            qDebug("null log codec for " + s);
+        }
     }
 }
 
@@ -88,13 +117,18 @@ void Logger::log(QtMsgType mtype, const char *text) {
     QString m_lvl = " -" + QString("DWCF???"[(int)mtype]) + "-  ";
 
     if (_lvl_file <= mtype && _stream) {
-        (*_stream) << tss_file + m_lvl + m_text << "\n";
+        QString m = tss_file + m_lvl + m_text;
+        (*_stream) << m << "\n";
         _stream->flush();
     }
     if (_lvl_cout <= mtype) {
         QString m = tss_cout + m_lvl + m_text;
 //        fprintf(stderr, "%s\n", qPrintable(m));
-        std::clog << m.toUtf8().constBegin() << std::endl;
+        if (_console_encoder) {
+            std::clog << _console_encoder->fromUnicode(m).constBegin() << std::endl;
+        } else {
+            std::clog << m.toUtf8().constBegin() << std::endl;
+        }
     }
 
     switch (mtype) {

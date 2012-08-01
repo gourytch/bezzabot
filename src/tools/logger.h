@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QString>
 #include <QFile>
+#include <QTextEncoder>
+#include <QTextCodec>
 #include <QTextStream>
 #include "build_id.h"
 
@@ -11,6 +13,12 @@ class Logger : public QObject
 {
     Q_OBJECT
 protected:
+
+    static QTextEncoder *_console_encoder;
+    static QTextEncoder *_log_encoder;
+    static QTextCodec   *_console_codec;
+    static QTextCodec   *_log_codec;
+
     static int      _count;
     static Logger  *_instance;
     static QtMsgHandler _prev_handler;

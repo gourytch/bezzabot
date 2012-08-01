@@ -7,7 +7,7 @@ CONFIG += debug
 QT += core gui network webkit
 
 win32 {
-  CONFIG -= debug
+#  CONFIG -= debug
   CONFIG += console
 }
 

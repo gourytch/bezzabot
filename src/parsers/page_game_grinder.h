@@ -8,6 +8,10 @@ class Page_Game_Grinder : public Page_Game {
 
     Q_OBJECT
 
+private:
+
+    bool gotSignal;
+
 public:
 
     int grinder_amount;
@@ -30,8 +34,8 @@ public:
 
 signals:
 
-public slots:
-
+private slots:
+    virtual void slot_update_finished();
 };
 
 #endif // PAGE_GAME_GRINDER_H

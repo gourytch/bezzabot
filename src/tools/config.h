@@ -26,7 +26,6 @@ protected:
     static QSettings*   _settings;
     static VarMap*      _overrides;
 
-
     static bool     _portable;
     static QString  _app_name;
     static QString  _location_appdir;

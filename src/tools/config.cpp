@@ -111,6 +111,7 @@ void Config::init_check ()
     _global->set("launched",
                  QDateTime::currentDateTime().
                  toString("yyyy-MM-dd hh:mm:ss"));
+
 }
 
 

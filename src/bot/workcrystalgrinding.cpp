@@ -7,17 +7,18 @@
 WorkCrystalGrinding::WorkCrystalGrinding(Bot *bot) : Work(bot) {
     _workLink = "http://g3.botva.ru/castle.php?a=workshop_mine&id=3";
     _capacity = -1;
+    _amount = -1;
 }
 
 
 void WorkCrystalGrinding::configure(Config *config) {
     Work::configure(config);
-    _grind_over = config->get("Work_CrystalGrdinding/grind_over", false, 10).toInt();
+    _grind_over = config->get("Work_CrystalGrinding/grind_over", false, 10).toInt();
 }
 
 void WorkCrystalGrinding::dumpConfig() const {
     Work::dumpConfig();
-    qDebug(u8(" [Work_CrystalGrdinding]"));
+    qDebug(u8(" [Work_CrystalGrinding]"));
     qDebug("  grind_over = %d", _grind_over);
 }
 
@@ -28,7 +29,7 @@ bool WorkCrystalGrinding::isPrimaryWork() const {
 
 
 WorkType WorkCrystalGrinding::getWorkType() const {
-    return Work_CrystalGrdinding;
+    return Work_CrystalGrinding;
 }
 
 
@@ -53,15 +54,27 @@ bool WorkCrystalGrinding::processPage(const Page_Game *gpage) {
     _capacity = p->grinder_capacity;
     _amount = p->grinder_amount;
     qDebug(u8("заполнение крипылью %1 из %2").arg(_amount).arg(_capacity));
+    if (_capacity <= _amount) {
+        qDebug("а коли всё переполнено, то и молоть не надо");
+        _bot->GoToWork();
+        return false;
+    }
     if (p->grinder_cooldown.active()) {
         _cooldown =  QDateTime::currentDateTime()
                 .addSecs(p->grinder_cooldown.hms + (qrand() % 10));
         qDebug(u8("пока не готово. отдохнём до %1").arg(::toString(_cooldown)));
+        _bot->GoToWork();
         return false;
     }
     qDebug("мелем очередной кристалл");
-    p->doGrinding();
-    p->delay(333 + (qrand() % 777), false);
+    if (!p->doGrinding()) {
+        qCritical("doGrinding failed");
+        _bot->GoToWork();
+        return false;
+    }
+    _cooldown =  QDateTime::currentDateTime()
+            .addSecs(p->grinder_cooldown.hms + (qrand() % 30));
+    qDebug(u8("поставим откат до %1").arg(::toString(_cooldown)));
     qDebug("работаем дальше");
     _bot->GoToWork();
     return false;
@@ -112,18 +125,18 @@ bool WorkCrystalGrinding::canStartWork() {
         return false;
     }
     if (_bot->_gpage->crystal <= _grind_over) {
-        qDebug("кристаллов маловато");
+//        qDebug("кристаллов маловато");
         return false;
     }
     QDateTime now = QDateTime::currentDateTime();
     if (_cooldown.isValid() && now < _cooldown) {
-        qDebug("кристаллы молоть ещё рано");
+//        qDebug("кристаллы молоть ещё рано");
         return false;
     }
     if (_capacity > 0 && _capacity <= _amount) {
-        qDebug("кристалльной пыли у нас уже дофига. молоть не будем");
+//        qDebug("кристалльной пыли у нас уже дофига. молоть не будем");
         return false;
     }
-    qDebug("можно помолоть кристаллы");
+//    qDebug("можно помолоть кристаллы");
     return true;
 }

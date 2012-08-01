@@ -443,9 +443,9 @@ signals:
 
 private slots:
 
-    void slot_js_injected();
-    void slot_update_invoked(QString data, QString config);
-    void slot_update_finished();
+    virtual void slot_js_injected();
+    virtual void slot_update_invoked(QString data, QString config);
+    virtual void slot_update_finished();
 };
 
 #endif // PAGE_GAME_H
