@@ -414,7 +414,9 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             _bot->GoToWork();
             return false;
         }
-        if (!(p->fa_events0.valid || p->fa_boxgame.valid)) {
+        if (!(p->fa_events0.valid ||
+              p->fa_boxgame.valid ||
+              p->fa_attacked.valid)) {
             qDebug("нет валидного содержимого fa_events. :(");
             _cooldown = QDateTime::currentDateTime()
                     .addSecs(300 + (qrand() % 300));
@@ -426,6 +428,17 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         }
     }
     qDebug("мы на вкладке событий.");
+    if (p->fa_attacked.valid) {
+        qDebug(u8("на нас напал %1.").arg(p->fa_attacked.attacker));
+        setAwaiting();
+        if (!p->doCloseAttackedInfo()) {
+            qCritical(u8("не смогли закрыть инфу по атаке. пойдём отсюда"));
+            _bot->GoToWork();
+            return false;
+        }
+        qDebug("ожидаем результатов.");
+        return true;
+    }
     if (p->fa_boxgame.valid) {
         if (!p->fa_boxgame.is_finished) {
             qDebug("сыграем в ящик.");
@@ -588,6 +601,7 @@ int WorkFlyingBreeding::findAwaitingFlying() {
             return i;
         }
     }
+
     for (int i = 0; i < n; ++i) {
         if (!_configs[i].isServed()) continue;
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
@@ -599,6 +613,12 @@ int WorkFlyingBreeding::findAwaitingFlying() {
         }
         if (fi.journey.valid && !fi.journey.journey_cooldown.active()) {
             qDebug(u8("#%1 (%2) закончил путешествие")
+                   .arg(i)
+                   .arg(fi.caption.title));
+            return i;
+        }
+        if (fi.attacked.valid) {
+            qDebug(u8("#%1 (%2) пережил нападение")
                    .arg(i)
                    .arg(fi.caption.title));
             return i;
@@ -667,6 +687,18 @@ bool WorkFlyingBreeding::GoToIncubator(bool checkCD) {
                 return false;
             }
             qDebug("ожидаем перехода на страничку с взлётной полосой");
+            return true;
+        }
+        if (fi.attacked.valid) {
+            qDebug(u8("на летуна %1 кто-то напал, пойдём, посмотрим")
+                   .arg(fi.caption.title));
+            setAwaiting();
+            if (!_bot->_gpage->doLookAtAttackResults(i)) {
+                qCritical("не смогли перейти на просмотр нападения :(");
+                _bot->GoToNeutralUrl();
+                return false;
+            }
+            qDebug("ожидаем перехода на страничку с нападением");
             return true;
         }
     }

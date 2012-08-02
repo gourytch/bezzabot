@@ -85,6 +85,7 @@ QString Page_Game_Incubator::toString (const QString& pfx) const {
             pfx + u8("fa_bonus   : %1\n").arg(fa_bonus.toString()) +
             pfx + u8("fa_training: %1\n").arg(fa_training.toString()) +
             pfx + u8("fa_feed    : %1\n").arg(fa_feed.toString()) +
+            pfx + u8("fa_attacked: %1\n").arg(fa_attacked.toString()) +
             pfx + "}";
 }
 
@@ -137,8 +138,9 @@ void Page_Game_Incubator::parseDivFlyingActions() {
 bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     fa_events0.reset();
     fa_boxgame.reset();
-    fa_bonus.reset();
     fa_journey.reset();
+    fa_attacked.reset();
+    fa_bonus.reset();
     fa_training.reset();
     fa_feed.reset();
     detectedTab = QString();
@@ -177,6 +179,11 @@ bool Page_Game_Incubator::parseDivFlyingBlock(bool verbose) {
     if (fa_feed.parse(flying_block)) {
         if (verbose) qDebug("fa_feed detected");
         detectedTab = "fa_feed";
+        return true;
+    }
+    if (fa_attacked.parse(flying_block)) {
+        if (verbose) qDebug("fa_attacked detected");
+        detectedTab = "fa_attacked";
         return true;
     }
     if (verbose) qDebug("flying block not parsed");
@@ -282,6 +289,7 @@ void Page_Game_Incubator::Tab_Action_Boxgame::reset() {
 }
 
 bool Page_Game_Incubator::Tab_Action_Boxgame::parse(QWebElement flying_block) {
+    reset();
     block = flying_block;
     QWebElementCollection chests = block.findAll("A.chest");
     num_chests = chests.count();
@@ -315,6 +323,44 @@ QString Page_Game_Incubator::Tab_Action_Boxgame::toString() const {
     }
     return u8("boxgame started. %1 boxes").arg(num_chests);
 }
+
+
+///
+///     Tab_Action_Attacked
+///
+
+void Page_Game_Incubator::Tab_Action_Attacked::reset() {
+    valid       = false;
+    attacker    = QString();
+    link        = QWebElement();
+}
+
+bool Page_Game_Incubator::Tab_Action_Attacked::parse(QWebElement flying_block) {
+    reset();
+    block = flying_block;
+    QWebElement E = block.findFirst("CENTER DIV");
+    if (E.toPlainText() != u8("Нападение на летуна!")) {
+        return false;
+    }
+    attacker = block.findFirst("DIV.monster_ava").attribute("title");
+    foreach (QWebElement e, block.findAll("A")) {
+        if (e.toOuterXml().contains(u8("Отправить зверушку"))) {
+            link = e;
+            break;
+        }
+    }
+    if (link.isNull()) {
+        return false;
+    }
+    valid = true;
+    return true;
+}
+
+QString Page_Game_Incubator::Tab_Action_Attacked::toString() const {
+    if (!valid) return "?invalid action attacked tab?";
+    return "{ attacked by " + attacker + " }";
+}
+
 
 ///
 /// Tab_Bonus
@@ -1003,6 +1049,18 @@ bool Page_Game_Incubator::doFeed(int ptype) {
     return true;
 }
 
+bool Page_Game_Incubator::doCloseAttackedInfo() {
+    if (!fa_attacked.valid) {
+        qCritical("fa_attacked is not valid");
+        return false;
+    }
+    if (fa_attacked.link.isNull()) {
+        qFatal("null link");
+        return false;
+    }
+    actuate(fa_attacked.link);
+    return true;
+}
 
 void Page_Game_Incubator::slotParseFlyingBlock() {
     qDebug("Page_Game_Incubator::slotParseFlyingBlock[thrID=%p] {",

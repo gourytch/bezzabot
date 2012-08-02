@@ -72,6 +72,17 @@ public:
         QString toString() const;
     };
 
+    struct Tab_Action_Attacked {
+        QWebElement block;
+        bool        valid;
+        QString     attacker;
+        QWebElement link;
+
+        void reset();
+        bool parse(QWebElement flying_block);
+        QString toString() const;
+    };
+
     struct Tab_Bonus {
         static const char *bonus_name[8];
         static const char *bonus_name_r[8];
@@ -152,12 +163,13 @@ public:
     int rel_active;
     int ix_active;
 
-    Tab_Action_Normal fa_events0;
-    Tab_Action_Boxgame fa_boxgame;
-    Tab_Bonus fa_bonus;
-    Tab_Action_Journey fa_journey;
-    Tab_Training fa_training;
-    Tab_Feed fa_feed;
+    Tab_Action_Normal   fa_events0;
+    Tab_Action_Boxgame  fa_boxgame;
+    Tab_Action_Journey  fa_journey;
+    Tab_Action_Attacked fa_attacked;
+    Tab_Bonus           fa_bonus;
+    Tab_Training        fa_training;
+    Tab_Feed            fa_feed;
 
     void reparse();
 
@@ -172,6 +184,9 @@ public:
     // boxgame
     bool doSelectBox(int boxNo = -1);
     bool doFinishGame();
+
+    // attacked
+    bool doCloseAttackedInfo();
 
     // bonus
     int  getBonusCooldown(int bonus_ix);

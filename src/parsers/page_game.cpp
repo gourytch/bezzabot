@@ -446,6 +446,19 @@ QString FlyingInfo::Boxgame::toString() const {
 }
 
 
+bool FlyingInfo::Attacked::parse(QWebElement &content) {
+    valid = false;
+    QWebElement e = content.findFirst("CENTER B A");
+    if (e.isNull()) return false;
+    if (e.toPlainText() != u8("Нападение на летуна!")) return false;
+}
+
+QString FlyingInfo::Attacked::toString() const {
+    if (!valid) return "??invalid??";
+    return u8("{attacked}");
+}
+
+
 FlyingInfo::FlyingInfo() {
     init();
 }
@@ -489,7 +502,8 @@ bool FlyingInfo::parse(QWebElement& element) {
     valid = egg.parse(e) ||
             normal.parse(e) ||
             journey.parse(e) ||
-            boxgame.parse(e);
+            boxgame.parse(e) ||
+            attacked.parse(e);
     return valid;
 }
 
@@ -501,6 +515,7 @@ QString FlyingInfo::toString() const {
     if (normal.valid)   s += normal.toString();
     if (journey.valid)  s += journey.toString();
     if (boxgame.valid)  s += boxgame.toString();
+    if (attacked.valid) s += attacked.toString();
     return "{" + s + "}";
 }
 
@@ -1119,6 +1134,37 @@ bool Page_Game::doFlyingGoEvents(int flyingNo) {
         return false;
     }
     qDebug(u8("submitting eventlink for flyingNo=%1 (%2)")
+           .arg(flyingNo).arg(fi.caption.title));
+    qDebug("submit=" + submit.toInnerXml());
+    pressSubmit();
+    return true;
+}
+
+
+bool Page_Game::doLookAtAttackResults(int flyingNo) {
+    if (flyingslist.size() < flyingNo) {
+        qCritical("flyings pos %d is too big", flyingNo);
+        return false;
+    }
+    const FlyingInfo & fi = flyingslist.at(flyingNo);
+    qDebug("... flying info: " + fi.toString());
+    if (!(fi.normal.valid || fi.boxgame.valid || fi.journey.valid)) {
+        qCritical("normal/boxgame/journey is not active for flyingNo=%d", flyingNo);
+        return false;
+    }
+    if (!doShowFlyingsAccordion()) {
+        qCritical("accordion tab not visible");
+        return false;
+    }
+
+    QWebElementCollection all = document.findFirst("DIV#accordion DIV.flyings")
+            .findAll("DIV.title");
+    if (all.count() != flyingslist.size()) {
+        qFatal("titles=%d, flyinglist=%d", all.count(), flyingslist.count());
+        return false;
+    }
+    submit = all[flyingNo].findFirst("FORM INPUT[type=submit]");
+    qDebug(u8("submitting look-at-attack-results button for flyingNo=%1 (%2)")
            .arg(flyingNo).arg(fi.caption.title));
     qDebug("submit=" + submit.toInnerXml());
     pressSubmit();

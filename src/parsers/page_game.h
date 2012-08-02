@@ -342,14 +342,27 @@ struct FlyingInfo {
 
     };
 
+    struct Attacked {
+        bool valid;
+
+        Attacked() {
+            valid = false;
+        }
+
+        bool parse(QWebElement &content);
+
+        QString toString() const;
+    };
+
 
     //
-    bool    valid;
-    Caption caption;
-    Egg     egg;
-    Normal  normal;
-    Journey journey;
-    Boxgame boxgame;
+    bool        valid;
+    Caption     caption;
+    Egg         egg;
+    Normal      normal;
+    Journey     journey;
+    Boxgame     boxgame;
+    Attacked    attacked;
 
     FlyingInfo();
 
@@ -428,6 +441,8 @@ public:
     bool doFlyingBoxgame(int flyingNo);
 
     bool doFlyingGoEvents(int flyingNo);
+
+    bool doLookAtAttackResults(int flyingNo);
 
     bool isJSInjected();
 
