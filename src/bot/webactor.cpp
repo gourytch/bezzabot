@@ -257,15 +257,22 @@ void WebActor::onDownloadRequested (const QNetworkRequest& request)
 
 }
 
-void WebActor::savePage ()
-{
+void WebActor::savePage () {
+    saveCurrentPage(false);
+}
+
+void WebActor::saveAlonePage () {
+    saveCurrentPage(true);
+}
+
+void WebActor::saveCurrentPage(bool alone) {
     QString ts = now ();
     checkDir (_savepath);
     Page_Generic *page = parse();
     qDebug("SAVE PAGE TS=" +
            ts + " URL:" +
            _webpage->mainFrame ()->url().toString());
-    if (_tarball.isOpened()) {
+    if (_tarball.isOpened() && !alone) {
         QString pfx = _bot->id() + "-" + ts + "-"
                 + (page ? ::toString(page->pagekind) : u8("NULL"));
         _tarball.add(pfx + ".url",

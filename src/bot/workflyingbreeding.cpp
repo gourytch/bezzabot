@@ -723,7 +723,7 @@ void WorkFlyingBreeding::adjustCooldown(Page_Game *gpage) {
             cd = now;
             break;
         }
-        if (fi.normal.valid && cfg.isServed()) {
+        if ((fi.normal.valid || fi.attacked.valid) && cfg.isServed()) {
             // прямо сейчас можно пойти запускать
             cd = now;
             break;
@@ -778,7 +778,7 @@ bool WorkFlyingBreeding::canStartWork() {
     for (int i = 0; i < n; ++i) {
         const FlyingConfig& cfg = _configs[i];
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
-        if (fi.normal.valid && cfg.isServed()) return true;
+        if ((fi.normal.valid || fi.attacked.valid) && cfg.isServed()) return true;
         if (fi.journey.valid && !fi.journey.journey_cooldown.active() &&
             cfg.isServed()) return true;
     }

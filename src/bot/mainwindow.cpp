@@ -217,7 +217,7 @@ void MainWindow::setupConnections () {
 
     connect (pGoButton, SIGNAL(clicked()), this, SLOT(slotGoClicked()));
 
-    connect (pSaveButton, SIGNAL(clicked()), this, SLOT(slotSavePage()));
+    connect (pSaveButton, SIGNAL(clicked()), this, SLOT(slotSaveAlonePage()));
 
     connect (pUrlEdit, SIGNAL(returnPressed()),
              this, SLOT(slotGoClicked()));
@@ -458,3 +458,8 @@ void MainWindow::slotGoClicked() {
 void MainWindow::slotSavePage () {
     pActor->savePage();
 }
+
+void MainWindow::slotSaveAlonePage () {
+    pActor->saveAlonePage();
+}
+

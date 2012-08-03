@@ -108,6 +108,7 @@ protected slots:
     void slotLoadProgress (int percent);
     void slotLoadFinished (bool success);
     void slotSavePage ();
+    void slotSaveAlonePage ();
 
     void slotUrlEdited(const QString& s);
     void slotGoClicked();

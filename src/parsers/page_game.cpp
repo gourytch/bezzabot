@@ -448,9 +448,16 @@ QString FlyingInfo::Boxgame::toString() const {
 
 bool FlyingInfo::Attacked::parse(QWebElement &content) {
     valid = false;
+//    qDebug(u8("FlyingInfo::Attacked::parse(%1)").arg(content.toOuterXml()));
     QWebElement e = content.findFirst("CENTER B A");
     if (e.isNull()) return false;
-    if (e.toPlainText() != u8("Нападение на летуна!")) return false;
+    QString s = e.toInnerXml();
+    if (! s.contains(u8("Нападение на летуна!"))) {
+//        qDebug(u8("{%1}").arg(s));
+        return false;
+    }
+    valid = true;
+    return true;
 }
 
 QString FlyingInfo::Attacked::toString() const {
@@ -1148,8 +1155,8 @@ bool Page_Game::doLookAtAttackResults(int flyingNo) {
     }
     const FlyingInfo & fi = flyingslist.at(flyingNo);
     qDebug("... flying info: " + fi.toString());
-    if (!(fi.normal.valid || fi.boxgame.valid || fi.journey.valid)) {
-        qCritical("normal/boxgame/journey is not active for flyingNo=%d", flyingNo);
+    if (!(fi.attacked.valid)) {
+        qCritical("flyingNo=%d is not in attacked state", flyingNo);
         return false;
     }
     if (!doShowFlyingsAccordion()) {
@@ -1163,7 +1170,10 @@ bool Page_Game::doLookAtAttackResults(int flyingNo) {
         qFatal("titles=%d, flyinglist=%d", all.count(), flyingslist.count());
         return false;
     }
-    submit = all[flyingNo].findFirst("FORM INPUT[type=submit]");
+    submit = all[flyingNo].nextSibling().findFirst("FORM INPUT[type=submit]");
+    if (submit.isNull()) {
+        qFatal("SUBMIT BUTTON NOT FOUND");
+    }
     qDebug(u8("submitting look-at-attack-results button for flyingNo=%1 (%2)")
            .arg(flyingNo).arg(fi.caption.title));
     qDebug("submit=" + submit.toInnerXml());

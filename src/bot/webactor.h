@@ -55,6 +55,8 @@ public:
 
     Page_Generic* parse (); // создаётся новый объект!
 
+    void saveCurrentPage(bool alone);
+
 signals:
 
     void page_loaded (Page_Generic* p);
@@ -88,6 +90,8 @@ protected slots:
 public slots:
 
     void savePage ();
+
+    void saveAlonePage ();
 
 };
 
