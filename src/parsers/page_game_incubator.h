@@ -84,6 +84,17 @@ public:
     };
 
     struct Tab_Bonus {
+        enum BonusID{
+            Bonus_Power         = 0,
+            Bonus_Block         = 1,
+            Bonus_Dexterity     = 2,
+            Bonus_Charisma      = 3,
+            Bonus_Gold_Safe     = 4,
+            Bonus_Crystal_Safe  = 5,
+            Bonus_Bell          = 6,
+            Bonus_Horseshoe     = 7
+        };
+
         static const char *bonus_name[8];
         static const char *bonus_name_r[8];
         static const int   bonus_price1[8];

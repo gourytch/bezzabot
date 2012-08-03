@@ -21,9 +21,8 @@ void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
             ? u8("")
             : u8("~%1").arg(ix);
 
-    days4bell = config->get(pfx + "days4bell" + sfx, false, -1).toInt();
-    days4bagG = config->get(pfx + "days4bagK" + sfx, false, -1).toInt();
-    days4bagK = config->get(pfx + "days4bagK" + sfx, false, -1).toInt();
+    bonus_days = config->get(pfx + "bonus_days" + sfx, false, -1).toInt();
+    parsePrioritySet(config->get(pfx + "donus_priority" + sfx, false, "").toString(), bonus_priority);
 
     smart_journeys = config->get(pfx + "smart_journeys" + sfx, false, true).toBool();
     use_small_journey = config->get(pfx + "use_small_journey" + sfx, false, false).toBool();
@@ -61,9 +60,9 @@ void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
 
 void WorkFlyingBreeding::FlyingConfig::dumpConfig() const {
     qDebug(u8("    WorkFlyingBreeding::FlyingConfig, ix=%1").arg(ix));
-    qDebug(u8("      days4bell: %1").arg(days4bell));
-    qDebug(u8("      days4bagG: %1").arg(days4bagG));
-    qDebug(u8("      days4bagK: %1").arg(days4bagK));
+    qDebug(u8("      use_bonus: %1").arg(getBonusString()));
+    qDebug(u8("      bonus_days: %1").arg(bonus_days));
+    qDebug(u8("      bonus_priority: %1").arg(prioritySetToString(bonus_priority)));
     qDebug(u8("      smart_journeys: %1").arg(smart_journeys ? "true" : "false"));
     qDebug(u8("      use_small_journey: %1").arg(use_small_journey ? "true" : "false"));
     qDebug(u8("      use_big_journey  : %1").arg(use_big_journey ? "true" : "false"));
@@ -77,8 +76,22 @@ void WorkFlyingBreeding::FlyingConfig::dumpConfig() const {
     qDebug(u8("      workout_plan: %1").arg(::toString(plan)));
     qDebug(u8("      workout_set : %1").arg(::toString(&workout_set)));
     qDebug(u8("      accumulate: %1").arg(accumulate));
+
+
 }
 
+QString WorkFlyingBreeding::FlyingConfig::getBonusString() const {
+    QString ret = "";
+    for (int i = 0; i < 8; ++i) {
+        if (use_bonus[i]) {
+            if (!ret.isEmpty()) {
+                ret.append(" ");
+            }
+            ret.append(Page_Game_Incubator::Tab_Bonus::bonus_name[i]);
+        }
+    }
+    return "{" + ret + "}";
+}
 
 WorkFlyingBreeding::WorkFlyingBreeding(Bot *bot) :
     Work(bot)
@@ -102,7 +115,7 @@ void WorkFlyingBreeding::configure(Config *config) {
     _safeSwitch = config->get("Work_FlyingBreeding/safe_switch",
                               false, true).toBool();
     for (int i = 0; i < 4; ++i) {
-        _configs[i].configure(config, i);
+        _flying_configs[i].configure(config, i);
     }
 
     setNextTimegap();
@@ -119,7 +132,7 @@ void WorkFlyingBreeding::dumpConfig() const {
     qDebug(u8("   use_small_journey: %1").arg(_use_small_journey ? "true" : "false"));
     qDebug(u8("   duration10       : %1").arg(_duration10));
     for (int i = 0; i < 4; ++i) {
-        _configs[i].dumpConfig();
+        _flying_configs[i].dumpConfig();
     }
 }
 
@@ -188,8 +201,8 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
 
     const FlyingInfo flyingInfo = p->flyingslist.at(activeIx);
     const Page_Game_Incubator::Flying flying = p->flyings.at(activeIx);
-    const FlyingConfig &cfg = _configs[activeIx];
-    const PetState& state = _pet_states[activeIx];
+    const FlyingConfig &cfg = _flying_configs[activeIx];
+    FlyingState& state = _flying_states[activeIx];
 
     qDebug(u8("проверяем птыца %1").arg(flyingInfo.caption.title));
     qDebug("PetState=" + state.toString());
@@ -200,21 +213,43 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
          p->detectedTab == "fa_training" ||
          p->detectedTab == "fa_feed")) {
         qDebug("птыц не занят ничем и готов к проверкам [FEED-N00]");
-        if (_check4bell) { // надо ли его занять проверкой колокольчика?
-            int bell_len = _days4bell * sec_per_day;
-            int dailyPrice = p->getBonusPrice2(BELL_IX);
-
-            QDateTime pit = _pit_bell[p->rel_active];
+        if (cfg.needProcessBonusTab()) { // надо ли проверять бонусы?
             bool go_n_look = false;
+            QDateTime now = QDateTime::currentDateTime();
+            int min_cd = cfg.bonus_days * sec_per_day;
             qDebug("check point 1");
-            if (pit.isNull()) {
-                go_n_look = true;
-                qDebug("для первичного осмотра...[FEED-N01]");
-            } else if (QDateTime::currentDateTime().secsTo(pit) < bell_len &&
-                       dailyPrice <= p->crystal) {
-                go_n_look = true;
-                qDebug("по причине истекающего отката...[FEED-N02]");
-            } else if ((qrand() % 100) == 0) {
+            for (int i = 0; i < 8; ++i) {
+                int ix = cfg.bonus_priority[i];
+                if (!cfg.use_bonus[ix]) continue;
+                if (state.pit_bonus[ix].isNull()) {
+                    qDebug(u8("pit_bonus для %1 не установлен. надо поглядеть")
+                            .arg(Page_Game_Incubator::Tab_Bonus::bonus_name[ix]));
+                    go_n_look = true;
+                    break;
+                }
+                int cd = now.secsTo(state.pit_bonus[ix]);
+                if (cd < min_cd) {
+                    int price = Page_Game_Incubator::Tab_Bonus::bonus_price2[ix];
+                    if (p->crystal < price) {
+                        qDebug(u8("pit_bonus для %1 истекает (осталось %2 сек < %3), но кристаллов маловато (%4 < %5)")
+                               .arg(Page_Game_Incubator::Tab_Bonus::bonus_name[ix])
+                               .arg(cd)
+                               .arg(min_cd)
+                               .arg(p->crystal)
+                               .arg(price));
+                        go_n_look = false;
+                        break;
+                    } else {
+                        qDebug(u8("pit_bonus для %1 истекает (осталось %2 сек < %3).")
+                                .arg(Page_Game_Incubator::Tab_Bonus::bonus_name[ix])
+                               .arg(cd)
+                               .arg(min_cd));
+                        go_n_look = true;
+                        break;
+                    }
+                }
+            }
+            if (!go_n_look & (qrand() % 100 == 0)) {
                 go_n_look = true;
                 qDebug("просто разнообразия ради...[FEED-N03]");
             }
@@ -240,9 +275,9 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         } // check4bell
 
         bool go_n_look = false;
-        QDateTime pit = _pit_feed[p->rel_active];
+        QDateTime pit = state.pit_feed;
         qDebug("check point 2");
-        if (!_check4feed) {
+        if (!cfg.check4feed) {
             // не делаем ничего
         } else if (_bot->state.plant_slaves < 30) {
             qDebug("мало рабов (%d), кормить не стану [FEED-N10]",
@@ -296,7 +331,7 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
                 pit = QDateTime::currentDateTime()
                         .addSecs(600 + (qrand() % 3600));
                 qDebug(u8("сразу поставим ему кормилко-откат до %1 [FEED-D12]").arg(::toString(pit)));
-                _pit_feed[p->rel_active] = pit;
+                state.pit_feed = pit;
             }
         }
         if (p->fa_feed.valid) {
@@ -603,7 +638,7 @@ int WorkFlyingBreeding::findAwaitingFlying() {
     }
 
     for (int i = 0; i < n; ++i) {
-        if (!_configs[i].isServed()) continue;
+        if (!_flying_configs[i].isServed()) continue;
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
         if (fi.normal.valid) {
             qDebug(u8("#%1 (%2) не занят ничем")
@@ -663,7 +698,7 @@ bool WorkFlyingBreeding::GoToIncubator(bool checkCD) {
 
     for (int i = 0; i < _bot->_gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
-        const FlyingConfig& cfg = _configs[i];
+        const FlyingConfig& cfg = _flying_configs[i];
         if (!cfg.isServed()) continue;
         if (fi.normal.valid) {
             qDebug(u8("пойдём отправлять летуна %1")
@@ -716,7 +751,7 @@ void WorkFlyingBreeding::adjustCooldown(Page_Game *gpage) {
     QDateTime now = QDateTime::currentDateTime();
     for (int i = 0; i <  gpage->flyingslist.size(); ++i) {
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
-        const FlyingConfig &cfg = _configs[i];
+        const FlyingConfig &cfg = _flying_configs[i];
 
         if (fi.boxgame.valid) {
             // можно что-то прямо сейчас открыть ящик
@@ -776,7 +811,7 @@ bool WorkFlyingBreeding::canStartWork() {
         return false;
     }
     for (int i = 0; i < n; ++i) {
-        const FlyingConfig& cfg = _configs[i];
+        const FlyingConfig& cfg = _flying_configs[i];
         const FlyingInfo& fi = _bot->_gpage->flyingslist.at(i);
         if ((fi.normal.valid || fi.attacked.valid) && cfg.isServed()) return true;
         if (fi.journey.valid && !fi.journey.journey_cooldown.active() &&
@@ -830,66 +865,7 @@ void WorkFlyingBreeding::invalidateCooldown() {
 //    return true;
 //}
 
-
-bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
-    if (!_check4bell) {
-        qDebug("нам не надо проверять колокольчик.");
-        return true;
-    }
-
-    if (!p->fa_bonus.valid) {
-        qDebug("мы не на бонусовой вкладке.");
-        return true;
-    }
-    int activeIx = p->ix_active;
-    int numFlyings = p->flyings.count();
-    bool bValidIx = (0 <= activeIx && activeIx < numFlyings);
-    if (!bValidIx) {
-        qDebug("??? активный индекс %d вне диапазона [0…%d)",
-               activeIx, numFlyings);
-        return true;
-    }
-
-    if (p->flyings.at(activeIx).was_born == false) {
-        qDebug("летун #%d ещё не вылупился", activeIx);
-        return true;
-    }
-
-    int bell_len = _days4bell * sec_per_day;
-
-    qDebug("проверяем колокольчик. запас должен быть не менее %d сут.",
-           _days4bell);
-
-    int dailyPrice = p->getBonusPrice2(BELL_IX);
-    int cd = p->getBonusCooldown(BELL_IX);
-    _pit_bell[p->rel_active] = QDateTime::currentDateTime().addSecs(cd);
-
-    int safe_cd = cd - bell_len;
-    if (safe_cd > 0) {
-        QDateTime safe_pit = QDateTime::currentDateTime().addSecs(safe_cd);
-        qDebug(u8("можно не волноваться до %1").arg(::toString(safe_pit)));
-        return true;
-    }
-
-    int numDays = (sec_per_day - 1 - safe_cd) / sec_per_day;
-
-    QString name = u8(Page_Game_Incubator::Tab_Bonus::bonus_name_r[BELL_IX]);
-    qDebug(u8("%1 истекает! надо продлять (%2 сут.)")
-           .arg(name).arg(numDays));
-    int totalPrice = numDays * dailyPrice;
-    if (p->crystal < totalPrice) {
-        numDays = p->crystal / dailyPrice;
-        if (numDays > 0) {
-            totalPrice = numDays * dailyPrice;
-            qDebug(u8("кристаллов хватит лишь на оплату %1 дн. (%2 кр)")
-                   .arg(numDays).arg(totalPrice));
-        } else {
-            qDebug(u8("кристаллов не хватит даже на день"));
-        }
-    } else {
-        qDebug(u8("кристаллов на это вполне хватает"));
-    }
-
+void alignDays(int &numDays) {
     // выравниваем по сетке [1,2,3,7,14,28]
     int unalignedNumDays = numDays;
     if (numDays >= 28) {
@@ -904,43 +880,145 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
     if (numDays != unalignedNumDays) {
         qDebug("выровняли до %d", numDays);
     }
+}
 
-    if (numDays > 0 && totalPrice <= p->crystal) {
-        qWarning(u8("продлеваем %1 за %2 * %3 = %4 кр.")
-                 .arg(name).arg(dailyPrice)
-                 .arg(numDays).arg(totalPrice));
-        if (!p->doBonusSetCheck(BELL_IX, true)) {
+bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
+    int activeIx = p->ix_active;
+    int numFlyings = p->flyings.count();
+    bool bValidIx = (0 <= activeIx && activeIx < numFlyings);
+    if (!bValidIx) {
+        qDebug("??? активный индекс %d вне диапазона [0…%d)",
+               activeIx, numFlyings);
+        return true;
+    }
+
+    const FlyingConfig& cfg     = _flying_configs[activeIx];
+    const Page_Game_Incubator::Flying &flying  = p->flyings.at(activeIx);
+    FlyingState& state = _flying_states[activeIx];
+
+    if (flying.was_born == false) {
+        qDebug("летун #%d ещё не вылупился", activeIx);
+        return true;
+    }
+
+    if (!cfg.needProcessBonusTab()) {
+        qDebug("нам не надо проверять что либо на бонусной вкладке.");
+        return true;
+    }
+
+    if (!p->fa_bonus.valid) {
+        qDebug("мы не на бонусовой вкладке.");
+        return true;
+    }
+
+    qDebug("мы на бонусовой вкладке. запомним откаты для бонусов");
+    QDateTime now = QDateTime::currentDateTime();
+    QDateTime nullTime;
+
+    int minimal_cooldown = -1;
+
+    for (int ix = 0; ix < 8; ++ix) {
+        int cd = p->getBonusCooldown(ix);
+        state.pit_bonus[ix] = (cd == -1) ? nullTime : now.addSecs(cd);
+
+        if (!cfg.use_bonus[ix]) continue;
+        if (minimal_cooldown == -1 || cd == -1 || cd < minimal_cooldown) {
+            minimal_cooldown = cd == -1 ? 0 : cd;
+        }
+    }
+
+    if (minimal_cooldown != -1) {
+        qDebug("нужных нам откатов не замечено, дальше бонусы не проверяем");
+        return true;
+    }
+
+    int days_to_prolong = cfg.bonus_days - minimal_cooldown / sec_per_day;
+    if (days_to_prolong < 1) {
+        qDebug("пока всё нормально, не продлеваем (days_to_prolong=%d)",
+               days_to_prolong);
+    }
+
+    qDebug("надо продлить некоторые бонусы на %d суток.",
+           days_to_prolong);
+    alignDays(days_to_prolong);
+
+    int crystals_left = p->crystal;
+
+    qDebug("сбросим поле крыжиков.");
+    bool checks[8];
+    for (int i = 0; i < 8; ++i) {
+        checks[i] = false;
+    }
+
+    for (int i = 0; i < 8; ++i) {
+        int ix = cfg.bonus_priority[i];
+        if (!cfg.use_bonus[ix]) continue;
+        int dailyPrice = p->getBonusPrice2(ix);
+        int days_left = p->getBonusCooldown(ix) / sec_per_day;
+        if (days_to_prolong < days_left) {
+            qDebug(u8("у бонуса %1 ещё есть %2 дней, пропускаем его")
+                   .arg(Page_Game_Incubator::Tab_Bonus::bonus_name[ix])
+                   .arg(days_left));
+            continue;
+        }
+        int price = dailyPrice * days_to_prolong;
+        if (price < crystals_left) {
+            qDebug(u8("бонуса %1 мы уже не потянем.")
+                   .arg(Page_Game_Incubator::Tab_Bonus::bonus_name[ix])
+                   .arg(days_left));
+            break;
+        }
+        crystals_left -= price;
+        qDebug(u8("запомним в поле крыжиков бонус %1, стоимость=%2. %3 остаётся")
+               .arg(Page_Game_Incubator::Tab_Bonus::bonus_name[ix])
+               .arg(price)
+               .arg(crystals_left));
+        checks[ix] = true;
+    }
+
+    bool checked_some = false;
+    qDebug(u8("крыжиим крыжики..."));
+    for (int i = 0; i < 8; ++i) {
+        if (!checks[i]) continue;
+        qDebug(u8("... #%1, %2")
+               .arg(i)
+               .arg(Page_Game_Incubator::Tab_Bonus::bonus_name[i]));
+        if (!p->doBonusSetCheck(i, true)) {
             qCritical("set check failed!");
             setAwaiting();
             _bot->GoToWork();
             return false;
         }
-        if (!p->doBonusSetCurrency(BELL_CURRENCY)) {
-            qCritical("set currency failed!");
-            setAwaiting();
-            _bot->GoToWork();
-            return false;
-        }
-
-        if (!p->doBonusSetDuration(numDays)) {
-            qCritical("set duration failed!");
-            setAwaiting();
-            _bot->GoToWork();
-            return false;
-        }
-        if (!p->doBonusSubmit()) {
-            qCritical("submit failed!");
-            setAwaiting();
-            _bot->GoToWork();
-            return false;
-        }
-        qDebug("ждём перезагрузки страницы");
-        setAwaiting();
-        return true;
-    } else {
-        qDebug("... но кристаллов не хватает (%d < %d) :(",
-               p->crystal, dailyPrice);
+        checked_some = true;
     }
+    if (!checked_some) {
+        qFatal("не покрыжили ничего! программера на мыло!");
+        setAwaiting();
+        _bot->GoToWork();
+        return false;
+    }
+    if (!p->doBonusSetCurrency(BELL_CURRENCY)) {
+        qCritical("set currency failed!");
+        setAwaiting();
+        _bot->GoToWork();
+        return false;
+    }
+
+    if (!p->doBonusSetDuration(days_to_prolong)) {
+        qCritical("set duration failed!");
+        setAwaiting();
+        _bot->GoToWork();
+        return false;
+    }
+
+    if (!p->doBonusSubmit()) {
+        qCritical("submit failed!");
+        setAwaiting();
+        _bot->GoToWork();
+        return false;
+    }
+    qDebug("ждём перезагрузки страницы");
+    setAwaiting();
     return true;
 }
 
@@ -955,7 +1033,7 @@ bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
     }
 
     const Page_Game_Incubator::Flying &flying = p->flyings.at(activeIx);
-    const FlyingConfig &cfg = _configs[activeIx];
+    const FlyingConfig &cfg = _flying_configs[activeIx];
     const FlyingInfo &fi = p->flyingslist.at(activeIx);
 
 
@@ -1049,8 +1127,8 @@ bool WorkFlyingBreeding::processTrainingTab(Page_Game_Incubator *p) {
     }
 
     const Page_Game_Incubator::Flying &flying = p->flyings.at(activeIx);
-    const FlyingConfig &cfg = _configs[activeIx];
-    const PetState& state = _pet_states[activeIx];
+    const FlyingConfig &cfg = _flying_configs[activeIx];
+    const FlyingState& state = _flying_states[activeIx];
 
     qDebug(u8("летун #%1/%2 : план тренировок: %3, set: %4")
            .arg(activeIx)
@@ -1128,8 +1206,8 @@ bool WorkFlyingBreeding::canTraining(Page_Game_Incubator *p, int ix) {
         return false;
     }
     const Page_Game_Incubator::Flying &flying = p->flyings.at(ix);
-    const PetState& state = _pet_states[ix];
-    const FlyingConfig& cfg = _configs[ix];
+    const FlyingState& state = _flying_states[ix];
+    const FlyingConfig& cfg = _flying_configs[ix];
 
     qDebug(u8("смотрим насчёт тренировок у летуна #%1: %2")
            .arg(ix).arg(flying.title));
@@ -1170,18 +1248,18 @@ void WorkFlyingBreeding::updateStates() {
     Page_Game *p = _bot->_gpage;
     if (p == NULL) return;
     p->parseFlyingList();
-    if (_pet_states.empty()) {
+    if (_flying_states.empty()) {
         for (int i = 0; i < p->flyingslist.count(); ++i) {
-            _pet_states.append(PetState());
+            _flying_states.append(FlyingState());
         }
     }
-    for (int i = 0; i < _pet_states.count(); ++i) {
-        _pet_states[i].update(p, i);
+    for (int i = 0; i < _flying_states.count(); ++i) {
+        _flying_states[i].update(p, i);
     }
 }
 
 
-WorkFlyingBreeding::PetState::PetState() {
+WorkFlyingBreeding::FlyingState::FlyingState() {
     ix      = -1;
     rel     = -1;
     level   = -1;
@@ -1199,7 +1277,7 @@ WorkFlyingBreeding::PetState::PetState() {
 }
 
 
-void WorkFlyingBreeding::PetState::update(Page_Game *gpage, int ix) {
+void WorkFlyingBreeding::FlyingState::update(Page_Game *gpage, int ix) {
     int n = gpage->flyingslist.count();
     if (ix < 0 || n <= ix) {
         return;
@@ -1245,7 +1323,7 @@ void WorkFlyingBreeding::PetState::update(Page_Game *gpage, int ix) {
 }
 
 
-QString WorkFlyingBreeding::PetState::toString() const {
+QString WorkFlyingBreeding::FlyingState::toString() const {
     QString ret = u8("{ix=%1, rel=%2, level=%3; title=%4, kind=%5; "
                      "gold=%6, health=%7, satiety=%8, minutesleft=%9; stat={\n")
             .arg(ix).arg(rel).arg(level).arg(title).arg(kind)
@@ -1260,3 +1338,69 @@ QString WorkFlyingBreeding::PetState::toString() const {
     return ret;
 }
 
+
+void parsePrioritySet(const QString& s, int priority[8]) {
+    if (s.isEmpty()) { // fill by hardcoded default
+        priority[0] = Page_Game_Incubator::Tab_Bonus::Bonus_Bell;
+        priority[1] = Page_Game_Incubator::Tab_Bonus::Bonus_Crystal_Safe;
+        priority[2] = Page_Game_Incubator::Tab_Bonus::Bonus_Gold_Safe;
+        priority[3] = Page_Game_Incubator::Tab_Bonus::Bonus_Horseshoe;
+        priority[4] = Page_Game_Incubator::Tab_Bonus::Bonus_Power;
+        priority[5] = Page_Game_Incubator::Tab_Bonus::Bonus_Block;
+        priority[6] = Page_Game_Incubator::Tab_Bonus::Bonus_Charisma;
+        priority[7] = Page_Game_Incubator::Tab_Bonus::Bonus_Dexterity;
+        return;
+    }
+    QStringList L = s.toLower().split(QRegExp("\\s*(\\s+|,)\\s*"));
+    bool used[8];
+    for (int i = 0; i < 8; ++i) {
+        used[i] = false;
+    }
+    int pos = 0;
+
+    foreach (QString ss, L) {
+        if (pos > 7) {
+            qCritical("too many bonuses in priority set");
+            break;
+        }
+        QString t = ss.trimmed();
+        bool ok = false;
+        int ix = t.toInt(&ok);
+        if (!ok) {
+            ix = -1;
+            for (int i = 0; i < 8; ++i) {
+                if (t == Page_Game_Incubator::Tab_Bonus::bonus_name[i] ||
+                        t == Page_Game_Incubator::Tab_Bonus::bonus_name_r[i]) {
+                    ix = i;
+                    break;
+                }
+            }
+        }
+        if (ix < 0 || 7 < ix) {
+            qCritical(u8("parse error for bonus {%1}=%2").arg(t).arg(ix));
+        } else if (used[ix]) {
+            qCritical(u8("duplicate bonus {%1}=%2").arg(t).arg(ix));
+        } else {
+            priority[pos++] = ix;
+            used[ix] = true;
+        }
+    }
+    for (int i = 0; i < 8; ++i) {
+        if (!used[i]) {
+            priority[pos++] = i;
+            used[i] = true;
+        }
+    }
+}
+
+QString prioritySetToString(const int priority[8]) {
+    QString ret;
+    for (int i = 0; i < 8; ++i) {
+        int ix = priority[i];
+        if (!ret.isEmpty()) {
+            ret.append(", ");
+        }
+        ret.append(Page_Game_Incubator::Tab_Bonus::bonus_name[ix]);
+    }
+    return "{" + ret + "}";
+}

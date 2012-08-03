@@ -11,7 +11,10 @@ enum WorkoutPlan {
     Training_Lowest,
     Training_Highest,
     Training_Cheapest,
-    Training_Greatest
+    Training_Greatest,
+    Training_Lowest_At_All,
+    Training_Highest_At_All,
+    Training_Greatest_At_All
 };
 
 class WorkFlyingBreeding : public Work
@@ -23,9 +26,9 @@ protected:
     struct FlyingConfig {
         int     ix;
 
-        int     days4bell; // -1 - no checking
-        int     days4bagG;
-        int     days4bagK;
+        bool    use_bonus[8]; // см. Page_Game_Incubator
+        int     bonus_days; // на сколько дней должны быть продлены бонусы
+        int     bonus_priority[8]; // ID в порядке уменьшения важности
 
         ActivityHours hours4sj;
         ActivityHours hours4bj;
@@ -52,6 +55,18 @@ protected:
                     (use_small_journey && hours4sj.isActive()) ||
                     (use_karkar && hours4kk.isActive()));
         }
+
+        bool needProcessBonusTab() const {
+            if (bonus_days < 0) return false;
+            for (int i = 0; i < 8; ++i) {
+                if (use_bonus[i]) return true;
+            }
+            return false;
+        }
+
+        void parsePriorities(QString s);
+
+        QString getBonusString() const;
     };
 
 
@@ -61,7 +76,7 @@ protected:
         bool enabled;
     };
 
-    struct PetState {
+    struct FlyingState {
         int         ix;
         int         rel;
         int         level;
@@ -81,12 +96,12 @@ protected:
 
         int         minutesleft;
 
-        QDateTime   bell_pit; // когда полностью закончится колокольчик
-        QDateTime   feed_pit; // когда сытость упадёт до 70%
+        QDateTime   pit_bonus[8]; // время окончания каждого бонуса
+        QDateTime   pit_feed; // когда сытость упадёт до 70%
 
         StatStruct stat[5];
 
-        PetState();
+        FlyingState();
 
         void update(Page_Game *gpage, int ix);
 
@@ -94,14 +109,10 @@ protected:
 
     };
 
-    FlyingConfig _configs[4];
-    QVector<PetState>   _pet_states;
-
-    QMap<int, QDateTime> _pit_bell;
-    QMap<int, QDateTime> _pit_feed;
+    FlyingConfig            _flying_configs[4];
+    QVector<FlyingState>    _flying_states;
 
     QDateTime _cooldown;
-//    QDateTime _bell_pit;
 
     int     _min_timegap;
     int     _max_timegap;
@@ -163,5 +174,8 @@ public:
 
 
 };
+
+void parsePrioritySet(const QString& s, int priority[8]);
+QString prioritySetToString(const int priority[8]);
 
 #endif // WORKFLYINGBREEDING_H
