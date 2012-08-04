@@ -84,6 +84,10 @@ bool Page_Game_Harbor_Market::parseMessage() {
         previousBuyResult = rx.cap(1).toInt();
         return true;
     }
+    if (message.contains("поздравлямс")) {
+        previousBuyResult = 1; // bought something
+        return true;
+    }
 //    if (p->message == u8("Не удалось найти ни одного лота")) {
 //    }
     previousBuyResult = 0;
