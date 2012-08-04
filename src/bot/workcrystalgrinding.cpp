@@ -61,7 +61,10 @@ bool WorkCrystalGrinding::processPage(const Page_Game *gpage) {
     }
     if (p->grinder_cooldown.active()) {
         _cooldown =  QDateTime::currentDateTime()
-                .addSecs(p->grinder_cooldown.hms + (qrand() % 10));
+                .addSecs(p->grinder_cooldown.hms
+                         + 15
+                         + (qrand() % 50)
+                         + (qrand() % 200));
         qDebug(u8("пока не готово. отдохнём до %1").arg(::toString(_cooldown)));
         _bot->GoToWork();
         return false;
@@ -73,7 +76,10 @@ bool WorkCrystalGrinding::processPage(const Page_Game *gpage) {
         return false;
     }
     _cooldown =  QDateTime::currentDateTime()
-            .addSecs(p->grinder_cooldown.hms + (qrand() % 30));
+            .addSecs(p->grinder_cooldown.hms
+                     + 5
+                     + (qrand() % 30)
+                     + (qrand() % 300));
     qDebug(u8("поставим откат до %1").arg(::toString(_cooldown)));
     qDebug("работаем дальше");
     _bot->GoToWork();

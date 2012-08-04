@@ -507,6 +507,8 @@ void Bot::configure() {
 
     _maxAwaitingTimeout = _config->get("watchdog/max_awaiting_timeout", false, 60).toInt();
 
+    _coward_mode = _config->get("watchdog/coward_mode", false, false).toBool();
+
     _neutral_urls.append("dressingroom.php");
     _neutral_urls.append("house.php");
     _neutral_urls.append("school.php");

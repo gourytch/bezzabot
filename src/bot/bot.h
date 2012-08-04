@@ -64,21 +64,39 @@ public:
     bool _awaiting;
     QDateTime _awaitingSince;
     int       _maxAwaitingTimeout;
+    bool    _has_timeout;
+    bool    _coward_mode;
 
     bool _page_busy;
+
+    bool cowardMode() const {
+        return _coward_mode;
+    }
 
     void setAwaiting() {
         _awaiting = true;
         _awaitingSince = QDateTime::currentDateTime();
+        (void)hasTimeout();
     }
 
     void unsetAwaiting() {
         _awaiting = false;
         _awaitingSince = QDateTime();
+        (void)hasTimeout();
     }
 
     bool isAwaiting() const {
         return _awaiting;
+    }
+
+    bool hasTimeout() {
+        if (!_has_timeout) return false;
+        _has_timeout = false;
+        return true;
+    }
+
+    void setTimeoutFlag() {
+        _has_timeout = true;
     }
 
     bool checkAwaiting() {
@@ -90,6 +108,7 @@ public:
         }
         qCritical("awaiting timeout");
         unsetAwaiting();
+        setTimeoutFlag();
         return false;
     }
 

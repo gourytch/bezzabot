@@ -13,15 +13,21 @@ QString now (bool utc=false);
 QDateTime nextDay();
 
 inline QString toString(const QDateTime& t) {
-    return t.toString("yyyy-MM-dd hh:mm:ss");
+    return (!t.isValid() || t.isNull())
+            ? "NULL_TIMESTAMP"
+            : t.toString("yyyy-MM-dd hh:mm:ss");
 }
 
 inline QString toString(const QDate& t) {
-    return t.toString("yyyy-MM-dd");
+    return (!t.isValid() || t.isNull())
+            ? "NULL_TIME"
+            : t.toString("yyyy-MM-dd");
 }
 
 inline QString toString(const QTime& t) {
-    return t.toString("hh:mm:ss");
+    return (!t.isValid() || t.isNull())
+            ? "NULL_TIME"
+            : t.toString("hh:mm:ss");
 }
 
 QString escape(const QString& text);

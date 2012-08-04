@@ -172,9 +172,9 @@ public:
 
     virtual bool processCommand(Command command);
 
-
 };
 
+void parseBonusSet(const QString& s, bool use_bonus[8]);
 void parsePrioritySet(const QString& s, int priority[8]);
 QString prioritySetToString(const int priority[8]);
 

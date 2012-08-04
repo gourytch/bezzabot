@@ -17,6 +17,7 @@ void WorkScaryFighting::configure(Config *config) {
     _level = config->get("Work_ScaryFighting/level", false, 1).toInt();
     _pet_index = config->get("Work_ScaryFighting/pet_index", false, -1).toInt();
     _save_pet = config->get("Work_ScaryFighting/save_pet", false, false).toBool();
+    _save_pet_paranoid = config->get("Work_ScaryFighting/save_pet_paranoid", false, false).toBool();
     _use_coulons = config->get("Work_ScaryFighting/use_coulons", false, true).toBool();
 }
 
@@ -43,12 +44,12 @@ bool WorkScaryFighting::processPage(const Page_Game *gpage) {
 
     if (hasWork()) {
         qDebug("мы чем-то заняты");
-        checkPet();
+        checkPet(false);
         return false;
     }
     if (gpage->pagekind == page_Game_Dozor_LowHealth) {
         qDebug("мало здоровья");
-        checkPet();
+        checkPet(true);
         _bot->GoTo();
         setAwaiting();
         return false;
@@ -59,19 +60,19 @@ bool WorkScaryFighting::processPage(const Page_Game *gpage) {
             _cooldown = p->scary_cooldown.pit.addSecs(1 + (qrand() % 10));
             qDebug("на страшилке стоит откат. ждём до " +
                    ::toString(_cooldown));
-            checkPet();
+            checkPet(true);
             return false;
         }
         _cooldown = QDateTime(); // нет отката
         if (_level == 0) {
             if (p->gold < p->scary_auto_price) {
                 qDebug("на автобой денег не хватает");
-                checkPet();
+                checkPet(true);
                 return false;
             }
         } else if (p->crystal < 1) {
             qDebug("на бой не хватает кристалла");
-            checkPet();
+            checkPet(true);
             return false;
         }
 
@@ -114,7 +115,7 @@ bool WorkScaryFighting::processPage(const Page_Game *gpage) {
         qWarning("идём искать монстра, level=%d", _level);
         if (!p->doScarySearch(_level)) {
             qCritical("проблема с поиском страшилки!");
-            checkPet();
+            checkPet(true);
             _bot->GoTo();
             setAwaiting();
             return false;
@@ -129,7 +130,7 @@ bool WorkScaryFighting::processPage(const Page_Game *gpage) {
         qWarning(u8("противник: %1. нападаем.").arg(p->getName()));
         if (!p->doAttack()) {
             qCritical("не смогли напасть!");
-            checkPet();
+            checkPet(true);
             _bot->GoTo();
             setAwaiting();
             return false;
@@ -143,7 +144,7 @@ bool WorkScaryFighting::processPage(const Page_Game *gpage) {
         qWarning("подрались. " + p->results());
         _cooldown = QDateTime::currentDateTime().addSecs(15 * 60 + (qrand() % 60));
         qDebug("заканчиваем. выставили откат на " + ::toString(_cooldown));
-        checkPet();
+        checkPet(true);
         return false;
 
     }
@@ -158,18 +159,18 @@ bool WorkScaryFighting::processQuery(Query query) {
     case CanStartWork:
         if (hasWork()) {
             qDebug("чем-то уже заняты. не пойдём бить страшилок");
-            checkPet();
+            checkPet(false);
             return false;
         }
         if (_bot->state.hp_cur < _min_hp) {
             qDebug("здоровья маловато, чтобы страшилок бить: %d < %d",
                    _bot->state.hp_cur, _min_hp);
-            checkPet();
+            checkPet(false);
             return false;
         }
         if (!_cooldown.isNull() && _cooldown > QDateTime::currentDateTime()) {
             qDebug("откат на страшилок до " + ::toString(_cooldown));
-            checkPet();
+            checkPet(false);
             return false;
         }
         qDebug("можем пострахобоить");
@@ -204,8 +205,11 @@ bool WorkScaryFighting::processCommand(Command command) {
     return false;
 }
 
-void WorkScaryFighting::checkPet() {
-    if (_save_pet && _bot->_gpage != NULL &&
+void WorkScaryFighting::checkPet(bool inWork) {
+    if (!(_save_pet && (inWork || _save_pet_paranoid))) {
+        return;
+    }
+    if (_bot->_gpage != NULL &&
         _bot->_gpage->petlist.size() > 0 &&
         _bot->_gpage->petlist.at(0).active) {
         qDebug("надо сныкать зверушку");

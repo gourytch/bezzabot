@@ -16,6 +16,8 @@ class WorkScaryFighting : public Work
 
     bool _save_pet;
 
+    bool _save_pet_paranoid;
+
     bool _use_coulons;
 
     QDateTime _cooldown;
@@ -39,7 +41,7 @@ public:
 
     virtual bool processCommand(Command command);
 
-    void checkPet();
+    void checkPet(bool inWork=true);
 };
 
 #endif // WORKSCARYFIGHTING_H
