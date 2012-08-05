@@ -89,6 +89,21 @@ double gaussian_rand() {
             cos(6.2831273072 * qrand() / RAND_MAX);
 }
 
+QString DTtoString(int in_secs) {
+    int in_mins = in_secs / 60;
+    int in_hours = in_mins / 60;
+    int in_days = in_hours / 24;
+    if (in_days > 0) {
+        return u8("%1 сут").arg(in_days);
+    } if (in_hours > 0) {
+        return u8("%1 ч.").arg(in_hours);
+    } if (in_mins > 0) {
+        return u8("%1 мин").arg(in_mins);
+    }
+    return u8("%1 сек").arg(in_secs);
+}
+
+
 int gaussian_rand(int minValue, int maxValue) {
     Q_ASSERT(minValue < maxValue);
     int drift = maxValue - minValue + 1;

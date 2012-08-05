@@ -1423,7 +1423,13 @@ int WorkFlyingBreeding::calculateDaysToProlongBonus(
             qDebug(u8("pit для бонуса %1 не инициализирован").arg(name));
             return -1;
         }
-        if (waterline <= t) continue;
+        if (waterline <= t) {
+            qDebug(u8("бонус %1 (pit=%2) продления не требует (over %3).")
+                   .arg(name)
+                   .arg(::toString(t))
+                   .arg(DTtoString(waterline.secsTo(t))));
+            continue;
+        }
         int days = (t.secsTo(waterline) + sec_per_day - 1) / sec_per_day;
         qDebug(u8("бонус %1 (pit=%2) требует продления на %3 д.")
                .arg(name).arg(::toString(t)).arg(days));

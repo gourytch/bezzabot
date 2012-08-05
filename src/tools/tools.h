@@ -30,6 +30,8 @@ inline QString toString(const QTime& t) {
             : t.toString("hh:mm:ss");
 }
 
+QString DTtoString(int in_secs);
+
 QString escape(const QString& text);
 
 QString unescape(const QString& text);
