@@ -150,6 +150,8 @@ protected:
 
     void updateStates();
 
+    int calculateDaysToProlongBonus(int flyingIx, bool checklist[8]);
+
 public:
 
     explicit WorkFlyingBreeding(Bot *bot);
