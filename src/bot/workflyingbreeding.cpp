@@ -916,13 +916,15 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
     qDebug("надо продлить некоторые бонусы (days=%d)", days);
     alignDays(days);
 
+    QString info;
     bool checked_some = false;
     qDebug(u8("крыжиим крыжики..."));
     for (int i = 0; i < 8; ++i) {
         if (!checklist[i]) continue;
+        QString s = Page_Game_Incubator::Tab_Bonus::bonus_name[i];
         qDebug(u8("... #%1, %2")
                .arg(i)
-               .arg(Page_Game_Incubator::Tab_Bonus::bonus_name[i]));
+               .arg(s));
         if (!p->doBonusSetCheck(i, true)) {
             qCritical("set check failed!");
             setAwaiting();
@@ -930,6 +932,8 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
             return false;
         }
         checked_some = true;
+        info.append(" ");
+        info.append(s);
     }
     if (!checked_some) {
         qFatal("не покрыжили ничего! программера на мыло!");
@@ -952,6 +956,8 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
         return false;
     }
 
+    qWarning(u8("продлим бонусы у %1 на %2 д: %3")
+             .arg(flying.title).arg(days).arg(info));
     if (!p->doBonusSubmit()) {
         qCritical("submit failed!");
         setAwaiting();
