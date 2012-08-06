@@ -118,14 +118,6 @@ protected:
     int     _max_timegap;
     int     _next_timegap;
 
-    bool    _use_small_journey;
-    bool    _use_big_journey;
-    bool    _duration10;
-
-    bool _check4bell;
-    int  _days4bell;
-
-    bool _check4feed;
     bool _safeSwitch;
 
     int findAwaitingFlying();

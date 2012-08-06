@@ -200,7 +200,7 @@ QString TreeMap::toXml() const {
             .arg(root.toXml());
 }
 
-void TreeMap::load(const QString& fname) {
+void TreeMap::load(const QString& /* fname */) {
 }
 
 void TreeMap::save(const QString& fname) {

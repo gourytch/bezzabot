@@ -102,19 +102,19 @@ void Page_Game_Post_Messages::parse() {
     }
 }
 
-bool Page_Game_Post_Messages::doSelectFolder(int number) {
+bool Page_Game_Post_Messages::doSelectFolder(int /* number */) {
     return false;
 }
 
-bool Page_Game_Post_Messages::doSelectPage(int number) {
+bool Page_Game_Post_Messages::doSelectPage(int /* number */) {
     return false;
 }
 
-bool Page_Game_Post_Messages::doSelectMessage(int id) {
+bool Page_Game_Post_Messages::doSelectMessage(int /* id */) {
     return false;
 }
 
-bool Page_Game_Post_Messages::doUnselectMessage(int id) {
+bool Page_Game_Post_Messages::doUnselectMessage(int /* id */) {
     return false;
 }
 

@@ -100,10 +100,10 @@ WebActor::WebActor(Bot *bot) :
     }
     QWebSettings *settings = _webpage->settings ();
     settings->setMaximumPagesInCache(
-                Config::global().get("connection/cached_pages", 20).toInt());
+                Config::global().get("connection/cached_pages", false, 20).toInt());
     settings->enablePersistentStorage ();
     settings->setOfflineStorageDefaultQuota (
-                Config::global().get("connection/cache_size", CACHE_SIZE).toInt());
+                Config::global().get("connection/cache_size", false, CACHE_SIZE).toInt());
     settings->setAttribute (QWebSettings::AutoLoadImages, true);
     settings->setAttribute (QWebSettings::JavascriptEnabled, true);
     settings->setAttribute (QWebSettings::OfflineStorageDatabaseEnabled, true);

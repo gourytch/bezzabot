@@ -32,6 +32,36 @@ using namespace std;
 };
 ****/
 
+#ifdef _MSC_VER
+
+inline int c99_vsnprintf(char* str, size_t size, const char* format, va_list ap)
+{
+    int count = -1;
+
+    if (size != 0)
+        count = _vsnprintf_s(str, size, _TRUNCATE, format, ap);
+    if (count == -1)
+        count = _vscprintf(format, ap);
+
+    return count;
+}
+
+inline int c99_snprintf(char* str, size_t size, const char* format, ...)
+{
+    int count;
+    va_list ap;
+
+    va_start(ap, format);
+    count = c99_vsnprintf(str, size, format, ap);
+    va_end(ap);
+
+    return count;
+}
+
+#define snprintf c99_snprintf
+
+#endif // _MSC_VER
+
 struct TARHeader {
     char s_name[100];
     char s_mode[8];
@@ -78,7 +108,11 @@ struct TARHeader {
         snprintf(s_mtime, 12, "11715417351");
         s_ftype[0] = '0';
         // ustar
+#ifdef _MSC_VER
+        sprintf_s(s_ustar, "ustar  ");
+#else
         sprintf(s_ustar, "ustar  ");
+#endif
         //sprintf(s_version, "00");
 
 //        char *login = getlogin();
