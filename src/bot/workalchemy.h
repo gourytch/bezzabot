@@ -10,17 +10,19 @@ class WorkAlchemy : public Work {
 
 protected:
 
-    QDateTime mixtime;
+    QDateTime pit_mix;
 
-    QDateTime finaltime;
+    QDateTime pit_final;
 
-    QDateTime bowl_cooldown;
+    QDateTime pit_bowl_expire;
 
     int bowl_index;
 
     int mixcatcher;
 
     void checkCooldowns();
+
+    void updateCooldowns(Page_Game *page);
 
     bool canStartWork();
 

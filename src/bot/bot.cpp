@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QDir>
+#include <QPainter>
 #include "mainwindow.h"
 #include "bot.h"
 #include "webactor.h"
@@ -257,11 +258,13 @@ void Bot::onPageFinished (bool ok)
     if (ok)
     {
         _cookies->save ();
+        savePix(_actor->page()->mainFrame()->documentElement());
     }
     if (_page) {
         delete _page;
         _page = NULL;
     }
+
     _page = _actor->parse();
     _gpage = dynamic_cast<Page_Game*>(_page);
 
@@ -948,4 +951,25 @@ void Bot::minidump() {
     mdsav_crystal = state.crystal;
     mdsav_fish = state.fish;
     mdsav_green = state.green;
+}
+
+
+void Bot::savePix(QWebElement doc) {
+    QString t = now();
+    int i = 0;
+    checkDir("IMAGES");
+    foreach (QWebElement e, doc.findAll("IMG")) {
+        QString name;
+        name.sprintf("%04d", i++);
+        name = "IMAGES/" + t + "--" + name + ".png";
+        qDebug("savepix: " + name);
+
+        QImage image(e.geometry().width(),
+                     e.geometry().height(),
+                     QImage::Format_ARGB32);
+        QPainter painter(&image);
+        e.render(&painter);
+        painter.end();
+        image.save(name);
+    }
 }

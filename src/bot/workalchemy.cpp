@@ -6,6 +6,8 @@
 #include "alertdialog.h"
 #include "iconames.h"
 
+#define URL_TEMP_CURRENT "/castle.php?a=myguild&id=31&m=temperature"
+#define URL_TEMP_IDEAL "/castle.php?a=myguild&id=31&m=temperature&ideal=1"
 
 WorkAlchemy::WorkAlchemy(Bot *bot) : Work(bot) {
 }
@@ -53,22 +55,29 @@ bool WorkAlchemy::processCommand(Command /*command*/){
     return false;
 }
 
-void WorkAlchemy::checkCooldowns() {
-    const PageTimer *pMix = _bot->_gpage->timers.byTitle(u8("Следующее помешивание зелья."));
-    const PageTimer *pRdy = _bot->_gpage->timers.byTitle(u8("Варка зелья."));
+void WorkAlchemy::updateCooldowns(Page_Game *page) {
+    const PageTimer *pMix = page->timers.byTitle(u8("Следующее помешивание зелья."));
+    const PageTimer *pRdy = page->timers.byTitle(u8("Варка зелья."));
     if (pMix == NULL || pRdy == NULL) {
         return;
     }
-    if (pRdy->active()) {
-        if (!pMix->active(mixcatcher)) {
-            if (!alerted) {
-                AlertDialog::alert(ICON_MIXTIME,
-                                   u8("time to mix"),
-                                   u8("надо помешать зелье!"));
-                alerted = true;
-                return;
-            }
-        }
+}
+
+
+void WorkAlchemy::checkCooldowns() {
+    QDateTime now = QDateTime::currentDateTime();
+    if (pit_final.isNull()) return;
+    if (pit_mix.isNull()) {
+        qDebug("== reset alerted flag");
+        alerted = false;
+        return;
+    }
+    if (now.secsTo(pit_mix) < mixcatcher && !alerted) {
+        AlertDialog::alert(ICON_MIXTIME,
+                           u8("time to mix"),
+                           u8("<body><h1>помешай зелье!</h1></body>"));
+        alerted = true;
+        return;
     } else {
         alerted = false;
     }

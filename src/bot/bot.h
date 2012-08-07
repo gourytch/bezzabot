@@ -156,6 +156,8 @@ protected:
 
     void minidump();
 
+    void savePix(QWebElement doc);
+
 public:
 
     void cancelAuto();
