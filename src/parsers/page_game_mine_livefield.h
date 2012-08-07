@@ -13,7 +13,7 @@ public:
 
     bool finished;
 
-    bool tickets_left;
+    int  tickets_left;
 
 protected:
 

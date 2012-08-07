@@ -57,7 +57,8 @@ SOURCES += \
     $$SRC/parsers/page_game_training.cpp \
     $$SRC/parsers/page_game_house_plantation.cpp \
     $$SRC/parsers/page_game_alchemy_entrance.cpp \
-    $$SRC/parsers/page_game_alchemy_lab.cpp
+    $$SRC/parsers/page_game_alchemy_lab.cpp \
+    $$SRC/parsers/page_game_grinder.cpp
 
 SOURCES += \
     $$SRC/bot/main.cpp\
@@ -80,7 +81,8 @@ SOURCES += \
     $$SRC/bot/workflyingbreeding.cpp \
     $$SRC/bot/worktraining.cpp \
     $$SRC/bot/workslaveholding.cpp \
-    $$SRC/bot/workalchemy.cpp
+    $$SRC/bot/workalchemy.cpp \
+    $$SRC/bot/workcrystalgrinding.cpp
 
 
 HEADERS += \
@@ -128,7 +130,9 @@ HEADERS  += \
     $$SRC/parsers/page_game_training.h \
     $$SRC/parsers/page_game_house_plantation.h \
     $$SRC/parsers/page_game_alchemy_entrance.h \
-    $$SRC/parsers/page_game_alchemy_lab.h
+    $$SRC/parsers/page_game_alchemy_lab.h \
+    $$SRC/parsers/page_game_grinder.h \
+
 
 HEADERS  += \
     $$SRC/bot/mainwindow.h \
@@ -148,7 +152,8 @@ HEADERS  += \
     $$SRC/bot/workflyingbreeding.h \
     $$SRC/bot/worktraining.h \
     $$SRC/bot/workslaveholding.h \
-    $$SRC/bot/workalchemy.h
+    $$SRC/bot/workalchemy.h \
+    $$SRC/bot/workcrystalgrinding.h
 
 RESOURCES += \
     $$SRC/bot/bot.qrc

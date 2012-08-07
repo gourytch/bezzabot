@@ -103,16 +103,6 @@ void WorkFlyingBreeding::configure(Config *config) {
     Work::configure(config);
     _min_timegap = config->get("Work_FlyingBreeding/min_timegap", false, 5).toInt();
     _max_timegap = config->get("Work_FlyingBreeding/max_timegap", false, 300).toInt();
-    _use_small_journey = config->get("Work_FlyingBreeding/use_small_journey",
-                                     false, false).toBool();
-    _check4bell = config->get("Work_FlyingBreeding/check4bell",
-                              false, false).toBool();
-    _days4bell = config->get("Work_FlyingBreeding/days4bell",
-                             false, 3).toInt();
-    _duration10 = config->get("Work_FlyingBreeding/duration10",
-                              false, 0).toInt();
-    _check4feed = config->get("Work_FlyingBreeding/check4feed",
-                              false, false).toBool();
     _safeSwitch = config->get("Work_FlyingBreeding/safe_switch",
                               false, true).toBool();
     for (int i = 0; i < 4; ++i) {
@@ -127,11 +117,6 @@ void WorkFlyingBreeding::dumpConfig() const {
     qDebug(u8(" [WorkFlyingBreeding]"));
     qDebug(u8("   min_timegap  : %1").arg(_min_timegap));
     qDebug(u8("   max_timegap  : %1").arg(_max_timegap));
-    qDebug(u8("   check4bell   : %1").arg(_check4bell ? "true" : "false"));
-    qDebug(u8("   days4bell   : %1").arg(_days4bell));
-    qDebug(u8("   check4feed   : %1").arg(_check4feed ? "true" : "false"));
-    qDebug(u8("   use_small_journey: %1").arg(_use_small_journey ? "true" : "false"));
-    qDebug(u8("   duration10       : %1").arg(_duration10));
     for (int i = 0; i < 4; ++i) {
         _flying_configs[i].dumpConfig();
     }
@@ -179,7 +164,7 @@ const int sec_per_day = 86400;
 bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     qDebug("Обработаем страничку");
     updateStates();
-    if (_check4feed && _bot->state.plant_slaves == -1) {
+    if (/* _check4feed && */ _bot->state.plant_slaves == -1) {
         if (gpage->pagekind == page_Game_House_Plantation) {
             qFatal("мы на плантации, а её объём так и не узнали!");
             setAwaiting();
@@ -504,12 +489,11 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
     if (p->fa_events0.valid) {
         if (cfg.use_small_journey && cfg.hours4sj.isActive()) {
             if (p->fa_events0.minutesleft > 0 &&
-                p->fa_events0.minutesleft >= _duration10) {
+                (p->fa_events0.minutesleft >= cfg.duration10)) {
                 qDebug("запустим по маленькому");
                 setAwaiting();
-                if (!p->doStartSmallJourney(_duration10)) {
-                    qCritical(u8("не выщло по маленькому. запретим на будущее"));
-                    _use_small_journey = false;
+                if (!p->doStartSmallJourney(cfg.duration10)) {
+                    qCritical(u8("не выщло по маленькому."));
                     _bot->GoToNeutralUrl();
                     return false;
                 }
@@ -887,7 +871,7 @@ bool WorkFlyingBreeding::processBonusTab(Page_Game_Incubator *p) {
 
     const FlyingConfig& cfg     = _flying_configs[activeIx];
     const Page_Game_Incubator::Flying &flying  = p->flyings.at(activeIx);
-    FlyingState& state = _flying_states[activeIx];
+    //FlyingState& state = _flying_states[activeIx];
 
     if (flying.was_born == false) {
         qDebug("летун #%d ещё не вылупился", activeIx);

@@ -374,7 +374,7 @@ void MainWindow::slotLoadStarted ()
 void MainWindow::slotLoadProgress (int percent)
 {
     QString urlstr = pWebView->page()->mainFrame()->requestedUrl().toString ();
-    setWindowTitle(tr ("bot %1: loading %2, %3\%").arg(pBot->id(), urlstr).arg(percent));
+    setWindowTitle(tr("bot %1: loading %2, %3%").arg(pBot->id(), urlstr).arg(percent));
 }
 
 void MainWindow::slotLoadFinished(bool success)
