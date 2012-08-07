@@ -9,10 +9,18 @@ TEMPLATE = app
 
 SOURCES += \
     appwindow.cpp \
-    surgery.cpp
+    surgery.cpp \
+    alertdialog.cpp
 
 HEADERS += \
-    appwindow.h
+    appwindow.h \
+    alertdialog.h
+
+RESOURCES += \
+    surgery.qrc
+
+FORMS += \
+    alertdialog.ui
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools

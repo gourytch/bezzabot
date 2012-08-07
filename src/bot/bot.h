@@ -226,6 +226,8 @@ signals:
 
     void signalHasStep();
 
+    void signalAlert();
+
 private slots:
 
     void delayedGoTo();

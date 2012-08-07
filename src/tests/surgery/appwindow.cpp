@@ -5,6 +5,8 @@
 #include <QWebElement>
 #include <QWebElementCollection>
 #include "appwindow.h"
+#include "alertdialog.h"
+#include "tools/tools.h"
 
 AppWindow::AppWindow(QWidget *parent) :
     QWidget(parent)
@@ -93,6 +95,9 @@ AppWindow::AppWindow(QWidget *parent) :
 AppWindow::~AppWindow() {
 }
 
+void AppWindow::closeEvent(QCloseEvent*) {
+    qApp->quit();
+}
 
 void AppWindow::slotLoadStart () {
     qDebug("LOAD STARTED: {" + pWebView->url().toString() + "}");
@@ -229,6 +234,15 @@ void AppWindow::slotClick1() {
 
 
 void AppWindow::slotClick2() {
+    (new AlertDialog(this,
+                     8 * 15 + 2,
+                     u8("Алерт!"),
+                     u8(
+                         "<body><h1>TITLE # 1</h1>"
+                         "<hr/>"
+                         "<em>Клёво!</em>"
+                         "<p>не, ну <b>реально</b> же клёво!</p>"
+                         "</body>")))->show();
 }
 
 

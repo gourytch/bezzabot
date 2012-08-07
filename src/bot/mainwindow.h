@@ -57,6 +57,7 @@ protected:
     bool        toggle_on_tray_click;
     int         balloon_ttl;
     bool        balloon_enabled;
+    bool        alert_enabled;
     bool        noimages;
     int         history_size;
     int         icon_index;
@@ -93,11 +94,13 @@ signals:
 
 public slots:
 
-    void log (const QString& text);
+    void log (QString text);
 //    void dbg (const QString& text);
 
     void startAutomaton();
     void stopAutomaton();
+
+    void alert(int icon, QString subject, QString text);
 
 protected slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -110,7 +113,7 @@ protected slots:
     void slotSavePage ();
     void slotSaveAlonePage ();
 
-    void slotUrlEdited(const QString& s);
+    void slotUrlEdited(QString s);
     void slotGoClicked();
 
 };

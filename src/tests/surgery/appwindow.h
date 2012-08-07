@@ -53,6 +53,8 @@ protected:
 
     bool quickHealth();
 
+    void  closeEvent(QCloseEvent*);
+
 public:
     explicit AppWindow(QWidget *parent = 0);
     virtual ~AppWindow();

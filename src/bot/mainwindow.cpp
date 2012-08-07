@@ -11,6 +11,7 @@
 #include "tools/tools.h"
 #include "tools/timebomb.h"
 #include "tools/logger.h"
+#include "alertdialog.h"
 #include "bot.h"
 
 MainWindow *MainWindow::_instance = NULL;
@@ -36,6 +37,7 @@ MainWindow::MainWindow (QWidget *parent) :
     toggle_on_tray_click    = cfg.get("ui/tray_toggle", false, true).toBool();
     balloon_ttl             = cfg.get("ui/balloon_ttl", false, 3000).toInt();
     balloon_enabled         = cfg.get("ui/balloon_enabled", false, true).toBool();
+    alert_enabled           = cfg.get("ui/alert_enabled", false, true).toBool();
     noimages                = cfg.get("ui/noimages", false, false).toBool();
     history_size            = cfg.get("ui/history_size", false, 1000).toInt();
     icon_index              = cfg.get("ui/icon_index", false, -1).toInt();
@@ -277,7 +279,7 @@ void MainWindow::load (const QUrl &url)
 }
 
 
-void MainWindow::log (const QString &text)
+void MainWindow::log (QString text)
 {
 //  dbg (QString("LOG: %1").arg(text));
     qDebug("LOG MESSAGE: " + text);
@@ -441,7 +443,7 @@ void MainWindow::messageClicked() {
     }
 }
 
-void MainWindow::slotUrlEdited(const QString& s) {
+void MainWindow::slotUrlEdited(QString s) {
     _entered_url = s;
 }
 
@@ -463,3 +465,11 @@ void MainWindow::slotSaveAlonePage () {
     pActor->saveAlonePage();
 }
 
+void MainWindow::alert(int icon, QString subject, QString text) {
+    if (!alert_enabled) {
+        qCritical(u8("ALERT [icon#%1] %2 // %3")
+                  .arg(icon).arg(subject).arg(text));
+        return;
+    }
+    AlertDialog::alert(icon, subject, text);
+}

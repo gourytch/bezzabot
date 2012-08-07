@@ -24,6 +24,7 @@
 #include "worktraining.h"
 #include "workslaveholding.h"
 #include "workcrystalgrinding.h"
+#include "workalchemy.h"
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent) // QThread
@@ -791,6 +792,7 @@ void Bot::initWorks() {
     _secworklist.append(new WorkFlyingBreeding(this));
     _secworklist.append(new WorkSlaveHolding(this));
     _secworklist.append(new WorkCrystalGrinding(this));
+    _secworklist.append(new WorkAlchemy(this));
 
     for (WorkListIterator i(_worklist);
          i.hasNext();

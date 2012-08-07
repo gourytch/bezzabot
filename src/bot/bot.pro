@@ -34,7 +34,8 @@ SOURCES += \
     workslaveholding.cpp \
     workalchemy.cpp \
     workhealing.cpp \
-    workcrystalgrinding.cpp
+    workcrystalgrinding.cpp \
+    alertdialog.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -56,7 +57,9 @@ HEADERS  += \
     workslaveholding.h \
     workalchemy.h \
     workhealing.h \
-    workcrystalgrinding.h
+    workcrystalgrinding.h \
+    alertdialog.h \
+    iconames.h
 
 INCLUDEPATH += $$TOP/src
 LIBS += -L$$TOP/lib -lparsers -ltools
@@ -68,6 +71,9 @@ DESTDIR = $$TOP/bin
 
 RESOURCES += \
     bot.qrc
+
+FORMS += \
+    alertdialog.ui
 
 
 
