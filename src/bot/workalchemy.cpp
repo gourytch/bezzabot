@@ -121,6 +121,10 @@ void WorkAlchemy::checkCooldowns() {
         }
         return;
     } else {
+        if (alerted) {
+            qDebug("== reset alerted flag");
+            alerted = false;
+        }
         alerted = false;
     }
 }
