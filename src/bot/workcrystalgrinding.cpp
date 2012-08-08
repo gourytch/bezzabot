@@ -5,7 +5,7 @@
 #include "parsers/page_game_grinder.h"
 
 WorkCrystalGrinding::WorkCrystalGrinding(Bot *bot) : Work(bot) {
-    _workLink = "http://g3.botva.ru/castle.php?a=workshop_mine&id=3";
+    _workLink = "castle.php?a=workshop_mine&id=3";
     _capacity = -1;
     _amount = -1;
 }
@@ -54,7 +54,7 @@ bool WorkCrystalGrinding::processPage(const Page_Game *gpage) {
     _capacity = p->grinder_capacity;
     _amount = p->grinder_amount;
     qDebug(u8("заполнение крипылью %1 из %2").arg(_amount).arg(_capacity));
-    if (_capacity <= _amount) {
+    if (_capacity - _amount < 10) {
         qDebug("а коли всё переполнено, то и молоть не надо");
         _bot->GoToWork();
         return false;
@@ -130,6 +130,16 @@ bool WorkCrystalGrinding::canStartWork() {
     if (_bot->_gpage->workguild != WorkGuild_Miners) {
         return false;
     }
+
+    Page_Game *p = _bot->_gpage;
+    if (p->resources.contains(56)) { // i56, кристальная пыль
+        int v = p->resources.value(56).count;
+        if (v != _amount) {
+            qDebug("запомним количество крипыли (%d)", v);
+            _amount = v;
+        }
+    }
+
     if (_bot->_gpage->crystal <= _grind_over) {
 //        qDebug("кристаллов маловато");
         return false;
@@ -139,7 +149,7 @@ bool WorkCrystalGrinding::canStartWork() {
 //        qDebug("кристаллы молоть ещё рано");
         return false;
     }
-    if (_capacity > 0 && _capacity <= _amount) {
+    if (_capacity > 0 && (_capacity - _amount < 10)) {
 //        qDebug("кристалльной пыли у нас уже дофига. молоть не будем");
         return false;
     }

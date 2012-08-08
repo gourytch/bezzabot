@@ -955,21 +955,23 @@ void Bot::minidump() {
 
 
 void Bot::savePix(QWebElement doc) {
+    static const char DIR[] = "CAPTCHA";
     QString t = now();
-    int i = 0;
-    checkDir("IMAGES");
     foreach (QWebElement e, doc.findAll("IMG")) {
-        QString name;
-        name.sprintf("%04d", i++);
-        name = "IMAGES/" + t + "--" + name + ".png";
+        QString src = e.attribute("src");
+        if (!src.contains("m=temperature")) continue;
+        QString name = QString(DIR) + "/" + t + "-temperature-"
+                + (src.contains("ideal=1") ? "ideal" : "current")
+                + ".png";
         qDebug("savepix: " + name);
-
         QImage image(e.geometry().width(),
                      e.geometry().height(),
                      QImage::Format_ARGB32);
         QPainter painter(&image);
         e.render(&painter);
         painter.end();
+
+        checkDir(DIR);
         image.save(name);
     }
 }

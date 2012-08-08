@@ -61,10 +61,46 @@ void WorkAlchemy::updateCooldowns(Page_Game *page) {
     if (pMix == NULL || pRdy == NULL) {
         return;
     }
+    QDateTime now = QDateTime::currentDateTime();
+    if (!pRdy->active()) {
+        if (!pit_final.isNull()) {
+            qDebug("варительный таймер отключился. сбрасываем PITы");
+            pit_final = QDateTime();
+            pit_mix   = QDateTime();
+        }
+        return;
+    }
+    // pRdy->active
+    if (pit_final.isNull()) {
+        pit_final = pRdy->pit;
+        qDebug("варительный таймер активен. поставили pit_final=" +
+               ::toString(pit_final));
+    } else if (abs(pit_final.secsTo(pRdy->pit)) > 15) {
+        pit_final = pRdy->pit;
+        qDebug("варительный таймер активен. подправили pit_final=" +
+               ::toString(pit_final));
+    }
+    if (!pMix->active()) {
+        if (!pit_mix.isNull()) {
+            pit_mix = now;
+            qDebug("смесительный таймер отключился. закоротили pit_mix");
+        }
+    } else {
+        if (pit_mix.isNull()) {
+            pit_mix = pMix->pit;
+            qDebug("смесительный таймер активен. поставили pit_mix=" +
+                   ::toString(pit_mix));
+        } else if (abs(pit_mix.secsTo(pMix->pit)) > 15) {
+            pit_mix = pMix->pit;
+            qDebug("смесительный таймер активен. подправили pit_mix=" +
+                   ::toString(pit_mix));
+        }
+    }
 }
 
 
 void WorkAlchemy::checkCooldowns() {
+    updateCooldowns(_bot->_gpage);
     QDateTime now = QDateTime::currentDateTime();
     if (pit_final.isNull()) return;
     if (pit_mix.isNull()) {
