@@ -104,16 +104,21 @@ void WorkAlchemy::checkCooldowns() {
     updateCooldowns(_bot->_gpage);
     QDateTime now = QDateTime::currentDateTime();
     if (pit_final.isNull()) return;
+
     if (pit_mix.isNull()) {
-        qDebug("== reset alerted flag");
-        alerted = false;
+        if (alerted) {
+            qDebug("== reset alerted flag");
+            alerted = false;
+        }
         return;
     }
-    if (now.secsTo(pit_mix) < mixcatcher && !alerted) {
-        AlertDialog::alert(ICON_MIXTIME,
-                           u8("time to mix"),
-                           u8("<body><h1>помешай зелье!</h1></body>"));
-        alerted = true;
+    if (now.secsTo(pit_mix) < mixcatcher) {
+        if (!alerted) {
+            AlertDialog::alert(ICON_MIXTIME,
+                               u8("time to mix"),
+                               u8("<body><h1>помешай зелье!</h1></body>"));
+            alerted = true;
+        }
         return;
     } else {
         alerted = false;
