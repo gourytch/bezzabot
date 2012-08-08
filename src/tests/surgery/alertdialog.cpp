@@ -45,7 +45,7 @@ void AlertDialog::Registry::killall() {
 }
 
 
-AlertDialog::AlertDialog(QWidget *parent,
+AlertDialog::AlertDialog(QWidget */*parent*/,
                          int pixno,
                          QString subject,
                          QString text) :

@@ -84,6 +84,11 @@ QDateTime nextDay() {
     return QDateTime(QDate::currentDate().addDays(1)).addSecs(2 * 60 * 60 + 1);
 }
 
+int randrange(int minValue, int maxValue) {
+    Q_ASSERT(minValue < maxValue);
+    return (minValue + (qrand() % (maxValue - minValue + 1)));
+}
+
 double gaussian_rand() {
     return sqrt(-2 * log((double)(qrand()) / RAND_MAX)) *
             cos(6.2831273072 * qrand() / RAND_MAX);

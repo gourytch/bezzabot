@@ -61,10 +61,7 @@ bool WorkCrystalGrinding::processPage(const Page_Game *gpage) {
     }
     if (p->grinder_cooldown.active()) {
         _cooldown =  QDateTime::currentDateTime()
-                .addSecs(p->grinder_cooldown.hms
-                         + 15
-                         + (qrand() % 50)
-                         + (qrand() % 200));
+                .addSecs(p->grinder_cooldown.hms + randrange(50, 300));
         qDebug(u8("пока не готово. отдохнём до %1").arg(::toString(_cooldown)));
         _bot->GoToWork();
         return false;
@@ -76,10 +73,7 @@ bool WorkCrystalGrinding::processPage(const Page_Game *gpage) {
         return false;
     }
     _cooldown =  QDateTime::currentDateTime()
-            .addSecs(p->grinder_cooldown.hms
-                     + 5
-                     + (qrand() % 30)
-                     + (qrand() % 300));
+            .addSecs(p->grinder_cooldown.hms + randrange(50, 300));
     qDebug(u8("поставим откат до %1").arg(::toString(_cooldown)));
     qDebug("работаем дальше");
     _bot->GoToWork();
@@ -120,9 +114,10 @@ void WorkCrystalGrinding::updateCooldown() {
         _enabled = false;
 #endif
     }
-    if (p->active()) {
-        _cooldown = QDateTime::currentDateTime()
-                .addSecs(p->cooldown() + (qrand() % 15));
+    QDateTime now = QDateTime::currentDateTime();
+    if (p->active() && (_cooldown.isNull() || (_cooldown < now))) {
+        _cooldown = now.addSecs(p->cooldown() + randrange(30, 300));
+        qDebug(u8("запомним откат на помол: %1").arg(::toString(_cooldown)));
     }
 }
 
@@ -140,19 +135,23 @@ bool WorkCrystalGrinding::canStartWork() {
         }
     }
 
+    if (_capacity > 0 && (_capacity - _amount < 10)) {
+//        qDebug("кристалльной пыли у нас уже дофига. молоть не будем");
+        return false;
+    }
+
     if (_bot->_gpage->crystal <= _grind_over) {
 //        qDebug("кристаллов маловато");
         return false;
     }
+    updateCooldown();
+
     QDateTime now = QDateTime::currentDateTime();
     if (_cooldown.isValid() && now < _cooldown) {
 //        qDebug("кристаллы молоть ещё рано");
         return false;
     }
-    if (_capacity > 0 && (_capacity - _amount < 10)) {
-//        qDebug("кристалльной пыли у нас уже дофига. молоть не будем");
-        return false;
-    }
+
 //    qDebug("можно помолоть кристаллы");
     return true;
 }

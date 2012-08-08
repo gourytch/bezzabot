@@ -17,6 +17,7 @@ void WorkAlchemy::configure(Config *config) {
     Work::configure(config);
     bowl_index = config->get("Work_Alchemy/bowl_index", false, 0).toInt();
     mixcatcher = config->get("Work_Alchemy/mix_catcher", false, 60).toInt();
+    use_cleaner= config->get("Work_Alchemy/use_cleaner", false, true).toBool();
     alerted = false;
 }
 

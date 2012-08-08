@@ -16,9 +16,13 @@ protected:
 
     QDateTime pit_bowl_expire;
 
+    QDateTime pit_bowl_cleaning;
+
     int bowl_index;
 
     int mixcatcher;
+
+    bool use_cleaner;
 
     void checkCooldowns();
 

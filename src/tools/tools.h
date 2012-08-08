@@ -77,6 +77,8 @@ typedef bool WorkoutSet[5];
 void parseWorkoutSet(const QString& s, WorkoutSet* set);
 QString toString(const WorkoutSet* set);
 
+int randrange(int minValue, int maxValue); // [min..max]
+
 double gaussian_rand();
 
 int gaussian_rand(int minValue, int maxValue); // [min..max]
