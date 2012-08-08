@@ -18,17 +18,23 @@ protected:
 
     QDateTime pit_bowl_cleaning;
 
-    int bowl_index;
+    int mixes_left;       // оставшееся количество помешиваний
 
-    int mixcatcher;
+    int bowl_index;     // номер котла
 
-    bool use_cleaner;
+    int mixcatcher;     // время запаса перед помешиванием
+
+    int boiling_time;   // время готовки зелья
+
+    bool use_cleaner;   // использовать ли зелье "чистюля"
 
     void checkCooldowns();
 
     void updateCooldowns(Page_Game *page);
 
     bool canStartWork();
+
+    bool isMixerReady();
 
     bool alerted;
 

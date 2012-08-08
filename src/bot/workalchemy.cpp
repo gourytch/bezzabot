@@ -100,6 +100,21 @@ void WorkAlchemy::updateCooldowns(Page_Game *page) {
 }
 
 
+bool WorkAlchemy::isMixerReady() {
+    QDateTime now = QDateTime::currentDateTime();
+    if (pit_final.isNull() || (pit_final < now)) {
+        return false; // варка неактивна
+    }
+    if (mixes_left == 0) { // все помешивания закончены
+        return false;
+    }
+    if (pit_mix.isNull() || now.secsTo(pit_mix) < mixcatcher) {
+        // самое время приготовиться к помешиванию
+        return true;
+    }
+    return false; // до помешивания ещё рано
+}
+
 void WorkAlchemy::checkCooldowns() {
     updateCooldowns(_bot->_gpage);
     QDateTime now = QDateTime::currentDateTime();
@@ -130,5 +145,6 @@ void WorkAlchemy::checkCooldowns() {
 }
 
 bool WorkAlchemy::canStartWork() {
+    checkCooldowns();
     return false;
 }
