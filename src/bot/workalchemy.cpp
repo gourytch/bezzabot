@@ -82,7 +82,7 @@ void WorkAlchemy::updateCooldowns(Page_Game *page) {
                ::toString(pit_final));
     }
     if (!pMix->active()) {
-        if (!pit_mix.isNull()) {
+        if (!pit_mix.isNull() && (now < pit_mix)) {
             pit_mix = now;
             qDebug("смесительный таймер отключился. закоротили pit_mix");
         }
