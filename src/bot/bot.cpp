@@ -293,7 +293,19 @@ void Bot::onPageFinished (bool ok)
     }
 
     QString new_url = _actor->page()->mainFrame ()->url().toString();
-    if (_last_url == new_url) {
+    bool dup = true;
+    foreach (QString s, _skippers) {
+        if (new_url.contains(s)) {
+            qDebug(u8("ignore dupcheck for url {%1}: found skipper {%2}")
+                   .arg(new_url).arg(s));
+            dup = false;
+            break;
+        }
+    }
+    if (dup) {
+        dup = (_last_url == new_url);
+    }
+    if (dup) {
         ++_last_url_counter;
         if (_last_url_count_for_warning > 0 &&
             _last_url_count_for_warning == _last_url_counter) {
@@ -508,6 +520,12 @@ void Bot::configure() {
     _last_url_count_for_unloop = _config->get("watchdog/loop_soft_unloop_count", false, 10).toInt();
     _last_url_count_for_forced_unloop = _config->get("watchdog/loop_forced_unloop_count", false, 13).toInt();
     _last_url_count_for_quit = _config->get("watchdog/loop_fatal_count", false, 15).toInt();
+    _skippers = _config->get("watchdog/skippers", false, "tavern.php a=zoo&").toString().split(QRegExp("\\s+"));
+    qDebug("skippers");
+    foreach (QString s, _skippers) {
+        qDebug("{" + s + "}");
+    }
+    qDebug("eol");
 
     _maxAwaitingTimeout = _config->get("watchdog/max_awaiting_timeout", false, 60).toInt();
 

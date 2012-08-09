@@ -59,6 +59,7 @@ public:
     int     _last_url_count_for_forced_unloop;
     int     _last_url_count_for_quit;
     QList<QString> _neutral_urls;
+    QList<QString> _skippers;
 
 
     bool _awaiting;
