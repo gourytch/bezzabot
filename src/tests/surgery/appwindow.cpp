@@ -90,6 +90,12 @@ AppWindow::AppWindow(QWidget *parent) :
 
     pWebPage->mainFrame()->addToJavaScriptWindowObject("__ww__", this);
     pWebView->load(QUrl(_baseurl));
+
+    if (pWebPage->supportsExtension(QWebPage::ErrorPageExtension)) {
+        qDebug("Page supported ErrorPageExtension");
+    } else {
+        qDebug("Page does not supported ErrorPageExtension");
+    }
 }
 
 AppWindow::~AppWindow() {

@@ -2,6 +2,7 @@
 #include <QUrl>
 #include <QDateTime>
 #include <QTime>
+#include "tools/netmanager.h"
 #include "tools/tools.h"
 #include "parsers/all_pages.h"
 #include "bot.h"
@@ -110,7 +111,7 @@ void Bot::one_step () {
     }
 
     if (_workq.empty()) {
-        // работы у нас нет, а добавляли мы её кодом ранее.
+        // работы у нас нет, а добавляли мы её ходом ранее.
         // значит делать нам пока нечего, значит идём отсюда
         return;
     }

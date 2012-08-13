@@ -7,6 +7,7 @@
 #include "bot.h"
 #include "webactor.h"
 #include "tools/persistentcookiejar.h"
+#include "tools/netmanager.h"
 #include "tools/tools.h"
 #include "tools/timebomb.h"
 #include "tools/logger.h"
@@ -255,11 +256,19 @@ void Bot::onPageFinished (bool ok)
 {
     state.atime = QDateTime::currentDateTime();
 
-    if (ok)
-    {
+    if (ok) {
         _cookies->save ();
         savePix(_actor->page()->mainFrame()->documentElement());
+    } else {
+        qWarning("page load error");
+        return;
     }
+
+    if (! NetManager::shared->isLinkEnabled()) {
+        qWarning("onPageFinished whilst link is disabled");
+        return; // нечего нам тут делать без сети
+    }
+
     if (_page) {
         delete _page;
         _page = NULL;

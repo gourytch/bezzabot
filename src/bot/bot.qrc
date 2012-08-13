@@ -8,5 +8,7 @@
         <file alias="go.png">images/go.png</file>
         <file alias="save.png">images/save.png</file>
         <file alias="ico.png">images/ico.png</file>
+        <file alias="link_off.png">images/link_off.png</file>
+        <file alias="link_on.png">images/link_on.png</file>
     </qresource>
 </RCC>

@@ -6,6 +6,13 @@
 #include "tools/tools.h"
 #include "tools/netmanager.h"
 
+ESTART(FoodType)
+ECASE(NoFood)
+ECASE(Slaves)
+ECASE(Crystals)
+ECASE(Fish)
+EEND
+
 ///
 /// Page_Game_Incubator::Flying
 ///
@@ -1004,8 +1011,8 @@ bool Page_Game_Incubator::doBuyStat(int stat_ix) {
     return true;
 }
 
-bool Page_Game_Incubator::doFeed(int ptype) {
-    if (! (ptype == 10 || ptype == 2 || ptype == 50010)) {
+bool Page_Game_Incubator::doFeed(FoodType ptype) {
+    if (! (ptype == Slaves || ptype == Crystals || ptype == Fish)) {
         qCritical("bad ptype=%d", ptype);
         return false;
     }

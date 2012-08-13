@@ -11,6 +11,7 @@
 #include "tools/tools.h"
 #include "tools/timebomb.h"
 #include "tools/logger.h"
+#include "tools/netmanager.h"
 #include "alertdialog.h"
 #include "bot.h"
 
@@ -88,10 +89,14 @@ void MainWindow::createUI ()
     imgButtonOn     = QIcon(":/button_on.png");
     imgNoPicsOff    = QIcon(":/nopix_off.png");
     imgNoPicsOn     = QIcon(":/nopix_on.png");
+    imgLinkOff      = QIcon(":/link_off.png");
+    imgLinkOn       = QIcon(":/link_on.png");
     strAutomatonOff = u8("автомат отключен");
     strAutomatonOn  = u8("автомат включен");
     strNoPicsOn     = u8("картинки не грузим");
     strNoPicsOff    = u8("качаем с картинками");
+    strLinkOn       = u8("соединение с сервером разрешено");
+    strNoPicsOff    = u8("соединение с сервером запрещено");
 
     setWindowIcon(imgAppIcon);
 
@@ -115,6 +120,14 @@ void MainWindow::createUI ()
 //    pShowLog->setFlat(true);
 //    pShowLog->setFixedSize(20, 20);
 //    pShowLog->setToolTip(strNoPicsOff);
+
+    pLink = new QPushButton();
+    pLink->setFixedSize(20, 20);
+    pLink->setFlat(true);
+    pLink->setCheckable(true);
+    pLink->setChecked(true);
+    pLink->setIcon(imgLinkOn);
+    pLink->setToolTip(strLinkOn);
 
     pSaveButton = new QPushButton();
     pSaveButton->setIcon(QIcon(":/save.png"));
@@ -148,6 +161,7 @@ void MainWindow::createUI ()
     pControls->setSpacing(1);
     pControls->addWidget (pAutomaton, 0);
     pControls->addWidget (pNoPics, 0);
+    pControls->addWidget (pLink, 0);
     pControls->addWidget (pSaveButton, 0);
     pControls->addWidget (pUrlEdit, 100);
     pControls->addWidget (pGoButton, 0);
@@ -208,6 +222,9 @@ void MainWindow::setupConnections () {
     connect (pNoPics, SIGNAL(toggled(bool)),
              this, SLOT(nopicsToggled(bool)));
 
+    connect (pLink, SIGNAL(toggled(bool)),
+             this, SLOT(linkToggled(bool)));
+
     connect (pWebView->page (), SIGNAL (loadStarted ()),
              this, SLOT (slotLoadStarted ()));
 
@@ -227,6 +244,9 @@ void MainWindow::setupConnections () {
     connect (pUrlEdit, SIGNAL(textEdited(QString)),
              this, SLOT(slotUrlEdited(QString)));
 
+    connect (NetManager::shared,
+             SIGNAL(linkChanged(bool)),
+             this, SLOT(slotLinkChanged(bool)));
     Logger *pLogger = &(Logger::global());
     connect(pLogger, SIGNAL(signalWarning(QString)), this, SLOT(log(QString)));
     connect(pLogger, SIGNAL(signalCritical(QString)), this, SLOT(log(QString)));
@@ -320,6 +340,7 @@ void MainWindow::nopicsToggled (bool checked) {
     settings->setAttribute (QWebSettings::AutoLoadImages, !checked);
 }
 
+
 void MainWindow::automatonToggled (bool checked) {
     if (checked) {
         qDebug("automaton enabled");
@@ -337,6 +358,14 @@ void MainWindow::automatonToggled (bool checked) {
         pAutomaton->setIcon(imgButtonOff);
         pAutomaton->setToolTip(strAutomatonOff);
     }
+}
+
+void MainWindow::linkToggled(bool checked) {
+    if (NetManager::shared->isLinkEnabled() == checked) {
+        return;
+    }
+    NetManager::shared->enableLink(checked);
+    updateLinkButton();
 }
 
 void MainWindow::startAutomaton()
@@ -440,6 +469,29 @@ void MainWindow::messageClicked() {
     }
     if (!isActiveWindow()) {
         activateWindow();
+    }
+}
+
+void MainWindow::updateLinkButton() {
+    bool linkOn = NetManager::shared->isLinkEnabled();
+    if (linkOn) {
+        qDebug("connection enabled");
+        pLink->setChecked(true);
+        pLink->setIcon(imgLinkOn);
+        pLink->setToolTip(strLinkOn);
+    } else {
+        qDebug("connection disabled");
+        pLink->setChecked(false);
+        pLink->setIcon(imgLinkOff);
+        pLink->setToolTip(strLinkOff);
+    }
+}
+
+
+void MainWindow::slotLinkChanged(bool enabled) {
+    qDebug("MainWindow::slotLinkChanged(%d)", enabled);
+    if (enabled != pLink->isChecked()) {
+        updateLinkButton();
     }
 }
 

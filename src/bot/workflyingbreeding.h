@@ -17,6 +17,8 @@ enum WorkoutPlan {
     Training_Greatest_At_All
 };
 
+
+
 class WorkFlyingBreeding : public Work
 {
     Q_OBJECT
@@ -41,6 +43,7 @@ protected:
         int     karkar_length;
 
         bool    check4feed;
+        FoodType food;
 
         WorkoutPlan plan;
         WorkoutSet workout_set;

@@ -1,6 +1,7 @@
 #ifndef NETMANAGER_H
 #define NETMANAGER_H
 
+#include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include <QString>
 #include <QFile>
@@ -20,6 +21,8 @@ protected:
 
     bool        _write_debug;
     bool        _write_log;
+
+    bool        _link_enabled;
 
 protected:
 
@@ -46,10 +49,21 @@ public:
 
     bool gotReply;
 
+    bool gotError;
+
+    void enableLink(bool enabled);
+
+    bool isLinkEnabled() const;
+
+signals:
+
+    void linkChanged(bool enabled);
+
 protected slots:
 
     void slotGotReply(QNetworkReply *reply);
 
+    void slotGotError(QNetworkReply::NetworkError error);
 };
 
 QString toString(QNetworkAccessManager::Operation v);

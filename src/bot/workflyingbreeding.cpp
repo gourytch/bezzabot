@@ -13,6 +13,14 @@ ECASE(Training_Cheapest)
 ECASE(Training_Greatest)
 EEND
 
+
+S2E_START(FoodType)
+S2E_CASE(Slaves)
+S2E_CASE(Crystals)
+S2E_CASE(Fish)
+S2E_END(FoodType)
+
+
 void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
     this->ix = ix;
 
@@ -33,6 +41,12 @@ void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
 
     duration10 = config->get(pfx + "duration10" + sfx, false, -1).toInt();
     check4feed = config->get(pfx + "check4feed" + sfx, false, true).toBool();
+    food = fromString(config->get(pfx + "food" + sfx, false, "Crystals").toString());
+    if ((int)food == -1) {
+        qCritical("bad food type! reset to Crystals");
+        food = Crystals;
+    }
+
 
     QString s = config->get(pfx + "workout_plan" + sfx, false, "lowest")
             .toString().trimmed().toLower();
@@ -74,6 +88,7 @@ void WorkFlyingBreeding::FlyingConfig::dumpConfig() const {
     qDebug(u8("      duration10: %1").arg(duration10));
     qDebug(u8("      karkar_length: %1").arg(karkar_length));
     qDebug(u8("      check4feed: %1").arg(check4feed ? "true" : "false"));
+    qDebug(u8("      food: %1").arg(::toString(food)));
     qDebug(u8("      workout_plan: %1").arg(::toString(plan)));
     qDebug(u8("      workout_set : %1").arg(::toString(&workout_set)));
     qDebug(u8("      accumulate: %1").arg(accumulate));
@@ -257,9 +272,23 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
         qDebug("check point 2");
         if (!cfg.check4feed) {
             // не делаем ничего
-        } else if (_bot->state.plant_slaves < 30) {
-            qDebug("мало рабов (%d), кормить не стану [FEED-N10]",
-                   _bot->state.plant_slaves);
+        } else if ((cfg.food == Slaves && _bot->state.plant_slaves < 30) ||
+                   (cfg.food == Crystals && gpage->crystal < 40) ||
+                   (cfg.food == Fish && gpage->fish < 200))
+        {
+            switch (cfg.food) {
+            case Slaves:
+                qDebug("для кормёжки мало рабов (%d)",
+                       _bot->state.plant_slaves);
+            case Crystals:
+                qDebug("для кормёжки мало кристаллов (%d)",
+                       gpage->crystal);
+            case Fish:
+                qDebug("для кормёжки мало рыбы (%d)",
+                       gpage->fish);
+            default:
+                qFatal("этим кормить нельзя");
+            }
         } else if (p->selectedTab == "fa_feed") {
             qDebug("стоим возле кормушки... [FEED-A13]");
             go_n_look = true;
@@ -1024,17 +1053,52 @@ bool WorkFlyingBreeding::processFeedTab(Page_Game_Incubator *p) {
     qDebug(u8("сытость летуна %1 упала до %2%, надо бы покормить")
            .arg(flying.title).arg(p->fa_feed.satiety));
 
-    qDebug("будем кормить рабами");
-    if (_bot->state.plant_slaves == -1) {
-        qDebug("мы не знаем, сколько рабов у нас в загашнике. кормим вслепую");
-    } else if (_bot->state.plant_slaves < p->fa_feed.price_slaves) {
-        qDebug("рабов у нас всего %d, а надо %d. не прокормим",
-               _bot->state.plant_slaves, p->fa_feed.price_slaves);
+    FoodType ptype = NoFood;  // 10 | 2 | 50010
+    switch (cfg.food) {
+    case Slaves:
+        qDebug("будем кормить рабами");
+        if (_bot->state.plant_slaves == -1) {
+            qDebug("мы не знаем, сколько рабов у нас в загашнике. кормим вслепую");
+        } else if (_bot->state.plant_slaves < p->fa_feed.price_slaves) {
+            qDebug("рабов у нас всего %d, а надо %d. не прокормим",
+                   _bot->state.plant_slaves, p->fa_feed.price_slaves);
+            return true;
+        }
+        qDebug("у нас %d рабов, этого хватит", _bot->state.plant_slaves);
+        ptype = Slaves;
+        break;
+    case Crystals:
+        qDebug("будем кормить кристаллами");
+        if (p->crystal < p->fa_feed.price_crystal) {
+            qDebug("кристаллов у нас всего %d, а надо %d. не прокормим",
+                  p->crystal, p->fa_feed.price_crystal);
+            return true;
+        }
+        qDebug("у нас %d кристаллов, этого хватит", p->crystal);
+        ptype = Crystals;
+        break;
+    case Fish:
+        qDebug("будем кормить пирашками");
+        if (p->fish < p->fa_feed.price_fish) {
+            qDebug("рыбы у нас всего %d, а надо %d. не прокормим",
+                  p->fish, p->fa_feed.price_fish);
+            return true;
+        }
+        qDebug("пирашек у нас %d, этого хватит", p->fish);
+        ptype = Fish;
+        break;
+    default:
+        qFatal("такой дряни у нас нет и быть не может!");
+        break;
+    }
+
+    if (ptype == NoFood) {
+        qFatal("не кормим");
         return true;
     }
-    qDebug("у нас %d рабов, этого хватит", _bot->state.plant_slaves);
+
     qDebug("кормим");
-    if (p->doFeed()) {
+    if (p->doFeed(ptype)) {
         qWarning(u8("кормим летуна %1").arg(flying.title));
         setAwaiting();
         return true;

@@ -7,6 +7,16 @@
 #include <QVectorIterator>
 #include "page_game.h"
 
+enum FoodType {
+    NoFood      = 0,
+    Slaves      = 10,
+    Crystals    = 2,
+    Fish        = 50010
+};
+
+QString toString(FoodType food);
+
+
 class Page_Game_Incubator : public Page_Game
 {
     Q_OBJECT
@@ -215,7 +225,7 @@ public:
     bool doBuyStat(int stat_ix);
 
     // feed
-    bool doFeed(int ptype = 50010); // 10=рыба, 2=кри, 50010=рабы
+    bool doFeed(FoodType ptype = Crystals); // 10=рыба, 2=кри, 50010=рабы
 
 protected:
 

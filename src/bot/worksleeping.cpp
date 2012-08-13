@@ -1,18 +1,19 @@
 #include <QDateTime>
 #include "tools/tools.h"
+#include "tools/netmanager.h"
 #include "worksleeping.h"
 #include "bot.h"
 
 WorkSleeping::WorkSleeping(Bot *bot) :
     Work(bot)
 {
+    _sleep_on = false;
 }
 
 void WorkSleeping::configure(Config *config) {
     Work::configure(config);
-    sleepdownHour = config->get("Work_Sleeping/sleepdown_hour", false, 23).toInt();
-    wakeupHour = config->get("Work_Sleeping/wakeup_hour", false, 8).toInt();
     _use_coulons = config->get("Work_Sleeping/use_coulons", false, true).toBool();
+    _use_link    = config->get("Work_Sleeping/use_link", false, false).toBool();
 }
 
 bool WorkSleeping::isPrimaryWork() const {
@@ -35,13 +36,16 @@ QString WorkSleeping::getWorkStage() const {
 
 bool WorkSleeping::nextStep() {
     if (isSleeping()) {
+        sleepDown();
         return true;
     }
     if (!isSleepNeed()) {
         qWarning("мы проснулись");
+        wakeUp();
         _bot->GoTo();
         return false;
     }
+    sleepDown();
     return true;
 }
 
@@ -53,15 +57,20 @@ bool WorkSleeping::processPage(const Page_Game *gpage) {
                  .arg(gpage->timer_work.href)
                  .arg(gpage->timer_work.pit.toString("yyyy-MM-dd hh:mm:ss")));
         _wakeupTime = QDateTime();
+        wakeUp();
         return false;
     }
     if (isSleeping()) {
+        sleepDown();
         return true;
     }
     if (!isSleepNeed()) {
         _wakeupTime = QDateTime();
+        wakeUp();
         return false;
     }
+    // FIXME неплохо бы разобраться, как мы в это место вообще попасть можем?
+    sleepDown();
     return true;
 }
 
@@ -101,10 +110,12 @@ bool WorkSleeping::processCommand(Command command) {
             }
             _wakeupTime = now.addSecs(secs);
             qWarning(u8("ложимся спать до %2").arg(::toString(_wakeupTime)));
+            sleepDown();
             return true;
         } else {
             qWarning(u8("спать не хочется"));
             _wakeupTime = QDateTime();
+            wakeUp();
             return false;
         }
     }
@@ -118,21 +129,31 @@ bool WorkSleeping::processCommand(Command command) {
 
 int WorkSleeping::getTimeToSleep() const {
     QDateTime now = QDateTime::currentDateTime();
+    int l = _activity_hours.seg_length();
+    if (l == 0) return 0; // неактивный час
+    int s = l * 3600 + randrange(-3000, +1000);
+    return s < 0 ? 0 : s;
+}
 
-    int h = now.time().hour();
-    int dh = -1;
 
-    if (sleepdownHour <= wakeupHour) {
-        if (sleepdownHour <= h && h <= wakeupHour) {
-            dh = wakeupHour - h;
-        }
-    } else { // wakeup < sleepdown, 2 parts
-        if (h <= wakeupHour) {
-            dh = wakeupHour - h;
-        } else if (sleepdownHour <= h) {
-            dh = 24 - h + wakeupHour;
-        }
+void WorkSleeping::sleepDown() {
+    if (_sleep_on) return;
+    qDebug(u8("засыпаем..."));
+    if (_use_link) {
+        qDebug("запрещаем сетевое взаимодействие. типа отключились");
+        NetManager::shared->enableLink(false);
     }
+    qDebug(u8("...заснули"));
+    _sleep_on = true;
+}
 
-    return (dh < 0) ? 0 : dh * 3600 + (qrand() % 3600) + 5;
+void WorkSleeping::wakeUp() {
+    if (!_sleep_on) return;
+    qDebug(u8("просыпаемся..."));
+    if (_use_link) {
+        qDebug("разрешаем взаимодействие с внешним миром");
+        NetManager::shared->enableLink(false);
+    }
+    qDebug(u8("...проснулись"));
+    _sleep_on = false;
 }

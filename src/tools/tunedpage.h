@@ -16,7 +16,11 @@ class TunedPage : public QWebPage
     Q_OBJECT
 
 protected:
-        virtual QString userAgentForUrl ( const QUrl & url ) const;
+    virtual QString userAgentForUrl ( const QUrl & url ) const;
+    virtual bool extension(Extension extension,
+                           const ExtensionOption *option = 0,
+                           ExtensionReturn * output = 0);
+    virtual bool supportsExtension(Extension extension) const;
 
 public:
     TunedPage (QObject * parent = 0) : QWebPage (parent) {}

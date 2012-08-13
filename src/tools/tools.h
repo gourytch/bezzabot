@@ -89,7 +89,7 @@ int gaussian_rand(int minValue, int maxValue); // [min..max]
 
 // STRING-TO-ENUM
 #define S2E_START(E) E fromString(const QString& s) {
-#define S2E_CASE(x) if (s == #x) return x; else
-#define S2E_END return (E)-1; }
+#define S2E_CASE(x) if (s.compare(#x, Qt::CaseInsensitive) == 0) return x; else
+#define S2E_END(E) return (E)-1; }
 
 #endif // TOOLS_H

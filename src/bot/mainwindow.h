@@ -24,12 +24,16 @@ protected:
     QIcon           imgButtonOn;
     QIcon           imgNoPicsOff;
     QIcon           imgNoPicsOn;
+    QIcon           imgLinkOff;
+    QIcon           imgLinkOn;
 //    QIcon           imgLogVisible;
     QIcon           imgLogHidden;
     QString         strAutomatonOff;
     QString         strAutomatonOn;
     QString         strNoPicsOff;
     QString         strNoPicsOn;
+    QString         strLinkOff;
+    QString         strLinkOn;
 
     QSystemTrayIcon *pTrayIcon;
     QMenu           *pTrayMenu;
@@ -45,6 +49,7 @@ protected:
     QPushButton     *pAutomaton;
     QPushButton     *pNoPics;
     QPushButton     *pShowLog;
+    QPushButton     *pLink;
     QLineEdit       *pUrlEdit;
     QPushButton     *pGoButton;
     QPushButton     *pSaveButton;
@@ -74,6 +79,7 @@ protected:
 
     virtual void closeEvent(QCloseEvent *);
 
+    void updateLinkButton();
 
 public:
     explicit MainWindow (QWidget *parent = 0);
@@ -107,15 +113,16 @@ protected slots:
     void messageClicked();
     void automatonToggled (bool checked);
     void nopicsToggled (bool checked);
+    void linkToggled(bool checked);
+
     void slotLoadStarted ();
     void slotLoadProgress (int percent);
     void slotLoadFinished (bool success);
     void slotSavePage ();
     void slotSaveAlonePage ();
-
+    void slotLinkChanged(bool enabled);
     void slotUrlEdited(QString s);
     void slotGoClicked();
-
 };
 
 #endif // MAINWINDOW_H

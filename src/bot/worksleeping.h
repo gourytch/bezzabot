@@ -2,6 +2,7 @@
 #define WORKSLEEPING_H
 
 #include <QDateTime>
+#include "tools/activityhours.h"
 #include "work.h"
 
 class Bot;
@@ -11,10 +12,9 @@ class WorkSleeping : public Work
     Q_OBJECT
 
 protected:
-
-    int sleepdownHour;
-    int wakeupHour;
     bool _use_coulons;
+    bool _use_link;
+    bool _sleep_on;
 
     QDateTime _wakeupTime;
 
@@ -28,6 +28,10 @@ protected:
     bool isSleepNeed() const {
         return (getTimeToSleep() > 0);
     }
+
+    void sleepDown();
+
+    void wakeUp();
 
 public:
 
