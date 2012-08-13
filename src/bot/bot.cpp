@@ -261,7 +261,7 @@ void Bot::onPageFinished (bool ok)
         savePix(_actor->page()->mainFrame()->documentElement());
     } else {
         qWarning("page load error");
-        return;
+        if (_strict) return;
     }
 
     if (! NetManager::shared->isLinkEnabled()) {
@@ -539,6 +539,7 @@ void Bot::configure() {
     _maxAwaitingTimeout = _config->get("watchdog/max_awaiting_timeout", false, 60).toInt();
 
     _coward_mode = _config->get("watchdog/coward_mode", false, false).toBool();
+    _strict = _config->get("watchdog/strict", false, false).toBool();
 
     _neutral_urls.append("dressingroom.php");
     _neutral_urls.append("house.php");

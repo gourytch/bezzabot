@@ -68,6 +68,8 @@ public:
     bool    _has_timeout;
     bool    _coward_mode;
 
+    bool _strict;
+
     bool _page_busy;
 
     bool cowardMode() const {
