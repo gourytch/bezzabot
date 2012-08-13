@@ -160,8 +160,8 @@ void MainWindow::createUI ()
     QHBoxLayout *pControls = new QHBoxLayout ();
     pControls->setSpacing(1);
     pControls->addWidget (pAutomaton, 0);
-    pControls->addWidget (pNoPics, 0);
     pControls->addWidget (pLink, 0);
+    pControls->addWidget (pNoPics, 0);
     pControls->addWidget (pSaveButton, 0);
     pControls->addWidget (pUrlEdit, 100);
     pControls->addWidget (pGoButton, 0);
