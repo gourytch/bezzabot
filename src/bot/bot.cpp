@@ -260,12 +260,16 @@ void Bot::onPageFinished (bool ok)
         _cookies->save ();
         savePix(_actor->page()->mainFrame()->documentElement());
     } else {
-        qWarning("page load error");
-        if (_strict) return;
+        if (_strict) {
+            qWarning("page load error in strict mode");
+            return;
+        } else {
+            qDebug("page load error. reparse old page");
+        }
     }
 
     if (! NetManager::shared->isLinkEnabled()) {
-        qWarning("onPageFinished whilst link is disabled");
+        qWarning(u8("** доступ к сети запрещен, парсить ничего не будем!"));
         return; // нечего нам тут делать без сети
     }
 
