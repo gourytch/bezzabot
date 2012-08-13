@@ -226,6 +226,15 @@ void NetManager::slotGotReply(QNetworkReply *reply) {
     }
 }
 
+
 void NetManager::slotGotError(QNetworkReply::NetworkError error) {
-    qCritical("NetManager got Error %d", error);
+    QNetworkReply *p = dynamic_cast<QNetworkReply*>(sender());
+    if (p) {
+        qCritical(u8("network request {%1} got error #%2 (%3)")
+                  .arg(p->url().toString())
+                  .arg(p->error())
+                  .arg(p->errorString()));
+    } else {
+        qCritical("NetManager got Error %d from unknown sender", error);
+    }
 }
