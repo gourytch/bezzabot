@@ -11,4 +11,4 @@ qrc_*.cpp
 /obj/*
 /lib/*
 /include/*
-
+ui_*.h

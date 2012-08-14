@@ -63,6 +63,7 @@ SOURCES += \
 SOURCES += \
     $$SRC/bot/main.cpp\
     $$SRC/bot/mainwindow.cpp \
+    $$SRC/bot/alertdialog.cpp \
     $$SRC/bot/bot.cpp \
     $$SRC/bot/webactor.cpp \
     $$SRC/bot/farmersgroupsprices.cpp \
@@ -136,6 +137,7 @@ HEADERS  += \
 
 HEADERS  += \
     $$SRC/bot/mainwindow.h \
+    $$SRC/bot/alertdialog.h \
     $$SRC/bot/bot.h \
     $$SRC/bot/webactor.h \
     $$SRC/bot/farmersgroupsprices.h \
@@ -157,6 +159,9 @@ HEADERS  += \
 
 RESOURCES += \
     $$SRC/bot/bot.qrc
+
+FORMS += \
+    $$SRC/bot/alertdialog.ui
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$OBJECTS_DIR/moc
