@@ -1,44 +1,82 @@
 #! /bin/bash
 
-MAINDIR="$HOME/src/toys/botva/bezzabot"
+BUILD_LX32="N"
+BUILD_WIN32="Y"
+#DEPLOY_TO="$HOME/Dropbox/bezzabot-shared/"
+DEPLOY_TO="$HOME/temp/bezzabot-deploy/"
 
-TS="$(date +'%Y%m%d_%H%M%S')"
-DST="$HOME/Dropbox/bezzabot-shared/$TS"
+MAINDIR="$(cd $(dirname $0) && pwd)"
+
+LX32_ROOT="/srv/chroots/squeeze32"
+LX32_BDIR="/root/bezzabot"
+
+EXE_LX64="$MAINDIR/bin/bezzabot"
+EXE_LX32="$LX32_BDIR/bin/bezzabot"
+EXE_WIN32="$MAINDIR/../win32bezzabot/C/bezzabot/solid_bot.exe"
+
+
+case "$*" in
+newid)
+  echo "create new build id"
+  cd $MAINDIR && 
+  git pull && 
+  ./UPDATE_bldid.sh &&
+  git push 
+  ;;
+oldid)
+  echo "keep old build id"
+  ;;
+*)
+  echo "use $0 oldid|newid"
+  exit 1
+  ;;
+esac
+
+BUILD_ID=$(gawk '/#define BUILD_ID/{gsub("\"", "", $3); print $3; }' src/tools/build_id.h | xargs )
+DST="$DEPLOY_TO/bid-$BUILD_ID"
+
+echo "[*] build id: $BUILD_ID"
+
+echo "[*] build on host system..."
+if ! ./REBUILD.sh 
+then
+  echo "[!] build failed"
+  exit 1
+fi
+
+if [ "$BUILD_LX32" = "Y" ]
+then
+  echo "[*] build linux32..."
+  sudo linux32 chroot /srv/chroots/squeeze32 /bin/bash --login -c "cd ~/bezzabot && git pull && ./REBUILD.sh"
+  if [ ! -e /srv/chroots/squeeze32/root/bezzabot/bin/bezzabot ]
+  then
+    echo "[!] build failed"
+    exit 1
+  fi
+else
+  echo  "[*] linux32 skipped"
+fi
+
+if [ "$BUILD_WIN32" = "Y" ]
+then
+  echo "[*] build win32..."
+  ./BUILD-bb-win32-zeppelin.sh
+  if [ ! -e $EXE_WIN32 ]
+  then
+    echo "[*] build win32 failed."
+    exit 1
+  fi
+  reset
+else
+  echo "[*] win32 skipped"
+fi
+
+echo "deploy executables to $DST"
+
 mkdir -p $DST
 
-cd $MAINDIR && 
-git pull && 
-./UPDATE_bldid.sh &&
-./REBUILD.sh || exit
-git push 
-sudo linux32 chroot /srv/chroots/squeeze32 /bin/bash --login -c "cd ~/bezzabot && git pull && ./REBUILD.sh"
-test -e /srv/chroots/squeeze32/root/bezzabot/bin/bezzabot || exit 1
-cd /home/gour/toys/wine-env/drive_c/bezzabot/ && git pull && wine cmd /c REBUILD-win32.cmd
-test -e /home/gour/toys/wine-env/drive_c/bezzabot/bin/bezzabot.exe || exit 1
-reset
-cp $MAINDIR/bin/bezzabot $DST/bezzabot-amd64
-cp /srv/chroots/squeeze32/root/bezzabot/bin/bezzabot $DST/bezzabot-i686
-cp /home/gour/toys/wine-env/drive_c/bezzabot/bin/bezzabot.exe $DST
+test -e $EXE_LX64 && cp $EXE_LX64 $DST/bezzabot-amd64
+test -e $EXE_LX32 && cp $EXE_LX32 $DST/bezzabot-i686
+test -e $EXE_WIN32 && cp $EXE_WIN32 $DST/bezzabot.exe
 
-if false; then
-BIN=$DST/bezzabot-i686
-EEE=/mnt/auto/sshfs/beee-gour/home/gour/bezzabot/bezzabot-i686
-else
-BIN=$DST/bezzabot-amd64
-EEE=/srv/toys/bezzabot/bezzabot-amd64
-fi
-
-BAK=${EEE}_bak_$TS
-if [ -e $BIN ]
-then
-  rm -f $BAK
-  mv $EEE $BAK
-  cp $BIN $EEE
-  echo "OK"
-else
-  echo "FAIL"
-fi
-
-
-echo "BEZZABOT WAS DEPLOYED TO $TS subdir"
-
+echo "[=] BEZZABOT BUILD_ID=$BUILD_ID WAS BUILT AND DEPLOYED TO $DST"
