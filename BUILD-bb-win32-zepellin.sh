@@ -4,4 +4,4 @@ source $W32BASE/rc
 
 cd $W32BASE/C/bezzabot && 
 git pull && 
-wine cmd /c REBUILD-win32-zeppelin.cmd
+wine cmd /c BUILD-bb-win32-zeppelin.cmd
