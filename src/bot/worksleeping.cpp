@@ -152,7 +152,7 @@ void WorkSleeping::wakeUp() {
     qDebug(u8("просыпаемся..."));
     if (_use_link) {
         qDebug("разрешаем взаимодействие с внешним миром");
-        NetManager::shared->enableLink(false);
+        NetManager::shared->enableLink(true);
     }
     qDebug(u8("...проснулись"));
     _sleep_on = false;
