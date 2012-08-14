@@ -160,6 +160,8 @@ HEADERS  += \
 RESOURCES += \
     $$SRC/bot/bot.qrc
 
+win32:RC_FILE += $$SRC/bot/bot_win32.rc
+
 FORMS += \
     $$SRC/bot/alertdialog.ui
 
