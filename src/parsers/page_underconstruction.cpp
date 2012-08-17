@@ -10,7 +10,7 @@ Page_UnderConstruction::Page_UnderConstruction(QWebElement& doc) :
 
 bool Page_UnderConstruction::fit(const QWebElement& doc) {
     if (doc.findFirst("DIV.text").toPlainText().trimmed()
-            .startsWith(u8("Идет процесс загрузки обновлений в игру."))) {
+            .startsWith(u8("процесс загрузки обновлений в игру"))) {
         return true;
     }
     return false;
