@@ -280,14 +280,18 @@ bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
             case Slaves:
                 qDebug("для кормёжки мало рабов (%d)",
                        _bot->state.plant_slaves);
+                break;
             case Crystals:
                 qDebug("для кормёжки мало кристаллов (%d)",
                        gpage->crystal);
+                break;
             case Fish:
                 qDebug("для кормёжки мало рыбы (%d)",
                        gpage->fish);
+                break;
             default:
                 qFatal("этим кормить нельзя");
+                break;
             }
         } else if (p->selectedTab == "fa_feed") {
             qDebug("стоим возле кормушки... [FEED-A13]");
