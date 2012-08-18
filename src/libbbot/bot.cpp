@@ -2,8 +2,8 @@
 #include <QDebug>
 #include <QTimer>
 #include <QDir>
+#include <QCoreApplication>
 #include <QPainter>
-#include "mainwindow.h"
 #include "bot.h"
 #include "webactor.h"
 #include "tools/persistentcookiejar.h"
@@ -50,8 +50,6 @@ Bot::Bot(const QString& id, QObject *parent) :
     _actor = new WebActor (this);
     _actor->page()->networkAccessManager ()->setCookieJar (_cookies);
 
-    MainWindow *wnd = MainWindow::getInstance();
-
     connect (_actor->page(), SIGNAL(loadStarted()),
              this, SLOT(onPageStarted()));
 
@@ -62,10 +60,10 @@ Bot::Bot(const QString& id, QObject *parent) :
 //             wnd, SLOT (dbg (const QString &)));
 
     connect (this, SIGNAL (log (const QString &)),
-             wnd, SLOT (log (const QString &)));
+             parent, SLOT (log (const QString &)));
 
     connect (_actor, SIGNAL (log (const QString &)),
-             wnd, SLOT (log (const QString &)));
+             parent, SLOT (log (const QString &)));
 
     connect (this, SIGNAL (rq_get (const QUrl &)),
              _actor, SLOT (request (const QUrl &)));
@@ -103,8 +101,7 @@ Bot::Bot(const QString& id, QObject *parent) :
 
 void Bot::delayedAutorun() {
     qWarning("invoke autostart");
-    MainWindow *wnd = MainWindow::getInstance();
-    Timebomb::global()->launch(2000, wnd, SLOT(startAutomaton()));
+    Timebomb::global()->launch(2000, parent(), SLOT(startAutomaton()));
 }
 
 Bot::~Bot ()
@@ -336,7 +333,7 @@ void Bot::onPageFinished (bool ok)
             _last_url_count_for_quit  <= _last_url_counter) {
             qFatal("URL {%s} WAS RETURNED %d TIMES. EXIT IMMEDIATELY",
                       qPrintable(_last_url), _last_url_counter);
-            qApp->quit();
+            QCoreApplication::instance()->quit();
             return;
         }
     } else {

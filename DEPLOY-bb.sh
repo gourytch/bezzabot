@@ -1,5 +1,6 @@
 #! /bin/bash
 
+BUILD_LX64="Y"
 BUILD_LX32="N"
 BUILD_WIN32="Y"
 #DEPLOY_TO="$HOME/Dropbox/bezzabot-shared/"
@@ -12,7 +13,7 @@ LX32_BDIR="/root/bezzabot"
 
 EXE_LX64="$MAINDIR/bin/bezzabot"
 EXE_LX32="$LX32_BDIR/bin/bezzabot"
-EXE_WIN32="$MAINDIR/../win32bezzabot/C/bezzabot/solid_bot.exe"
+EXE_WIN32="$MAINDIR/../w32bezzabot/C/bezzabot/bin/solid_bot.exe"
 
 
 case "$*" in
@@ -36,13 +37,18 @@ BUILD_ID=$(gawk '/#define BUILD_ID/{gsub("\"", "", $3); print $3; }' src/tools/b
 DST="$DEPLOY_TO/bid-$BUILD_ID"
 
 echo "[*] build id: $BUILD_ID"
-
-echo "[*] build on host system..."
-if ! ./REBUILD.sh 
+if [ "$BUILD_LX64" = "Y" ]
 then
-  echo "[!] build failed"
-  exit 1
+  echo "[*] build on host system..."
+  if ! ./REBUILD.sh 
+  then
+    echo "[!] build failed"
+    exit 1
+  fi
+else
+  echo "[*] linux64 skipped"
 fi
+
 
 if [ "$BUILD_LX32" = "Y" ]
 then
