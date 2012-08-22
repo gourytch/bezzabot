@@ -9,11 +9,10 @@ TEMPLATE = app
 
 SOURCES += test_parsers.cpp
 
-INCLUDEPATH += $$TOP/src
-LIBS += -L$$TOP/lib -lparsers -ltools
-PRE_TARGETDEPS += $$TOP/lib/libtools.a $$TOP/lib/libparsers.a
+INCLUDEPATH += $$TOP/src/libbbot
+LIBS += -L$$TOP/lib -lbbot
+PRE_TARGETDEPS += $$TOP/lib/libbbot.a
 
 OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/bin
-
