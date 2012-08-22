@@ -18,6 +18,12 @@ enum WorkGuild {
     WorkGuild_Traders
 };
 
+enum MedikitPotion {
+    Potion_Green,
+    Potion_Blue,
+    Potion_Red
+};
+
 QString toString(WorkGuild v);
 
 struct PageTimer
@@ -414,6 +420,8 @@ public:
 
     QWebElement body;
 
+    bool page_updated;
+
     Page_Game (QWebElement& doc);
 
     virtual QString toString (const QString& pfx = QString ()) const;
@@ -450,6 +458,38 @@ public:
 
     bool parseFlyingList();
 
+
+    // JSUpdateWatcher
+    bool jsWatcherActivated;
+    bool jsUpdateFinished;
+    bool activateJSUpdateWatcher(bool force = false);
+    bool deactivateJSUpdateWatcher();
+    bool waitForJSUpdate(int ms = 0);
+
+    // Аптечка
+
+    bool medikitOpened;
+
+    int numGreenPotions;
+
+    int numBluePotions;
+
+    int numRedPotions;
+
+    bool parseMedikit();
+
+    bool doOpenMedikit();
+
+    bool doCloseMedikit();
+
+    bool doDrinkPotion(MedikitPotion potion);
+
+    bool doBuyOnePotion(MedikitPotion potion);
+
+    bool doBuyAllPotion(MedikitPotion potion);
+
+    QString medikitToString() const;
+
 signals:
 
     void js_injected();
@@ -457,6 +497,8 @@ signals:
     void js_doUpdateInfo_finished();
 
 private slots:
+
+    void slot_catch_js_update();
 
     virtual void slot_js_injected();
     virtual void slot_update_invoked(QString data, QString config);

@@ -803,6 +803,8 @@ Page_Game::Page_Game (QWebElement& doc) :
 
     // летучки
     parseFlyingList();
+
+    parseMedikit();
 }
 
 bool Page_Game::parseFlyingList() {
@@ -892,6 +894,7 @@ QString Page_Game::toString (const QString& pfx) const
             pfx + ::toString(pfx + "   ", petlist) +
             pfx + QString("flyings:\n") +
             pfx + ::toString(pfx + "   ", flyingslist) +
+            pfx + medikitToString() + "\n" +
             pfx + "}";
 }
 
@@ -1026,6 +1029,185 @@ bool Page_Game::cagePet() {
         return false;
     }
 }
+
+
+bool Page_Game::activateJSUpdateWatcher(bool force) {
+    if (force) {
+        deactivateJSUpdateWatcher();
+    } else {
+        if (jsWatcherActivated) {
+            return true;
+        }
+    }
+
+    injectJSInsiders();
+    connect(this, SIGNAL(js_doUpdateInfo_finished()),
+            this, SLOT(slot_catch_js_update()));
+    jsWatcherActivated = true;
+    jsUpdateFinished = false;
+    return true;
+}
+
+
+bool Page_Game::deactivateJSUpdateWatcher() {
+    disconnect(this, SIGNAL(js_doUpdateInfo_finished()),
+               this, SLOT(slot_catch_js_update()));
+    jsWatcherActivated = false;
+    return true;
+}
+
+
+bool Page_Game::waitForJSUpdate(int ms) {
+    if (ms <= 0) {
+        ms = randrange(1000, 10000);
+    }
+    qDebug("wait for page update");
+    QTime t;
+    QEventLoop loop;
+    while (!jsUpdateFinished && (t.elapsed() < ms)) {
+        loop.processEvents();
+    }
+    if (jsUpdateFinished) {
+        qDebug("got update after %d ms", t.elapsed());
+    } else {
+        qDebug("timeout after %d ms", t.elapsed());
+    }
+    return true;
+}
+
+void Page_Game::slot_catch_js_update() {
+    jsUpdateFinished = true;
+}
+
+
+bool Page_Game::parseMedikit() {
+    medikitOpened = false;
+    numGreenPotions = -1;
+    numBluePotions = -1;
+    numRedPotions = -1;
+    QRegExp rx(">(\\d+)<");
+
+    QWebElement medikit = document.findFirst("TABLE#potions_popup");
+    if (medikit.isNull()) {
+        return true;
+    }
+
+    QWebElement e = medikit.findFirst("TD#potion_td_1 SPAN.count_amount");
+    if (e.isNull()) {
+        qCritical("cannot find potion_td_1");
+        return false;
+    }
+    if (rx.indexIn(e.toOuterXml()) == -1) {
+        qCritical("cannot fit span " + e.toOuterXml());
+        return false;
+    }
+    numGreenPotions = rx.cap(1).toInt();
+
+    e = medikit.findFirst("TD#potion_td_2 SPAN.count_amount");
+    if (e.isNull()) {
+        qCritical("cannot find potion_td_2");
+        return false;
+    }
+    if (rx.indexIn(e.toOuterXml()) == -1) {
+        qCritical("cannot fit span " + e.toOuterXml());
+        return false;
+    }
+    numBluePotions = rx.cap(1).toInt();
+
+    e = medikit.findFirst("TD#potion_td_3 SPAN.count_amount");
+    if (e.isNull()) {
+        qCritical("cannot find potion_td_3");
+        return false;
+    }
+    if (rx.indexIn(e.toOuterXml()) == -1) {
+        qCritical("cannot fit span " + e.toOuterXml());
+        return false;
+    }
+    numRedPotions = rx.cap(1).toInt();
+
+    medikitOpened = true;
+    return true;
+}
+
+bool Page_Game::doOpenMedikit() {
+    QWebElement e = document.findFirst("A.potion_all");
+    if (e.isNull()) {
+        qCritical("medikit opener not found");
+        return false;
+    }
+    qDebug("open medikit");
+    actuate(e);
+    if (!waitForPopup()) {
+        qCritical("medikit not opened");
+    }
+    qDebug("... medikit opened");
+    return true;
+}
+
+bool Page_Game::doCloseMedikit() {
+    qDebug("close medikit");
+    if (!closePopup()) {
+        qCritical("medikit not closed");
+        return false;
+    }
+    qDebug("medikit closed");
+    return true;
+}
+
+bool Page_Game::doDrinkPotion(MedikitPotion potion) {
+    QString id;
+    switch (potion) {
+    case Potion_Green:
+        id = "potion_td_1";
+        break;
+    case Potion_Blue:
+        id = "potion_td_2";
+        break;
+    case Potion_Red:
+        id = "potion_td_3";
+        break;
+    default:
+        qCritical("unknown potion id: %d", (int)potion);
+        return false;
+    }
+    QWebElement e = document.findFirst("TD#" + id + " A.cmd_all");
+    if (e.isNull()) {
+        qCritical("not found " + id);
+        return false;
+    }
+    if (e.toPlainText() != u8("ВЫПИТЬ")) {
+        qCritical(u8("button text = {%1}").arg(e.toPlainText()));
+        return false;
+    }
+    qDebug(u8("actuate button on id=%1").arg(id));
+    injectJSInsiders();
+    actuate(e);
+    activateJSUpdateWatcher();
+    connect(this, SIGNAL(js_doUpdateInfo_finished()),
+            this, SLOT(slot_update_finished()));
+    waitForJSUpdate();
+    deactivateJSUpdateWatcher();
+    return true;
+}
+
+bool Page_Game::doBuyOnePotion(MedikitPotion potion) {
+    return false;
+}
+
+bool Page_Game::doBuyAllPotion(MedikitPotion potion) {
+    return false;
+}
+
+QString Page_Game::medikitToString() const {
+    if (!medikitOpened) {
+        return "medikit closed";
+    }
+    QString s;
+    s.sprintf("potions in medikit: %d green, %d blue, %d red",
+             numGreenPotions, numBluePotions, numRedPotions);
+    return s;
+}
+
 
 bool Page_Game::waitForPopup(int ms) {
     qDebug("awaiting for popup with %d ms timeout", ms);
