@@ -226,6 +226,10 @@ bool Page_Generic::refreshDocument() {
 }
 
 void Page_Generic::doReload() {
-    qDebug("invoke reload page");
-    webpage->triggerAction(QWebPage::Reload);
+    if (webpage) {
+        qDebug("invoke reload page");
+        webpage->triggerAction(QWebPage::Reload);
+    } else {
+        qDebug("invoke reload on null page");
+    }
 }

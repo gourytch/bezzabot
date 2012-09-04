@@ -40,8 +40,11 @@ NetManager::NetManager(const QString& fname, QObject *parent) :
     _strm(NULL)
 {
     setFName(fname);
-    setMode(Config::global().get("connection/debug", false, false).toBool(),
-            Config::global().get("connection/nmlog", false, false).toBool());
+    Config& cfg = Config::global();
+    setMode(cfg.get("connection/debug", false, false).toBool(),
+            cfg.get("connection/nmlog", false, false).toBool());
+    _handle_posts = cfg.get("connection/handle_posts", false, false).toBool();
+    _antispy = cfg.get("connection/antispy", false, false).toBool();
 
     gotReply = false;
 
@@ -53,6 +56,9 @@ NetManager::NetManager(const QString& fname, QObject *parent) :
 
     connect(this, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(slotGotReply(QNetworkReply*)));
+    connect(this, SIGNAL(readyRead()),
+            this, SLOT(slotReadyRead()));
+
 }
 
 NetManager::~NetManager() {
@@ -134,6 +140,24 @@ QNetworkReply *NetManager::createRequest(
         const QNetworkRequest &req,
         QIODevice *outgoingData) {
 
+    if (_antispy) {
+        QString host = req.url().toString(QUrl::RemovePath |
+                                          QUrl::RemovePort |
+                                          QUrl::RemoveUserInfo |
+                                          QUrl::RemoveQuery |
+                                          QUrl::RemoveFragment |
+                                          QUrl::StripTrailingSlash);
+        if (!host.endsWith("botva.ru")) {
+            qDebug(u8("enemy request to host {%1}")
+                   .arg(host));
+            QNetworkRequest fakeRq = req;
+            fakeRq.setUrl(QUrl("about:blank"));
+            QNetworkReply *reply = QNetworkAccessManager::createRequest(
+                        op, fakeRq, outgoingData);
+            return reply;
+        }
+    }
+
     QString s_op = opStr(op);
 
     if (_write_debug) {
@@ -141,6 +165,7 @@ QNetworkReply *NetManager::createRequest(
                .arg(s_op)
                .arg(req.url().toString().trimmed()));
     }
+
 
     if (_write_log) {
         openOut();
@@ -156,7 +181,7 @@ QNetworkReply *NetManager::createRequest(
             (*_strm) << "   {" << h << "} = {" << v << "}\n";
         }
         if (outgoingData) {
-            QByteArray data = outgoingData->peek(4000);
+            QByteArray data = outgoingData->peek(outgoingData->bytesAvailable());
             (*_strm) << "OUTGOING DATA: " << data.count() << " OCTETS\n";
             (*_strm) << data.constBegin() << "\n";
         } else {
@@ -167,8 +192,30 @@ QNetworkReply *NetManager::createRequest(
         _file->flush();
     }
 
-    QNetworkReply *reply = QNetworkAccessManager::createRequest(
-                op, req, outgoingData);
+    MyPOST *post = NULL;
+    QNetworkReply *reply = NULL;
+    if (_handle_posts && (op == PostOperation)) {
+        if (_myPosts.contains(req.url())) {
+            post = _myPosts[req.url()];
+            post->count++;
+            post->buffer.seek(0);
+            qDebug(u8("post {%1} already registered. set count to %2")
+                   .arg(req.url().toString())
+                   .arg(post->count));
+        } else {
+            post = new MyPOST(req, outgoingData);
+            qDebug(u8("register new post {%1}, size=%2")
+                   .arg(req.url().toString())
+                   .arg(post->buffer.bytesAvailable()));
+            _myPosts.insert(req.url(), post);
+        }
+        reply = QNetworkAccessManager::createRequest(
+                    op, post->rq, &post->buffer);
+    } else {
+        reply = QNetworkAccessManager::createRequest(
+                    op, req, outgoingData);
+    }
+
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
             this, SLOT(slotGotError(QNetworkReply::NetworkError)));
     return reply;
@@ -203,37 +250,87 @@ void NetManager::slotGotReply(QNetworkReply *reply) {
     if (_write_debug) {
         qDebug(u8("NET REPLY TO %1 %2")
                .arg(s_op)
-               .arg(reply->url().toString().trimmed()));
+               .arg(reply->request().url().toString().trimmed()));
     }
 
     if (_write_log) {
         openOut();
         (*_strm) << "RS_TIME : " << QDateTime::currentDateTime()
                     .toString("yyyy-MM-dd hh:mm:ss.zzz") << "\n";
-        (*_strm) << "URL     : " << reply->url().toString().trimmed() << "\n";
-        (*_strm) << "URL     : " << reply->url().toString().trimmed() << "\n";
+        (*_strm) << "RQ_URL  : " << reply->request().url().toString().trimmed() << "\n";
+        (*_strm) << "RS_URL  : " << reply->url().toString().trimmed() << "\n";
         (*_strm) << "HEADERS :\n";
         foreach (QByteArray h, reply->rawHeaderList()) {
             QByteArray v = reply->rawHeader(h);
             (*_strm) << "   {" << h << "} = {" << v << "}\n";
         }
-        QByteArray data = reply->peek(4000);
-        (*_strm) << "OUTGOING DATA: " << data.count() << " OCTETS (max 4000)\n";
+        QByteArray data = reply->peek(reply->bytesAvailable());
+        (*_strm) << "INCOMING DATA: " << data.count() << " OCTETS\n";
         (*_strm) << data << "\n";
         (*_strm) << "--- END OF RESPONSE ---\n\n";
         _strm->flush();
         _file->flush();
     }
+
+    if (reply->operation() == PostOperation) {
+        QUrl url = reply->request().url();
+        if (_myPosts.contains(url)) {
+            qDebug(u8("unregister post {%1}").arg(url.toString()));
+            delete _myPosts[url];
+            _myPosts.remove(url);
+//        } else {
+//            qDebug(u8("?? post {%1} not in registry").arg(url.toString()));
+        }
+    }
 }
 
 
-void NetManager::slotGotError(QNetworkReply::NetworkError error) {
+void NetManager::slotReadyRead() {
     QNetworkReply *p = dynamic_cast<QNetworkReply*>(sender());
     if (p) {
+        if (_write_log) {
+            openOut();
+            (*_strm) << "NTE_TIME: " << QDateTime::currentDateTime()
+                        .toString("yyyy-MM-dd hh:mm:ss.zzz") << "\n";
+            (*_strm) << "URL     : " << p->url().toString().trimmed() << "\n";
+            (*_strm) << "NOTE    : got part of data\n";
+            (*_strm) << "--- END OF NOTE ---\n\n";
+            _strm->flush();
+            _file->flush();
+        }
+    }
+}
+
+void NetManager::slotGotError(QNetworkReply::NetworkError error) {
+    QNetworkReply *p = dynamic_cast<QNetworkReply*>(sender());                   
+    if (p) {
+        if (_write_log) {
+            openOut();
+            (*_strm) << "ERR_TIME: " << QDateTime::currentDateTime()
+                        .toString("yyyy-MM-dd hh:mm:ss.zzz") << "\n";
+            (*_strm) << "RQ_URL  : " << p->request().url().toString().trimmed() << "\n";
+            (*_strm) << "RS_URL  : " << p->url().toString().trimmed() << "\n";
+            (*_strm) << "ERROR_NO: " << p->error() << "\n";
+            (*_strm) << "ERROR   : " << p->errorString() << "\n";
+            (*_strm) << "--- END OF ERROR ---\n\n";
+            _strm->flush();
+            _file->flush();
+        }
         qCritical(u8("network request {%1} got error #%2 (%3)")
-                  .arg(p->url().toString())
+                  .arg(p->request().url().toString())
                   .arg(p->error())
                   .arg(p->errorString()));
+
+        if (p->operation() == PostOperation) {
+            QUrl url = p->request().url();
+            if (_myPosts.contains(url)) {
+                qDebug(u8("remove url {%1} from registry").arg(url.toString()));
+                delete _myPosts[url];
+                _myPosts.remove(url);
+//            } else {
+//                qDebug(u8("??? url {%1} not registered").arg(url.toString()));
+            }
+        }
     } else {
         qCritical("NetManager got Error %d from unknown sender", error);
     }
