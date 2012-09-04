@@ -1,6 +1,6 @@
 #! /bin/bash
 TS="$(date +'%Y%m%d_%H%M%S')"
-FNAME="$(cd $(dirname $0) && pwd)/src/tools/build_id.h"
+FNAME="$(cd $(dirname $0) && pwd)/src/libbbot/tools/build_id.h"
 if [ ! -e $FNAME ]
 then
   echo "file {$FNAME} not found" 1>&2

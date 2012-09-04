@@ -3,8 +3,8 @@
 BUILD_LX64="Y"
 BUILD_LX32="N"
 BUILD_WIN32="Y"
-#DEPLOY_TO="$HOME/Dropbox/bezzabot-shared/"
-DEPLOY_TO="$HOME/temp/bezzabot-deploy/"
+DEPLOY_TO="$HOME/Dropbox/bezzabot-shared/"
+#DEPLOY_TO="$HOME/temp/bezzabot-deploy/"
 
 MAINDIR="$(cd $(dirname $0) && pwd)"
 
@@ -33,7 +33,13 @@ oldid)
   ;;
 esac
 
-BUILD_ID=$(gawk '/#define BUILD_ID/{gsub("\"", "", $3); print $3; }' src/tools/build_id.h | xargs )
+BUILD_ID=$(gawk '/#define BUILD_ID/{gsub("\"", "", $3); print $3; }' src/libbbot/tools/build_id.h | xargs )
+if [ "x$BUILD_ID" = "x" ]
+then
+  echo "BUILD ID NOT FOUND" 1>&2
+  exit 1
+fi
+
 DST="$DEPLOY_TO/bid-$BUILD_ID"
 
 echo "[*] build id: $BUILD_ID"
@@ -43,7 +49,7 @@ then
   if ! ./REBUILD.sh 
   then
     echo "[!] build failed"
-    exit 1
+#    exit 1
   fi
 else
   echo "[*] linux64 skipped"
@@ -57,7 +63,7 @@ then
   if [ ! -e /srv/chroots/squeeze32/root/bezzabot/bin/bezzabot ]
   then
     echo "[!] build failed"
-    exit 1
+#    exit 1
   fi
 else
   echo  "[*] linux32 skipped"
@@ -70,7 +76,7 @@ then
   if [ ! -e $EXE_WIN32 ]
   then
     echo "[*] build win32 failed."
-    exit 1
+#    exit 1
   fi
   reset
 else
