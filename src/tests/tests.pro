@@ -2,11 +2,11 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     surgery \
-    testConfig \
-    test_disp \
-    test_parsers \
-    test_treemap \
-    examineQVariant
+    test_parsers
 
+#    testConfig \
+#    test_disp \
+#    test_treemap \
+#    examineQVariant
 #    testw32
 

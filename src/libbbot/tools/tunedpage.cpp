@@ -17,9 +17,11 @@ bool TunedPage::extension(Extension extension,
     if (p == NULL) {
         return QWebPage::extension(extension, option, output);
     }
-    qCritical("URL {" + p->url.toString() +
-              "} RETURNED ERROR {" + p->errorString + "}");
-    return true;
+    qCritical(u8("URL {%1} RETURNED ERROR %2 : %3")
+              .arg(p->url.toString())
+              .arg(p->error)
+              .arg(p->errorString));
+    return false;
 }
 
 bool TunedPage::supportsExtension(Extension extension) const {

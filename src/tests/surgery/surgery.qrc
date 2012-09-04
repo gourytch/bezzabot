@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="ico.png">../../bot/images/ico.png</file>
+        <file alias="ico.png">../../bezzabot/images/ico.png</file>
     </qresource>
 </RCC>
