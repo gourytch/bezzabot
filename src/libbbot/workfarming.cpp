@@ -39,7 +39,7 @@ bool WorkFarming::nextStep() {
     }
 
     if (_cooldown.isNull()) { // FIXME не приключится ли loop-а?
-        qDebug("идём на ферму");
+        qDebug("идём на ферму по пустому откату");
         gotoWork();
         return true;
     }
@@ -67,7 +67,7 @@ bool WorkFarming::processPage(const Page_Game *gpage) {
                    _bot->_gpage->timer_work.href);
             return false;
         }
-        _cooldown = _bot->_gpage->timer_work.pit.addSecs(30 + (qrand() % 180));
+        _cooldown = _bot->_gpage->timer_work.pit.addSecs(randrange(30, 230));
         qDebug("мы фермерствуем. поставили откат до " +
                _cooldown.toString("yyyy-MM-dd hh:mm:ss"));
         return true;

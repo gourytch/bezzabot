@@ -11,6 +11,7 @@
 #include "tools/tools.h"
 #include "tools/timebomb.h"
 #include "tools/config.h"
+#include "tools/sleeper.h"
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -112,16 +113,22 @@ void Page_Generic::slot_reload() {
 }
 
 
-void Page_Generic::delay(int ms, bool exclusive) {
-    QTime time;
+void Page_Generic::delay(int ms, bool/*exclusive*/) {
     qDebug("DELAY %d MS ...", ms);
+    Timebomb::global()->dedicatedWait(ms);
+/*
+    QTime time;
     QEventLoop loop;
+    Timebomb::global()->startWaiter();
     time.start();
     while (time.elapsed() < ms) {
         if (!exclusive) {
             loop.processEvents(QEventLoop::ExcludeUserInputEvents);
+            Sleeper::msleep(10);
         }
     }
+    Timebomb::global()->cancel();
+*/
     qDebug("CONTINUE EXECUTION");
 }
 
