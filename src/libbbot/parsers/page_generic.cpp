@@ -23,7 +23,7 @@ Page_Generic::Page_Generic (QWebElement &doc) :
     QObject(),
     document(doc)
 {
-    qDebug("Page_Generic(%p) born", this);
+//    qDebug("Page_Generic(%p) born", this);
     pagekind = page_Generic;
     parser_pit = QDateTime::currentDateTime();
     webframe = document.webFrame();
@@ -36,7 +36,7 @@ Page_Generic::Page_Generic (QWebElement &doc) :
 
 //virtual
 Page_Generic::~Page_Generic() {
-    qDebug("Page_Generic(%p) died", this);
+//    qDebug("Page_Generic(%p) died", this);
 }
 
 
