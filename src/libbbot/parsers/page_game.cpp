@@ -1190,11 +1190,11 @@ bool Page_Game::doDrinkPotion(MedikitPotion potion) {
     return true;
 }
 
-bool Page_Game::doBuyOnePotion(MedikitPotion potion) {
+bool Page_Game::doBuyOnePotion(MedikitPotion /*potion*/) {
     return false;
 }
 
-bool Page_Game::doBuyAllPotion(MedikitPotion potion) {
+bool Page_Game::doBuyAllPotion(MedikitPotion /*potion*/) {
     return false;
 }
 

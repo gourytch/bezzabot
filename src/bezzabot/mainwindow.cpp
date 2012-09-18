@@ -389,11 +389,8 @@ void MainWindow::stopAutomaton()
 
 void MainWindow::slotLoadStarted ()
 {
-    Timebomb::global()->cancel();
-
-    pLoadingProgress->setValue (0);
-//  pLoadingProgress->setVisible(true);
-    pLoadingProgress->setEnabled(true);
+//    Timebomb::global()->cancel();
+    Timebomb::global()->startDownloader();
 
     QString urlstr = pWebView->page()->mainFrame()->requestedUrl().toString();
     qDebug("loading " + urlstr);
@@ -403,14 +400,14 @@ void MainWindow::slotLoadStarted ()
 void MainWindow::slotLoadProgress (int percent)
 {
     QString urlstr = pWebView->page()->mainFrame()->requestedUrl().toString ();
-    setWindowTitle(tr("bot %1: loading %2, %3%").arg(pBot->id(), urlstr).arg(percent));
+//    setWindowTitle(tr("bot %1: loading %2, %3%").arg(pBot->id(), urlstr).arg(percent));
+    Timebomb::global()->updateDownloader(percent);
+
 }
 
 void MainWindow::slotLoadFinished(bool success)
 {
-//    pLoadingProgress->setVisible (false);
-    pLoadingProgress->setEnabled(false);
-    pLoadingProgress->reset();
+    Timebomb::global()->finishDownloader();
 //    QString urlstr = pWebView->page()->mainFrame()->requestedUrl().toString();
     QString urlstr = pWebView->page()->mainFrame()->url().toString();
     pUrlEdit->setText(urlstr);

@@ -51,7 +51,8 @@ HEADERS  += \
     workhealing.h \
     workcrystalgrinding.h \
     alertdialog.h \
-    iconames.h
+    iconames.h \
+    tools/sleeper.h
 
 FORMS += \
     alertdialog.ui

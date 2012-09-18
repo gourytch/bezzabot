@@ -13,31 +13,35 @@ class WorkSleeping : public Work
 
 protected:
     bool _use_coulons;
-    bool _use_link;
-    bool _sleep_on;
+    bool _use_link;  // выключать
+    int  _fuzziness; // радиус отклонения окончания сна от начала часа в сек
+    int  _min_sleep; // минимальное количество сна в сек
+    bool _sleep_on;  // включен режим сна (также установлен _wakeupTime)
+    int  _next_adj;  // насколько изменять следующее окончание сна в сек
 
     QDateTime _wakeupTime;
 
-    bool isSleeping() const {
-        QDateTime now = QDateTime::currentDateTime();
-        return now < _wakeupTime;
-    }
+    int calculateSleepDuration(); // длительность сна с учетом _next_adj
 
-    int getTimeToSleep() const;
+    void updateNextAdj(); // изменение _next_adj
 
-    bool isSleepNeed() const {
-        return (getTimeToSleep() > 0);
-    }
+    bool isSleepNeed(); // пора ли засыпать?
 
-    void sleepDown();
+    bool isWakeupNeed(); // пора ли просыпаться?
 
-    void wakeUp();
+    void sleepDown(); // заснуть
+
+    bool isSleeping(); // активен ли сон?
+
+    void wakeUp(); // проснуться
 
 public:
 
     explicit WorkSleeping(Bot *bot);
 
     virtual void configure(Config *config);
+
+    virtual void dumpConfig() const;
 
     virtual bool isPrimaryWork() const;
 

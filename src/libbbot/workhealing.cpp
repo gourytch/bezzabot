@@ -53,7 +53,7 @@ bool WorkHealing::nextStep() {
     return false;
 }
 
-bool WorkHealing::processPage(const Page_Game *gpage) {
+bool WorkHealing::processPage(const Page_Game * /*gpage*/) {
     if (needUpdateCounts()) {
 
     }
