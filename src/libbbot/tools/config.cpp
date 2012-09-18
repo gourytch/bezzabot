@@ -108,10 +108,7 @@ void Config::init_check ()
             _global->setTemplate();
         }
     }
-    _global->set("launched",
-                 QDateTime::currentDateTime().
-                 toString("yyyy-MM-dd hh:mm:ss"));
-
+    _global->set("launched", ::toString(_uptime0));
 }
 
 

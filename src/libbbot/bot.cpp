@@ -71,6 +71,7 @@ Bot::Bot(const QString& id, QObject *parent) :
     connect (this, SIGNAL (rq_post(const QUrl &, const QStringList&)),
              _actor, SLOT (request (const QUrl &, const QStringList &)));
 
+    _has_timeout = false;
     _good  = false;
     _started = false;
     _regular = true;
