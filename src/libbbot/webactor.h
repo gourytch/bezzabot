@@ -57,6 +57,8 @@ public:
 
     void saveCurrentPage(bool alone);
 
+    void resetForms();
+
 signals:
 
     void page_loaded (Page_Generic* p);

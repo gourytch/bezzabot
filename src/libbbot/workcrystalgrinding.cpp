@@ -43,7 +43,7 @@ bool WorkCrystalGrinding::nextStep() {
 }
 
 
-bool WorkCrystalGrinding::processPage(const Page_Game *gpage) {
+bool WorkCrystalGrinding::processPage(Page_Game *gpage) {
     if (gpage->pagekind != page_Game_Grinder) {
         qDebug("мы ещё не возле кристалломололки. переходим");
         gotoWork();

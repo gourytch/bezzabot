@@ -27,6 +27,8 @@
 #include "workslaveholding.h"
 #include "workcrystalgrinding.h"
 #include "workalchemy.h"
+#include "workdiving.h"
+
 
 Bot::Bot(const QString& id, QObject *parent) :
     QObject(parent) // QThread
@@ -269,6 +271,15 @@ void Bot::onPageFinished (bool ok)
     if (! NetManager::shared->isLinkEnabled()) {
         qWarning(u8("** доступ к сети запрещен, парсить ничего не будем!"));
         return; // нечего нам тут делать без сети
+    }
+
+    if (NetManager::shared->got205) {
+        NetManager::shared->got205 = false;
+        qDebug("got HTTPResetForm");
+        if (_reset205) {
+            qDebug("reset all forms on page");
+            _actor->resetForms();
+        }
     }
 
     if (_page) {
@@ -542,6 +553,7 @@ void Bot::configure() {
 
     _coward_mode = _config->get("watchdog/coward_mode", false, false).toBool();
     _strict = _config->get("watchdog/strict", false, false).toBool();
+    _reset205 = _config->get("watchdog/reset205", false, false).toBool();
 
     _neutral_urls.append("dressingroom.php");
     _neutral_urls.append("house.php");
@@ -826,6 +838,7 @@ void Bot::initWorks() {
     _secworklist.append(new WorkSlaveHolding(this));
     _secworklist.append(new WorkCrystalGrinding(this));
     _secworklist.append(new WorkAlchemy(this));
+    _secworklist.append(new WorkDiving(this));
 
     for (WorkListIterator i(_worklist);
          i.hasNext();
@@ -914,6 +927,7 @@ void Bot::popWork() {
     }
     minidump();
 }
+
 
 void Bot::fillNextQ() {
     QVector<Work*> desk;

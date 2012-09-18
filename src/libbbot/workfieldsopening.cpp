@@ -36,7 +36,7 @@ bool WorkFieldsOpening::nextStep() {
     return processPage(_bot->_gpage);
 }
 
-bool WorkFieldsOpening::processPage(const Page_Game *gpage) {
+bool WorkFieldsOpening::processPage(Page_Game *gpage) {
 
     if (hasWork()) {
         // работаем где-то

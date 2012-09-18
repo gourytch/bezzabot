@@ -48,6 +48,10 @@ NetManager::NetManager(const QString& fname, QObject *parent) :
 
     gotReply = false;
 
+    gotError = false;
+
+    got205 = false;
+
     _link_enabled = true;
 
     if (shared == NULL) {
@@ -302,7 +306,10 @@ void NetManager::slotReadyRead() {
 }
 
 void NetManager::slotGotError(QNetworkReply::NetworkError error) {
-    QNetworkReply *p = dynamic_cast<QNetworkReply*>(sender());                   
+    if ((int)error == 205) {
+        got205 = true;
+    }
+    QNetworkReply *p = dynamic_cast<QNetworkReply*>(sender());
     if (p) {
         if (_write_log) {
             openOut();

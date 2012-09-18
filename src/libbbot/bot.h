@@ -69,6 +69,7 @@ public:
     bool    _coward_mode;
 
     bool _strict;
+    bool _reset205;
 
     bool _page_busy;
 

@@ -67,7 +67,7 @@ void WorkSlaveHolding::setCooldown() {
            .arg(::toString(_cooldown)));
 }
 
-bool WorkSlaveHolding::processPage(const Page_Game *gpage) {
+bool WorkSlaveHolding::processPage(Page_Game *gpage) {
     if (gpage->pagekind != page_Game_Harbor_Market) {
         qDebug("идём на приморский рынок");
         setAwaiting();

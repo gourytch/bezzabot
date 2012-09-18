@@ -86,7 +86,7 @@ bool WorkWatching::nextStep() {
     return false; // мы досюда не должны добраться
 }
 
-bool WorkWatching::processPage(const Page_Game *gpage) {
+bool WorkWatching::processPage(Page_Game *gpage) {
     if (needUnLoop()) {
         return false;
     }

@@ -296,6 +296,22 @@ void WebActor::saveCurrentPage(bool alone) {
 }
 
 
+void WebActor::resetForms() {
+    qDebug(u8("reset all forms on page %1")
+           .arg(_webpage->mainFrame()->url().toString()));
+    int count = 0;
+    QWebElement doc = _webpage->mainFrame()->documentElement();
+    foreach (QWebElement form, doc.findAll("FORM")) {
+        qDebug(u8("   reset form method='%1' action='%2'")
+               .arg(form.attribute("method"))
+               .arg(form.attribute("action")));
+        form.evaluateJavaScript("this.reset();");
+        ++count;
+    }
+    qDebug(u8("%1 forms were reset").arg(count));
+}
+
+
 /***************************************************************************\
 *                                                                           *
 \***************************************************************************/

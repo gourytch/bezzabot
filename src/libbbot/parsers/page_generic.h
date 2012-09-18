@@ -58,6 +58,8 @@ public:
 
     void doReload();
 
+    void doResetAllForms();
+
 signals:
 
     void save_page();

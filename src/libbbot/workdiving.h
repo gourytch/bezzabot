@@ -1,30 +1,25 @@
-#ifndef WORKCRYSTALGRINDING_H
-#define WORKCRYSTALGRINDING_H
+#ifndef WORKDIVING_H
+#define WORKDIVING_H
 
 #include <QDateTime>
+#include "parsers/page_game_atlantis.h"
+#include "bot.h"
 #include "work.h"
 
-class WorkCrystalGrinding : public Work {
-
+class WorkDiving : public Work {
     Q_OBJECT
 
 protected:
 
     QDateTime _cooldown;
 
-    int _grind_over;
+    bool can_diving;
 
-    int _capacity;
-
-    int _amount;
-
-    void updateCooldown();
-
-    bool canStartWork();
+    void adjustCooldown(Page_Game_Atlantis *p);
 
 public:
 
-    explicit WorkCrystalGrinding(Bot *bot);
+    explicit WorkDiving(Bot *bot);
 
     virtual void configure(Config *config);
 
@@ -44,6 +39,10 @@ public:
 
     virtual bool processCommand(Command command);
 
+signals:
+
+public slots:
+
 };
 
-#endif // WORKCRYSTALGRINDING_H
+#endif // WORKDIVING_H

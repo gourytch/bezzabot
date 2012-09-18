@@ -240,3 +240,10 @@ void Page_Generic::doReload() {
         qDebug("invoke reload on null page");
     }
 }
+
+void Page_Generic::doResetAllForms() {
+    if (document.isNull()) return;
+    foreach (QWebElement form, document.findAll("FORM")) {
+        form.evaluateJavaScript("this.reset();");
+    }
+}

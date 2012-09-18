@@ -37,7 +37,7 @@ bool WorkScaryFighting::nextStep() {
     return false;
 }
 
-bool WorkScaryFighting::processPage(const Page_Game *gpage) {
+bool WorkScaryFighting::processPage(Page_Game *gpage) {
     if (needUnLoop()) {
         return false;
     }

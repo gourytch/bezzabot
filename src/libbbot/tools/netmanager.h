@@ -81,6 +81,8 @@ public:
 
     bool gotError;
 
+    bool got205;
+
     void enableLink(bool enabled);
 
     bool isLinkEnabled() const;

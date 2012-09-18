@@ -173,4 +173,5 @@ ECASE(Work_FlyingBreeding)
 ECASE(Work_SlaveHolding)
 ECASE(Work_Alchemy)
 ECASE(Work_CrystalGrinding)
+ECASE(Work_Diving)
 EEND

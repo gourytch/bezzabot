@@ -131,7 +131,7 @@ bool WorkSleeping::nextStep() {
 }
 
 
-bool WorkSleeping::processPage(const Page_Game *gpage) {
+bool WorkSleeping::processPage(Page_Game *gpage) {
     Q_CHECK_PTR(gpage);
 
     if (!gpage->timer_work.pit.isNull()) {

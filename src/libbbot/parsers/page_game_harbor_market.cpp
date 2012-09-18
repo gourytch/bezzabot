@@ -26,7 +26,7 @@ QString Page_Game_Harbor_Market::toString(const QString& pfx) const {
         s2 += "   " + i2.next().toString() + "\n";
     }
 
-    return "page_Game_Harbor_Market {\n" +
+    return "Page_Game_Harbor_Market {\n" +
             Page_Game::toString (pfx + "   ") + "\n" +
             pfx + u8("items[]:\n%1").arg(s2) +
             pfx + u8("доступные лоты:\n%1").arg(s) +

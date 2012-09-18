@@ -176,7 +176,7 @@ bool WorkFlyingBreeding::nextStep() {
 #define BELL_CURRENCY 1
 const int sec_per_day = 86400;
 
-bool WorkFlyingBreeding::processPage(const Page_Game *gpage) {
+bool WorkFlyingBreeding::processPage(Page_Game *gpage) {
     qDebug("Обработаем страничку");
     updateStates();
     if (/* _check4feed && */ _bot->state.plant_slaves == -1) {

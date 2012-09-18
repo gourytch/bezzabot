@@ -62,7 +62,7 @@ bool WorkMining::nextStep() {
     return processPage(_bot->_gpage);
 }
 
-bool WorkMining::processPage(const Page_Game *gpage) {
+bool WorkMining::processPage(Page_Game *gpage) {
     if (needUnLoop()) {
         return false;
     }

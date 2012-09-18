@@ -40,7 +40,7 @@ bool WorkFishing::nextStep() {
     return processPage(_bot->_gpage);
 }
 
-bool WorkFishing::processPage(const Page_Game *gpage) {
+bool WorkFishing::processPage(Page_Game *gpage) {
     if (needUnLoop()) {
         return false;
     }

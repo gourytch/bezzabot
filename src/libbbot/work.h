@@ -98,7 +98,7 @@ public:
 
     // вызов при наличии новой страницы
     // возврат: true ::= работа не завершена и должна быть продолжена
-    virtual bool processPage(const Page_Game *gpage) = 0;
+    virtual bool processPage(Page_Game *gpage) = 0;
 
     // получение информации об возможности изменения состояния работы
     // возврат: ответ на запрос

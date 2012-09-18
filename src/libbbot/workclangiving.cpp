@@ -38,7 +38,7 @@ bool WorkClanGiving::nextStep() {
     return processPage(_bot->_gpage);
 }
 
-bool WorkClanGiving::processPage(const Page_Game *gpage) {
+bool WorkClanGiving::processPage(Page_Game *gpage) {
     Q_CHECK_PTR(gpage);
 
     if (needUnLoop()) {

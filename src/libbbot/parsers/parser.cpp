@@ -62,6 +62,7 @@ void Parser::setup() {
     _producer.registerClass<Page_Game_Alchemy_Entrance>();
     _producer.registerClass<Page_Game_Alchemy_Lab>();
     _producer.registerClass<Page_Game_Grinder>();
+    _producer.registerClass<Page_Game_Atlantis>();
     ///
     _producer.registerClass<Page_Game>();
     _producer.registerClass<Page_Generic>();

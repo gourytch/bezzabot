@@ -76,4 +76,5 @@ ECASE(page_Game_LevelUp)
 ECASE(page_Game_Alchemy_Entrance)
 ECASE(page_Game_Alchemy_Lab)
 ECASE(page_Game_Grinder)
+ECASE(page_Game_Atlantis)
 EEND

@@ -41,7 +41,7 @@ bool WorkAlchemy::nextStep() {
 }
 
 
-bool WorkAlchemy::processPage(const Page_Game * /*gpage*/) {
+bool WorkAlchemy::processPage(Page_Game * /*gpage*/) {
     return false;
 }
 

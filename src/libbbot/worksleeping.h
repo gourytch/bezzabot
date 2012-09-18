@@ -51,7 +51,7 @@ public:
 
     virtual bool nextStep();
 
-    virtual bool processPage(const Page_Game *gpage);
+    virtual bool processPage(Page_Game *gpage);
 
     virtual bool processQuery(Query query);
 

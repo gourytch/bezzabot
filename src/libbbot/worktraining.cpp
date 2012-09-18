@@ -56,7 +56,7 @@ bool WorkTraining::nextStep() {
 }
 
 
-bool WorkTraining::processPage(const Page_Game *gpage) {
+bool WorkTraining::processPage(Page_Game *gpage) {
     if (gpage->pagekind != page_Game_Training) {
         qDebug(u8("пойдём тренироваться или посмотрим на цены"));
         gotoWork();

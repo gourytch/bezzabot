@@ -55,7 +55,7 @@ bool WorkFarming::nextStep() {
     return false;
 }
 
-bool WorkFarming::processPage(const Page_Game *gpage) {
+bool WorkFarming::processPage(Page_Game *gpage) {
 
     if (needUnLoop()) {
         return false;

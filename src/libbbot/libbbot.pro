@@ -28,7 +28,9 @@ SOURCES += \
     workalchemy.cpp \
     workhealing.cpp \
     workcrystalgrinding.cpp \
-    alertdialog.cpp
+    alertdialog.cpp \
+    workdiving.cpp \
+    parsers/page_game_atlantis.cpp
 
 HEADERS  += \
     bot.h \
@@ -52,7 +54,9 @@ HEADERS  += \
     workcrystalgrinding.h \
     alertdialog.h \
     iconames.h \
-    tools/sleeper.h
+    tools/sleeper.h \
+    workdiving.h \
+    parsers/page_game_atlantis.h
 
 FORMS += \
     alertdialog.ui
