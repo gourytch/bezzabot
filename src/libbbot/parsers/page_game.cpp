@@ -526,6 +526,22 @@ QString FlyingInfo::toString() const {
     return "{" + s + "}";
 }
 
+typedef QMap<QString, int> ValMap;
+ValMap parseSafeText(QString s) {
+    QRegExp rx("([^:|]+):\\|(\\d+)\\|;?");
+//    rx.setMinimal(true);
+    ValMap r;
+    int offs = s.indexOf("','");
+    if (offs == -1) return r;
+    offs += 3;
+    while ((offs = rx.indexIn(s, offs)) != -1) {
+        r.insert(rx.cap(1), dottedInt(rx.cap(2)));
+        offs += rx.matchedLength();
+    }
+    return r;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////
 //
 // Page_Game
@@ -552,11 +568,11 @@ Page_Game::Page_Game (QWebElement& doc) :
     {
         QString gStr = doc.findFirst ("DIV[id=gold]").attribute("onmouseover");
         //'total:|22517|;safe:|15360|;safe_add:|0|;pandora:|0|;free:|7157|'
-        QRegExp rx ("'total:\\|(\\d+)\\|;safe:\\|(\\d+)\\|.*free:\\|(\\d+)\\|'");
-        if (rx.indexIn(gStr) != -1) {
-            gold        = dottedInt(rx.cap(1));
-            safe_gold   = dottedInt(rx.cap(2));
-            free_gold   = dottedInt(rx.cap(3));
+        ValMap m = parseSafeText(gStr);
+        if (m.size() > 0) {
+            gold        = m.value("total", -1);
+            safe_gold   = m.value("safe", -1);
+            free_gold   = m.value("free", -1);
         } else {
             gold = dottedInt (doc.findFirst ("DIV[id=gold] B").toInnerXml ());
             free_gold = gold;
@@ -567,11 +583,11 @@ Page_Game::Page_Game (QWebElement& doc) :
     safe_crystal = -1;
     {
         QString cStr = doc.findFirst ("DIV[id=crystal]").attribute("onmouseover");
-        QRegExp rx ("'total:\\|(\\d+)\\|;safe:\\|(\\d+)\\|.*free:\\|(\\d+)\\|'");
-        if (rx.indexIn(cStr) != -1) {
-            crystal         = dottedInt(rx.cap(1));
-            safe_crystal    = dottedInt(rx.cap(2));
-            free_crystal    = dottedInt(rx.cap(3));
+        ValMap m = parseSafeText(cStr);
+        if (m.size() > 0) {
+            crystal         = m.value("total", -1);
+            safe_crystal    = m.value("safe", -1);
+            free_crystal    = m.value("free", -1);
         } else {
             crystal = dottedInt (doc.findFirst ("DIV[id=crystal] B").toInnerXml ());
             free_crystal = crystal;

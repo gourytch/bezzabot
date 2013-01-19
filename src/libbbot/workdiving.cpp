@@ -119,5 +119,5 @@ void WorkDiving::adjustCooldown(Page_Game_Atlantis *p) {
 
 
 bool WorkDiving::canStartWork() {
-
+    return false;
 }

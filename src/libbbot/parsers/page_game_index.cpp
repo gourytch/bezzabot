@@ -10,18 +10,8 @@ Page_Game_Index::Page_Game_Index (QWebElement &doc) :
     Page_Game (doc)
 {
     pagekind = page_Game_Index;
-    QWebElement grbody = document.findFirst("DIV[class=grbody]");
-    QWebElementCollection tds = grbody.findAll("TD");
-/*
-    int ix = 0;
-    clog << "--- TABLE CONTENT ----" << endl;
-    foreach (QWebElement td, tds) {
-        clog << "td[" << ix++ << "]={" << qPrintable(td.toPlainText()) << "}" << endl;
-    }
-    clog << "--- TABLE END ----" << endl;
-*/
-    level = tds[3].toPlainText().toInt();
-
+    QWebElement e = doc.findFirst("DIV.player_avatar DIV.rating B.level");
+    level = e.toPlainText().toInt();
 }
 
 
@@ -36,16 +26,7 @@ QString Page_Game_Index::toString (const QString& pfx) const
 
 //static
 bool Page_Game_Index::fit(const QWebElement& doc) {
-//    qDebug("* CHECK Page_Game_Index");
-    QWebElementCollection titles = doc.findAll ("DIV[class=title]");
-    if (!titles.count ()) {
-        return false;
-    }
-    foreach (QWebElement e, titles) {
-        QString title = e.toPlainText ().trimmed ();
-        if (title == u8("Мои подарки:")) {
-            return true;
-        }
-    }
-    return false;
+    QWebElement e = doc.findFirst("DIV.player_avatar DIV.avatar_settings");
+    if (e.isNull()) return false;
+    return true;
 }
