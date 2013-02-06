@@ -54,6 +54,8 @@ public:
 
     bool isDisplayed(QWebElement e);
 
+    bool isBlocked(QWebElement e);
+
     bool refreshDocument();
 
     void doReload();

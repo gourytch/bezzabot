@@ -2,6 +2,14 @@
 #include "tools/tools.h"
 
 WorkDiving::WorkDiving(Bot *bot) : Work(bot) {
+    _price = -1;
+    _currency = currency_Undefined;
+    _build_cooldown = QDateTime();
+    _diving_cooldown = QDateTime();
+    _working_count = -1;
+    _hangar_count = -1;
+    _hangar_max_count = -1;
+
 }
 
 
@@ -51,6 +59,16 @@ bool WorkDiving::processPage(Page_Game *gpage) {
         return false;
     }
     qDebug("исследуем атлантиду");
+
+    _price = p->next_bathyscaphe_price;
+    _currency = p->next_bathyscaphe_currency;
+    _atlantis_deadline = p->atlantis_reachable_cooldown.pit;
+    _build_cooldown = p->bathyscaphe_build_timer.pit;
+    _diving_cooldown = p->findMinDivingCooldown();
+    _working_count = p->working_count;
+    _hangar_count = p->hangar_count;
+    _hangar_max_count = p->hangar_max_count;
+
     adjustCooldown(p);
     return false;
 }
@@ -95,5 +113,11 @@ bool WorkDiving::processCommand(Command command) {
 
 void WorkDiving::adjustCooldown(Page_Game_Atlantis *p) {
     Q_CHECK_PTR(p);
+
     qDebug(u8("установили откат на %1").arg(::toString(_cooldown)));
+}
+
+
+bool WorkDiving::canStartWork() {
+    return false;
 }

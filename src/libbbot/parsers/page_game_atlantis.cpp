@@ -10,8 +10,11 @@ ECASE(Diving)
 EEND
 
 bool Page_Game_Atlantis::Bathyscaphe::parse(QWebElement& info) {
+    price = -1;
+    currency = currency_Undefined;
 //    qDebug("parse bathyscaphe from : " + info.toOuterXml());
     if (!info.findFirst("DIV.bathyscaphe-build-info").isNull()) {
+        state = Unpaid;
         QWebElement prc = info.findFirst("SPAN.hangar-price");
         Q_ASSERT(!prc.isNull());
         QWebElement c = prc.firstChild();
@@ -20,8 +23,17 @@ bool Page_Game_Atlantis::Bathyscaphe::parse(QWebElement& info) {
         c = c.nextSibling();
 //        qDebug(u8("nextSibling tag={%1}").arg(c.tagName()));
         Q_ASSERT(c.tagName() == "B");
-        currency = c.attribute("title");
-        state = Unpaid;
+        QString s = c.attribute("title");
+        if (s == u8("Золото")) {
+            currency = currency_Gold;
+        } else if (s == u8("Кристаллы")) {
+            currency = currency_Crystals;
+        } else if (s == u8("Зелень")) {
+            currency = currency_Green;
+        } else {
+            qFatal(u8("не могу распознать валюту: %1").arg(s));
+            currency = currency_Undefined;
+        }
     } else {
         QWebElement ct = info.findFirst("SPAN.bathyscaphe-status");
         Q_ASSERT(!ct.isNull());
@@ -47,7 +59,7 @@ QString Page_Game_Atlantis::Bathyscaphe::toString(const QString &pfx) const {
     QString s;
     switch (state) {
     case Unpaid:
-        s = u8("стоимость      : %1, %2").arg(currency).arg(price);
+        s = u8("стоимость      : %1, %2").arg(::toString(currency)).arg(price);
         break;
     case Awaiting:
         s = "";
@@ -102,6 +114,16 @@ bool Page_Game_Atlantis::fit(const QWebElement& doc) {
 }
 
 bool Page_Game_Atlantis::parse() {
+    if (!parseHead()) return false;
+    if (!parsePier()) return false;
+    if (!parseSecret()) return false;
+    if (!parseSea()) return false;
+
+    return true;
+}
+
+
+bool Page_Game_Atlantis::parseHead() {
     QWebElement e;
 
     e = document.findFirst("SPAN#total_bathyscaphes_count");
@@ -116,10 +138,6 @@ bool Page_Game_Atlantis::parse() {
     Q_ASSERT(!e.isNull());
     atlant_amount = dottedInt(e.toPlainText());
 
-    e = document.findFirst("DIV#atlantis-secret");
-    Q_ASSERT(!e.isNull());
-    boxgame = isDisplayed(e);
-
     e = document.findFirst("SPAN.hangar-count");
     Q_ASSERT(!e.isNull());
     hangar_count = dottedInt(e.toPlainText());
@@ -132,7 +150,48 @@ bool Page_Game_Atlantis::parse() {
     Q_ASSERT(!e.isNull());
     working_count = dottedInt(e.toPlainText());
 
-    foreach(QWebElement b, document.findAll("DIV.bathyscaphes DIV.bathyscaphe-info")) {
+    return true;
+}
+
+
+bool Page_Game_Atlantis::parsePier() {
+    button_launch_bathyscaphe   = QWebElement();
+    QWebElement pier = document.findFirst("DIV#pier");
+    QWebElement e =  pier.findFirst("FORM INPUT[type=submit]");
+    if (!e.isNull() && isDisplayed(e) && !isBlocked(e)) {
+        button_launch_bathyscaphe = e;
+        qDebug("button_launch_bathyscaphe: " + e.toOuterXml());
+    }
+    return true;
+}
+
+
+bool Page_Game_Atlantis::parseSecret() {
+    link_chests = QWebElementCollection();
+
+    QWebElement secret = document.findFirst("DIV#atlantis-secret");
+    Q_ASSERT(!secret.isNull());
+    boxgame = isDisplayed(secret);
+
+    if (boxgame) {
+        link_chests = secret.findAll("A");
+        qDebug("chests:");
+        foreach (QWebElement e, link_chests) {
+            qDebug("chest: " + e.toOuterXml());
+        }
+        qDebug("---");
+    }
+    return true;
+}
+
+
+bool Page_Game_Atlantis::parseSea() {
+    button_build_bathyscaphe = QWebElement();
+    bathyscaphes.clear();
+
+    QWebElement sea = document.findFirst("DIV#sea");
+
+    foreach(QWebElement b, sea.findAll("DIV.bathyscaphe-info")) {
         if (!isDisplayed(b)) {
             continue;
         }
@@ -141,24 +200,36 @@ bool Page_Game_Atlantis::parse() {
         bathyscaphes.append(bs);
     }
 
+    QWebElement e = sea.findFirst("FORM INPUT[type=submit]");
+    if (!e.isNull() && isDisplayed(e) && !isBlocked(e)) {
+        button_launch_bathyscaphe = e;
+        qDebug("button_launch_bathyscaphe: " + e.toOuterXml());
+    }
     return true;
 }
 
 
 bool Page_Game_Atlantis::canBuyBathyscaphe() {
-    foreach (Bathyscaphe bs, bathyscaphes) {
-        if (bs.state != Unpaid) continue;
+    if (!parseSea()) return false;
 
-        if (bs.currency == u8("Золото")) {
-            if (gold < bs.price) return false;
-            return true;
-        }
-        if (bs.currency == u8("Кристаллы")) {
-            if (crystal < bs.price) return false;
-            return true;
-        }
+    if (next_bathyscaphe_price == -1 ||
+        next_bathyscaphe_currency == currency_Undefined) {
         return false;
     }
+
+    if (button_build_bathyscaphe.isNull()) return false;
+
+    switch (next_bathyscaphe_currency) {
+    case currency_Gold:
+        return (next_bathyscaphe_price <= gold);
+    case currency_Crystals:
+        return (next_bathyscaphe_price <= crystal);
+    case currency_Green:
+        return (next_bathyscaphe_price <= green);
+    default:
+        return false;
+    }
+
     return false;
 }
 
@@ -168,29 +239,45 @@ bool Page_Game_Atlantis::doBuyBathyscaphe() {
         qCritical("батискаф купить нельзя!");
         return false;
     }
-    QWebElement e = document.findFirst("DIV.bathyscaphe-build-info INPUT[type=submit]");
-    if (e.isNull()) {
-        qCritical("кнопка покупки батискафа не найдена!");
-        return false;
-    }
-    if (!isDisplayed(e)) {
-        qCritical("кнопка покупки батискафа спрятана!");
-        return false;
-    }
-    if (e.attribute("class").contains("cmd_blocked")) {
-        qCritical("кнопка покупки батискафа заблокирована!");
-        return false;
-    }
     qWarning("покупаем новый батискаф");
-    actuate(e);
+    actuate(button_build_bathyscaphe);
     return true;
 }
 
 
 bool Page_Game_Atlantis::canLaunchBathyscaphe() {
-    return false;
+    if (!parsePier()) return false;
+    if (button_launch_bathyscaphe.isNull()) return false;
+    return true;
 }
 
+
 bool Page_Game_Atlantis::doLaunchBathyscaphe() {
-    return false;
+    if (!canBuyBathyscaphe()) {
+        qCritical("батискаф запустить нельзя!");
+        return false;
+    }
+    qWarning("запускаем батискаф");
+    actuate(button_build_bathyscaphe);
+    return true;
+}
+
+
+QDateTime Page_Game_Atlantis::findMinDivingCooldown() {
+    parseSea();
+    QDateTime min;
+    foreach (Bathyscaphe bs, bathyscaphes) {
+        switch (bs.state) {
+        case Awaiting:
+            return QDateTime::currentDateTime();
+        case Diving:
+            if (min.isNull() || min < bs.cooldown.pit) {
+                min = bs.cooldown.pit;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    return min;
 }

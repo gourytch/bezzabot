@@ -30,7 +30,8 @@ SOURCES += \
     workcrystalgrinding.cpp \
     alertdialog.cpp \
     workdiving.cpp \
-    parsers/page_game_atlantis.cpp
+    parsers/page_game_atlantis.cpp \
+    tools/currency.cpp
 
 HEADERS  += \
     bot.h \
@@ -56,7 +57,8 @@ HEADERS  += \
     iconames.h \
     tools/sleeper.h \
     workdiving.h \
-    parsers/page_game_atlantis.h
+    parsers/page_game_atlantis.h \
+    tools/currency.h
 
 FORMS += \
     alertdialog.ui

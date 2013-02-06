@@ -213,13 +213,27 @@ bool Page_Generic::wait4(QString etext, bool present, int timeout) {
 
 
 bool Page_Generic::isDisplayed(QWebElement e) {
-    if (e.attribute("style").contains(QRegExp("display:\\s*none"))) {
-        return false;
+    while (!e.isNull()) {
+        if (e.attribute("style").contains(QRegExp("display:\\s*none"))) {
+            return false;
+        }
+        if (e.attribute("class").contains("hidden")) {
+            return false;
+        }
+        e = e.parent();
     }
-    if (e.attribute("class").contains("hidden")) {
-        return false;
+    return true;
+}
+
+
+bool Page_Generic::isBlocked(QWebElement e) {
+    while (!e.isNull()) {
+        if (e.attribute("class").contains("cmd_blocked")) {
+            return false;
+        }
+        e = e.parent();
     }
-    return (e.parent().isNull()) ? true : isDisplayed(e.parent());
+    return true;
 }
 
 
