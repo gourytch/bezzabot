@@ -716,6 +716,8 @@ Page_Game::Page_Game (QWebElement& doc) :
 
     // 1: Таймер работы
     QWebElement c = e.firstChild();
+//    qDebug("first duplet: work timer");
+//    qDebug(" #1: " + c.toOuterXml());
     if (c.toPlainText().trimmed() == u8("Я свободен!")) {
         timer_work.title = u8("FREE");
         timer_work.href  = u8("/");
@@ -727,13 +729,17 @@ Page_Game::Page_Game (QWebElement& doc) :
     }
     // 2. таймер иммунитета
     c = c.nextSibling();
+//    qDebug("second duplet: immunity timer");
+//    qDebug(" #1: " + c.toOuterXml());
     if (c.toPlainText().trimmed() == u8("Я в опасности!")) {
         timer_immunity.title = u8("DANGER");
         timer_immunity.href  = u8("");
         timer_immunity.pit   = QDateTime();
         timer_immunity.hms   = -1;
     } else {
-        parseTimerSpan(c.findFirst("SPAN[class=js_timer]"),
+        QWebElement t = c.findFirst("SPAN.js_timer");
+//        qDebug("immtimer=" + t.toOuterXml());
+        parseTimerSpan(t,
                        &timer_immunity.pit, &timer_immunity.hms);
         timer_immunity.title = u8("SAFE");
         timer_immunity.adjust();
@@ -741,6 +747,8 @@ Page_Game::Page_Game (QWebElement& doc) :
     }
     // 3. таймер бодалки
     c = c.nextSibling();
+//    qDebug("third duplet: battle timer");
+//    qDebug(" #1: " + c.toOuterXml());
     if (c.toPlainText().trimmed() == u8("Пора в бой!")) {
         timer_attack.title = u8("BATTLETIME");
         timer_attack.href  = u8("dozor.php");
