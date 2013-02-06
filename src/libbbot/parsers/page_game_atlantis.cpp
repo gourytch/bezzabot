@@ -188,9 +188,9 @@ bool Page_Game_Atlantis::doBuyBathyscaphe() {
 
 
 bool Page_Game_Atlantis::canLaunchBathyscaphe() {
-
+    return false;
 }
 
 bool Page_Game_Atlantis::doLaunchBathyscaphe() {
-
+    return false;
 }

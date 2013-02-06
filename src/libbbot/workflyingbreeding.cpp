@@ -51,13 +51,15 @@ void WorkFlyingBreeding::FlyingConfig::configure(Config *config, int ix) {
     QString s = config->get(pfx + "workout_plan" + sfx, false, "lowest")
             .toString().trimmed().toLower();
     plan = Training_Lowest;
-    if (s == "lowest" || s == "0") {
+    if (s == "none" || s == "" || s == "0") {
+        plan = Training_None;
+    } else if (s == "lowest" || s == "1") {
         plan = Training_Lowest;
-    } else if (s == "highest" || s == "1") {
+    } else if (s == "highest" || s == "2") {
         plan = Training_Highest;
-    } else if (s == "cheapest" || s == "2") {
+    } else if (s == "cheapest" || s == "3") {
         plan = Training_Cheapest;
-    } else if (s == "greatest" || s == "3") {
+    } else if (s == "greatest" || s == "4") {
         plan = Training_Greatest;
     } else {
         qCritical(u8("unknown workout_plan: {%1}").arg(s));
