@@ -104,7 +104,7 @@ void Page_Game_Fight_Log::parseLoot(const QString& s) {
     while (txt.length() > 0) {
         txt = txt.trimmed();
         if (rx_gold.indexIn(txt) != -1) {
-            amount = dottedInt(rx_gold.cap(1));
+            amount = dottedInt(rx_gold.cap(1), NULL);
             title = rx_gold.cap(2).trimmed();
             txt = rx_gold.cap(3);
             loot[title] = amount;
@@ -112,7 +112,7 @@ void Page_Game_Fight_Log::parseLoot(const QString& s) {
         }
 
         if (rx_res.indexIn(txt) != -1) {
-            amount = dottedInt(rx_res.cap(1));
+            amount = dottedInt(rx_res.cap(1), NULL);
             title = rx_res.cap(2).trimmed();
             txt = rx_res.cap(3);
             loot[title] = amount;

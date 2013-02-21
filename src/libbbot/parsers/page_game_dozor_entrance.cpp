@@ -20,7 +20,7 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     _dozorForm = groups[2];
     dozor_price = dottedInt(
                 _dozorForm.findFirst("SPAN.price_num")
-                .toPlainText());
+                .toPlainText(), NULL);
     QWebElement selector = _dozorForm.findFirst("SELECT#auto_watch");
     QWebElementCollection options = selector.findAll("OPTION");
     dozor_left10 = 0;
@@ -36,7 +36,7 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     if (t.isNull()) {
         scary_auto_price = dottedInt(
                     _scaryForm.findFirst("P.sub_title_text B")
-                    .toPlainText());
+                    .toPlainText(), NULL);
     } else {
         scary_auto_price = -1;
         scary_cooldown.assign(t);

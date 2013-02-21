@@ -206,7 +206,8 @@ bool WorkWatching::processPage(Page_Game *gpage) {
             qDebug("пробуем пойти в поход ещё раз.");
         }
         Page_Game_Dozor_Entrance *q = (Page_Game_Dozor_Entrance*)gpage;
-        if (q->dozor_left10 == 0) { // подозорить не выйдет
+        int n = q->dozor_left10;
+        if (n == 0) { // подозорить не выйдет
             _watchingCooldown = nextDay() // поставим откат до следующего дня
                     .addSecs(3600 + (qrand() % 3600)); // с запасом
             qWarning("дозоров не осталось. поставили откат до " +
@@ -215,7 +216,10 @@ bool WorkWatching::processPage(Page_Game *gpage) {
             _bot->state.dozors_remains = -1; // после отката надо зайти в дозор
             return false;
         }
-        int n = qMin(q->dozor_left10, duration10); // макс. время дозора
+
+        if (duration10 > 0) { // ограничим время дозора
+            n = qMin(n, duration10);
+        }
 
         if (q->gold < q->dozor_price) {
             qWarning("денег не хватает на оплату дозора (%d < %d)",

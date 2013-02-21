@@ -13,17 +13,17 @@ Page_Game_Clan_Treasury::Page_Game_Clan_Treasury(QWebElement& doc) :
     // gold
     td = tabs[0].findAll("TD");
     Q_ASSERT(td.count() == 4);
-    gold_in_treasure = dottedInt(td[1].toPlainText());
+    gold_in_treasure = dottedInt(td[1].toPlainText(), NULL);
     _formGold = td[3].findFirst("FORM");
     // crystals
     td = tabs[1].findAll("TD");
     Q_ASSERT(td.count() == 4);
-    crystals_in_treasure = dottedInt(td[1].toPlainText());
+    crystals_in_treasure = dottedInt(td[1].toPlainText(), NULL);
     _formCrystals = td[3].findFirst("FORM");
     // fishes
     td = tabs[2].findAll("TD");
     Q_ASSERT(td.count() == 4);
-    fishes_in_treasure = dottedInt(td[1].toPlainText());
+    fishes_in_treasure = dottedInt(td[1].toPlainText(), NULL);
     _formFishes = td[3].findFirst("FORM");
 }
 

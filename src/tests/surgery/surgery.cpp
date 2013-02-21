@@ -68,7 +68,7 @@ void parseLoot(const QString& s) {
     while (loot.length() > 0) {
         loot = loot.trimmed();
         if (rx_gold.indexIn(loot) != -1) {
-            amount = dottedInt(rx_gold.cap(1));
+            amount = dottedInt(rx_gold.cap(1), NULL);
             title = rx_gold.cap(2).trimmed();
             loot = rx_gold.cap(3);
             qDebug(u8("%1:%2").arg(title).arg(amount));
@@ -76,7 +76,7 @@ void parseLoot(const QString& s) {
         }
 
         if (rx_res.indexIn(loot) != -1) {
-            amount = dottedInt(rx_res.cap(1));
+            amount = dottedInt(rx_res.cap(1), NULL);
             title = rx_res.cap(2).trimmed();
             loot = rx_res.cap(3);
             qDebug(u8("%1:%2").arg(title).arg(amount));

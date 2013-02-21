@@ -19,7 +19,7 @@ bool Page_Game_Atlantis::Bathyscaphe::parse(QWebElement& info) {
         Q_ASSERT(!prc.isNull());
         QWebElement c = prc.firstChild();
         Q_ASSERT(c.tagName() == "SPAN");
-        price = dottedInt(c.toInnerXml());
+        price = dottedInt(c.toInnerXml(), NULL);
         c = c.nextSibling();
 //        qDebug(u8("nextSibling tag={%1}").arg(c.tagName()));
         Q_ASSERT(c.tagName() == "B");
@@ -128,7 +128,7 @@ bool Page_Game_Atlantis::parseHead() {
 
     e = document.findFirst("SPAN#total_bathyscaphes_count");
     Q_ASSERT(!e.isNull());
-    total_bathyscaphes_count = dottedInt(e.toPlainText());
+    total_bathyscaphes_count = dottedInt(e.toPlainText(), NULL);
 
     e = document.findFirst("SPAN.big-timer SPAN.js_timer");
     Q_ASSERT(!e.isNull());
@@ -136,19 +136,19 @@ bool Page_Game_Atlantis::parseHead() {
 
     e = document.findFirst("SPAN#atlant_amount");
     Q_ASSERT(!e.isNull());
-    atlant_amount = dottedInt(e.toPlainText());
+    atlant_amount = dottedInt(e.toPlainText(), NULL);
 
     e = document.findFirst("SPAN.hangar-count");
     Q_ASSERT(!e.isNull());
-    hangar_count = dottedInt(e.toPlainText());
+    hangar_count = dottedInt(e.toPlainText(), NULL);
 
     e = document.findFirst("SPAN.hangar-max-count");
     Q_ASSERT(!e.isNull());
-    hangar_max_count = dottedInt(e.toPlainText());
+    hangar_max_count = dottedInt(e.toPlainText(), NULL);
 
     e = document.findFirst("SPAN.working-count");
     Q_ASSERT(!e.isNull());
-    working_count = dottedInt(e.toPlainText());
+    working_count = dottedInt(e.toPlainText(), NULL);
 
     return true;
 }

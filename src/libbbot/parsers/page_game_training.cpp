@@ -69,8 +69,8 @@ bool Page_Game_Training::parseStats() {
 bool Page_Game_Training::parseStat(int ix, QWebElement tr) {
     QWebElementCollection td1 = tr.findAll("TD");
     QWebElementCollection td2 = tr.nextSibling().findAll("TD");
-    stat_level[ix] = dottedInt(td2.at(0).toPlainText());
-    stat_price[ix] = dottedInt(td1.at(3).toPlainText());
+    stat_level[ix] = dottedInt(td2.at(0).toPlainText(), NULL);
+    stat_price[ix] = dottedInt(td1.at(3).toPlainText(), NULL);
     stat_submit[ix] = td2.at(3).firstChild();
     stat_blocked[ix] = stat_submit[ix].isNull() ||
             stat_submit[ix].attribute("class").contains("cmd_blocked");
