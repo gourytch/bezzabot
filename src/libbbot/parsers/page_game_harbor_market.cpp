@@ -68,10 +68,10 @@ bool Page_Game_Harbor_Market::parseGoods() {
         }
     }
 
-    lotQuantity = dottedInt(document.findFirst("SPAN#buy_q").toPlainText());
+    lotQuantity = dottedInt(document.findFirst("SPAN#buy_q").toPlainText(), NULL);
     lotIcon = document.findFirst("SPAN#buy_icon B").attribute("class")
             .replace("icon", "").trimmed();
-    lotPrice = dottedInt(document.findFirst("SPAN#buy_price").toPlainText());
+    lotPrice = dottedInt(document.findFirst("SPAN#buy_price").toPlainText(), NULL);
     lotCurrency = document.findFirst("SPAN#price_icon B").attribute("title");
     return true;
 }

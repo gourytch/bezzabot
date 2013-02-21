@@ -25,7 +25,7 @@ Page_Game_House_Plantation::Page_Game_House_Plantation(QWebElement& doc) :
     {
         QRegExp rx(u8("Доход ([0123456789.+-]+)"));
         if (rx.indexIn(text_info) != -1) {
-            plant_income = dottedInt(rx.cap(1));
+            plant_income = dottedInt(rx.cap(1), NULL);
         } else {
             qCritical("plant error: не найден текущий доход");
             plant_income = -1;

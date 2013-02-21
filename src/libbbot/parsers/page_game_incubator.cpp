@@ -492,8 +492,8 @@ bool Page_Game_Incubator::Tab_Training::parse(QWebElement flying_block) {
         QWebElementCollection td = C[i].findAll("TD");
 //        qDebug(u8("[%1:2]={%2}").arg(i).arg(td[2].toOuterXml()));
 //        qDebug(u8("[%1:4]={%2}").arg(i).arg(td[4].toOuterXml()));
-        stat_level[i] = dottedInt(td[2].toPlainText());
-        stat_price[i] = dottedInt(td[4].toPlainText());
+        stat_level[i] = dottedInt(td[2].toPlainText(), NULL);
+        stat_price[i] = dottedInt(td[4].toPlainText(), NULL);
         QWebElement button = td[5].findFirst("FORM INPUT[type=submit]");
         stat_accessible[i] = !button.isNull();
     }
@@ -919,7 +919,7 @@ int Page_Game_Incubator::getBonusTotalPrice1() {
     }
     qDebug("retrieve total price for currency #1");
     int n = dottedInt(document.findFirst("SPAN#bonus_money1")
-                      .toPlainText().trimmed());
+                      .toPlainText().trimmed(), NULL);
     qDebug("... = %d", n);
     return n;
 }
@@ -931,7 +931,7 @@ int  Page_Game_Incubator::getBonusTotalPrice2() {
     }
     qDebug("retrieve total price for currency #2");
     int n = dottedInt(document.findFirst("SPAN#bonus_money2")
-                      .toPlainText().trimmed());
+                      .toPlainText().trimmed(), NULL);
     qDebug("... = %d", n);
     return n;
 }

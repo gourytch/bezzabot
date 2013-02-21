@@ -5,12 +5,11 @@
 #include "tools/tools.h"
 
 
-int dottedInt (const QString& s)
-{
+int dottedInt (const QString& s, bool *ok) {
     QRegExp rx ("\\.");
     QString ss (s.trimmed());
     ss.replace (rx, "");
-    return ss.toInt ();
+    return ss.toInt(ok);
 }
 
 ESTART(PageKind)

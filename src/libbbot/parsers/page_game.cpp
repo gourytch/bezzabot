@@ -377,7 +377,7 @@ bool FlyingInfo::Normal::parse(QWebElement &content) {
     train_url   = anchors[2].attribute("href");
     QRegExp rx(">\\s*(\\d+)%\\s*<");
     if (rx.indexIn(anchors[0].toOuterXml()) == -1) return false;
-    feed = dottedInt(rx.cap(1));
+    feed = dottedInt(rx.cap(1), NULL);
     if (feed < 0 || feed > 100) {
         qCritical(u8("bad food level: %1; xml text: {%2}, cap: {%3}")
                   .arg(feed)
@@ -388,7 +388,7 @@ bool FlyingInfo::Normal::parse(QWebElement &content) {
     hits = rx.cap(1).trimmed().toInt();
     rx = QRegExp(">\\s*([0123456789.]+)\\s*<");
     if (rx.indexIn(anchors[2].toOuterXml()) == -1) return false;
-    gold = dottedInt(rx.cap(1).trimmed());
+    gold = dottedInt(rx.cap(1).trimmed(), NULL);
     valid = true;
     return true;
 }
@@ -535,7 +535,7 @@ ValMap parseSafeText(QString s) {
     if (offs == -1) return r;
     offs += 3;
     while ((offs = rx.indexIn(s, offs)) != -1) {
-        r.insert(rx.cap(1), dottedInt(rx.cap(2)));
+        r.insert(rx.cap(1), dottedInt(rx.cap(2), NULL));
         offs += rx.matchedLength();
     }
     return r;
@@ -574,7 +574,7 @@ Page_Game::Page_Game (QWebElement& doc) :
             safe_gold   = m.value("safe", -1);
             free_gold   = m.value("free", -1);
         } else {
-            gold = dottedInt (doc.findFirst ("DIV[id=gold] B").toInnerXml ());
+            gold = dottedInt (doc.findFirst ("DIV[id=gold] B").toInnerXml (), NULL);
             free_gold = gold;
         }
     }
@@ -589,22 +589,22 @@ Page_Game::Page_Game (QWebElement& doc) :
             safe_crystal    = m.value("safe", -1);
             free_crystal    = m.value("free", -1);
         } else {
-            crystal = dottedInt (doc.findFirst ("DIV[id=crystal] B").toInnerXml ());
+            crystal = dottedInt (doc.findFirst ("DIV[id=crystal] B").toInnerXml (), NULL);
             free_crystal = crystal;
         }
     }
 
-    fish    = dottedInt (doc.findFirst ("DIV[id=fish] B").toInnerXml ());
-    green   = dottedInt (doc.findFirst ("DIV[id=green] B").toInnerXml ());
+    fish    = dottedInt (doc.findFirst ("DIV[id=fish] B").toInnerXml (), NULL);
+    green   = dottedInt (doc.findFirst ("DIV[id=green] B").toInnerXml (), NULL);
 
     {
         QString hStr = doc.findFirst ("DIV[id=char]").attribute("onmouseover");
         QRegExp rx ("'now:\\|(\\d+)\\|;max:\\|(\\d+)\\|;speed:\\|(\\d+)\\|'");
         if (rx.indexIn(hStr) != -1)
         {
-            hp_cur = dottedInt (rx.cap (1));
-            hp_max = dottedInt (rx.cap (2));
-            hp_spd = dottedInt (rx.cap (3));
+            hp_cur = dottedInt (rx.cap (1), NULL);
+            hp_max = dottedInt (rx.cap (2), NULL);
+            hp_spd = dottedInt (rx.cap (3), NULL);
         }
         QRegExp rx_cage("'(uncage|cage)',\\s*(\\d+)");
 
@@ -634,9 +634,9 @@ Page_Game::Page_Game (QWebElement& doc) :
                 qDebug("??? BAD ONMOUSEOVER FORMAT FOR " + s.toOuterXml());
                 continue;
             }
-            p.hp_cur = dottedInt (rx.cap (1));
-            p.hp_max = dottedInt (rx.cap (2));
-            p.hp_spd = dottedInt (rx.cap (3));
+            p.hp_cur = dottedInt (rx.cap (1), NULL);
+            p.hp_max = dottedInt (rx.cap (2), NULL);
+            p.hp_spd = dottedInt (rx.cap (3), NULL);
             s = s.findFirst("B");
             if (!s.isNull()) {
                 QRegExp rx("pet(\\d+)");
@@ -791,7 +791,7 @@ Page_Game::Page_Game (QWebElement& doc) :
 //            qDebug("*----*");
 //        }
 
-        r.count = t.toInt(&ok);
+        r.count = dottedInt(t, &ok);
         if (!ok) {
             QRegExp rx( "(\\d+)\\s*/\\s*(\\d+)");
             if (rx.indexIn(c.toInnerXml()) == -1) {
@@ -800,13 +800,13 @@ Page_Game::Page_Game (QWebElement& doc) :
                 QRegExp rx2("</a>\\s*([0123456789+-.]+)\\s*</li>");
                 if (rx2.indexIn(c.toOuterXml())) {
 //                    qDebug(u8("cap={%1}").arg(rx2.cap(1)));
-                    r.count = dottedInt(rx2.cap(1));
+                    r.count = dottedInt(rx2.cap(1), &ok);
                 } else {
                     qDebug(u8("unparseable#1 t={%1} from c={%2}")
                        .arg(t, c.toOuterXml()));
                 }
             } else { // nnn/mmm
-                r.count = rx.cap(1).toInt(&ok);
+                r.count = dottedInt(rx.cap(1), &ok);
                 if (!ok) {
                     r.count = -1;
                     qDebug(u8("unparseable#2 t={%1} from c={%2}")
