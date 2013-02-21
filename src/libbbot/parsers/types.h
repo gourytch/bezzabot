@@ -73,7 +73,7 @@ enum PageKind {
     page_Game_Atlantis
 };
 
-extern int dottedInt (const QString& s);
+extern int dottedInt (const QString& s, bool *ok = NULL);
 
 extern QString toString (PageKind kind);
 

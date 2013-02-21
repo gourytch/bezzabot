@@ -780,7 +780,9 @@ Page_Game::Page_Game (QWebElement& doc) :
         bool ok;
         QString t = c.toPlainText().trimmed();
 
-//        if (r.id == 33 || r.id == 34) {
+//        if (r.id == 56)
+//        {
+//            qDebug(QString("*** rid=%1").arg(r.id));
 //            qDebug("*** inner=" + c.toInnerXml());
 //            qDebug("*** text={" + t + "}");
 //            QWebElement z = c.firstChild();
@@ -791,7 +793,7 @@ Page_Game::Page_Game (QWebElement& doc) :
 //            qDebug("*----*");
 //        }
 
-        r.count = t.toInt(&ok);
+        r.count = dottedInt(t, &ok);
         if (!ok) {
             QRegExp rx( "(\\d+)\\s*/\\s*(\\d+)");
             if (rx.indexIn(c.toInnerXml()) == -1) {
@@ -806,7 +808,7 @@ Page_Game::Page_Game (QWebElement& doc) :
                        .arg(t, c.toOuterXml()));
                 }
             } else { // nnn/mmm
-                r.count = rx.cap(1).toInt(&ok);
+                r.count = dottedInt(rx.cap(1), &ok);
                 if (!ok) {
                     r.count = -1;
                     qDebug(u8("unparseable#2 t={%1} from c={%2}")
