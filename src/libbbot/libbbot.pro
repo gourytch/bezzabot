@@ -161,13 +161,13 @@ OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/lib
 
-CONFIG(debug, debug|release) {
-  QMAKE_CXXFLAGS += \
-    -fno-builtin-malloc \
-    -fno-builtin-calloc \
-    -fno-builtin-realloc \
-    -fno-builtin-free
-}
+#CONFIG(debug, debug|release) {
+#  QMAKE_CXXFLAGS += \
+#    -fno-builtin-malloc \
+#    -fno-builtin-calloc \
+#    -fno-builtin-realloc \
+#    -fno-builtin-free
+#}
 
 
 
