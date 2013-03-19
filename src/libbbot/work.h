@@ -90,7 +90,7 @@ public:
 
     virtual QString getWorkName() const; // уникальное название работы
 
-    virtual QString getWorkStage() const = 0; // состояние работы
+    virtual QString getWorkStage() const; // состояние работы
 
     // вызов при возможности нового шага
     // возврат: true ::= работа не завершена и должна быть продолжена

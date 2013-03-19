@@ -83,6 +83,10 @@ QString toString(const WorkoutSet* set);
 
 int randrange(int minValue, int maxValue); // [min..max]
 
+inline int randvalue(int maxValue) { // [0..max)
+    return qrand() % maxValue;
+}
+
 double gaussian_rand();
 
 int gaussian_rand(int minValue, int maxValue); // [min..max]

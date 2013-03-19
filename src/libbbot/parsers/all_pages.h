@@ -29,5 +29,6 @@
 #include "page_game_alchemy_lab.h"
 #include "page_game_grinder.h"
 #include "page_game_atlantis.h"
+#include "page_game_school_quests.h"
 
 #endif // ALL_PAGES_H
