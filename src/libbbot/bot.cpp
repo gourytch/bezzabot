@@ -28,6 +28,7 @@
 #include "workcrystalgrinding.h"
 #include "workalchemy.h"
 #include "workdiving.h"
+#include "workquestcompletist.h"
 
 
 Bot::Bot(const QString& id, QObject *parent) :
@@ -839,6 +840,7 @@ void Bot::initWorks() {
     _secworklist.append(new WorkCrystalGrinding(this));
     _secworklist.append(new WorkAlchemy(this));
     _secworklist.append(new WorkDiving(this));
+    _secworklist.append(new WorkQuestCompletist(this));
 
     for (WorkListIterator i(_worklist);
          i.hasNext();

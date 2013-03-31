@@ -29,6 +29,12 @@ public:
 
     bool parse();
 
+    bool canAcceptBonus();
+
+    bool acceptBonus(QString title);
+
+    bool acceptFirstBonus();
+
 signals:
 
 public slots:

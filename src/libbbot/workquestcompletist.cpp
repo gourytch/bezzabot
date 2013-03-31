@@ -1,6 +1,7 @@
 #include "workquestcompletist.h"
 #include "bot.h"
 #include "tools/tools.h"
+#include "parsers/page_game_school_quests.h"
 
 
 WorkQuestCompletist::WorkQuestCompletist(Bot *bot) : Work(bot) {
@@ -44,7 +45,18 @@ bool WorkQuestCompletist::processPage(Page_Game *gpage) {
         gotoWork();
         return true;
     }
-    return false; // something went wrong
+    Page_Game_School_Quests *p = (Page_Game_School_Quests*)gpage;
+    if (p->canAcceptBonus()) {
+        qDebug("можно забрать награду");
+        if (p->acceptFirstBonus()) {
+            qDebug("... ждём страничку");
+            setAwaiting();
+            return true;
+        }
+    }
+    qDebug("наград нет. выставим откат и закончим на этом");
+    setCooldown();
+    return false;
 }
 
 
@@ -90,6 +102,6 @@ bool WorkQuestCompletist::hasCooldown() const {
 void WorkQuestCompletist::setCooldown() {
     int seconds = _minimal_interval + randvalue(_drift_interval);
     _cooldown = QDateTime::currentDateTime().addSecs(seconds);
-    qDebug(u8("устанолен новый откат для проверки квестов на %1 сек до %2")
+    qDebug(u8("установлен новый откат для проверки квестов на %1 сек до %2")
            .arg(seconds).arg(::toString(_cooldown)));
 }

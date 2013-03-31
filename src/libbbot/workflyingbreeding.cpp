@@ -366,6 +366,10 @@ bool WorkFlyingBreeding::processPage(Page_Game *gpage) {
         bool go_n_look = false;
         bool need_training = false;
         bool recheck = true;
+        if (true) {
+            qDebug("нам тренировки не нужны, так что и проверять их не будем");
+            recheck = false;
+        }
         while (recheck) {
             recheck = false;
             if (state.stat[0].level == -1) { // неинициализированное
