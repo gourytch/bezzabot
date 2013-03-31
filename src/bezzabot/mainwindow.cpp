@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QMessageBox>
 #include <QSystemTrayIcon>
+#include <algorithm>
 #include "mainwindow.h"
 #include "tools/config.h"
 #include "tools/tools.h"
@@ -42,6 +43,11 @@ MainWindow::MainWindow (QWidget *parent) :
     noimages                = cfg.get("ui/noimages", false, false).toBool();
     history_size            = cfg.get("ui/history_size", false, 1000).toInt();
     icon_index              = cfg.get("ui/icon_index", false, -1).toInt();
+
+    zoom_minimum            = cfg.get("ui/zoom_minimum", false, 0.1).toReal();
+    zoom_maximum            = cfg.get("ui/zoom_maximum", false, 2.0).toReal();
+    zoom_factor             = cfg.get("ui/zoom_factor", false, 0.05).toReal();
+    zoom_value              = cfg.get("ui/zoom_value", false, 1.0).toReal();
 
     createUI ();
 
@@ -152,10 +158,31 @@ void MainWindow::createUI ()
     pLoadingProgress->setEnabled (false);
     pLoadingProgress->setFixedWidth(128);
 
+    pZoomOutButton = new QPushButton();
+    pZoomOutButton->setIcon(QIcon(":/zoom_out.png"));
+    pZoomOutButton->setCheckable(false);
+    pZoomOutButton->setFlat(true);
+    pZoomOutButton->setFixedSize(15, 20);
+    pZoomOutButton->setToolTip(u8("уменьшить изображение"));
+
+    pZoomResetButton = new QPushButton();
+    pZoomResetButton->setIcon(QIcon(":/zoom_reset.png"));
+    pZoomResetButton->setCheckable(false);
+    pZoomResetButton->setFlat(true);
+    pZoomResetButton->setFixedSize(15, 20);
+    pZoomResetButton->setToolTip(u8("восстановить размер изображения"));
+
+    pZoomInButton = new QPushButton();
+    pZoomInButton->setIcon(QIcon(":/zoom_in.png"));
+    pZoomInButton->setCheckable(false);
+    pZoomInButton->setFlat(true);
+    pZoomInButton->setFixedSize(15, 20);
+    pZoomInButton->setToolTip(u8("увеличить изображение"));
+
     pLogView = new QTextEdit ();
 
     pWebView = new QWebView ();
-    pWebView->setMinimumWidth(1097);
+//    pWebView->setMinimumWidth(1097);
 
     QHBoxLayout *pControls = new QHBoxLayout ();
     pControls->setSpacing(1);
@@ -163,6 +190,11 @@ void MainWindow::createUI ()
     pControls->addWidget (pLink, 0);
     pControls->addWidget (pNoPics, 0);
     pControls->addWidget (pSaveButton, 0);
+
+    pControls->addWidget (pZoomOutButton, 0);
+    pControls->addWidget (pZoomResetButton, 0);
+    pControls->addWidget (pZoomInButton, 0);
+
     pControls->addWidget (pUrlEdit, 100);
     pControls->addWidget (pGoButton, 0);
     pControls->addWidget (pLoadingProgress, 10);
@@ -238,6 +270,10 @@ void MainWindow::setupConnections () {
 
     connect (pSaveButton, SIGNAL(clicked()), this, SLOT(slotSaveAlonePage()));
 
+    connect (pZoomOutButton, SIGNAL(clicked()), this, SLOT(slotZoomOut()));
+    connect (pZoomResetButton, SIGNAL(clicked()), this, SLOT(slotZoomReset()));
+    connect (pZoomInButton, SIGNAL(clicked()), this, SLOT(slotZoomIn()));
+
     connect (pUrlEdit, SIGNAL(returnPressed()),
              this, SLOT(slotGoClicked()));
 
@@ -253,10 +289,23 @@ void MainWindow::setupConnections () {
     connect(pLogger, SIGNAL(signalFatal(QString)), this, SLOT(log(QString)));
 }
 
+
 void MainWindow::setupWebView ()
 {
     pWebView->setPage (pActor->page ());
+//    qWarning(u8("initial zoom factor = %1").arg(pWebView->zoomFactor()));
+    updateZoom();
 }
+
+void MainWindow::updateZoom() {
+    zoom_value = std::min(zoom_maximum, std::max(zoom_minimum, zoom_value));
+    if (zoom_value != pWebView->zoomFactor()) {
+        qDebug(u8("set zoom factor to %1").arg(zoom_value));
+        pWebView->setZoomFactor(zoom_value);
+        Config::global().set("ui/zoom_value", zoom_value);
+    }
+}
+
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -521,4 +570,22 @@ void MainWindow::alert(int icon, QString subject, QString text) {
         return;
     }
     AlertDialog::alert(icon, subject, text);
+}
+
+
+void MainWindow::slotZoomIn() {
+    zoom_value += zoom_factor;
+    updateZoom();
+}
+
+
+void MainWindow::slotZoomOut() {
+    zoom_value -= zoom_factor;
+    updateZoom();
+}
+
+
+void MainWindow::slotZoomReset() {
+    zoom_value = 1.0;
+    updateZoom();
 }

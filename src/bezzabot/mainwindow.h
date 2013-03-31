@@ -19,6 +19,8 @@ class MainWindow : public QWidget
     Q_OBJECT
 
 protected:
+    typedef QWidget super;
+
     QIcon           imgAppIcon;
     QIcon           imgButtonOff;
     QIcon           imgButtonOn;
@@ -55,6 +57,10 @@ protected:
     QPushButton     *pSaveButton;
     QProgressBar    *pLoadingProgress;
 
+    QPushButton     *pZoomInButton;
+    QPushButton     *pZoomOutButton;
+    QPushButton     *pZoomResetButton;
+
     QString     _entered_url;
 
     bool        trayicon_enabled;
@@ -67,6 +73,11 @@ protected:
     int         history_size;
     int         icon_index;
 
+    qreal       zoom_minimum;
+    qreal       zoom_maximum;
+    qreal       zoom_factor;
+    qreal       zoom_value;
+
     Bot         *pBot;
     WebActor    *pActor;
 
@@ -75,11 +86,17 @@ protected:
     void setupWebView ();
     void setupConnections ();
 
+    void updateZoom();
+    void zoomIn();
+    void zoomOut();
+    void zoomReset();
+
     static MainWindow * _instance;
 
     virtual void closeEvent(QCloseEvent *);
 
     void updateLinkButton();
+
 
 public:
     explicit MainWindow (QWidget *parent = 0);
@@ -123,6 +140,10 @@ protected slots:
     void slotLinkChanged(bool enabled);
     void slotUrlEdited(QString s);
     void slotGoClicked();
+
+    void slotZoomIn();
+    void slotZoomOut();
+    void slotZoomReset();
 };
 
 #endif // MAINWINDOW_H

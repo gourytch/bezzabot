@@ -10,5 +10,8 @@
         <file alias="ico.png">images/ico.png</file>
         <file alias="link_off.png">images/link_off.png</file>
         <file alias="link_on.png">images/link_on.png</file>
+        <file alias="zoom_out.png">images/zoom_out.png</file>
+        <file alias="zoom_in.png">images/zoom_in.png</file>
+        <file alias="zoom_reset.png">images/zoom_reset.png</file>
     </qresource>
 </RCC>
