@@ -158,6 +158,7 @@ void MainWindow::createUI ()
     pLoadingProgress->setEnabled (false);
     pLoadingProgress->setFixedWidth(128);
 
+#if 0
     pZoomOutButton = new QPushButton();
     pZoomOutButton->setIcon(QIcon(":/zoom_out.png"));
     pZoomOutButton->setCheckable(false);
@@ -178,6 +179,28 @@ void MainWindow::createUI ()
     pZoomInButton->setFlat(true);
     pZoomInButton->setFixedSize(15, 20);
     pZoomInButton->setToolTip(u8("увеличить изображение"));
+#else
+    pZoom24Button = new QPushButton();
+    pZoom24Button->setIcon(QIcon(":/zoom_24.png"));
+    pZoom24Button->setCheckable(false);
+    pZoom24Button->setFlat(true);
+    pZoom24Button->setFixedSize(8, 20);
+    pZoom24Button->setToolTip(u8("zoom 50%"));
+
+    pZoom34Button = new QPushButton();
+    pZoom34Button->setIcon(QIcon(":/zoom_34.png"));
+    pZoom34Button->setCheckable(false);
+    pZoom34Button->setFlat(true);
+    pZoom34Button->setFixedSize(8, 20);
+    pZoom34Button->setToolTip(u8("zoom 75%"));
+
+    pZoom44Button = new QPushButton();
+    pZoom44Button->setIcon(QIcon(":/zoom_44.png"));
+    pZoom44Button->setCheckable(false);
+    pZoom44Button->setFlat(true);
+    pZoom44Button->setFixedSize(8, 20);
+    pZoom44Button->setToolTip(u8("zoom 100%"));
+#endif
 
     pLogView = new QTextEdit ();
 
@@ -191,9 +214,15 @@ void MainWindow::createUI ()
     pControls->addWidget (pNoPics, 0);
     pControls->addWidget (pSaveButton, 0);
 
+#if 0
     pControls->addWidget (pZoomOutButton, 0);
     pControls->addWidget (pZoomResetButton, 0);
     pControls->addWidget (pZoomInButton, 0);
+#else
+    pControls->addWidget (pZoom24Button, 0);
+    pControls->addWidget (pZoom34Button, 0);
+    pControls->addWidget (pZoom44Button, 0);
+#endif
 
     pControls->addWidget (pUrlEdit, 100);
     pControls->addWidget (pGoButton, 0);
@@ -270,10 +299,15 @@ void MainWindow::setupConnections () {
 
     connect (pSaveButton, SIGNAL(clicked()), this, SLOT(slotSaveAlonePage()));
 
+#if 0
     connect (pZoomOutButton, SIGNAL(clicked()), this, SLOT(slotZoomOut()));
     connect (pZoomResetButton, SIGNAL(clicked()), this, SLOT(slotZoomReset()));
     connect (pZoomInButton, SIGNAL(clicked()), this, SLOT(slotZoomIn()));
-
+#else
+    connect (pZoom24Button, SIGNAL(clicked()), this, SLOT(slotZoom24()));
+    connect (pZoom34Button, SIGNAL(clicked()), this, SLOT(slotZoom34()));
+    connect (pZoom44Button, SIGNAL(clicked()), this, SLOT(slotZoom44()));
+#endif
     connect (pUrlEdit, SIGNAL(returnPressed()),
              this, SLOT(slotGoClicked()));
 
@@ -573,6 +607,7 @@ void MainWindow::alert(int icon, QString subject, QString text) {
 }
 
 
+#if 0
 void MainWindow::slotZoomIn() {
     zoom_value += zoom_factor;
     updateZoom();
@@ -589,3 +624,19 @@ void MainWindow::slotZoomReset() {
     zoom_value = 1.0;
     updateZoom();
 }
+#else
+void MainWindow::slotZoom24() {
+    zoom_value = 0.5;
+    updateZoom();
+}
+
+void MainWindow::slotZoom34() {
+    zoom_value = 0.75;
+    updateZoom();
+}
+
+void MainWindow::slotZoom44() {
+    zoom_value = 1.0;
+    updateZoom();
+}
+#endif

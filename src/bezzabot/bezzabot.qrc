@@ -13,5 +13,8 @@
         <file alias="zoom_out.png">images/zoom_out.png</file>
         <file alias="zoom_in.png">images/zoom_in.png</file>
         <file alias="zoom_reset.png">images/zoom_reset.png</file>
+        <file alias="zoom_24.png">images/zoom_24.png</file>
+        <file alias="zoom_34.png">images/zoom_34.png</file>
+        <file alias="zoom_44.png">images/zoom_44.png</file>
     </qresource>
 </RCC>

@@ -57,10 +57,15 @@ protected:
     QPushButton     *pSaveButton;
     QProgressBar    *pLoadingProgress;
 
+#if 0
     QPushButton     *pZoomInButton;
     QPushButton     *pZoomOutButton;
     QPushButton     *pZoomResetButton;
-
+#else
+    QPushButton     *pZoom24Button;
+    QPushButton     *pZoom34Button;
+    QPushButton     *pZoom44Button;
+#endif
     QString     _entered_url;
 
     bool        trayicon_enabled;
@@ -87,9 +92,6 @@ protected:
     void setupConnections ();
 
     void updateZoom();
-    void zoomIn();
-    void zoomOut();
-    void zoomReset();
 
     static MainWindow * _instance;
 
@@ -141,9 +143,16 @@ protected slots:
     void slotUrlEdited(QString s);
     void slotGoClicked();
 
+#if 0
     void slotZoomIn();
     void slotZoomOut();
     void slotZoomReset();
+#else
+    void slotZoom24();
+    void slotZoom34();
+    void slotZoom44();
+#endif
+
 };
 
 #endif // MAINWINDOW_H
