@@ -14,11 +14,15 @@
 class Bot;
 class WebActor;
 
+//#define ZOOM_RELAXED
+
 class MainWindow : public QWidget
 {
     Q_OBJECT
 
 protected:
+    typedef QWidget super;
+
     QIcon           imgAppIcon;
     QIcon           imgButtonOff;
     QIcon           imgButtonOn;
@@ -55,6 +59,15 @@ protected:
     QPushButton     *pSaveButton;
     QProgressBar    *pLoadingProgress;
 
+#if ZOOM_RELAXED
+    QPushButton     *pZoomInButton;
+    QPushButton     *pZoomOutButton;
+    QPushButton     *pZoomResetButton;
+#else
+    QPushButton     *pZoom24Button;
+    QPushButton     *pZoom34Button;
+    QPushButton     *pZoom44Button;
+#endif
     QString     _entered_url;
 
     bool        trayicon_enabled;
@@ -67,6 +80,11 @@ protected:
     int         history_size;
     int         icon_index;
 
+    qreal       zoom_minimum;
+    qreal       zoom_maximum;
+    qreal       zoom_factor;
+    qreal       zoom_value;
+
     Bot         *pBot;
     WebActor    *pActor;
 
@@ -75,11 +93,14 @@ protected:
     void setupWebView ();
     void setupConnections ();
 
+    void updateZoom();
+
     static MainWindow * _instance;
 
     virtual void closeEvent(QCloseEvent *);
 
     void updateLinkButton();
+
 
 public:
     explicit MainWindow (QWidget *parent = 0);
@@ -123,6 +144,17 @@ protected slots:
     void slotLinkChanged(bool enabled);
     void slotUrlEdited(QString s);
     void slotGoClicked();
+
+#if ZOOM_RELAXED
+    void slotZoomIn();
+    void slotZoomOut();
+    void slotZoomReset();
+#else
+    void slotZoom24();
+    void slotZoom34();
+    void slotZoom44();
+#endif
+
 };
 
 #endif // MAINWINDOW_H
