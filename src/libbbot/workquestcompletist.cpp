@@ -67,7 +67,7 @@ bool WorkQuestCompletist::processQuery(Query query) {
             qDebug("можно посмотреть завершенные квесты");
             return true;
         }
-        qDebug("смотреть квесты пока рано");
+//        qDebug("смотреть квесты пока рано");
         return false;
     case CanStartSecondaryWork:
         return false;
