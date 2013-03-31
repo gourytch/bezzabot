@@ -14,6 +14,8 @@
 class Bot;
 class WebActor;
 
+//#define ZOOM_RELAXED
+
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -57,7 +59,7 @@ protected:
     QPushButton     *pSaveButton;
     QProgressBar    *pLoadingProgress;
 
-#if 0
+#if ZOOM_RELAXED
     QPushButton     *pZoomInButton;
     QPushButton     *pZoomOutButton;
     QPushButton     *pZoomResetButton;
@@ -143,7 +145,7 @@ protected slots:
     void slotUrlEdited(QString s);
     void slotGoClicked();
 
-#if 0
+#if ZOOM_RELAXED
     void slotZoomIn();
     void slotZoomOut();
     void slotZoomReset();

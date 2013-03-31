@@ -158,7 +158,7 @@ void MainWindow::createUI ()
     pLoadingProgress->setEnabled (false);
     pLoadingProgress->setFixedWidth(128);
 
-#if 0
+#if ZOOM_RELAXED
     pZoomOutButton = new QPushButton();
     pZoomOutButton->setIcon(QIcon(":/zoom_out.png"));
     pZoomOutButton->setCheckable(false);
@@ -299,7 +299,7 @@ void MainWindow::setupConnections () {
 
     connect (pSaveButton, SIGNAL(clicked()), this, SLOT(slotSaveAlonePage()));
 
-#if 0
+#if ZOOM_RELAXED
     connect (pZoomOutButton, SIGNAL(clicked()), this, SLOT(slotZoomOut()));
     connect (pZoomResetButton, SIGNAL(clicked()), this, SLOT(slotZoomReset()));
     connect (pZoomInButton, SIGNAL(clicked()), this, SLOT(slotZoomIn()));
@@ -607,7 +607,7 @@ void MainWindow::alert(int icon, QString subject, QString text) {
 }
 
 
-#if 0
+#if ZOOM_RELAXED
 void MainWindow::slotZoomIn() {
     zoom_value += zoom_factor;
     updateZoom();
