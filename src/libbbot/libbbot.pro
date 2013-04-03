@@ -31,7 +31,9 @@ SOURCES += \
     alertdialog.cpp \
     workdiving.cpp \
     parsers/page_game_atlantis.cpp \
-    tools/currency.cpp
+    tools/currency.cpp \
+    workquestcompletist.cpp \
+    parsers/page_game_school_quests.cpp
 
 HEADERS  += \
     bot.h \
@@ -58,7 +60,9 @@ HEADERS  += \
     tools/sleeper.h \
     workdiving.h \
     parsers/page_game_atlantis.h \
-    tools/currency.h
+    tools/currency.h \
+    workquestcompletist.h \
+    parsers/page_game_school_quests.h
 
 FORMS += \
     alertdialog.ui
@@ -161,13 +165,13 @@ OBJECTS_DIR = $$TOP/obj/$$TARGET
 MOC_DIR = $$TOP/obj/$$TARGET/moc
 DESTDIR = $$TOP/lib
 
-CONFIG(debug, debug|release) {
-  QMAKE_CXXFLAGS += \
-    -fno-builtin-malloc \
-    -fno-builtin-calloc \
-    -fno-builtin-realloc \
-    -fno-builtin-free
-}
+#CONFIG(debug, debug|release) {
+#  QMAKE_CXXFLAGS += \
+#    -fno-builtin-malloc \
+#    -fno-builtin-calloc \
+#    -fno-builtin-realloc \
+#    -fno-builtin-free
+#}
 
 
 

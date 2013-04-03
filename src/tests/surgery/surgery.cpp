@@ -6,6 +6,7 @@
 #include <QString>
 #include <QRegExp>
 #include "appwindow.h"
+#include "parsers/types.h"
 #include "tools/tools.h"
 #include "tools/logger.h"
 #include "tools/activityhours.h"

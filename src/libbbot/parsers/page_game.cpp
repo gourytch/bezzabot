@@ -780,7 +780,9 @@ Page_Game::Page_Game (QWebElement& doc) :
         bool ok;
         QString t = c.toPlainText().trimmed();
 
-//        if (r.id == 33 || r.id == 34) {
+//        if (r.id == 56)
+//        {
+//            qDebug(QString("*** rid=%1").arg(r.id));
 //            qDebug("*** inner=" + c.toInnerXml());
 //            qDebug("*** text={" + t + "}");
 //            QWebElement z = c.firstChild();

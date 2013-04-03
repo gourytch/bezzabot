@@ -2,8 +2,9 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     surgery \
-    test_parsers \
-    valgrinding
+    test_parsers
+
+#    valgrinding
 
 #    testConfig \
 #    test_disp \

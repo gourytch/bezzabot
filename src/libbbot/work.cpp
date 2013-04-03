@@ -57,6 +57,10 @@ QString Work::getWorkName() const {
     return ::toString(getWorkType());
 }
 
+QString Work::getWorkStage() const {
+    return "undefined";
+}
+
 QString Work::toString() const {
     return "Work:" + getWorkName() + ", Stage:" + getWorkStage();
 }

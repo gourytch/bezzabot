@@ -25,5 +25,5 @@ CONFIG(debug, debug|release) {
         -fno-builtin-calloc \
         -fno-builtin-realloc \
         -fno-builtin-free
-    LIBS += -ltcmalloc -lprofiler
+#    LIBS += -ltcmalloc -lprofiler
 }

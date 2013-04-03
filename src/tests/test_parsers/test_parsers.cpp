@@ -11,7 +11,7 @@
 using namespace std;
 
 void test(const QString& fname) {
-    cout << "LOAD " << qPrintable(fname) << endl;
+    cout << "LOAD PAGE FROM " << qPrintable(fname) << endl;
     QString text = ::load (fname);
     Page_Generic *p = Parser::parse (text);
     if (p) {
