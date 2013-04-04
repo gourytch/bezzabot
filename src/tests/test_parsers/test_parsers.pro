@@ -1,18 +1,12 @@
-CUR = $$PWD
-TOP = $$CUR/../../..
-
+TARGET = test_parsers
+TEMPLATE = app
 CONFIG += qt debug warn_on
 QT += core gui network webkit
 
-TARGET = test_parsers
-TEMPLATE = app
+include($${TOP_PROJECT_DIR}/common.pri)
 
 SOURCES += test_parsers.cpp
 
-INCLUDEPATH += $$TOP/src/libbbot
-LIBS += -L$$TOP/lib -lbbot
-PRE_TARGETDEPS += $$TOP/lib/libbbot.a
-
-OBJECTS_DIR = $$TOP/obj/$$TARGET
-MOC_DIR = $$TOP/obj/$$TARGET/moc
-DESTDIR = $$TOP/bin
+INCLUDEPATH += $${TOP_PROJECT_DIR}/src/libbbot
+LIBS += -lbbot
+PRE_TARGETDEPS += $${OUTPUT_LIB_DIR}/libbbot.a

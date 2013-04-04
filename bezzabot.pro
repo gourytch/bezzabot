@@ -1,3 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS  = src
+SUBDIRS  = \
+    initvars.pro \
+    src
+CONFIG += ordered recursive
 

@@ -6,6 +6,8 @@ TARGET = bbot
 CONFIG += qt warn_on staticlib
 QT += core gui network webkit
 
+include($${TOP_PROJECT_DIR}/common.pri)
+
 SOURCES += \
     bot.cpp \
     webactor.cpp \
@@ -160,11 +162,6 @@ HEADERS += \
     parsers/page_game_alchemy_lab.h \
     parsers/page_game_grinder.h
 
-
-OBJECTS_DIR = $$TOP/obj/$$TARGET
-MOC_DIR = $$TOP/obj/$$TARGET/moc
-DESTDIR = $$TOP/lib
-
 #CONFIG(debug, debug|release) {
 #  QMAKE_CXXFLAGS += \
 #    -fno-builtin-malloc \
@@ -172,39 +169,3 @@ DESTDIR = $$TOP/lib
 #    -fno-builtin-realloc \
 #    -fno-builtin-free
 #}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

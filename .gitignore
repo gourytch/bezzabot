@@ -7,8 +7,12 @@ Makefile
 moc_*.cpp
 qrc_*.cpp
 
+/out
+/out/*
 /bin/*
 /obj/*
 /lib/*
 /include/*
 ui_*.h
+*.pro.user
+.qmake.cache

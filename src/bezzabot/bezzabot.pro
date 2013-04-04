@@ -1,13 +1,12 @@
-TOP = ../..
-
 TARGET = bezzabot
 TEMPLATE = app
-
 QT += core gui network webkit
 
 win32 {
   CONFIG += console
 }
+
+include($${TOP_PROJECT_DIR}/common.pri)
 
 SOURCES += \
     main.cpp\
@@ -16,15 +15,11 @@ SOURCES += \
 HEADERS  += \
     mainwindow.h
 
-INCLUDEPATH += ../libbbot
-LIBS += -L$$TOP/lib -lbbot
-PRE_TARGETDEPS += $$TOP/lib/libbbot.a
+INCLUDEPATH += $${TOP_PROJECT_DIR}/src/libbbot
+LIBS += -lbbot
+PRE_TARGETDEPS += $${OUTPUT_LIB_DIR}/libbbot.a
 
 #LIBS += -lduma
-
-OBJECTS_DIR = $$TOP/obj/$$TARGET
-MOC_DIR = $$TOP/obj/$$TARGET/moc
-DESTDIR = $$TOP/bin
 
 RESOURCES += \
     bezzabot.qrc
@@ -41,38 +36,3 @@ CONFIG(debug, debug|release) {
 #    LIBS += -ltcmalloc -lprofiler
 #  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

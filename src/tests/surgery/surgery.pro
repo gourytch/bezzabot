@@ -1,11 +1,9 @@
-CUR = $$PWD
-TOP = $$CUR/../../..
-
+TARGET = surgery
+TEMPLATE = app
 CONFIG += debug
 QT += core gui network webkit
 
-TARGET = surgery
-TEMPLATE = app
+include($${TOP_PROJECT_DIR}/common.pri)
 
 SOURCES += \
     appwindow.cpp \
@@ -22,14 +20,7 @@ RESOURCES += \
 FORMS += \
     alertdialog.ui
 
-INCLUDEPATH += $$TOP/src/libbbot
-LIBS += -L$$TOP/lib -lbbot
-PRE_TARGETDEPS += $$TOP/lib/libbbot.a
 
-OBJECTS_DIR = $$TOP/obj/$$TARGET
-MOC_DIR = $$TOP/obj/$$TARGET/moc
-DESTDIR = $$TOP/bin
-
-
-
-
+INCLUDEPATH += $${TOP_PROJECT_DIR}/src/libbbot
+LIBS += -lbbot
+PRE_TARGETDEPS += $${OUTPUT_LIB_DIR}/libbbot.a
