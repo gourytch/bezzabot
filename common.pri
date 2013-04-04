@@ -2,8 +2,8 @@ TOP_OBJ_DIR = $${TOP_BUILD_DIR}/obj
 
 #TOP_OUTPUT_DIR = $${TOP_BUILD_DIR}/out
 TOP_OUTPUT_DIR = $${TOP_BUILD_DIR}
-OUTPUT_BIN_DIR = $${TOP_OUTPUT_DIR}
-OUTPUT_LIB_DIR = $${TOP_OUTPUT_DIR}
+OUTPUT_BIN_DIR = $${TOP_OUTPUT_DIR}/bin
+OUTPUT_LIB_DIR = $${TOP_OUTPUT_DIR}/lib
 
 BUILD_HASH=\"$$system("cd $${TOP_PROJECT_DIR}; git show --name-only --format='%h' | head -n1")\"
 BUILD_TSTAMP=\"$$system("cd $${TOP_PROJECT_DIR}; git show --name-only --format='%ci' | head -n1 | awk '{print $1, $2}'")\"
