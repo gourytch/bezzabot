@@ -16,14 +16,31 @@ Page_Game_Dozor_GotVictim::Page_Game_Dozor_GotVictim (QWebElement& doc) :
 {
     pagekind = page_Game_Dozor_GotVictim;
     QWebElement tab = document.findFirst("TABLE.attack");
-    QString img = tab.findFirst("TD[style]").attribute("style");
-    is_scary = (img.indexOf("/monster/") > -1);
-    if (is_scary) {
-        QRegExp rx("/([^/]+)\\.jpg");
-        if (rx.indexIn(img) != -1) {
-            img_name = rx.cap(1);
+    QWebElement e = tab.findFirst("TD.left").findFirst("DIV.avatar");
+    QString img;
+
+    if (e.isNull()) { // нет аватарки игрока. значит это страшилка
+        e = tab.findFirst("TD[style]");
+        if (e.isNull()) { // и не страшилка (?)
+            qCritical("IT IS A VERY STRANGE VICTIM!!!");
+        } else {
+            img = e.attribute("style");
+            is_scary = true;
         }
+    } else { // есть аватарка игрока. значит работаем дальше
+        img = e.attribute("style");
+        is_scary = false;
+        e = tab.findFirst("DIV#char_name");
+        name = e.findFirst("B").toPlainText();
+        clan = e.findFirst("A").toPlainText();
+        msg  = tab.findFirst("TD.enemy_message").toPlainText();
     }
+
+    QRegExp rx("/([^/]+)\\.jpg");
+    if (rx.indexIn(img) != -1) {
+        img_name = rx.cap(1);
+    }
+
     level       = -1;
     power       = -1;
     block       = -1;
@@ -127,7 +144,11 @@ QString Page_Game_Dozor_GotVictim::getName() const {
         if (scareNames.contains(img_name)) {
             return scareNames[img_name];
         } else {
-            return "unknown:" + img_name;
+            if (name.isEmpty()) {
+                return "unknown:" + img_name;
+            } else{
+                return name;
+            }
         }
     }
 

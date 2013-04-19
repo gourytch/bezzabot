@@ -12,6 +12,8 @@ class Page_Game_Dozor_GotVictim : public Page_Game
 public:
 
     QString name;
+    QString clan;
+    QString msg;
     QString img_name;
     bool    is_scary;
     int     level;
