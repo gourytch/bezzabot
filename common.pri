@@ -28,6 +28,8 @@ contains(TEMPLATE, lib) {
 INCLUDEPATH += $${TOP_PROJECT_DIR}/src
 LIBS += -L$${OUTPUT_LIB_DIR}
 
+CONFIG += exceptions
+
 #QMAKE_CXXFLAGS += \
 #    -DBUILD_HASH="$${BUILD_HASH}" \
 #    -DBUILD_TIME="$${BUILD_TSTAMP}" \

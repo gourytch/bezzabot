@@ -1,0 +1,76 @@
+Page_Game {
+Page_Generic {
+   pagekind=page_Game
+   }
+pagetitle: {}
+character: Баранка Нехрюшка
+hp: 1458646/2179028, spd 2814
+gold: 2175169, crystal: 52279, fish:1493451, green:561
+safe_gold:192000, safe_crystal:71
+free_gold:319833, free_crystal:10441
+workquild: WorkGuild_Miners
+messsage: {}
+system timer: Timer {pit=2013-04-09 02:00:00, hms=29247, href={/}, title={SYSTEM TIME}}
+work   timer: Timer {pit=2013-04-09 10:09:43, hms=130, href={mine.php?a=open}, title={BUSY}}
+immun. timer: Timer {pit=, hms=-1, href={}, title={DANGER}}
+fight  timer: Timer {pit=, hms=-1, href={dozor.php}, title={BATTLETIME}}
+other timers:
+PageTimers {
+   }
+resources:
+Resources: {
+      {id=19, count=150, href=/castle.php?a=room&id=11, title=Количество медальонов до следующей ступени}
+      {id=20, count=8, href=/harbour.php?a=market, title=Количество свободных мест на плантации}
+      {id=23, count=393, href=/harbour.php?a=pier, title=Кораблики}
+      {id=32, count=100660, href=/dozor.php, title=Количество опыта до следующего уровня}
+      {id=33, count=0, href=/harbour.php?a=market, title=Билетов на маленькую поляну: 0 + 0 б/у}
+      {id=34, count=2, href=/harbour.php?a=market, title=Билетов на большую поляну: 2 + 0 б/у}
+      {id=38, count=59, href=/harbour.php?a=market, title=Ртутный порошок}
+      {id=39, count=15, href=/harbour.php?a=pier, title=Количество походов за пирашками на сегодня}
+      {id=43, count=8, href=/castle.php?a=show2&id=caste, title=Получено реликов за сегодня}
+      {id=44, count=3, href=/shop.php?a=sell&group=11, title=Радужный Сундучок}
+      {id=45, count=161, href=/castle.php?a=show2&id=caste, title=Количество реликов до следующего взноса}
+      {id=48, count=55, href=/harbour.php?a=market, title=Конс. ядреная смесь}
+      {id=51, count=0, href=, title=Соль земли. Прибавляет от 2% до 24% к характеристикам элемента экипировки.}
+      {id=52, count=0, href=, title=Горная слеза. Повышает награбленное в кристаллах в боях бодалки на количество от 1 до 12. }
+      {id=53, count=0, href=, title=Рыжий сланец. Повышает награбленное в золоте в боях бодалки на количество от 2% до 18%.}
+      {id=56, count=2000, href=, title=Кристальная пыль}
+      {id=57, count=121, href=, title=Мыльный камень}
+      {id=58, count=1, href=, title=Раскаленное стекло}
+      {id=59, count=27, href=, title=Стеклянная тара}
+      {id=87, count=0, href=/atlantis.php, title=Батискафчик}
+   }
+
+effects:
+PageTimers {
+      Timer {pit=2013-04-09 19:29:56, hms=33743, href={}, title={Бонус. Транжира}}
+   }
+coulons:
+PageCoulons {
+      {id=20648833, kind=item_104, name={Копикрист} lvl=100 of 100, inactive}
+      {id=25140562, kind=item_508, name={Антихап} lvl=100 of 100, active}
+      {id=24197010, kind=item_247, name={Маслянка} lvl=100 of 100, inactive}
+      {id=25140574, kind=item_106, name={Клевер} lvl=100 of 100, inactive}
+      {id=26487414, kind=item_105, name={Чертирожка} lvl=100 of 100, inactive}
+      {id=25121384, kind=item_119, name={Большой Поляноид} lvl=100 of 100, inactive}
+      {id=24872782, kind=item_633, name={Разрушитель} lvl=17 of 100, inactive}
+      {id=21335789, kind=item_108, name={Антимаг} lvl=96 of 96, inactive}
+      {id=25632255, kind=item_83, name={Ловкий Пупс} lvl=100 of 100, inactive}
+      {id=27663029, kind=item_87, name={Большое пузо} lvl=100 of 100, inactive}
+      {id=28140910, kind=item_605, name={Фермец} lvl=100 of 100, inactive}
+      {id=28111652, kind=item_720, name={Пожарник} lvl=1 of 100, inactive}
+   }
+
+pets:
+Pet List: {
+      {id=476612, hp_cur/hp_max/hp_spd=4166618/5000000/90, kind=UNLISTED#21 title={}, uncaged}
+   }
+flyings:
+Flyings {
+      {{icon="flying_43" title="Мантикорик"}{feed=84% hits=34% gold=53630}}
+      {{icon="flying_13" title="Драко"}{feed=83% hits=67% gold=376791}}
+      {{icon="flying_23" title="Пегасус"}{feed=66% hits=54% gold=87518}}
+      {{icon="flying_33" title="Грифан"}{feed=84% hits=76% gold=517893}}
+   }
+medikit closed
+}

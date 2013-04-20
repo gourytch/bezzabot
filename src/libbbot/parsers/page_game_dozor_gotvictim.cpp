@@ -145,15 +145,14 @@ QString Page_Game_Dozor_GotVictim::getName() const {
             return scareNames[img_name];
         } else {
             if (name.isEmpty()) {
-                return "unknown:" + img_name;
-            } else{
-                return name;
+                return "scary:" + img_name;
             }
         }
     }
-
     return name;
 }
+
+
 //static
 bool Page_Game_Dozor_GotVictim::fit(const QWebElement& doc) {
 //    qDebug("* CHECK Page_Game_Dozor_GotVictim");
