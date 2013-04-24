@@ -11,8 +11,7 @@ BUILD_SUBJ=\"$$system("cd $${TOP_PROJECT_DIR}; git show --name-only --format='%s
 
 DEFINES += \
     BUILD_HASH="$${BUILD_HASH}" \
-    BUILD_TSTAMP="$${BUILD_TSTAMP}" \
-    BUILD_SUBJ="$${BUILD_SUBJ}"
+    BUILD_TSTAMP="$${BUILD_TSTAMP}"
 
 OBJECTS_DIR = $${TOP_OBJ_DIR}/$${TARGET}
 MOC_DIR     = $${OBJECTS_DIR}/moc
@@ -28,9 +27,4 @@ contains(TEMPLATE, lib) {
 INCLUDEPATH += $${TOP_PROJECT_DIR}/src
 LIBS += -L$${OUTPUT_LIB_DIR}
 
-CONFIG += exceptions
-
-#QMAKE_CXXFLAGS += \
-#    -DBUILD_HASH="$${BUILD_HASH}" \
-#    -DBUILD_TIME="$${BUILD_TSTAMP}" \
-#    -DBUILD_SUBJ="$${BUILD_SUBJ}"
+CONFIG += exceptions static
