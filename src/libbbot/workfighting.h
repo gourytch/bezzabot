@@ -30,15 +30,29 @@ public:
 
 protected:
 
+    bool use_coulons;
+
     bool use_normal_fighting;
 
     bool use_zorro_fighting;
+
+    int attempts_count;
 
     int max_retries;
 
     int min_hp;
 
     int min_hp_percents;
+
+    int min_gold;
+
+    int max_unsaved_gold;
+
+    int max_unsaved_crystals;
+
+    QDateTime fight_cooldown;
+
+    QDateTime zorro_cooldown;
 
 };
 
