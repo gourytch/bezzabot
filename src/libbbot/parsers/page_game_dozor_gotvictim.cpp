@@ -31,9 +31,13 @@ Page_Game_Dozor_GotVictim::Page_Game_Dozor_GotVictim (QWebElement& doc) :
         img = e.attribute("style");
         is_scary = false;
         e = tab.findFirst("DIV#char_name");
-        name = e.findFirst("B").toPlainText();
-        clan = e.findFirst("A").toPlainText();
+        name = e.toPlainText();
+        if (name.isEmpty()) {
+            qDebug(u8("??? empty name charname block is: %1").arg(e.toOuterXml()));
+        }
+        clan = e.nextSibling().toPlainText();
         msg  = tab.findFirst("TD.enemy_message").toPlainText();
+
     }
 
     QRegExp rx("/([^/]+)\\.jpg");
@@ -51,7 +55,7 @@ Page_Game_Dozor_GotVictim::Page_Game_Dozor_GotVictim (QWebElement& doc) :
         QWebElementCollection td = tr.findAll("TD");
         if (td.count() < 4) continue;
         QString name = td[1].toPlainText().trimmed();
-        if (name == u8("Уровень")) {
+        if (name.startsWith(u8("Уровень"))) {
             level = td[2].toPlainText().trimmed().toInt();
         } else if (name == u8("Сила")) {
             power = td[3].toPlainText().trimmed().toInt();
@@ -82,7 +86,7 @@ QString Page_Game_Dozor_GotVictim::toString (const QString& pfx) const
     return "Page_Game_Dozor_GotVictim {\n" +
 
             pfx + Page_Game::toString (pfx + "   ") + "\n" +
-            pfx + QString("VICTIM: %1 %2\n")
+            pfx + QString("VICTIM: %1 \"%2\"\n")
             .arg(is_scary ? "MONSTER" : "PLAYER")
             .arg(getName()) +
             pfx + QString("   level     : %1\n").arg(level) +
