@@ -65,6 +65,8 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
 
     // обработаем zorro
     // TODO: найти и обработать форму без активной маски
+    zorro_enabled = true; // FIXME и сделать выставление этой переменной
+
     e = _zorroForm.findFirst("DIV.watch_no_attack");
     if (e.isNull()) { // нет запрета на Zorro
         zorro_price = dottedInt(
