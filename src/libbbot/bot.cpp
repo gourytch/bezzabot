@@ -29,6 +29,7 @@
 #include "workalchemy.h"
 #include "workdiving.h"
 #include "workquestcompletist.h"
+#include "workfighting.h"
 
 
 Bot::Bot(const QString& id, QObject *parent) :
@@ -830,6 +831,7 @@ void Bot::initWorks() {
     _worklist.append(new WorkMining(this));
     _worklist.append(new WorkFieldsOpening(this));
     _worklist.append(new WorkFarming(this));
+    _worklist.append(new WorkFighting(this));
     _worklist.append(new WorkScaryFighting(this));
     _worklist.append(new WorkTraining(this));
 

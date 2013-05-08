@@ -35,7 +35,8 @@ SOURCES += \
     parsers/page_game_atlantis.cpp \
     tools/currency.cpp \
     workquestcompletist.cpp \
-    parsers/page_game_school_quests.cpp
+    parsers/page_game_school_quests.cpp \
+    workfighting.cpp
 
 HEADERS  += \
     bot.h \
@@ -64,7 +65,8 @@ HEADERS  += \
     parsers/page_game_atlantis.h \
     tools/currency.h \
     workquestcompletist.h \
-    parsers/page_game_school_quests.h
+    parsers/page_game_school_quests.h \
+    workfighting.h
 
 FORMS += \
     alertdialog.ui
