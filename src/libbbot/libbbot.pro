@@ -15,6 +15,7 @@ SOURCES += \
     bot_one_step.cpp \
     botstate.cpp \
     bot_got_page.cpp \
+    perceptron.cpp \
     work.cpp \
     workwatching.cpp \
     worksleeping.cpp \
@@ -32,17 +33,15 @@ SOURCES += \
     workcrystalgrinding.cpp \
     alertdialog.cpp \
     workdiving.cpp \
-    parsers/page_game_atlantis.cpp \
-    tools/currency.cpp \
-    workquestcompletist.cpp \
-    parsers/page_game_school_quests.cpp \
-    workfighting.cpp
+    workfighting.cpp \
+    workquestcompletist.cpp
 
 HEADERS  += \
     bot.h \
     webactor.h \
     farmersgroupsprices.h \
     botstate.h \
+    perception.h \
     work.h \
     workwatching.h \
     worksleeping.h \
@@ -62,11 +61,8 @@ HEADERS  += \
     iconames.h \
     tools/sleeper.h \
     workdiving.h \
-    parsers/page_game_atlantis.h \
-    tools/currency.h \
-    workquestcompletist.h \
-    parsers/page_game_school_quests.h \
-    workfighting.h
+    workfighting.h \
+    workquestcompletist.h
 
 FORMS += \
     alertdialog.ui
@@ -85,7 +81,8 @@ HEADERS += \
     tools/tarball.h \
     tools/varmap.h \
     tools/treemap.h \
-    tools/vartools.h
+    tools/vartools.h \
+    tools/currency.h
 
 SOURCES += \
     tools/tools.cpp \
@@ -99,7 +96,8 @@ SOURCES += \
     tools/tarball.cpp \
     tools/varmap.cpp \
     tools/treemap.cpp \
-    tools/vartools.cpp
+    tools/vartools.cpp \
+    tools/currency.cpp 
 
 SOURCES += \
     parsers/types.cpp \
@@ -130,7 +128,9 @@ SOURCES += \
     parsers/page_game_house_plantation.cpp \
     parsers/page_game_alchemy_entrance.cpp \
     parsers/page_game_alchemy_lab.cpp \
-    parsers/page_game_grinder.cpp
+    parsers/page_game_grinder.cpp \
+    parsers/page_game_atlantis.cpp \
+    parsers/page_game_school_quests.cpp
 
 HEADERS += \
     parsers/types.h \
@@ -162,7 +162,9 @@ HEADERS += \
     parsers/page_game_house_plantation.h \
     parsers/page_game_alchemy_entrance.h \
     parsers/page_game_alchemy_lab.h \
-    parsers/page_game_grinder.h
+    parsers/page_game_grinder.h \
+    parsers/page_game_atlantis.h \
+    parsers/page_game_school_quests.h
 
 #CONFIG(debug, debug|release) {
 #  QMAKE_CXXFLAGS += \

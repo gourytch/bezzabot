@@ -88,6 +88,12 @@ Logger& Logger::global() {
         _instance = new Logger(NULL);
         _prev_handler = qInstallMsgHandler (_handler);
         _instance->log(QtDebugMsg, "start logging, " BUILD_ID); // VERBATIM!
+#if defined(BUILD_HASH)
+        _instance->log(QtDebugMsg, "BUILD_HASH=" BUILD_HASH);
+#endif
+#if defined(BUILD_TSTAMP)
+        _instance->log(QtDebugMsg, "BUILD_TSTAMP=" BUILD_TSTAMP);
+#endif
     }
     return *_instance;
 }
