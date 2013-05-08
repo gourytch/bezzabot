@@ -34,7 +34,7 @@ QString WorkScaryFighting::getWorkStage() const {
 }
 
 bool WorkScaryFighting::nextStep() {
-    return false;
+    return processPage(_bot->_gpage);
 }
 
 bool WorkScaryFighting::processPage(Page_Game *gpage) {

@@ -33,6 +33,7 @@ SOURCES += \
     workcrystalgrinding.cpp \
     alertdialog.cpp \
     workdiving.cpp \
+    workfighting.cpp \
     workquestcompletist.cpp
 
 HEADERS  += \
@@ -60,6 +61,7 @@ HEADERS  += \
     iconames.h \
     tools/sleeper.h \
     workdiving.h \
+    workfighting.h \
     workquestcompletist.h
 
 FORMS += \
