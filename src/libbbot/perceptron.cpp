@@ -118,6 +118,18 @@ QRect findCrop(const QImage& img) {
     return r;
 }
 
+double compare(const QImage& a, const QImage& b) {
+    Q_ASSERT(a.size() == b.size());
+    if (a.isNull()) return 1.0;
+
+    unsigned long int equals = 0;
+    for (int y = 0; y < a.height(); ++y) {
+        for (int x = 0; x < a.width(); ++x) {
+            if (a.pixel(x, y) == b.pixel(x,y)) ++equals;
+        }
+    }
+    return ((double)equals) / (a.width() * a.height());
+}
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -133,10 +145,16 @@ Perceptron::~Perceptron() {
 
 // загружаем библиотеку шаблонов из ресурсов
 bool Perceptron::init() {
+    const int w = 8;
+    const int h = 10;
     if (digits) return true;
+    QImage bigpix(":/digits.png");
+    if (bigpix.isNull()) return false;
+    Q_ASSERT(bigpix.width() == 10 * w);
+    Q_ASSERT(bigpix.height() == h);
     digits = new QImage*[10];
     for (int i = 0; i <= 9; ++i) { // грузим из ресурсов
-        digits[i] = new QImage(QString(":/digits/%1.png").arg(i));
+        digits[i] = new QImage(bigpix.copy(i * w, 0, w, h));
     }
     return true;
 }
@@ -153,6 +171,7 @@ bool Perceptron::deinit() {
         delete[] digits;
         digits = NULL;
     }
+    return true;
 }
 
 
@@ -160,8 +179,13 @@ bool Perceptron::deinit() {
 
   алгоритм для распознавания текста из символов фиксированной ширины:
   1. преобразуем в b/w прямоугольную битовую карту
-  2. ищем минимальный граничный прямоугольник с шириной,
-     кратной ширине знакоместа
+  FIXME как лучше всего найти место с текстом?
+  2. ищем строку символов в картинке
+     (место на картинке по высоте равное высоте знакоместа
+     и вмещающее наибольшее количество белых точек)
+  3. ищем края текста
+
+     если
   3. разрезаем на символы. признак раздельных символов -
      отсутствие связности
   4. распознаём каждый символ по отдельности:
