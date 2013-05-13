@@ -16,5 +16,6 @@
         <file alias="zoom_24.png">images/zoom_24.png</file>
         <file alias="zoom_34.png">images/zoom_34.png</file>
         <file alias="zoom_44.png">images/zoom_44.png</file>
+        <file alias="digits.png">images/digits/0123456789.png</file>
     </qresource>
 </RCC>

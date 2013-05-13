@@ -24,7 +24,7 @@ protected:
 
 
 QImage binarize(const QImage& img);
-
+double compare(const QImage& a, const QImage& b);
 
 // распознавание текста на картинке
 class Perceptron {

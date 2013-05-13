@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="digits.png">0123456789.png</file>
+    </qresource>
+</RCC>

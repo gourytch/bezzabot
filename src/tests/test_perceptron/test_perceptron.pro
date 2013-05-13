@@ -16,3 +16,6 @@ INCLUDEPATH += $${TOP_PROJECT_DIR}/src/libbbot
 LIBS += -lbbot
 PRE_TARGETDEPS += $${OUTPUT_LIB_DIR}/libbbot.a
 
+RESOURCES += \
+    test_perceptron.qrc
+
