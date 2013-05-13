@@ -70,6 +70,12 @@ enum PageKind {
     page_Game_LevelUp,
     page_Game_Alchemy_Entrance,
     page_Game_Alchemy_Lab,
+    page_Game_Alchemy_Shop,
+    page_Game_Alchemy_Simple,
+    page_Game_Alchemy_Normal,
+    page_Game_Alchemy_Complex,
+    page_Game_Alchemy_Rare,
+    page_Game_Alchemy_Epic,
     page_Game_Grinder,
     page_Game_Atlantis
 };

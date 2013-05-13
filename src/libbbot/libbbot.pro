@@ -128,6 +128,7 @@ SOURCES += \
     parsers/page_game_house_plantation.cpp \
     parsers/page_game_alchemy_entrance.cpp \
     parsers/page_game_alchemy_lab.cpp \
+    parsers/page_game_alchemy_simple.cpp \
     parsers/page_game_grinder.cpp \
     parsers/page_game_atlantis.cpp \
     parsers/page_game_school_quests.cpp
@@ -162,6 +163,7 @@ HEADERS += \
     parsers/page_game_house_plantation.h \
     parsers/page_game_alchemy_entrance.h \
     parsers/page_game_alchemy_lab.h \
+    parsers/page_game_alchemy_simple.h \
     parsers/page_game_grinder.h \
     parsers/page_game_atlantis.h \
     parsers/page_game_school_quests.h

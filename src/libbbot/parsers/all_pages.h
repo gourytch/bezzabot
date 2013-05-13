@@ -27,6 +27,7 @@
 #include "page_game_house_plantation.h"
 #include "page_game_alchemy_entrance.h"
 #include "page_game_alchemy_lab.h"
+#include "page_game_alchemy_simple.h"
 #include "page_game_grinder.h"
 #include "page_game_atlantis.h"
 #include "page_game_school_quests.h"
