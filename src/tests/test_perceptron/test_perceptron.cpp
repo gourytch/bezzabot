@@ -73,10 +73,12 @@ void init() {
 
 
 void deinit() {
+    if (!digits) return;
     for (int i = 0; i < 10; ++i) {
         delete digits[i];
     }
     delete[] digits;
+    digits = NULL;
 }
 
 
@@ -391,6 +393,6 @@ int main(int argc, char *argv[])
     }
     cout << "done" << endl;
 
-    deinit();
+//    deinit();
     return 0;
 }
