@@ -1,43 +1,12 @@
 #include <QDebug>
+#include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include "perceptron.h"
 
 using namespace std;
 
-QImage red2gray(const QImage& img) {
-    QImage dst(img.size(), QImage::Format_RGB888);
-    for (int y = 0; y < img.height(); ++y) {
-        for (int x = 0; x < img.width(); ++x) {
-            int s =  qRed(img.pixel(x, y));
-            dst.setPixel(x, y, qRgb(s, s, s));
-        }
-    }
-    return dst;
-}
-
-
-QImage grayblur(const QImage& img) {
-    QImage dst(img.size(), QImage::Format_RGB888);
-    for (int y = 0; y < img.height(); ++y) {
-        for (int x = 0; x < img.width(); ++x) {
-            int s = 0;
-            for (int yi = -1; yi <= +1; ++yi) {
-                int yy = max(0, min(img.height() - 1, yi + y));
-                for (int xi = -1; xi <= +1; ++xi) {
-                    int xx = max(0, min(img.width() - 1, xi + x));
-                    //s += qGray(img.pixel(xx, yy));
-                    s += qRed(img.pixel(xx, yy));
-                    if (xi == 0 && yi == 0) {
-                        s += 3 * qRed(img.pixel(xx, yy));
-                    }
-                }
-            }
-            s /= 12;
-            dst.setPixel(x, y, qRgb(s, s, s));
-        }
-    }
-    return dst;
-}
+namespace { // чтобы не видно было снаружи
 
 
 QImage threshold(const QImage& img, int value, bool inverted) {
@@ -54,87 +23,110 @@ QImage threshold(const QImage& img, int value, bool inverted) {
 }
 
 
-int findBinarizer(const QImage& img, qreal watermark) {
-    // составим гистограмму
-    int hst[256];
-    for (int i = 0; i < 256; ++i) {
-        hst[i] = 0;
-    }
-
-//  long int total_v = 0;
-    for (int y = 0; y < img.height(); ++y) {
-        for (int x = 0; x < img.width(); ++x) {
-            int v = qGray(img.pixel(x, y));
-            ++hst[v];
-//            total_v += v;
-        }
-    }
-    // ищем точку разделения черное/белое
-    int total = img.height() * img.width();
-    int topval = total * watermark;
-    qDebug() << "total =" << total;
-
-    int acc = 0;
-    int color;
-    for (color = 0; color < 256; ++color) {
-//        qDebug() << "acc =" << acc << ", hst ["<< color << "] =" << hst[color];
-
-        if (topval <= acc) {
-            break; // color - найденное значение демаркационного цвета
-        }
-        acc += hst[color];
-    }
-//    qDebug() << "found color =" << color;
-    return color;
-}
-
-
 QImage binarize(const QImage& img) {
-//    QImage gray = grayblur(img);
-//    QImage gray = red2gray(img);
-//    int color = findBinarizer(gray, 0.05);
-    // сделаем теперь инвертированную ч/б картинку
-//    return threshold(gray, color, true);
     return threshold(img, 70, true);
 }
 
 
-// по бинарному изображению ищем его границы
-QRect findCrop(const QImage& img) {
-    QRect r;
-    bool virgin = true;
-    for (int y = 0; y < img.height(); ++y) {
-        for (int x = 0; x < img.width(); ++x) {
-            if (img.pixel(x, y) == 0) continue;
-            if (virgin) {
-                r = QRect(x, y, 1, 1);
-            } else {
-                r.setRight(x);
-                r.setBottom(x);
-            }
+int findTopY(const QImage& img, int h) {
+    int height = img.height();
+    QVector<int> v(height);
 
+    for (int y = 0; y < height; ++y) {
+        int n = 0;
+        for (int x = 0; x < img.width(); ++x) {
+            if (qBlue(img.pixel(x, y))) ++n;
+        }
+        v[y] = n;
+    }
+
+    int ymax = height - h;
+    int best_y = -1;
+    int best_count = -1;
+    for (int y = 0; y < ymax; ++y) {
+        int n = 0;
+        for (int d = 0; d < h; ++d) {
+            n += v[y + d];
+        }
+        if (best_count < n) {
+            best_count = n;
+            best_y = y;
         }
     }
-    return r;
+    return best_y;
 }
+
+
+int findLeftPixel(const QImage& img, int topy, int h) {
+    int w = img.width();
+    for (int x = 0; x < w; ++x) {
+        for (int y = topy; y < topy + h; ++y) {
+            if (qBlue(img.pixel(x, y))) return x;
+        }
+    }
+    return w-1;
+}
+
+
+int findRightPixel(const QImage& img, int topy, int h) {
+    int w = img.width();
+    for (int x = w - 1; x > 0; --x) {
+        for (int y = topy; y < topy + h; ++y) {
+            if (qBlue(img.pixel(x, y))) return x;
+        }
+    }
+    return 0;
+}
+
+
+QRect findROI(const QImage& img, int h) {
+//    clog << "findROI. img.size=" << img.width() << "x" << img.height() << endl;
+    int top = findTopY(img, h);
+//    clog << "top = " << top << endl;
+    if (top == -1) return QRect();
+    int left = findLeftPixel(img, top, h);
+//    clog << "left = " << left << endl;
+    int right = findRightPixel(img, top, h);
+//    clog << "right = " << right << endl;
+    if (right < left) {
+//        clog << "left < right" << endl;
+        return QRect();
+    }
+    return QRect(left, top, right - left, h);
+}
+
 
 double compare(const QImage& a, const QImage& b) {
     Q_ASSERT(a.size() == b.size());
     if (a.isNull()) return 1.0;
 
-    unsigned long int equals = 0;
+//    dump("compare", a , b);
+
+    unsigned long int A_and_B = 0;
+    unsigned long int A_or_B = 0;
     for (int y = 0; y < a.height(); ++y) {
         for (int x = 0; x < a.width(); ++x) {
-            if (a.pixel(x, y) == b.pixel(x,y)) ++equals;
+            bool bA = (qBlue(a.pixel(x, y)) != 0);
+            bool bB = (qBlue(b.pixel(x, y)) != 0);
+            if (bA && bB) ++A_and_B;
+            if (bA || bB) ++A_or_B;
         }
     }
-    return ((double)equals) / (a.width() * a.height());
+    if (A_or_B == 0) return 1.0; // black & black
+
+    double r = ((double)A_and_B) / A_or_B;
+//    cout << "A&B=" << A_and_B << ", A|B=" << A_or_B << endl;
+//    cout << "similarity = " << r << endl << endl;
+    return r;
 }
 
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+}// end of anonymous namespace
 
 
 Perceptron::Perceptron() : digits(NULL) {
+    init();
 }
 
 
@@ -143,71 +135,117 @@ Perceptron::~Perceptron() {
 }
 
 
-// загружаем библиотеку шаблонов из ресурсов
 bool Perceptron::init() {
-    const int w = 8;
-    const int h = 10;
     if (digits) return true;
-    QImage bigpix(":/digits.png");
-    if (bigpix.isNull()) return false;
-    Q_ASSERT(bigpix.width() == 10 * w);
-    Q_ASSERT(bigpix.height() == h);
+    bigpix.load(":/digits.png");
+    Q_ASSERT(!bigpix.isNull());
+    Q_ASSERT(bigpix.width() == 10 * cell_w);
+    Q_ASSERT(bigpix.height() == cell_h);
     digits = new QImage*[10];
-    for (int i = 0; i <= 9; ++i) { // грузим из ресурсов
-        digits[i] = new QImage(bigpix.copy(i * w, 0, w, h));
+    for (int i = 0; i < 10; ++i) {
+        digits[i] = new QImage(bigpix.copy(i * cell_w, 0, cell_w, cell_h));
     }
     return true;
 }
 
 
-bool Perceptron::deinit() {
-    if (digits) {
-        for (int i = 0; i <= 9; ++i) {
-            if (digits[i]) {
-                delete digits[i];
-                digits[i] = NULL;
+void Perceptron::deinit() {
+    if (!digits) return;
+    for (int i = 0; i < 10; ++i) {
+        delete digits[i];
+        digits[i] = NULL;
+    }
+    delete[] digits;
+    digits = NULL;
+}
+
+
+int Perceptron::parseTemperature(const QImage& img, double *confidence) {
+    QImage bw = binarize(img);
+    QRect roi = findROI(bw, cell_h);
+
+    if (roi.isEmpty()) {
+        cout << "empty ROI" << endl;
+        if (confidence) *confidence = 0.0;
+        return -1;
+    }
+    int n;
+    double c;
+    QRect drift;
+    drift.setLeft(max(0, roi.left() - cell_w / 2));
+    drift.setRight(min(bw.width() - cell_w, roi.left() + cell_w / 2));
+    drift.setTop(roi.top() - 2);
+    drift.setBottom(roi.top() + 2);
+    QPoint h;
+    findNumber(bw, drift, h, n, c);
+    if (confidence) *confidence = c;
+    return n;
+}
+
+
+void Perceptron::guessDigit(const QImage& a,
+                int& digit, double& confidence) {
+    digit = -1;
+    confidence = -1.0;
+    for (int i = 0; i <= 9; ++i) {
+        double v = compare(a, *(digits[i]));
+        if (confidence < v) {
+            confidence = v;
+            digit = i;
+        }
+    }
+}
+
+
+void Perceptron::findDigit(const QImage& a, QRect drift,
+                QPoint& home, int& digit, double& confidence) {
+    digit = -1;
+    confidence = 0.0;
+
+    for (int y = drift.top(); y <= drift.bottom(); ++y) {
+        for (int x = drift.left(); x <= drift.right(); ++x) {
+            QImage cut = a.copy(x, y, cell_w, cell_h);
+            int d_digit;
+            double d_conf;
+            guessDigit(cut, d_digit, d_conf);
+            if (confidence < d_conf) {
+                digit = d_digit;
+                confidence = d_conf;
+                home.setX(x);
+                home.setY(y);
             }
         }
-        delete[] digits;
-        digits = NULL;
     }
-    return true;
 }
 
 
-/*****************************************************************************
+void Perceptron::findNumber(const QImage& a, QRect drift,
+                QPoint& home, int& number, double& confidence) {
+    confidence = 0.0;
 
-  алгоритм для распознавания текста из символов фиксированной ширины:
-  1. преобразуем в b/w прямоугольную битовую карту
-  FIXME как лучше всего найти место с текстом?
-  2. ищем строку символов в картинке
-     (место на картинке по высоте равное высоте знакоместа
-     и вмещающее наибольшее количество белых точек)
-  3. ищем края текста
+    bool virgin = true;
 
-     если
-  3. разрезаем на символы. признак раздельных символов -
-     отсутствие связности
-  4. распознаём каждый символ по отдельности:
-     для каждого шаблона:
-     0. нормализуем размеры изображения под шаблон
-     1. вычитаем (absdiff) из изображения символа изображение шаблона
-     2. подсчитываем сумму разностей (0 - полное совпадение)
-     3. вычисляем процент соответствия как соотношение совпало / всего
-     4. вставляем в массив в порядке уменьшения соответствия
-        [{similarity, char}...]
-     5. выбираем наиболее соответствующий элемент
- 5. вставляем составляем из них строку
-
-  ----
-
-  упрощения:
-  1. размер знакоместа 8x10, spacing 1px
-
-*****************************************************************************/
-int Perceptron::parseTemperature(const QImage& img, bool *ok) {
-    QImage bw = binarize(img);
-    QRect r = findCrop(bw);
+    for (;;) {
+        QPoint d_home;
+        int    d_digit;
+        double d_conf;
+        findDigit(a, drift, d_home, d_digit, d_conf);
+        if (d_conf < min_confidence) break; // не нашли символ
+        if (virgin) {
+            virgin = false;
+            home = d_home;
+            number = d_digit;
+            confidence = d_conf;
+            drift = QRect(d_home.x(),
+                          d_home.y(),
+                          drift_x * 2,
+                          drift_y * 2);
+        } else {
+            confidence *= d_conf;
+            number = number * 10 + d_digit;
+        }
+        d_home.setX(d_home.x() + cell_w + gap_w);
+        drift.moveCenter(d_home);
+    }
 }
-
 

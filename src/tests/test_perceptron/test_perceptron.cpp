@@ -1,5 +1,5 @@
 //#include <QCoreApplication>
-//#include "perceptron.h"
+#include "perceptron.h"
 #include <QImage>
 #include <iostream>
 #include <iomanip>
@@ -371,10 +371,13 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    init();
+//    init();
 //    dump("digit 0", getDigit(0));
 //    dump("digit 1", getDigit(1));
 //    dump("digit 2", getDigit(2));
+
+
+    Perceptron pct;
 
     for (int i = 1; i < argc; ++i) {
         string src_name = argv[i];
@@ -382,7 +385,8 @@ int main(int argc, char *argv[])
         QImage src(src_name.c_str());
         int number;
         double confidence;
-        number = percept(src, &confidence);
+        // number = percept(src, &confidence);
+        number = pct.parseTemperature(src, &confidence);
         cout << "number " << number << " with confidence " << confidence << endl;
     }
     cout << "done" << endl;
