@@ -1,0 +1,924 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<title>Лесопилка. Ботва Онлайн | Битва за реальную капусту! </title>
+
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+<script>
+	var LANG_NAME='RU';
+	var TIME = 1365939559;
+	var KEY=26849;
+	var IMG_URL='http://i.botva.ru';
+	var POPUPS_VER='2';
+	var locale_separator	= '.';
+</script>
+
+<link href="http://i.botva.ru/locale/RU/i/global.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/locale/RU/i/inside.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/mega/mega.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/balert/balert.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/locale/RU/i/game.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/class/zoo.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/skills.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/class/talants.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/i/inside/style.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/i/global-3.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/i/icons.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/i/game.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/sunny/jquery-ui-1.8.custom.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/popups/new.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/counters/new.css?v=330" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/profile/profile.css?v=330" rel="stylesheet" type="text/css">
+<script language="javascript" src="http://i.botva.ru/css/modules/trainer.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/mega/mega.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/news.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery-1.5.2.min.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery-ui-1.8.11.custom.min.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/locale/RU/pp.2.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/i/global2.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery-jtemplates.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery.base.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery.ui.touch-punch.min.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/i/inside/script.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/balert/balert.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/class/zoo.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/popups/new.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.js?v=330"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/counters/new.js?v=330"></script>
+
+
+<style>
+	#js_message {
+		display: none;
+		z-index: 10001 !important;
+		left: 0px;
+		top: -110px;
+	}
+	#body {
+/*		position: relative !important;*/
+	}
+</style>
+<script>
+var inside_frame = false;
+
+var USER_ID	= 484947;
+</script>
+<script type="text/javascript" src="http://yandex.st/share/share.js" charset="utf-8"></script><script>
+	var arrows = null;
+	$( function() {
+		var news = new bNews();
+		news.init({  title: "Архив новостей", share_active: true});
+
+		var gnews = new gNews();
+		gnews.init({
+						title: "Всякие-разные новости",
+			share_active: false,
+			on_click: '#guild_news_link',
+			load_link: '/news.php?type=guild&json=1',
+			filter_count: 12
+		});
+				$('#cm_potions').click( function() {
+			doSwitch('cm_potions', 'cmd_split2_active', 'potions', 'weapons', 'acctab_77');
+		});
+	});
+	
+	function setReadWiki() {
+		$.getJSON('/news.php?type=bwiki&json=2', function(data){
+			if (data.status == 'ok') {
+				return true;
+			}else {
+				return false;
+			}
+		});
+		return false;
+	}
+</script>
+
+</head>
+<body class="lang_RU ">
+
+
+
+<div id="bgmain">
+<div id="bgmain2">
+<div id="bgmain3">
+
+<div id="container" class="">
+
+	<div id="top1">
+		<div>
+						<a id="news_link" href="news.php" onclick="$(this).removeClass('active'); return true;">Новости</a>
+						
+			<a id="guild_news_link" href="#" onclick="$(this).removeClass('active'); return true;">Вестник</a>
+			
+						<a href="link.php?id=blog" target="_blank">Дневники</a>
+						<a href="http://forum.theabyss.ru/index.php?act=external&amp;project=botva3&amp;session=484947_7f793f7299e988c899b42dd2f826be88" target="_blank">Форум</a>
+
+			<a id="q_chat" href="chat.php">Чат  (22)</a>
+			<a id="guild_link" onclick="return true;" href="options.php">Настройки</a>
+
+						<a href="page.php?page=contact">Поддержка</a>
+									<a href="http://www.theabyss.ru" target="_blank">Другие игры</a>
+
+					</div>
+		<div id="online">
+			<p style="height: 14px">Активных игроков:	<b>4564</b></p>
+			<p style="height: 14px">Онлайн: 	<b>1614</b></p>
+			<p style="height: 14px">Время:</p>
+			<p class="t" style="height: 14px"><b id="time"><span id="counter_1" class="js_timer " timer="1365883200|0|day">15:39:23</span></b></p>
+		</div>
+	</div>
+
+
+
+	<div id="top_menu"><b style="display:none">&nbsp;</b>
+		<!-- Отряд приглашения на БГ -->
+				<!-- ------------------------- -->
+				
+		
+		
+		<a href="/" class="logo logo2  ">
+			<div class="ap_extra"></div>
+			<div id="ap11"></div>
+			<div id="ap12"></div>
+			<div id="ap13"></div>
+		</a>
+		
+		
+				
+				<div class="lenta"></div>
+		<div class="top_stats  ">
+			    
+<div class="char_stat char_stat_with_pets" id="char" onmouseover="doItem('design_hps','now:|1847930|;max:|2218038|;speed:|2839|',event,this)">
+	<div class="name"><b class="icon2 race22" title="Баранка"></b> <u>Нехрюшка</u></div>
+
+	<a href="javascript:doPotions()" title="ВЫПИТЬ" class="icon potion_all"></a>
+	
+	<i>83%</i>
+	<b class="stat life_1" style="width:168px"></b>
+	</div>
+		<div class="char_stat char_stat_small length3" id="pet">
+		<a href="javascript:doCage('uncage', 160030)" title="Выпустить из клетки" class="ico_cage ico_cage_2"></a>
+
+		<div class="name" onmouseover="doItem('design_hps','now:|200000|;max:|200000|;speed:|0|',event,this)"><b class="icon2 pet6" title=""></b></div>
+		<i>100%</i>
+		<b class="stat life_1" style="width:46px"></b>
+	</div>
+		<div class="char_stat char_stat_small length3" id="pet">
+		<a href="javascript:doCage('uncage', 170875)" title="Выпустить из клетки" class="ico_cage ico_cage_2"></a>
+
+		<div class="name" onmouseover="doItem('design_hps','now:|10000|;max:|10000|;speed:|9100|',event,this)"><b class="icon2 pet7" title=""></b></div>
+		<i>100%</i>
+		<b class="stat life_1" style="width:46px"></b>
+	</div>
+		<div class="char_stat char_stat_small length3" id="pet">
+		<a href="javascript:doCage('uncage', 184320)" title="Выпустить из клетки" class="ico_cage ico_cage_2"></a>
+
+		<div class="name" onmouseover="doItem('design_hps','now:|500000|;max:|500000|;speed:|2730|',event,this)"><b class="icon2 pet12" title=""></b></div>
+		<i>100%</i>
+		<b class="stat life_1" style="width:46px"></b>
+	</div>
+
+<style>
+    .length1 { margin-left: 130px !important;}
+    .length2 { margin-left: 60px !important;}
+    .length3 { margin-left: 25px !important;}
+</style>		</div>
+		<div class="top_money ">
+			<div class="money" id="gold" onmouseover="doItem('design_money_1','total:|8942470|;safe:|192000|;safe_add:|384000|;pandora:|0|;safe3:|6693176|;free:|1673294|',event,this)" title="">
+	<p>золото:</p>
+	<b>8.942.470</b>
+		<p class="safe" title="8942470  / 192000"><i></i><b class="safe_1" style="width:65px"></b></p>
+	</div>
+<div class="money" id="crystal" onmouseover="doItem('design_money_2','total:|54788|;safe:|71|;safe4:|43774|;free:|10943|;max_crystals:|71000|',event,this)">
+	<p>кристаллы:</p>
+	<b>54.788</b>
+		<p class="safe safe2" title="54788  / 71"><i></i><b class="safe_1" style="width:65px"></b></p>
+	</div>
+<div class="money" id="fish">
+	<a href="harbour.php?a=change"></a>
+	<p>пирашки:</p>
+	<b>1.218.171</b>
+
+</div>
+<div class="money" id="green">
+	<a href="kormushka.php"></a>
+	<p>зелень:</p>
+	<b>571</b>
+
+</div>		</div>
+
+					<div id="fast" class="fast
+	 	 ">
+	
+		<a class="fast_item floatl" href="/mine.php?a=open" title="Карьер"><div class="ico f43"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/harbour.php?a=pier" title="Причал"><div class="ico f35"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/school.php?m=square" title="Квадрат удачи"><div class="ico f36"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/farm.php" title="Ферма"><div class="ico f21"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/clan_mod.php?m=treasury" title="Казначейство"><div class="ico f28"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/training.php" title="Тренировка"><div class="ico f38"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/smith.php?a=master" title="Мастер Кузнеч"><div class="ico f30"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/shop.php" title="Лавка"><div class="ico f17"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/temple.php?a=pandora" title="Святилище - эффекты пандор"><div class="ico f62"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/trade.php" title="Сбытница"><div class="ico f18"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/harbour.php?a=market" title="Торговая площадка"><div class="ico f14"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/castle.php?a=workshop_mine&amp;id=3" title="Жерновая"><div class="ico f58"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/house.php?info=cage" title="Клетка"><div class="ico f7"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/clan_mod.php?m=sawmill" title="Лесопилка"><div class="ico f71"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/school.php?m=class3" title="Школьные поручения"><div class="ico f66"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/tavern.php?a=game&amp;id=3" title="Так иль так?"><div class="ico f6"></div></a>
+	
+		<a class="fast_item floatr last" href="/options.php?a=fast" title="Настройки панели быстрого доступа"><div class="ico flast"></div></a>
+</div>
+		
+		
+		<div class="guilds">
+			<u>Ваши гильдии</u>
+			<div style="margin-left:-7px; margin-top: 5px; margin-bottom: 5px;">
+							<a href="castle.php?a=show2&amp;id=3" style="background-image:url(http://i.botva.ru/images/menus/guild_3.png)" class="hover" title="Шахтеры"></a>
+										<a href="castle.php?a=show2&amp;id=11" style="background-image:url(http://i.botva.ru/images/menus/guild_11.png)" class="hover" title="Устрашатели"></a>
+			
+							<a href="castle.php?a=show2&amp;id=23" style="background-image:url(http://i.botva.ru/images/menus/guild_23.png)" class="hover" title="Мирники"></a>
+			
+							<a href="castle.php?a=show2&amp;id=6" style="background-image:url(http://i.botva.ru/images/menus/guild_6.png)" class="hover" title="Теневоды"></a>
+			
+			
+							<a href="castle.php?a=show2&amp;id=31" style="background-image:url(http://i.botva.ru/images/menus/guild_31.png)" class="hover" title="Братство Алхимиков"></a>
+						
+
+			</div>
+
+			<u>Ваш клан</u>
+			<p class="link">
+							<b class="icon2 race2" title="Барантус"></b>
+				<a href="clan_members.php?id=30113">Терра</a>
+
+
+						</p>
+
+		</div>
+
+	</div>
+	<div id="content-container">
+		<div id="menu">
+			<a href="index.php" id="m1">Персонаж<b></b></a>
+			<a href="post.php" id="m2" class="active">Почта<b></b></a>
+			<a href="village.php" id="m3">Деревня<b></b></a>
+			<a href="castle.php" id="m4">Крепость<b></b></a>
+		  			<a href="clan.php" id="m5">Клан<b></b></a>
+			<a href="school.php" id="m16">Школа<b></b></a>
+			<a href="harbour.php" id="m7">Гавань<b></b></a>
+			<a href="mine.php" id="m6">Шахта<b></b></a>
+			<a href="dozor.php" id="m8">Бодалка<b></b></a>
+			<a href="shtab.php" id="m9">Штаб<b></b></a>
+			<a href="kormushka.php" id="m10">Кормушка<b></b></a>
+			<a href="contacts.php" id="m11">Братва<b></b></a>
+			<a href="search.php" id="m12">Поиск<b></b></a>
+			<a href="http://wiki.botva.ru/" target="_blank" id="m13" onclick="$(this).removeClass('active'); setReadWiki();">Ботвапедия<b></b></a>
+			<a href="lol.php" id="m14">Смешилка<b></b></a>
+			<a href="logout.php" id="m15">Выход<b></b></a>
+
+
+						
+			
+			
+						<a href="/space.php" class="top " id="menu_space"> &nbsp; </a>
+			
+			
+			
+						    <div class="bg_banner_new battleground_banner_mine_02_new" onclick="document.location.href='/battleground.php'" alt="Кофейный лист" title="Кофейный лист"></div>
+			    <div class="battleground_banner_text_new" onclick="document.location.href='/battleground.php'">Помоги отстоять &gt;&gt;</div>
+						
+
+			
+		</div>
+		<div id="content">
+			<div id="crumbs">
+				<a href="clan.php">Клан</a> &gt; <b>Лесопилка</b> <div class="cmd_back floatr" onclick="history.back();" title="Назад"></div>
+			</div>
+			<div id="body" class=""><div id="js_message"><!-- Slider message box --></div>
+
+
+
+
+
+
+	<div class="mt-10">
+					
+	<div class="round_block_round_border round_block_header_top slide_block_click uppercase mt10  " style="position:relative;" id="t_help_98">
+		<b class="slide_block_icon"></b>
+		<span>лесопилка <span class="wiki_in_profile"><a href="http://wiki.botva.ru/%D0%9B%D0%B5%D1%81%D0%BE%D0%BF%D0%B8%D0%BB%D0%BA%D0%B0" target="_blank" title="Почитать об этом в Ботвапедии" class="iconsp20 ico_wiki"></a></span></span>
+		<div class="slide_click" onclick="$(this).parent().toggleClass('open');showBox('help_98')"></div>
+	</div>
+	
+	<div class="round_block_round_border round_block_header_cont slide_block_action p10 mb0 hidden " style="position:relative;" id="b_help_98">
+		
+			<div class="pt5 pl7"><img src="http://i.botva.ru/images/m/sawmill/sawmill_bg.jpg" alt="" width="520" height="125"></div>
+			<div class="pt7 ml7 pb7 mr7 mb-10 borderb">
+				Лесопилка – это занимательное место, где собираются лесорубы всего клана, чтобы вместе попилить добровольно согласившиеся на это действо деревья. Использование лесопилки одобрено крепостным фондом защитников окружающего леса после того, как процесс попилки окончательно стал нежным.
+			</div>
+		
+	</div>
+
+		<div class="round_block_round_border round_block_header_cont mh0 pt7 pb7 pl17 center" style="position:relative;">
+	
+			Доступно для обработки: <b>150</b> <b class="icon2 wood2" title="Необработанное Дерево"></b>
+		
+</div>
+	</div>
+
+	<div class="clear_fix">
+		<div class="w272 fl_l">
+			<div class="round_block_round_border round_block_header_top " style="position:relative;">
+	Сходить в лес за деревом <b class="gray_popup" rel="42"></b>
+</div>
+			<div class="round_block_round_border round_block_header_cont pt10 pb10 pl16 pr14 normal_inputs" style="position:relative;">
+	
+			<div class="h70 pb12 center" id="forest_work">
+							Нельзя ходить в лес работая другую работу
+						</div>
+
+			<div class="bar_brown pl10 mb10 center">Послать управляющего <b class="gray_popup" rel="43"></b></div>
+			<div class="h70 pb7 center" id="forest_manager">
+								<form action="/clan_mod.php?m=sawmill&amp;do_cmd=send_manager_forest" method="POST">
+					<input type="hidden" name="k" value="26849">
+					<select name="hours" class="field select_hours w120 mr5" id="hours"><option value="1">1 час</option><option value="2">2 часа</option><option value="3">3 часа</option><option value="4">4 часа</option><option value="5">5 часов</option><option value="6">6 часов</option><option value="7">7 часов</option><option value="8">8 часов</option></select>
+					Цена:  <span class="price">1</span> <b class="icon img_money_3_small" title="Зелень"></b>
+					<div class="center pt10">
+						<input type="submit" class="cmd_all cmd_large cmd_alarge " value="ОТПРАВИТЬ">
+					</div>
+				</form>
+							</div>
+			
+</div>
+		</div>
+		<div class="w272 fl_r">
+			<div class="round_block_round_border round_block_header_top " style="position:relative;">
+	Обработать дерево <b class="gray_popup" rel="44"></b>
+</div>
+			<div class="round_block_round_border round_block_header_cont pt10 pb10 pl16 pr14 normal_inputs" style="position:relative;">
+	
+			<div class="h70 pb12 center" id="cutter_work">
+							<span id="work_span_2">
+				Вы пилите деревья на материалы для великих построек.
+				<div id="work_count" class="dblock mauto big_count middle_count countdownHolder" countdown_id="1365939559_9820546"><span class="countDays"><span class="position">					<span class="digit static" style="top: 0px; opacity: 1; ">0</span>				</span>				<span class="position">					<span class="digit static" style="top: 0px; opacity: 1; ">0</span>				</span></span><span class="countDiv countDiv0"></span><span class="countHours"><span class="position">					<span class="digit static" style="top: 0px; opacity: 1; ">0</span>				</span>				<span class="position">					<span class="digit static" style="top: 0px; opacity: 1; ">2</span>				</span></span><span class="countDiv countDiv1"></span><span class="countMinutes"><span class="position">					<span class="digit static" style="top: 0px; opacity: 1; ">5</span>				</span>				<span class="position">					<span class="digit static" style="top: 0px; opacity: 1; ">4</span>				</span></span><span class="countDiv countDiv2"></span><span class="countSeconds"><span class="position">					<span class="digit static" style="top: 0px; opacity: 1; ">3</span>				</span>				<span class="position">					<span class="digit" style="top: -2.1em; opacity: 0; ">8</span><span class="digit" style="top: 0.9000000000000001em; opacity: 0.6399999999999999; ">9</span>				</span></span></div>
+				<script>
+					$(function(){
+						timer({
+							'time'	: time() + 10483,
+							'id'	: '#work_count',
+							'after'	: function(){
+								window.location.reload();
+							}
+						});
+					}) ;
+				</script>
+				</span>
+						</div>
+
+			<div class="bar_brown pl10 mb10 center">Послать управляющего <b class="gray_popup" rel="45"></b></div>
+			<div class="h70 pb7 center" id="cutter_manager">
+									<form action="/clan_mod.php?m=sawmill&amp;do_cmd=send_manager_cutter" method="POST">
+						<input type="hidden" name="k" value="26849">
+						<select name="hours" class="field select_hours w120 mr5" id="hours"><option value="1">1 час</option><option value="2">2 часа</option><option value="3">3 часа</option><option value="4">4 часа</option><option value="5">5 часов</option><option value="6">6 часов</option><option value="7">7 часов</option><option value="8">8 часов</option></select>
+						Цена:  <span class="price">1</span> <b class="icon img_money_3_small" title="Зелень"></b>
+						<div class="center pt10">
+							<input type="submit" class="cmd_all cmd_large cmd_alarge " value="ОТПРАВИТЬ">
+						</div>
+					</form>
+							</div>
+			
+</div>
+
+		</div>
+	</div>
+<div class="round_block_round_border round_block_header_top " style="position:relative;">
+	Репутация
+</div>
+<div class="round_block_round_border round_block_header_cont pb7 pt5 clear_fix center" style="position:relative;">
+	
+	<div class="w262 fl_l normal_inputs">
+		<div class="pb7 center bold"><b class="icon2 ico_forest_brotherhood" title="Лесное братство"></b> Лесное братство <b class="gray_popup" rel="46"></b></div>
+		<div class="bar_brown pl10 ml6 mr4 cornert3">Репутация: Интерес</div>
+		<div class="profile_hud green_line ml6 mr4">
+			<div style="width: 17%;"></div>
+			<div class="value1">17% (1590 / 9000)</div>
+		</div>
+		<div class="p5 center">
+			<form action="/clan_mod.php?m=sawmill&amp;do_cmd=donate" method="POST">
+			<select name="amount" class="field select_amount w100 mr5 mb5" id="amount"><option value="10">1.000 (+10)</option><option value="100">10.000 (+100)</option><option value="300">30.000 (+300)</option></select> <b class="icon img_money_10_small" title="Пирашки"></b> <br>
+				<input type="hidden" name="k" value="26849">
+				<input type="hidden" name="type" value="forest">
+				<input type="submit" class="cmd_all cmd_row2 cmd_arow2 " value="ПОМОЧЬ ЛЕСНОМУ БРАТСТВУ">
+			</form>
+		</div>
+	</div>
+	<div class="w262 fl_r normal_inputs">
+		<div class="pb7 center bold"><b class="icon2 ico_loggers" title="Лесорубы"></b> Лесорубы <b class="gray_popup" rel="47"></b></div>
+		<div class="bar_brown pl10 ml6 mr4 cornert3">Репутация: Интерес</div>
+		<div class="profile_hud green_line ml6 mr4">
+			<div style="width: 0%;"></div>
+			<div class="value1">0% (0 / 9000)</div>
+		</div>
+		<div class="p5 center">
+			<form action="/clan_mod.php?m=sawmill&amp;do_cmd=donate" method="POST">
+			<select name="amount" class="field select_amount w100 mr5 mb5" id="amount"><option value="10">1.000 (+10)</option><option value="100">10.000 (+100)</option><option value="300">30.000 (+300)</option></select> <b class="icon img_money_10_small" title="Пирашки"></b> <br>
+				<input type="hidden" name="k" value="26849">
+				<input type="hidden" name="type" value="cutter">
+				<input type="submit" class="cmd_all cmd_row2 cmd_arow2 " value="СКИНУТЬСЯ В ФОНД ЛЕСОРУБОВ">
+			</form>
+		</div>
+
+	</div>
+
+</div>
+
+
+
+<script>
+var forest_price = 90;
+var cutter_price = 90;
+$(function(){
+	$('#cutter_manager #hours').change(function(){
+		$('#cutter_manager span.price').html($(this).val());
+	})
+	$('#forest_manager #hours').change(function(){
+		$('#forest_manager span.price').html($(this).val());
+	})
+	$('#forest_work #time').change(function(){
+		var val = $(this).val();
+		if (val == '20m') {
+			val = getLang('no');
+		} else {
+			val = val*forest_price + ' ' + getLang('money_2_small');
+		}
+		$('#forest_work span.price').html(val);
+	})
+	$('#cutter_work #time').change(function(){
+		var val = $(this).val();
+		if (val == '20m') {
+			val = getLang('no');
+		} else {
+			val = val*cutter_price + ' ' + getLang('money_2_small');
+		}
+		$('#cutter_work span.price').html(val);
+	})
+
+	bind_popup();
+})
+</script></div>
+		</div>
+		<div id="right">
+
+			<div id="rmenu1" class="extend3">
+
+				<span id="mtimers" class="spr">Таймеры<b></b></span>
+				<div class="timers">
+					На лесопилке
+					<a href="clan_mod.php?m=sawmill" class="timer link"><span id="counter_2" class="js_timer " timer="1365950042|0">02:54:39</span></a>
+					Защита от нападений:
+					<span class="timer"><span id="counter_3" class="js_timer " timer="1365942050|0">00:41:27</span></span>
+					До нападения:
+					<a href="dozor.php" class="timer attack">Пора в бой!</a>
+				</div>
+
+
+
+
+				
+				<a href="harbour.php?a=coulonpack" id="mcoulons" class="spr">Склад кулонов<b></b></a>
+				<div id="coulons_bar">
+					<div class="coulons icon_pack">
+	<a item_id="20648833" title="Копикрист 100/100"><b class="item_104"></b></a>
+		<a class="active" item_id="25140562" title="Антихап 100/100"><b class="item_508"></b></a>
+		<a item_id="24197010" title="Маслянка 100/100"><b class="item_247"></b></a>
+		<a item_id="25140574" title="Клевер 100/100"><b class="item_106"></b></a>
+		<a item_id="26487414" title="Чертирожка 100/100"><b class="item_105"></b></a>
+		<a item_id="25121384" title="Большой Поляноид 100/100"><b class="item_119"></b></a>
+	</div>
+<div class="coulons icon_pack margin2">
+		<a item_id="24872782" title="Разрушитель 17/100"><b class="item_633"></b></a>
+		<a item_id="21335789" title="Антимаг 96/96"><b class="item_108"></b></a>
+		<a item_id="25632255" title="Ловкий Пупс 100/100"><b class="item_83"></b></a>
+		<a item_id="27663029" title="Большое пузо 100/100"><b class="item_87"></b></a>
+		<a item_id="28140910" title="Фермец 100/100"><b class="item_605"></b></a>
+		<a item_id="28111652" title="Пожарник 1/100"><b class="item_720"></b></a>
+	</div>
+<div class="coulons icon_pack margin2">
+	
+
+	<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+	</div>
+				</div>
+
+
+
+							</div>
+			<div id="rmenu2" class="rmenu_size4">
+
+				<a item_id="nothing" href="/options.php?a=menu" class="settings" title="Настройки">&nbsp;</a>
+				<div id="accordion" style="height: 101%; " class="ui-accordion ui-widget ui-helper-reset ui-accordion-icons" role="tablist">
+															<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span>Ресурсы</h3>
+						<div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" style="height: 280px; overflow-x: auto; overflow-y: auto; display: none; " role="tabpanel">
+
+
+<div class="resources" id="resources_scroll" style="overflow-x: hidden; overflow-y: hidden; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 177px; ">
+	
+	
+
+<div class="jspContainer" style="width: 177px; height: 268px; "><div class="jspPane" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; top: 0px; width: 176px; "><ul class="l">
+				<li id="i39" title="Количество походов за пирашками на сегодня" style="overflow:hidden"><a href="/harbour.php?a=pier"><b class="iconsp20 harbour_crusades"></b></a> <span style="margin-left: -1px;">7</span>
+				</li><li id="i23" title="Кораблики" style="overflow:hidden"><a href="/harbour.php?a=pier"><b class="iconsp ico_harbour_3"></b></a> <span style="margin-left: -1px;">555</span>
+				</li><li id="i45" title="Количество реликов до следующего взноса" style="overflow:hidden"><a href="/castle.php?a=show2&amp;id=caste"><b class="iconsp20 relics_total"></b></a> <span style="margin-left: -1px;">743</span>
+				</li><li id="i43" title="Получено реликов за сегодня" style="overflow:hidden"><a href="/castle.php?a=show2&amp;id=caste"><b class="icon2 relics"></b></a> <span style="margin-left: -1px;">24</span>
+				</li><li id="i19" title="Количество медальонов до следующей ступени" style="overflow:hidden"><a href="/castle.php?a=room&amp;id=11"><b class="icon medallions"></b></a> <span style="margin-left: -1px;">196</span>
+				</li><li id="i57" title="Мыльный камень" style="overflow:hidden"><b class="icon2 item_farm_1"></b> <span style="margin-left: -1px;">121</span>
+				</li><li id="i58" title="Раскаленное стекло" style="overflow:hidden"><b class="icon2 item_alchemy_1"></b> <span style="margin-left: -1px;">1/71</span>
+				</li><li id="i48" title="Конс. ядреная смесь" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="iconsp item_smith_6"></b></a> <span style="margin-left: -1px;">55/71</span>
+				</li><li id="i51" title="Соль земли. Прибавляет от 2% до 24% к характеристикам элемента экипировки." style="overflow:hidden"><b class="icon2 flyings_salt"></b> <span style="margin-left: -1px;">0/71</span>
+				</li><li id="i52" title="Горная слеза. Повышает награбленное в кристаллах в боях бодалки на количество от 1 до 12. " style="overflow:hidden"><b class="icon2 flyings_tear"></b> <span style="margin-left: -1px;">0/71</span>
+			</li></ul><ul class="r">
+				<li id="i34" title="Билетов на большую поляну: 14 + 0 б/у" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="icon ico_ticket2"></b></a> <span style="margin-left: -1px;">14/71</span>
+				</li><li id="i33" title="Билетов на маленькую поляну: 21 + 0 б/у" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="icon ico_ticket1"></b></a> <span style="margin-left: -1px;">21/71</span>
+				</li><li id="i20" title="Количество свободных мест на плантации" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="icon slaves"></b></a> <span style="margin-left: -1px;">1</span>
+				</li><li id="i32" title="Количество опыта до следующего уровня" style="overflow:hidden"><a href="/dozor.php"><b class="icon ico_exp"></b></a> <span style="margin-left: -1px;">29.802</span>
+				</li><li id="i44" title="Радужный Сундучок" style="overflow:hidden"><a href="/shop.php?a=sell&amp;group=11"><b class="iconsp20 item_pandora_caste_gold"></b></a> <span style="margin-left: -1px;">5</span>
+				</li><li id="i56" title="Кристальная пыль" style="overflow:hidden"><b class="icon2 item_mine_7"></b> <span style="margin-left: -1px;">2.000</span>
+				</li><li id="i59" title="Стеклянная тара" style="overflow:hidden"><b class="icon2 item_alchemy_2"></b> <span style="margin-left: -1px;">27/71</span>
+				</li><li id="i38" title="Ртутный порошок" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="icon ico_trade1"></b></a> <span style="margin-left: -1px;">59/71</span>
+				</li><li id="i53" title="Рыжий сланец. Повышает награбленное в золоте в боях бодалки на количество от 2% до 18%." style="overflow:hidden"><b class="icon2 flyings_ore"></b> <span style="margin-left: -1px;">0/71</span>
+				</li><li id="i87" title="Батискафчик" style="overflow:hidden"><a href="/atlantis.php"><b class="icon2 bathyscaphe"></b></a> <span style="margin-left: -1px;">0/12</span>
+			</li></ul></div></div></div>
+
+
+<script>
+$( function() {
+	$('.resources #i33').mouseover( function(event) {
+		doItem('popup_ticket_1', 'total:|21|;normal:|21|;used:|0|', event, this);
+	})
+	$('.resources #i34').mouseover( function(event) {
+		doItem('popup_ticket_2', 'total:|14|;normal:|14|;used:|0|', event, this);
+	})
+})
+
+</script>
+
+
+<script>
+	$(function(){
+		$('#resources_scroll').jScrollPane({
+			autoReinitialise : true
+		});
+	});
+</script>
+</div>
+					
+															<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span>Счётчики</h3>
+						<div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" style="height: 280px; overflow-x: auto; overflow-y: auto; display: none; " role="tabpanel">
+
+
+<div class="right_counters" id="right_counters_scroll" style="overflow-x: hidden; overflow-y: hidden; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 177px; ">
+	
+
+
+<div class="jspContainer" style="width: 177px; height: 268px; "><div class="jspPane" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; top: 0px; width: 176px; "><ul class="r">
+			<li title="Время до возвращения судна с пирашками"><a href="/harbour.php?a=pier"><b class=" iconsp ico_harbour_2"></b></a> <span id="counter_2" class="js_timer " timer="1365939939|0">00:06:16</span></li>
+			<li title="Следующий взнос в Касту"><a href="/castle.php"><b class=" icon2 timer_caste"></b></a> <span id="counter_3" class="js_timer " timer="1366809202|0">10:01:33:59</span></li>
+			<li title="Инкубатор Мантикорика."><a href="/castle.php"><b class=" icon2 timer_mantibator"></b></a> <span id="counter_4" class="js_timer " timer="1368591261|0">30:16:34:58</span></li>
+			<li title="Перемолка Кристальной Пыли."><a href="/castle.php?a=workshop_mine&amp;id=3"><b class=" icon2 timer_mine_7"></b></a> <span id="counter_5" class="" timer="|0">00:00:00</span></li>
+			<li title="Производство Раскаленного Стекла."><a href="/castle.php?a=myguild&amp;id=31&amp;m=lab"><b class=" icon2 timer_alchemy_1"></b></a> <span id="counter_6" class="" timer="|0">00:00:00</span></li>
+			<li title="Производство Стеклянной Тары."><a href="/castle.php?a=myguild&amp;id=31&amp;m=lab"><b class=" icon2 timer_alchemy_2"></b></a> <span id="counter_7" class="" timer="|0">00:00:00</span></li>
+			<li title="Следующее помешивание зелья."><a href="/castle.php?a=myguild&amp;id=31&amp;m=potion_1"><b class=" icon2 timer_alchemy_stir"></b></a> <span id="counter_8" class="" timer="|0">00:00:00</span></li>
+			<li title="Варка зелья."><a href="/castle.php?a=myguild&amp;id=31&amp;m=potion_1"><b class=" icon2 timer_alchemy_make"></b></a> <span id="counter_9" class="" timer="|0">00:00:00</span></li>
+			<li title="Бодатливые страшилки"><a href="/school.php?m=class3"><b class=" icon2 ico_daily_time_6"></b></a> <span id="counter_10" class="js_timer " timer="1366043370|0">1:04:50:07</span></li>
+			<li title="Кристаллы Удачи"><a href="/school.php?m=class3"><b class=" icon2 ico_daily_time_5"></b></a> <span id="counter_11" class="" timer="|0">00:00:00</span></li>
+			<li title="Правильный дозорный"><a href="/school.php?m=class3"><b class=" icon2 ico_daily_time_8"></b></a> <span id="counter_12" class="" timer="|0">00:00:00</span></li>
+			<li title="Активный бодун"><a href="/school.php?m=class3"><b class=" icon2 ico_daily_time_1"></b></a> <span id="counter_13" class="" timer="|0">00:00:00</span></li>
+			<li title="Время до окончания постройки батискафчика."><a href="/atlantis.php"><b class=" icon2 bathyscaphe"></b></a> <span id="counter_14" class="" timer="|0">00:00:00</span></li>
+			<li title="Время до возврата печати крепости"><a href="/castle.php?a=sign&amp;id=2"><b class=" icon2 ico_bonus_sign"></b></a> <span id="counter_15" class="js_timer " timer="1367066349|0">13:00:59:46</span></li>
+		</ul></div></div></div>
+	
+<script>
+	$(function(){
+		$('#right_counters_scroll').jScrollPane({
+			autoReinitialise : true
+		});
+	});
+</script></div>
+					
+															<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span>Эффекты</h3>
+						<div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" style="height: 280px; overflow-x: auto; overflow-y: auto; display: none; " role="tabpanel">
+
+
+<div class="timers" id="timers_scroll" style="overflow-x: hidden; overflow-y: hidden; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 177px; ">
+	
+
+        	
+        
+
+	
+        	
+        
+<div class="jspContainer" style="width: 177px; height: 268px; "><div class="jspPane" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; top: 0px; width: 176px; "><h6>Временные эффекты </h6><ul class="r">
+        
+			<li title="Бонус. Правильный дозорный" class="w161"><b class="icon icon2 ico_daily_bonus_8"></b> 
+		    		<span id="counter_20" class="js_timer " timer="1365943243|0">01:01:20</span>
+				
+					</li><li title="Бонус. Транжира" class="w161"><b class="icon icon2 ico_daily_bonus_11"></b> 
+		    		<span id="counter_21" class="js_timer " timer="1365943094|0">00:58:51</span>
+				
+				</li></ul><h6>Эффекты Пандоры</h6><ul class="r">
+			<li title="Любой получаемый опыт увеличивается в 2 раза." class="w161"><b class="icon iconsp item_pandora"></b> <span id="counter_19" class="js_timer " timer="1365943109|0">00:59:06</span>
+			</li><li title="Доход от походов в дозор увеличивается в 2 раза." class="w161"><b class="icon iconsp item_pandora"></b> <span id="counter_18" class="js_timer " timer="1365943109|0">00:59:06</span>
+			</li><li title="Все ваши летуны получают дополнительные 10% в сражениях с монстриками островов Кар Кар." class="w161"><b class="icon iconsp item_pandora bad"></b> <span id="counter_16" class="js_timer " timer="1365942983|0">00:57:00</span>
+			</li><li title="На стоимость характеристик у тренера действует скидка в 20%." class="w161"><b class="icon iconsp item_pandora bad"></b> <span id="counter_17" class="js_timer " timer="1365942961|0">00:56:38</span>
+		</li></ul></div></div></div>
+
+<script>
+	$(function(){
+		$('#timers_scroll').jScrollPane({
+			autoReinitialise : true
+		});
+	});
+</script>
+</div>
+					
+															<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-state-active ui-corner-top" role="tab" aria-expanded="true" aria-selected="true" tabindex="0"><span class="ui-icon ui-icon-triangle-1-s"></span>Инкубатор</h3>
+						<div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active" style="height: 280px; overflow-x: auto; overflow-y: auto; " role="tabpanel">
+
+
+
+
+		<div class="flyings">
+				 
+			<div class="title">
+				<a href="/castle.php?a=zoo&amp;id=6&amp;flying=11582&amp;redirect=1"><b class="icon2 flying_43" title="Мантикорик"></b></a>
+			</div>
+			<div class="content">
+				<center>
+									<b class="dblock"><a href="/castle.php?a=zoo&amp;id=6&amp;block=events&amp;flying=11582&amp;redirect=1">Большое приключение</a></b>
+					
+											<i class="timer_center"><span id="counter_22" class="js_timer " timer="1365943090|0">00:58:47</span></i>
+													</center>
+			</div>
+						 
+			<div class="title">
+				<a href="/castle.php?a=zoo&amp;id=6&amp;flying=11879&amp;redirect=1"><b class="icon2 flying_13" title="Драко"></b></a>
+			</div>
+			<div class="content">
+				<center>
+									<b class="dblock"><a href="/castle.php?a=zoo&amp;id=6&amp;block=events&amp;flying=11879&amp;redirect=1">Большое приключение</a></b>
+					
+											<i class="timer_center"><span id="counter_23" class="js_timer " timer="1365943097|0">00:58:54</span></i>
+													</center>
+			</div>
+						 
+			<div class="title">
+				<a href="/castle.php?a=zoo&amp;id=6&amp;flying=13965&amp;redirect=1"><b class="icon2 flying_23" title="Пегасус"></b></a>
+			</div>
+			<div class="content">
+				<center>
+								<u class="first">
+					<a href="/castle.php?a=zoo&amp;id=6&amp;block=feed&amp;flying=13965&amp;redirect=1"><b class="icon2 flying_feed" title="Сытость зверушки"></b> 97%</a>
+				</u>
+				<u>
+					<a href="/castle.php?a=zoo&amp;id=6&amp;block=heal&amp;flying=13965&amp;redirect=1"><b class="icon ico_hits" title="Здоровье"></b> 48%</a>
+				</u>	
+				<div class="clear"></div>
+				<u class="long first">
+					<center><a href="/castle.php?a=zoo&amp;id=6&amp;block=training&amp;flying=13965&amp;redirect=1">26.516.214 <b class="icon money1" title="Золото"></b></a></center>
+				</u>
+								</center>
+			</div>
+						 
+			<div class="title">
+				<a href="/castle.php?a=zoo&amp;id=6&amp;flying=14677&amp;redirect=1"><b class="icon2 flying_33" title="Грифан"></b></a>
+			</div>
+			<div class="content">
+				<center>
+								<u class="first">
+					<a href="/castle.php?a=zoo&amp;id=6&amp;block=feed&amp;flying=14677&amp;redirect=1"><b class="icon2 flying_feed" title="Сытость зверушки"></b> 84%</a>
+				</u>
+				<u>
+					<a href="/castle.php?a=zoo&amp;id=6&amp;block=heal&amp;flying=14677&amp;redirect=1"><b class="icon ico_hits" title="Здоровье"></b> 88%</a>
+				</u>	
+				<div class="clear"></div>
+				<u class="long first">
+					<center><a href="/castle.php?a=zoo&amp;id=6&amp;block=training&amp;flying=14677&amp;redirect=1">29.775.997 <b class="icon money1" title="Золото"></b></a></center>
+				</u>
+								</center>
+			</div>
+							
+	<div class="status_control"><a href="#" class="inlineb m5" onclick="popupnew.fromURL('/ajax.php?m=zoo_status_control',{id_content: 'popup_status_control'});return false;">Управление статусами</a></div>
+</div></div>
+					
+				
+
+				</div>
+
+
+				<script language="javascript" type="text/javascript">
+					var accordion_active_tab =  3 ;
+				</script>
+			</div>
+
+		</div>
+
+
+	</div>
+	<div id="footer">
+
+		<a href="http://www.ddestiny.ru" target="_blank" class="logo_ddestiny"></a>
+					<div id="footer_menu">
+			<div class="links">
+				<a href="page.php?page=legal">Лицензионное соглашение</a> &nbsp;
+				<a href="page.php?page=rules">Правила  игры</a>
+				
+			</div>
+
+
+			<span class="small">© Destiny Development 2008-2013 г.<br> Все права защищены.
+
+			</span>
+		</div>
+		
+	</div>
+	<div class="counters">
+		<div>
+									<!--LiveInternet counter--><script type="text/javascript"><!--
+document.write("<a href='http://www.liveinternet.ru/click' "+
+"target=_blank><img src='http://counter.yadro.ru/hit?t21.6;r"+
+escape(document.referrer)+((typeof(screen)=="undefined")?"":
+";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+";"+Math.random()+
+"' alt='' title='LiveInternet: показано число просмотров за 24"+
+" часа, посетителей за 24 часа и за сегодня' "+
+"border=0 width=88 height=31><\/a>")//--></script><a href="http://www.liveinternet.ru/click" target="_blank"><img src="http://counter.yadro.ru/hit?t21.6;r;s1366*768*24;uhttp%3A//g3.botva.ru/clan_mod.php%3Fm%3Dsawmill;0.14619860029779375" alt="" title="LiveInternet: показано число просмотров за 24 часа, посетителей за 24 часа и за сегодня" border="0" width="88" height="31"></a><!--/LiveInternet-->				</div>
+	</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="path_go_to_top" class="go_to_top hidden" style="width: 228px; ">
+	<div class="go_to_top_bgr">
+		<div class="go_to_top_title">наверх</div>
+	</div>
+</div>
+<script>
+$(function(){
+	globalPrepareGoToTop();
+});
+</script>
+
+<script>
+$(document).ready(
+	function(){
+		setDefaultMoney();
+	}
+);
+
+var default_money	= '1';
+
+function setDefaultMoney()
+{
+	$('input[type=radio][name=ptype][value=1]').attr('checked', 'checked');
+	$('input[type=radio][name=ptype_1][value=1]').attr('checked', 'checked');
+	$('input[type=radio][name=ptype_2][value=1]').attr('checked', 'checked');
+	if (1==2)
+	{
+		$('input[type=radio][name=ptype][value=3]').attr('checked', 'checked');
+		$('input[type=radio][name=ptype_1][value=3]').attr('checked', 'checked');
+		$('input[type=radio][name=ptype_2][value=3]').attr('checked', 'checked');
+	}
+}
+
+var onscroll_interval	= 0;
+window.onscroll		= function(e) {
+	var vScroll = document.documentElement.scrollTop || document.body.scrollTop;
+	if (vScroll > 200) 
+		$('#path_go_to_top').removeClass('hidden');
+	else
+		$('#path_go_to_top').addClass('hidden');
+	
+	clearTimeout(onscroll_interval);
+	
+	if (vScroll > 900) 
+		onscroll_interval	= setTimeout(function(){ 
+		globalPrepareGoToTop(vScroll)
+	},100);
+}
+
+function globalPrepareGoToTop(vScroll) {
+	var vScroll	= vScroll || 0;
+	var free_width	= $('#content-container').offset().left;
+	var w		= Math.max(free_width + 40,40);
+	
+	if (vScroll > $('#menu').offset().top+200)
+		w	+= 200;
+	
+	if (free_width < 105) {
+		/** маленькое разрешение */
+		$('#path_go_to_top .go_to_top_bgr').addClass('go_to_top_mini');
+		w	= Math.max(free_width - 30,40);
+	} 
+	
+	$('#path_go_to_top').width(w).unbind().click(function(){
+		globalPrepareGoToTop(0);
+		 $('body,html').animate({
+			scrollTop: 0
+		}, 400);
+	});
+}
+</script>
+
+
+
+<div id="opaque" style="display: none;"></div><div id="opaque" style="display: none;"></div>
+	<div id="simple_popup" class="shadow9">
+		<table class="popup_item">
+			<tbody><tr>
+				<th colspan="2">
+					<div>Подсказка</div>
+				</th>
+			</tr>
+			<tr>
+				<td valign="top">
+					<div class="b_body"></div>
+				</td>
+			</tr>
+		</tbody></table>
+	</div><div id="blue_popup"><div class="b_top"></div><div class="b_body"><!-- Текст popup --></div><div class="b_bottom"></div></div><div class="shadow9" style="position: absolute; display: none; " id="tooltip2"><table class="popup_item"><tbody><tr><th colspan="2">Золото</th></tr><tr><td class="image"><b class="imgpopups money_1"></b></td><td>Всего: 8942470 <b class="icon money1" title="Золото"></b><br>Сейф: 192000 <b class="icon money1" title="Золото"></b><br>Двойное дно: 384000 <b class="icon money1" title="Золото"></b><br>Золотой сейф: 6693176 <b class="icon money1" title="Золото"></b><br>Без защиты: 1673294 <b class="icon money1" title="Золото"></b></td></tr></tbody></table></div></body></html>

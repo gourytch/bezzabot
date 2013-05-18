@@ -26,6 +26,7 @@
 #include "worktraining.h"
 #include "workslaveholding.h"
 #include "workcrystalgrinding.h"
+#include "workbottlemaking.h"
 #include "workalchemy.h"
 #include "workdiving.h"
 #include "workquestcompletist.h"
@@ -840,6 +841,7 @@ void Bot::initWorks() {
     _secworklist.append(new WorkFlyingBreeding(this));
     _secworklist.append(new WorkSlaveHolding(this));
     _secworklist.append(new WorkCrystalGrinding(this));
+    _secworklist.append(new WorkBottleMaking(this));
     _secworklist.append(new WorkAlchemy(this));
     _secworklist.append(new WorkDiving(this));
     _secworklist.append(new WorkQuestCompletist(this));

@@ -35,6 +35,7 @@ enum WorkType { // основная работа
     Work_SlaveHolding,
     Work_Alchemy,
     Work_CrystalGrinding,
+    Work_BottleMaking,
     Work_Diving,
     Work_QuestCompletist
 };

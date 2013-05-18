@@ -549,12 +549,15 @@ ValMap parseSafeText(QString s) {
 ////////////////////////////////////////////////////////////////////////////
 
 Page_Game::Page_Game (QWebElement& doc) :
-    Page_Generic (doc)
-{
+    Page_Generic (doc) {
+    parse();
+}
+
+bool Page_Game::parse() {
     body = document.findFirst("DIV[id=body]");
     Q_ASSERT (!body.isNull());
     pagekind = page_Game;
-    foreach (QWebElement e, doc.findAll("DIV.title")) {
+    foreach (QWebElement e, document.findAll("DIV.title")) {
         if (isDisplayed(e)) {
             pagetitle = e.toPlainText().trimmed();
             break;
@@ -566,7 +569,7 @@ Page_Game::Page_Game (QWebElement& doc) :
     free_gold = -1;
     safe_gold = -1;
     {
-        QString gStr = doc.findFirst ("DIV[id=gold]").attribute("onmouseover");
+        QString gStr = document.findFirst ("DIV[id=gold]").attribute("onmouseover");
         //'total:|22517|;safe:|15360|;safe_add:|0|;pandora:|0|;free:|7157|'
         ValMap m = parseSafeText(gStr);
         if (m.size() > 0) {
@@ -574,7 +577,7 @@ Page_Game::Page_Game (QWebElement& doc) :
             safe_gold   = m.value("safe", -1);
             free_gold   = m.value("free", -1);
         } else {
-            gold = dottedInt (doc.findFirst ("DIV[id=gold] B").toInnerXml (), NULL);
+            gold = dottedInt (document.findFirst ("DIV[id=gold] B").toInnerXml (), NULL);
             free_gold = gold;
         }
     }
@@ -582,23 +585,23 @@ Page_Game::Page_Game (QWebElement& doc) :
     free_crystal = -1;
     safe_crystal = -1;
     {
-        QString cStr = doc.findFirst ("DIV[id=crystal]").attribute("onmouseover");
+        QString cStr = document.findFirst ("DIV[id=crystal]").attribute("onmouseover");
         ValMap m = parseSafeText(cStr);
         if (m.size() > 0) {
             crystal         = m.value("total", -1);
             safe_crystal    = m.value("safe", -1);
             free_crystal    = m.value("free", -1);
         } else {
-            crystal = dottedInt (doc.findFirst ("DIV[id=crystal] B").toInnerXml (), NULL);
+            crystal = dottedInt (document.findFirst ("DIV[id=crystal] B").toInnerXml (), NULL);
             free_crystal = crystal;
         }
     }
 
-    fish    = dottedInt (doc.findFirst ("DIV[id=fish] B").toInnerXml (), NULL);
-    green   = dottedInt (doc.findFirst ("DIV[id=green] B").toInnerXml (), NULL);
+    fish    = dottedInt (document.findFirst ("DIV[id=fish] B").toInnerXml (), NULL);
+    green   = dottedInt (document.findFirst ("DIV[id=green] B").toInnerXml (), NULL);
 
     {
-        QString hStr = doc.findFirst ("DIV[id=char]").attribute("onmouseover");
+        QString hStr = document.findFirst ("DIV[id=char]").attribute("onmouseover");
         QRegExp rx ("'now:\\|(\\d+)\\|;max:\\|(\\d+)\\|;speed:\\|(\\d+)\\|'");
         if (rx.indexIn(hStr) != -1)
         {
@@ -647,9 +650,9 @@ Page_Game::Page_Game (QWebElement& doc) :
             petlist.append(p);
         }
     }
-    chartitle = doc.findFirst("DIV[class=name] B").attribute ("title");
-    charname = doc.findFirst("DIV[class=name] U").toPlainText ().trimmed ();
-    foreach (QWebElement e, doc.findAll("DIV.message")) {
+    chartitle = document.findFirst("DIV[class=name] B").attribute ("title");
+    charname = document.findFirst("DIV[class=name] U").toPlainText ().trimmed ();
+    foreach (QWebElement e, document.findAll("DIV.message")) {
         if (isDisplayed(e)) {
             message = e.toPlainText().trimmed();
 //            qDebug("[message] displayed: {%s}", qPrintable(message));
@@ -662,7 +665,7 @@ Page_Game::Page_Game (QWebElement& doc) :
 //    message = doc.findFirst("DIV[class=message]").toPlainText ().trimmed ();
     workguild = WorkGuild_None;
     alchemicalguild = false;
-    foreach (QWebElement e, doc.findFirst("DIV.guilds").findAll("A")) {
+    foreach (QWebElement e, document.findFirst("DIV.guilds").findAll("A")) {
         QString title = e.attribute("title");
         if (title == u8("Шахтеры")) {
             workguild = WorkGuild_Miners;
@@ -686,7 +689,7 @@ Page_Game::Page_Game (QWebElement& doc) :
     }
 
     QWebElement e;
-    e = doc.findFirst("B[id=time] SPAN");
+    e = document.findFirst("B[id=time] SPAN");
     timer_system.title = "SYSTEM TIME";
     timer_system.href = "/";
     parseTimerSpan(e, &timer_system.pit, &timer_system.hms);
@@ -712,7 +715,7 @@ Page_Game::Page_Game (QWebElement& doc) :
         qDebug("systime_delta = %d sec", PageTimer::systime_delta);
     }
 
-    e = doc.findFirst("DIV[id=rmenu1] DIV[class=timers]");
+    e = document.findFirst("DIV[id=rmenu1] DIV[class=timers]");
 
     // 1: Таймер работы
     QWebElement c = e.firstChild();
@@ -763,7 +766,7 @@ Page_Game::Page_Game (QWebElement& doc) :
     }
 
     timers.clear();
-    QWebElement accordion = doc.findFirst("DIV[id=accordion]");
+    QWebElement accordion = document.findFirst("DIV[id=accordion]");
     e = accordion.findFirst("DIV[class=counters]");
     foreach (c, e.findAll("LI")) {
         timers.add(c);
@@ -831,7 +834,10 @@ Page_Game::Page_Game (QWebElement& doc) :
     parseFlyingList();
 
     parseMedikit();
+
+    return true;
 }
+
 
 bool Page_Game::parseFlyingList() {
     flyingslist.clear();

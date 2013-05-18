@@ -34,7 +34,8 @@ SOURCES += \
     alertdialog.cpp \
     workdiving.cpp \
     workfighting.cpp \
-    workquestcompletist.cpp
+    workquestcompletist.cpp \
+    workbottlemaking.cpp
 
 HEADERS  += \
     bot.h \
@@ -62,7 +63,8 @@ HEADERS  += \
     tools/sleeper.h \
     workdiving.h \
     workfighting.h \
-    workquestcompletist.h
+    workquestcompletist.h \
+    workbottlemaking.h
 
 FORMS += \
     alertdialog.ui

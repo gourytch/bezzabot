@@ -1,0 +1,1132 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<title>Простейшие зелья. Ботва Онлайн | Битва за реальную капусту! </title>
+
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+<script>
+	var LANG_NAME='RU';
+	var TIME = 1368467662;
+	var KEY=19021;
+	var IMG_URL='http://i.botva.ru';
+	var POPUPS_VER='2';
+	var locale_separator	= '.';
+</script>
+
+<link href="http://i.botva.ru/locale/RU/i/global.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/locale/RU/i/inside.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/mega/mega.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/balert/balert.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/locale/RU/i/game.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/class/zoo.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/skills.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/class/talants.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/i/inside/style.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/i/global-3.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/i/icons.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/i/game.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/sunny/jquery-ui-1.8.custom.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/popups/new.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.css?v=335" rel="stylesheet" type="text/css">
+<link href="http://i.botva.ru/css/modules/castle.css?v=335" rel="stylesheet" type="text/css">
+<script language="javascript" src="http://i.botva.ru/css/modules/trainer.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/mega/mega.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/news.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery-1.5.2.min.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery-ui-1.8.11.custom.min.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/locale/RU/pp.2.js?v=336"></script>
+<script language="javascript" src="http://i.botva.ru/i/global2.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery-jtemplates.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery.base.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/jquery.ui.touch-punch.min.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/i/inside/script.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/balert/balert.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/class/zoo.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/popups/new.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/jscrollpane/jscrollpane.js?v=335"></script>
+<script language="javascript" src="http://i.botva.ru/css/modules/castle.js?v=335"></script>
+
+
+<style>
+	#js_message {
+		display: none;
+		z-index: 10001 !important;
+		left: 0px;
+		top: -110px;
+	}
+	#body {
+/*		position: relative !important;*/
+	}
+</style>
+<script>
+var inside_frame = false;
+
+var USER_ID	= 484947;
+</script>
+<script type="text/javascript" src="http://yandex.st/share/share.js" charset="utf-8"></script><script>
+	var arrows = null;
+	$( function() {
+		var news = new bNews();
+		news.init({  title: "Архив новостей", share_active: true});
+
+		var gnews = new gNews();
+		gnews.init({
+						title: "Всякие-разные новости",
+			share_active: false,
+			on_click: '#guild_news_link',
+			load_link: '/news.php?type=guild&json=1',
+			filter_count: 12
+		});
+				$('#cm_potions').click( function() {
+			doSwitch('cm_potions', 'cmd_split2_active', 'potions', 'weapons', 'acctab_77');
+		});
+	});
+	
+	function setReadWiki() {
+		$.getJSON('/news.php?type=bwiki&json=2', function(data){
+			if (data.status == 'ok') {
+				return true;
+			}else {
+				return false;
+			}
+		});
+		return false;
+	}
+</script>
+
+</head>
+<body class="lang_RU ">
+
+
+
+<div id="bgmain">
+<div id="bgmain2">
+<div id="bgmain3">
+
+<div id="container" class="">
+
+	<div id="top1">
+		<div>
+						<a id="news_link" href="news.php" onclick="$(this).removeClass('active'); return true;">Новости</a>
+						
+			<a id="guild_news_link" href="#" onclick="$(this).removeClass('active'); return true;">Вестник</a>
+			
+						<a href="link.php?id=blog" target="_blank">Дневники</a>
+						<a href="http://forum.theabyss.ru/index.php?act=external&amp;project=botva3&amp;session=484947_1756247aa9a082aff677b219c68602d9" target="_blank">Форум</a>
+
+			<a id="q_chat" href="chat.php">Чат  (4)</a>
+			<a id="guild_link" onclick="return true;" href="options.php">Настройки</a>
+
+						<a href="page.php?page=contact">Поддержка</a>
+									<a href="http://www.theabyss.ru" target="_blank">Другие игры</a>
+
+					</div>
+		<div id="online">
+			<p style="height: 14px">Активных игроков:	<b>4797</b></p>
+			<p style="height: 14px">Онлайн: 	<b>1694</b></p>
+			<p style="height: 14px">Время:</p>
+			<p class="t" style="height: 14px"><b id="time"><span id="counter_1" class="js_timer " timer="1368388800|0|day">21:55:27</span></b></p>
+		</div>
+	</div>
+
+
+
+	<div id="top_menu"><b style="display:none">&nbsp;</b>
+		<!-- Отряд приглашения на БГ -->
+				<!-- ------------------------- -->
+				
+		
+		
+		<a href="/" class="logo logo2  ">
+			<div class="ap_extra"></div>
+			<div id="ap11"></div>
+			<div id="ap12"></div>
+			<div id="ap13"></div>
+		</a>
+		
+		
+				
+				<div class="lenta"></div>
+		<div class="top_stats  ">
+			    
+<div class="char_stat char_stat_with_pets" id="char" onmouseover="doItem('design_hps','now:|2430859|;max:|2464526|;speed:|2992|',event,this)">
+	<div class="name"><b class="icon2 race22" title="Баранка"></b> <u>Нехрюшка</u></div>
+
+	<a href="javascript:doPotions()" title="ВЫПИТЬ" class="icon potion_all"></a>
+	
+	<i>99%</i>
+	<b class="stat life_1" style="width:201px"></b>
+	</div>
+		<div class="char_stat" id="pet">
+					<a href="javascript:doCage('cage',500515)" title="Посадить в клетку" class="ico_cage ico_cage_1"></a>
+							<a href="/index.php?a=parrot_say" title="Корабельный журнал" class="cage_parrot_icon"></a>
+				<div class="name name_slim" onmouseover="doItem('design_hps','now:|250000|;max:|250000|;speed:|1918|',event,this)"><b class="icon2 pet23" title=""></b> <u>Йагупоп 78-й</u></div>
+		<i>100%</i>
+		<a href="javascript:doPetPotions()" title="ВЫПИТЬ" class="icon potion_all"></a>
+		<b class="stat life_1" style="width:203px"></b>
+	</div>
+	
+<style>
+    .length1 { margin-left: 130px !important;}
+    .length2 { margin-left: 60px !important;}
+    .length3 { margin-left: 25px !important;}
+</style>		</div>
+		<div class="top_money ">
+			<div class="money" id="gold" onmouseover="doItem('design_money_1','total:|586771|;safe:|222720|;safe_add:|445440|;pandora:|0|;safe3:|0|;free:|0|',event,this)">
+	<p>золото:</p>
+	<b>586.771</b>
+		<p class="safe" title="586771  / 222720"><i></i><b class="safe_2" style="width:57px"></b></p>
+	</div>
+<div class="money" id="crystal" onmouseover="doItem('design_money_2','total:|112|;safe:|75|;safe4:|30|;free:|7|;max_crystals:|75000|',event,this)">
+	<p>кристаллы:</p>
+	<b>112</b>
+		<p class="safe safe2" title="112  / 75"><i></i><b class="safe_1" style="width:65px"></b></p>
+	</div>
+<div class="money" id="fish">
+	<a href="harbour.php?a=change"></a>
+	<p>пирашки:</p>
+	<b>72.618</b>
+
+</div>
+<div class="money" id="green">
+	<a href="kormushka.php"></a>
+	<p>зелень:</p>
+	<b>1.298</b>
+
+</div>		</div>
+
+					<div id="fast" class="fast
+	 	 ">
+	
+		<a class="fast_item floatl" href="/mine.php?a=open" title="Карьер"><div class="ico f43"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/harbour.php?a=pier" title="Причал"><div class="ico f35"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/school.php?m=square" title="Квадрат удачи"><div class="ico f36"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/farm.php" title="Ферма"><div class="ico f21"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/clan_mod.php?m=treasury" title="Казначейство"><div class="ico f28"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/training.php" title="Тренировка"><div class="ico f38"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/smith.php?a=master" title="Мастер Кузнеч"><div class="ico f30"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/shop.php" title="Лавка"><div class="ico f17"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/temple.php?a=pandora" title="Святилище - эффекты пандор"><div class="ico f62"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/trade.php" title="Сбытница"><div class="ico f18"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/harbour.php?a=market" title="Торговая площадка"><div class="ico f14"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/school.php?m=class3" title="Школьные поручения"><div class="ico f66"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/castle.php?a=workshop_mine&amp;id=3" title="Жерновая"><div class="ico f58"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/house.php?info=cage" title="Клетка"><div class="ico f7"></div></a>
+	
+	
+		<a class="fast_item floatl" href="/clan_mod.php?m=task" title="Коммандный пункт"><div class="ico f73"></div></a>
+	
+		<a class="fast_item floatr last" href="/options.php?a=fast" title="Настройки панели быстрого доступа"><div class="ico flast"></div></a>
+</div>
+		
+		
+		<div class="guilds">
+			<u>Ваши гильдии</u>
+			<div style="margin-left:-7px; margin-top: 5px; margin-bottom: 5px;">
+							<a href="castle.php?a=show2&amp;id=3" style="background-image:url(http://i.botva.ru/images/menus/guild_3.png)" class="hover" title="Шахтеры"></a>
+										<a href="castle.php?a=show2&amp;id=11" style="background-image:url(http://i.botva.ru/images/menus/guild_11.png)" class="hover" title="Устрашатели"></a>
+			
+							<a href="castle.php?a=show2&amp;id=23" style="background-image:url(http://i.botva.ru/images/menus/guild_23.png)" class="hover" title="Мирники"></a>
+			
+							<a href="castle.php?a=show2&amp;id=6" style="background-image:url(http://i.botva.ru/images/menus/guild_6.png)" class="hover" title="Теневоды"></a>
+			
+			
+							<a href="castle.php?a=show2&amp;id=31" style="background-image:url(http://i.botva.ru/images/menus/guild_31.png)" class="hover" title="Братство Алхимиков"></a>
+						
+
+			</div>
+
+			<u>Ваш клан</u>
+			<p class="link">
+							<b class="icon2 race2" title="Барантус"></b>
+				<a href="clan_members.php?id=4198">*_SWAG_*</a>
+
+
+						</p>
+
+		</div>
+
+	</div>
+	<div id="content-container">
+		<div id="menu">
+			<a href="index.php" id="m1">Персонаж<b></b></a>
+			<a href="post.php" id="m2" class="active">Почта<b></b></a>
+			<a href="village.php" id="m3">Деревня<b></b></a>
+			<a href="castle.php" id="m4">Крепость<b></b></a>
+		  			<a href="clan.php" id="m5">Клан<b></b></a>
+			<a href="school.php" id="m16">Школа<b></b></a>
+			<a href="harbour.php" id="m7">Гавань<b></b></a>
+			<a href="mine.php" id="m6">Шахта<b></b></a>
+			<a href="dozor.php" id="m8">Бодалка<b></b></a>
+			<a href="shtab.php" id="m9">Штаб<b></b></a>
+			<a href="kormushka.php" id="m10">Кормушка<b></b></a>
+			<a href="contacts.php" id="m11">Братва<b></b></a>
+			<a href="search.php" id="m12">Поиск<b></b></a>
+			<a href="http://wiki.botva.ru/" target="_blank" id="m13" onclick="$(this).removeClass('active'); setReadWiki();">Ботвапедия<b></b></a>
+			<a href="lol.php" id="m14">Смешилка<b></b></a>
+			<a href="logout.php" id="m15">Выход<b></b></a>
+
+
+						
+			
+			
+						<a href="http://wiki.botva.ru/" target="_blank" class="top " id="menu_advwiki"> &nbsp; </a>
+			
+			
+			
+						    <div class="bg_banner_new battleground_banner_mine_01_new" onclick="document.location.href='/battleground.php'" alt="Соль земли" title="Соль земли"></div>
+			    <div class="battleground_banner_text_new" onclick="document.location.href='/battleground.php'">Помоги отбить &gt;&gt;</div>
+						
+
+			
+		</div>
+		<div id="content">
+			<div id="crumbs">
+				<a href="castle.php">Крепость</a> &gt; <a href="castle.php?a=myguild&amp;id=31">Братство Алхимиков</a> &gt; <b>Простейшие зелья</b> <div class="cmd_back floatr" onclick="history.back();" title="Назад"></div>
+			</div>
+			<div id="body" class=""><div id="js_message"><!-- Slider message box --></div>
+<style>
+	#left_info { width: 50%; height: 30px; float: left; text-align: left; }
+	#right_info { width: 50%; height: 30px; float: right; text-align: left; }
+	
+	#left_param { width: 200px; height: 30px; float: left; text-align: left; }
+	#middle_param { width: 140px; height: 30px; float: left; text-align: center; }
+	#right_param { width: 210px; height: 30px; float: right; text-align: right; }
+	
+	#left_main { width: 225px; height: 300px; float: left; text-align: center; }
+	#right_main { width: 325px; height: 300px; float: right; text-align: center; }
+	
+	.alchemy_cont { text-align: center; }
+	.alchemy_img_pos { margin: 2px; }
+	.alchemy_res_img { position: relative; width: 62px; height: 62px; }
+	.alchemy_disabled { position: absolute; width: 60px; height: 60px; top: 2px; left: 2px; background-image: url(http://i.botva.ru/images/items/empty.png); background-position: 0px 0px; background-repeat: no-repeat; }
+	.alchemy_selected { border: 2px solid #F7A922; }
+	
+	.alchemy_res_line {
+		height: 25px;
+		width: 60px;
+		border: 1px solid #ebdecb; margin-left: 1px;
+		text-align:left;
+		padding-left: 3px;
+		vertical-align: middle; 
+	}
+	
+	.alchemy_size_60 { height: 60px; }
+	.alchemy_size_30 { height: 30px; padding-top: 5px; }
+	.alchemy_size_130 { height: 140px; padding: 0px; }
+	.alchemy_size_300 { height: 320px; background-color: #E3D4B7; }
+	.alchemy_skills { margin-top: 5px; }
+	.alchemy_res_count { margin-left: 5px; }
+</style>
+
+<div class="round_block_round_border round_block_header_top">
+	<div>Ваша должность: <b>Простейший алхимик 5 разряда</b></div>
+</div>
+<div class="round_block_round_border round_block_header_cont alchemy_size_60">
+	<div id="left_info">
+		<div class="alchemy_skills">Ваше мастерство по изготовлению <b class=" icon2 alchemy_step_1" title="Простейшие Зелья"></b>: <b>3%</b> <b class="gray_popup" rel="28"></b></div>
+		<div class="alchemy_skills">Аккуратность <b class=" icon2 alchemy_step_1" title="Простейшие Зелья"></b>: <b>4%</b> <b class="gray_popup" rel="29"></b></div>
+	</div>
+	<div id="right_info">
+		<div class="alchemy_skills">Качество <b class=" icon2 alchemy_step_1" title="Простейшие Зелья"></b>: <b>2%</b> <b class="gray_popup" rel="30"></b></div>
+		<div class="alchemy_skills">Время изготовления <b class=" icon2 alchemy_step_1" title="Простейшие Зелья"></b>: <b class="iconsp20 ico_time_small"></b><b>3:54:00</b> <b class="gray_popup" rel="31"></b></div>
+	</div>
+	<div class="clear"></div>
+</div>
+
+<div class="round_block_round_border round_block_header_cont alchemy_size_30">
+	<table border="0" width="100%" cellspacing="1" cellpadding="0">
+		<tbody><tr>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class="icon2 item_alchemy_2" title="Стеклянная тара"></b><span class="alchemy_res_count">9</span>
+			</td>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class=" icon ico_trade1" title="РП"></b><span class="alchemy_res_count">6</span>
+			</td>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class=" iconsp item_smith_6" title="КЯС"></b><span class="alchemy_res_count">6</span>
+			</td>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class=" icon2 item_mine_7" title="Кристальная пыль"></b><span class="alchemy_res_count">1996</span>
+			</td>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class=" icon2 item_farm_1" title="Мыльный камень"></b><span class="alchemy_res_count">135</span>
+			</td>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class="icon item_1" title="Зеленка"></b><span class="alchemy_res_count">14</span>
+			</td>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class="icon item_2" title="Синька"></b><span class="alchemy_res_count">10</span>
+			</td>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class="icon item_130" title="Бутылочка"></b><span class="alchemy_res_count">14</span>
+			</td>
+						<td valign="middle" class="round_block_round_border alchemy_res_line">
+				<b class="icon item_131" title="Пузырек"></b><span class="alchemy_res_count">10</span>
+			</td>
+					</tr>
+	</tbody></table>
+</div>
+
+<div class="round_block_round_border round_block_header_top">
+	<div style="text-align: center;"><b>Выберите зелье, которое хотите сварить:</b></div>
+</div>
+<div class="round_block_round_border round_block_header_cont alchemy_size_130">
+	<table border="0" width="100%" cellspacing="5" cellpadding="0" style="position: relative; top: -6px;">
+		<tbody><tr>
+												</tr><tr>
+							<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(590)" id="alchemy_potion_590" onmouseover="doItem(590, '', event, this)" title="">
+					<span class="count_amount  ">20</span><img count="20" class="alchemy_selected js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_1s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(591)" id="alchemy_potion_591" onmouseover="doItem(591, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_2s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(594)" id="alchemy_potion_594" onmouseover="doItem(594, '', event, this)">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_5s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(595)" id="alchemy_potion_595" onmouseover="doItem(595, '', event, this)">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_6s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(596)" id="alchemy_potion_596" onmouseover="doItem(596, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_7s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(597)" id="alchemy_potion_597" onmouseover="doItem(597, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_8s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(598)" id="alchemy_potion_598" onmouseover="doItem(598, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_9s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(599)" id="alchemy_potion_599" onmouseover="doItem(599, '', event, this)">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_10s.jpg" item-init-new="1">
+									</div>
+			</td>
+													</tr><tr>
+							<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(600)" id="alchemy_potion_600" onmouseover="doItem(600, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_11s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(601)" id="alchemy_potion_601" onmouseover="doItem(601, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_12s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(602)" id="alchemy_potion_602" onmouseover="doItem(602, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_13s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(603)" id="alchemy_potion_603" onmouseover="doItem(603, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_14s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(604)" id="alchemy_potion_604" onmouseover="doItem(604, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_15s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(645)" id="alchemy_potion_645" onmouseover="doItem(645, '', event, this)">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_17s.jpg" item-init-new="1">
+									</div>
+			</td>
+														<td align="center" width="60">
+				<div class="alchemy_res_img" onclick="AlchemySetPotion(664)" id="alchemy_potion_664" onmouseover="doItem(664, '', event, this)" title="">
+					<img count="1" class="alchemy_img_pos js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_18s.jpg" item-init-new="1">
+									</div>
+			</td>
+									</tr>
+	</tbody></table>
+</div>
+
+<div class="center message" id="alchemy_error_msg">Завершился процесс варки зелья.</div>
+
+<div class="round_block_round_border round_block_header_top">
+	<div style="text-align: center;">Варка зелья <b><span id="alchemy_potion_name_need">Чистюля</span></b></div>
+</div>
+<div class="round_block_round_border alchemy_size_300">
+	<div id="left_main">
+
+<style>
+	#alch_boiler_img { width: 225px; height: 250px; text-align: center; margin-bottom: 10px; background: url(http://i.botva.ru/images/items/boiler_0bg.png) }
+</style>
+<center>
+	<div id="alch_boiler_img"></div>
+			У вас нет котла, зайдите в <a href="?a=myguild&amp;id=31&amp;m=shop">закупочную.</a>
+	</center>
+</div>
+	<div id="right_main" class="round_block_round_border" style="background-color: #dbcbad; height: 320px;">
+
+<style>
+	#alch_main_left_info { width: 50%; height: 30px; float: left; text-align: center; }
+	#alch_main_right_info { width: 50%; height: 30px; float: right; text-align: center; }
+	#alch_main_cleaner_count { width: 100%; height: 30px; text-align: center; }
+	
+	#alch_main_left_cleaner { width: 20%; height: 60px; float: left; text-align: right; }
+	#alch_main_right_cleaner { width: 80%; height: 60px; float: right; text-align: left; }
+	
+	#alch_main_left_start { width: 100%; height: 20px; text-align: center; margin-top: 5px; }
+	#alch_main_right_start { width: 100%; text-align: center; }
+	
+	.alchemy_small_simple_text { width: 100%; min-height: 70px; text-align: center; padding-top: 20px; font-size: 12px; }
+	#alchemy_small_window_text { width: 100%; min-height: 50px; text-align: center; padding-top: 20px; font-weight: bold; font-size: 12px; }
+	#alchemy_small_window_text2 { width: 100%; text-align: center; font-weight: bold; font-size: 20px; }
+	#alchemy_small_window_text3 { width: 100%; min-height: 20px; text-align: center; font-weight: bold; font-size: 12px; }
+	#alchemy_small_window_text4 { width: 100%; text-align: center; margin-top: 10px; margin-bottom: 10px; }
+	
+	.alch_main_left_stir { width: 50%; height: 50px; float: left; text-align: center; }
+	.alch_main_right_stir { width: 50%; height: 50px; float: right; text-align: center; }
+	.alchemy_res_img2 { position: relative; width: 60px; height: 60px; left: 2px; }
+	.alchemy_disabled2 { position: absolute; width: 60px; height: 60px; top: 0px; left: 0px; background-image: url(http://i.botva.ru/images/items/empty.png); background-position: 0px 0px; background-repeat: no-repeat; }
+	.alchemy_padding { padding-top: 20px; }
+	.alchemy_bold { font-weight: bold; }
+	
+	#alchemy_stir_action { width: 100%; text-align: left; padding-left: 20px;}
+	#alch_main_left_choose { width: 50%; float: left; text-align: center; }
+	#alch_main_right_choose { width: 50%; float: right; text-align: center; padding-top: 15px; }
+	
+	#alchemy_recipe { width: 100%; text-align: center; height: 60px; position: relative; margin-top: 10px;}
+	#alchemy_potion_name_need { font-weight: bold; }
+	
+	#alch_main_assistent { margin-top: 10px; }
+	
+	#change_temperature { width: 30px; height: 15px; border-color: #D6C29D; border-style: inset; text-align: center; font-weight: bold; }
+	#alchemy_use_assistent { border: 1px; border-color: #D6C29D; border-style: inset; }
+	
+	.slider_div { width: 200px; padding-top: 8px; margin-left:10px; }
+	.harbour_slider_div { width: 301px; height: 18px; }
+	.alch_left_padding { padding-left: 110px; }
+	
+	.slider { width:185px }
+	.slider_v { display:none }
+	
+	.ico_smithy		{
+		background:  url(http://i.botva.ru/i/ico_smithy.png) no-repeat;
+		background-position: 0px 0px;
+		width: 18px;
+		height: 18px;
+		display: inline-block;
+		text-decoration: none;
+		position: relative;
+		top: 2px;
+		cursor: default;
+	}
+	.smith_min			{	background-position:	0px		-20px;		}
+	.smith_min:hover	{	background-position:	-18px	-20px;		}
+	.smith_min:active	{	background-position:	-36px	-20px;		}
+	.smith_max			{	background-position:	0px		-74px;		}
+	.smith_max:hover	{	background-position:	-18px	-74px;		}
+	.smith_max:active	{	background-position:	-36px	-74px;		}
+</style>
+<div style="margin-top: 10px;">Для варки зелья необходимы ингридиенты:</div>
+<div id="alchemy_recipe">
+		<table border="0" width="100%">
+		<tbody><tr>
+					<td align="center">
+				<div class="alchemy_res_img2">
+					<img count="1" class="js_count" title="Стеклянная тара(9/1)" alt="Стеклянная тара(9/1)" src="http://i.botva.ru/images/items/Alchemy_2s_alch.jpg" item-init-new="1">
+									</div>
+			</td>
+					<td align="center">
+				<div class="alchemy_res_img2">
+					<img count="1" class="js_count" title="Ртутный порошок(6/1)" alt="Ртутный порошок(6/1)" src="http://i.botva.ru/images/items/Trade_1s_alch.jpg" item-init-new="1">
+									</div>
+			</td>
+					<td align="center">
+				<div class="alchemy_res_img2">
+					<span class="count_amount  ">2</span><img count="2" class="js_count" title="Конс. ядреная смесь(6/2)" alt="Конс. ядреная смесь(6/2)" src="http://i.botva.ru/images/items/Smith_6s_alch.jpg" style="" item-init-new="1">
+									</div>
+			</td>
+				</tr>
+	</tbody></table>
+	</div>
+
+<form action="" method="POST" name="form_alchemy_action" id="form_alchemy_action">
+	<input type="hidden" name="k" value="10728">
+	<input type="hidden" name="do_cmd" value="make_potion">
+<div style="margin-top: 15px;">
+	<div id="alch_main_left_info">Шанс успеха варки: <b>100%</b> <b class="gray_popup" rel="33"></b></div>
+	<div id="alch_main_right_info">Шанс взрыва котла: <b>80%</b> <b class="gray_popup" rel="34"></b></div>
+	<div class="clear"></div>
+	
+	<div id="alch_main_cleaner_count">Сколько зелий Чистюля использовать в процессе варки?</div>
+	
+	<div id="alch_main_left_cleaner">
+		<div id="alchemy_cleaner_element" class="alchemy_res_img2" style="margin-right: 10px; margin-left: 0px;">
+			<span class="count_amount  ">122</span><img count="122" class="js_count" title="" src="http://i.botva.ru/images/items/Alchemy_Potion_1s.jpg" onmouseover="doItem(590, '', event, this)" item-init-new="1">
+					</div>
+	</div>
+	<div id="alch_main_right_cleaner">
+		<div class="harbour_slider_div alch_left_padding">
+			<div><b><span id="how_much_1">0</span> / 2 </b></div>
+		</div>
+		<div class="harbour_slider_div">
+			<div class="floatl"><a id="b_min_1" href="javascript:SetMin(1);" rel="1" title="Минимум" class="ico_smithy smith_min"></a></div>
+
+			<div class="slider_div floatl">
+							<div id="slider_1" class="slider  ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a href="#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%; "></a></div>
+
+<input type="text" value="0" name="cleaner_count" id="slider_v_1" rel="" onchange="$(&quot;#slider_1&quot;).slider(&quot;value&quot;,this.value); " class="slider_v ">
+
+
+
+						</div>
+			<div class="floatl"><a id="b_max_1" href="javascript:SetMax(1);" rel="1" title="Максимум" class="ico_smithy smith_max"></a></div>
+		</div>
+	</div>
+	<div class="clear"></div>
+	
+	<div id="alch_main_assistent"><input type="checkbox" name="use_assistent" id="alchemy_use_assistent" value="1">Нанять ассистента для помешивания за 5 <b class="icon money3" title="Зелень"></b> <b class="gray_popup" rel="35"></b></div>
+	
+	<div id="alch_main_left_start">Следующее помешивание котла через: <b class="iconsp20 ico_time_small"></b><b>1:57:00</b> <b class="gray_popup" rel="36"></b></div>
+	<div id="alch_main_right_start">
+			<input type="submit" class="cmd_all cmd_row5 cmd_arow5 " value="ВАРИТЬ" onclick="startMake();">
+		</div>
+</div>
+</form>
+
+
+
+</div>
+	<div class="clear"></div>
+</div>
+
+
+<script>
+	var pkey	= 19021;
+	
+	$(document).ready(function(){
+		blockForms();
+	});
+	
+	function AlchemySetPotion(potion_type) {
+		$('img').filter(".alchemy_selected").attr('class', 'alchemy_img_pos');
+		$('#alchemy_potion_' + potion_type + ' img').attr('class', 'alchemy_selected');
+		getPotion(potion_type);
+	}
+	
+	function getPotion(potion_type) {
+		var add_get	= '&potion_type=' + potion_type + '&key=' + pkey;
+
+		$.getJSON('?a=myguild&id=31&m=potion_1' + add_get, function(data){
+			if (data.status == 'ok') {
+				pkey	= data.data.GET_KEY;
+				$('#right_main').html(data.data.action_window);
+				$('#alchemy_potion_name_need').html(data.data.selected.potion.item_info.name);
+				addItemInfo();
+				
+				return true;
+			}else {
+				$('#alchemy_error_msg').html(data.data);
+			}
+			if (data.update != null)
+				doUpdateInfo(data.update);
+		});
+		return false;
+	}
+	
+	function cleanBoiler() {
+		var ptype	= $("#form_alchemy_boiler input:checked[type=radio][name=ptype]").val();
+		var add_get	= '&do_cmd=clean_boiler&ptype=' + ptype + '&k=' + pkey;
+
+		$.getJSON('?a=myguild&id=31&m=potion_1' + add_get, function(data){
+			if (data.status == 'ok') {
+				pkey	= data.data.GET_KEY;
+				$('#alchemy_error_msg').html(data.data.message);
+				$('#left_main').html(data.data.boiler_window);
+				$('#right_main').html(data.data.action_window);
+				blockForms();
+				addItemInfo();
+			}else {
+				$('#alchemy_error_msg').html(data.data);
+			}
+			if (data.update != null)
+				doUpdateInfo(data.update);
+		});
+	}
+	
+	function startMake() {
+		var cleaner		= $('#slider_v_1').val();
+		var assistent	= 0;
+		if ($('#alchemy_use_assistent').is(':checked'))
+			assistent	= 1;
+		
+		var add_get		= '&do_cmd=make_potion&k=' + pkey + '&cleaner_count=' + cleaner + '&use_assistent=' + assistent;
+
+		$.getJSON('?a=myguild&id=31&m=potion_1' + add_get, function(data){
+			if (data.status == 'ok') {
+				pkey	= data.data.GET_KEY;
+				$('#alchemy_error_msg').html(data.data.message);
+				$('#left_main').html(data.data.boiler_window);
+				$('#right_main').html(data.data.action_window);
+				blockForms();
+				addItemInfo();
+			}else {
+				$('#alchemy_error_msg').html(data.data);
+			}
+			if (data.update != null)
+				doUpdateInfo(data.update);
+		});
+	}
+	
+	function tryStir() {
+		var atype		= $("#form_alchemy_stir input:checked[type=radio][name=action_type]").val();
+		var temperature	= $("#change_temperature").val();
+		var add_get		= '&do_cmd=stir&action_type=' + atype + '&change_temperature=' + temperature + '&k=' + pkey;
+
+		$.getJSON('?a=myguild&id=31&m=potion_1' + add_get, function(data){
+			if (data.status == 'ok') {
+				pkey	= data.data.GET_KEY;
+				$('#alchemy_error_msg').html(data.data.message);
+				$('#left_main').html(data.data.boiler_window);
+				$('#right_main').html(data.data.action_window);
+				blockForms();
+				addItemInfo();
+			}else {
+				$('#alchemy_error_msg').html(data.data);
+			}
+			if (data.update != null)
+				doUpdateInfo(data.update);
+		});
+	}
+	
+	function endWork() {
+		var add_get		= '&do_cmd=end_work&k=' + pkey;
+
+		$.getJSON('?a=myguild&id=31&m=potion_1' + add_get, function(data){
+			if (data.status == 'ok') {
+				pkey	= data.data.GET_KEY;
+				$('#alchemy_error_msg').html(data.data.message);
+				$('#left_main').html(data.data.boiler_window);
+				$('#right_main').html(data.data.action_window);
+				blockForms();
+				addItemInfo();
+			}else {
+				$('#alchemy_error_msg').html(data.data);
+			}
+			if (data.update != null)
+				doUpdateInfo(data.update);
+		});
+	}
+	
+	function blockForms() {
+		$("#form_alchemy_action").bind("submit", function(event){
+			event.preventDefault();
+		});
+		
+		$("#form_alchemy_boiler").bind("submit", function(event){
+			event.preventDefault();
+		});
+		
+		$("#form_alchemy_stir").bind("submit", function(event){
+			event.preventDefault();
+		});
+		
+		$("#form_alchemy_end").bind("submit", function(event){
+			event.preventDefault();
+		});
+	}
+</script></div>
+		</div>
+		<div id="right">
+
+			<div id="rmenu1" class="extend3">
+
+				<span id="mtimers" class="spr">Таймеры<b></b></span>
+				<div class="timers">
+					Текущая работа
+					<a href="/" class="timer link">Я свободен!</a>
+					Защита от нападений:
+					<span class="timer"><span id="counter_24" class="js_timer " timer="1368470369|0">00:44:02</span></span>
+					До нападения:
+					<a href="dozor.php" class="timer attack">Пора в бой!</a>
+				</div>
+
+
+
+
+				
+				<a href="harbour.php?a=coulonpack" id="mcoulons" class="spr">Склад кулонов<b></b></a>
+				<div id="coulons_bar">
+					<div class="coulons icon_pack">
+	<a item_id="20648833" title="Копикрист 100/100"><b class="item_104"></b></a>
+		<a class="active" item_id="25140562" title="Антихап 100/100"><b class="item_508"></b></a>
+		<a item_id="24197010" title="Маслянка 100/100"><b class="item_247"></b></a>
+		<a item_id="25140574" title="Клевер 100/100"><b class="item_106"></b></a>
+		<a item_id="26487414" title="Чертирожка 100/100"><b class="item_105"></b></a>
+		<a item_id="25121384" title="Большой Поляноид 100/100"><b class="item_119"></b></a>
+	</div>
+<div class="coulons icon_pack margin2">
+		<a item_id="21335789" title="Антимаг 96/96"><b class="item_108"></b></a>
+		<a item_id="25632255" title="Ловкий Пупс 100/100"><b class="item_83"></b></a>
+		<a item_id="27663029" title="Большое пузо 100/100"><b class="item_87"></b></a>
+		<a item_id="28140910" title="Фермец 100/100"><b class="item_605"></b></a>
+		<a item_id="28111652" title="Пожарник 1/100"><b class="item_720"></b></a>
+		<a item_id="29963774" title="Пожарник 52/100"><b class="item_720"></b></a>
+	</div>
+<div class="coulons icon_pack margin2">
+		<a item_id="24872782" title="Разрушитель 17/100"><b class="item_633"></b></a>
+	
+
+	<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+		<a><b class="item_0"></b></a>
+	</div>
+				</div>
+
+
+
+							</div>
+			<div id="rmenu2" class="rmenu_size4">
+
+				<a item_id="nothing" href="/options.php?a=menu" class="settings" title="Настройки">&nbsp;</a>
+				<div id="accordion" style="height: 101%; " class="ui-accordion ui-widget ui-helper-reset ui-accordion-icons" role="tablist" aria-disabled="false">			<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span>Ресурсы</h3>
+		<div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" style="height: 272px; overflow-x: auto; overflow-y: auto; display: none; " role="tabpanel">
+
+
+<div class="resources" id="resources_scroll" style="overflow-x: hidden; overflow-y: hidden; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 178px; ">
+	
+	
+
+<div class="jspContainer" style="width: 178px; height: 268px; "><div class="jspPane" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; top: 0px; width: 178px; "><ul class="l">
+				<li id="i39" title="Количество походов за пирашками на сегодня" style="overflow:hidden"><a href="/harbour.php?a=pier"><b class="iconsp20 harbour_crusades"></b></a> <span style="margin-left: -1px;">6</span>
+				</li><li id="i23" title="Кораблики" style="overflow:hidden"><a href="/harbour.php?a=pier"><b class="iconsp ico_harbour_3"></b></a> <span style="margin-left: -1px;">189</span>
+				</li><li id="i45" title="Количество реликов до следующего взноса" style="overflow:hidden"><a href="/castle.php?a=show2&amp;id=caste"><b class="iconsp20 relics_total"></b></a> <span style="margin-left: -1px;">234</span>
+				</li><li id="i43" title="Получено реликов за сегодня" style="overflow:hidden"><a href="/castle.php?a=show2&amp;id=caste"><b class="icon2 relics"></b></a> <span style="margin-left: -1px;">58</span>
+				</li><li id="i19" title="Количество медальонов до следующей ступени" style="overflow:hidden"><a href="/castle.php?a=room&amp;id=11"><b class="icon medallions"></b></a> <span style="margin-left: -1px;">511</span>
+				</li><li id="i57" title="Мыльный камень" style="overflow:hidden"><b class="icon2 item_farm_1"></b> <span style="margin-left: -1px;">135</span>
+				</li><li id="i58" title="Раскаленное стекло" style="overflow:hidden"><b class="icon2 item_alchemy_1"></b> <span style="margin-left: -1px;">0/75</span>
+				</li><li id="i48" title="Конс. ядреная смесь" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="iconsp item_smith_6"></b></a> <span style="margin-left: -1px;">6/75</span>
+				</li><li id="i51" title="Соль земли. Прибавляет от 2% до 24% к характеристикам элемента экипировки." style="overflow:hidden"><b class="icon2 flyings_salt"></b> <span style="margin-left: -1px;">1/75</span>
+				</li><li id="i52" title="Горная слеза. Повышает награбленное в кристаллах в боях бодалки на количество от 1 до 12. " style="overflow:hidden"><b class="icon2 flyings_tear"></b> <span style="margin-left: -1px;">2/75</span>
+			</li></ul><ul class="r">
+				<li id="i34" title="Билетов на большую поляну: 0 + 0 б/у" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="icon ico_ticket2"></b></a> <span style="margin-left: -1px;">0/75</span>
+				</li><li id="i33" title="Билетов на маленькую поляну: 1 + 0 б/у" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="icon ico_ticket1"></b></a> <span style="margin-left: -1px;">1/75</span>
+				</li><li id="i20" title="Количество свободных мест на плантации" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="icon slaves"></b></a> <span style="margin-left: -1px;">1</span>
+				</li><li id="i32" title="Количество опыта до следующего уровня" style="overflow:hidden"><a href="/dozor.php"><b class="icon ico_exp"></b></a> <span style="margin-left: -1px;">348.234</span>
+				</li><li id="i44" title="Радужный Сундучок" style="overflow:hidden"><a href="/shop.php?a=sell&amp;group=11"><b class="iconsp20 item_pandora_caste_gold"></b></a> <span style="margin-left: -1px;">1</span>
+				</li><li id="i56" title="Кристальная пыль" style="overflow:hidden"><b class="icon2 item_mine_7"></b> <span style="margin-left: -1px;">1.996</span>
+				</li><li id="i59" title="Стеклянная тара" style="overflow:hidden"><b class="icon2 item_alchemy_2"></b> <span style="margin-left: -1px;">9/75</span>
+				</li><li id="i38" title="Ртутный порошок" style="overflow:hidden"><a href="/harbour.php?a=market"><b class="icon ico_trade1"></b></a> <span style="margin-left: -1px;">6/75</span>
+				</li><li id="i53" title="Рыжий сланец. Повышает награбленное в золоте в боях бодалки на количество от 2% до 18%." style="overflow:hidden"><b class="icon2 flyings_ore"></b> <span style="margin-left: -1px;">0/75</span>
+				</li><li id="i87" title="Батискафчик" style="overflow:hidden"><a href="/atlantis.php"><b class="icon2 bathyscaphe"></b></a> <span style="margin-left: -1px;">0/12</span>
+			</li></ul></div></div></div>
+
+
+
+
+
+
+</div>
+				<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-state-active ui-corner-top" role="tab" aria-expanded="true" aria-selected="true" tabindex="0"><span class="ui-icon ui-icon-triangle-1-s"></span>Счётчики</h3>
+		<div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active" style="height: 272px; overflow-x: auto; overflow-y: auto; " role="tabpanel">
+
+
+<div class="right_counters jspScrollable" id="right_counters_scroll" style="overflow-x: hidden; overflow-y: hidden; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 178px; " tabindex="0">
+	
+
+
+<div class="jspContainer" style="width: 178px; height: 268px; "><div class="jspPane" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 171px; top: 0px; "><ul class="r">
+			<li title="Время до возвращения судна с пирашками"><a href="/harbour.php?a=pier"><b class=" iconsp ico_harbour_2"></b></a> <span id="counter_1" class="js_timer " timer="1368467996|0">00:04:29</span></li>
+			<li title="Следующий взнос в Касту"><a href="/castle.php"><b class=" icon2 timer_caste"></b></a> <span id="counter_2" class="js_timer " timer="1369228402|0">8:19:17:55</span></li>
+			<li title="Инкубатор Мантикорика."><a href="/castle.php"><b class=" icon2 timer_mantibator"></b></a> <span id="counter_3" class="js_timer " timer="1368591261|0">1:10:18:54</span></li>
+			<li title="Перемолка Кристальной Пыли."><a href="/castle.php?a=workshop_mine&amp;id=3"><b class=" icon2 timer_mine_7"></b></a> <span id="counter_4" class="" timer="|0">00:00:00</span></li>
+			<li title="Производство Раскаленного Стекла."><a href="/castle.php?a=myguild&amp;id=31&amp;m=lab"><b class=" icon2 timer_alchemy_1"></b></a> <span id="counter_5" class="js_timer " timer="1368467729|0">00:00:02</span></li>
+			<li title="Производство Стеклянной Тары."><a href="/castle.php?a=myguild&amp;id=31&amp;m=lab"><b class=" icon2 timer_alchemy_2"></b></a> <span id="counter_6" class="" timer="|0">00:00:00</span></li>
+			<li title="Следующее помешивание зелья."><a href="/castle.php?a=myguild&amp;id=31&amp;m=potion_1"><b class=" icon2 timer_alchemy_stir"></b></a> <span id="counter_7" class="" timer="|0">00:00:00</span></li>
+			<li title="Варка зелья."><a href="/castle.php?a=myguild&amp;id=31&amp;m=potion_1"><b class=" icon2 timer_alchemy_make"></b></a> <span id="counter_8" class="" timer="|0">00:00:00</span></li>
+			<li title="Бодатливые страшилки"><a href="/school.php?m=class3"><b class=" icon2 ico_daily_time_6"></b></a> <span id="counter_9" class="" timer="|0">00:00:00</span></li>
+			<li title="Кристаллы Удачи"><a href="/school.php?m=class3"><b class=" icon2 ico_daily_time_5"></b></a> <span id="counter_10" class="" timer="|0">00:00:00</span></li>
+			<li title="Правильный дозорный"><a href="/school.php?m=class3"><b class=" icon2 ico_daily_time_8"></b></a> <span id="counter_11" class="js_timer " timer="1368584190|0">1:08:21:03</span></li>
+			<li title="Активный бодун"><a href="/school.php?m=class3"><b class=" icon2 ico_daily_time_1"></b></a> <span id="counter_12" class="js_timer " timer="1368633934|0">1:22:10:07</span></li>
+			<li title="Время до окончания постройки батискафчика."><a href="/atlantis.php"><b class=" icon2 bathyscaphe"></b></a> <span id="counter_13" class="" timer="|0">00:00:00</span></li>
+			<li title="Время до возврата печати крепости"><a href="/castle.php?a=sign&amp;id=2"><b class=" icon2 ico_bonus_sign"></b></a> <span id="counter_14" class="js_timer " timer="1371610685|0">36:09:02:38</span></li>
+		</ul></div><div class="jspVerticalBar"><div class="jspCap jspCapTop"></div><div class="jspTrack" style="height: 268px; "><div class="jspDrag" style="height: 223px; "><div class="jspDragTop"></div><div class="jspDragBottom"></div></div></div><div class="jspCap jspCapBottom"></div></div></div></div>
+	
+</div>
+				<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span>Эффекты</h3>
+		<div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" style="height: 272px; overflow-x: auto; overflow-y: auto; display: none; " role="tabpanel">
+
+
+<div class="timers" id="timers_scroll" style="overflow-x: hidden; overflow-y: hidden; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; width: 178px; ">
+	
+
+        	
+        
+
+	
+        	
+        
+<div class="jspContainer" style="width: 178px; height: 268px; "><div class="jspPane" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; top: 0px; width: 178px; "><h6>Временные эффекты </h6><ul class="r">
+        
+			<li title="Бонус. Победоносец" class="w161"><b class="icon icon2 ico_daily_bonus_2"></b> 
+		    		<span id="counter_15" class="js_timer " timer="1368523939|0">15:36:52</span>
+				
+					</li><li title="Бонус. Бодатливые страшилки" class="w161"><b class="icon icon2 ico_daily_bonus_6"></b> 
+		    		<span id="counter_16" class="js_timer " timer="1368534210|0">18:28:03</span>
+				
+					</li><li title="Бонус. Транжира" class="w161"><b class="icon icon2 ico_daily_bonus_11"></b> 
+		    		<span id="counter_18" class="js_timer " timer="1368536703|0">19:09:36</span>
+				
+				</li></ul><h6>Эффекты Пандоры</h6><ul class="r">
+			<li title="Требования для прохождения всех дейликов снижены в 2 раза." class="w161"><b class="icon iconsp item_pandora bad"></b> <span id="counter_17" class="js_timer " timer="1368536670|0">19:09:03</span>
+		</li></ul></div></div></div>
+
+
+</div>
+				<h3 class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all" role="tab" aria-expanded="false" aria-selected="false" tabindex="-1"><span class="ui-icon ui-icon-triangle-1-e"></span>Инкубатор</h3>
+		<div class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" style="height: 272px; overflow-x: auto; overflow-y: auto; display: none; " role="tabpanel">
+
+
+
+
+		<div class="flyings">
+				 
+			<div class="title">
+				<a href="/castle.php?a=zoo&amp;id=6&amp;flying=11582&amp;redirect=1"><b class="icon2 flying_43" title="Мантикорик"></b></a>
+			</div>
+			<div class="content">
+				<center>
+									<b class="dblock"><a href="/castle.php?a=zoo&amp;id=6&amp;block=events&amp;flying=11582&amp;redirect=1">Кар Кар</a></b>
+					
+											<i class="timer_center"><span id="counter_19" class="js_timer " timer="1368488549|0">05:47:02</span></i>
+													</center>
+			</div>
+						 
+			<div class="title">
+				<a href="/castle.php?a=zoo&amp;id=6&amp;flying=11879&amp;redirect=1"><b class="icon2 flying_13" title="Драко"></b></a>
+			</div>
+			<div class="content">
+				<center>
+									<b class="dblock"><a href="/castle.php?a=zoo&amp;id=6&amp;block=events&amp;flying=11879&amp;redirect=1">Кар Кар</a></b>
+					
+											<i class="timer_center"><span id="counter_20" class="js_timer " timer="1368488551|0">05:47:04</span></i>
+													</center>
+			</div>
+						 
+			<div class="title">
+				<a href="/castle.php?a=zoo&amp;id=6&amp;flying=13965&amp;redirect=1"><b class="icon2 flying_23" title="Пегасус"></b></a>
+			</div>
+			<div class="content">
+				<center>
+									<b class="dblock"><a href="/castle.php?a=zoo&amp;id=6&amp;block=events&amp;flying=13965&amp;redirect=1">Кар Кар</a></b>
+					
+											<i class="timer_center"><span id="counter_21" class="js_timer " timer="1368488553|0">05:47:06</span></i>
+													</center>
+			</div>
+						 
+			<div class="title">
+				<a href="/castle.php?a=zoo&amp;id=6&amp;flying=14677&amp;redirect=1"><b class="icon2 flying_33" title="Грифан"></b></a>
+			</div>
+			<div class="content">
+				<center>
+									<b class="dblock"><a href="/castle.php?a=zoo&amp;id=6&amp;block=events&amp;flying=14677&amp;redirect=1">Кар Кар</a></b>
+					
+											<i class="timer_center"><span id="counter_22" class="js_timer " timer="1368488555|0">05:47:08</span></i>
+													</center>
+			</div>
+							
+	<div class="status_control"><a href="#" class="inlineb m5" onclick="popupnew.fromURL('/ajax.php?m=zoo_status_control',{id_content: 'popup_status_control'});return false;">Управление статусами</a></div>
+</div></div>
+	</div>
+
+
+				<script language="javascript" type="text/javascript">
+					var accordion_active_tab =  1 ;
+				</script>
+			</div>
+
+		</div>
+
+
+	</div>
+	<div id="footer">
+
+		<a href="http://www.ddestiny.ru" target="_blank" class="logo_ddestiny"></a>
+					<div id="footer_menu">
+			<div class="links">
+				<a href="page.php?page=legal">Лицензионное соглашение</a> &nbsp;
+				<a href="page.php?page=rules">Правила  игры</a>
+				
+			</div>
+
+
+			<span class="small">© Destiny Development 2008-2013 г.<br> Все права защищены.
+
+			</span>
+		</div>
+		
+	</div>
+	<div class="counters">
+		<div>
+									<!--LiveInternet counter--><script type="text/javascript"><!--
+document.write("<a href='http://www.liveinternet.ru/click' "+
+"target=_blank><img src='http://counter.yadro.ru/hit?t21.6;r"+
+escape(document.referrer)+((typeof(screen)=="undefined")?"":
+";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+";"+Math.random()+
+"' alt='' title='LiveInternet: показано число просмотров за 24"+
+" часа, посетителей за 24 часа и за сегодня' "+
+"border=0 width=88 height=31><\/a>")//--></script><a href="http://www.liveinternet.ru/click" target="_blank"><img src="http://counter.yadro.ru/hit?t21.6;rhttp%3A//g3.botva.ru/mine.php%3Fa%3Dopen%26m%3Ddig%26k%3D39621;s1366*768*24;uhttp%3A//g3.botva.ru/castle.php%3Fa%3Dmyguild%26id%3D31%26m%3Dpotion_1;0.08252751943655312" alt="" title="LiveInternet: показано число просмотров за 24 часа, посетителей за 24 часа и за сегодня" border="0" width="88" height="31"></a><!--/LiveInternet-->				</div>
+	</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+<div id="path_go_to_top" class="go_to_top" style="width: 164px; ">
+	<div class="go_to_top_bgr">
+		<div class="go_to_top_title">наверх</div>
+	</div>
+</div>
+<script>
+$(function(){
+	globalPrepareGoToTop();
+});
+</script>
+
+<script>
+$(document).ready(
+	function(){
+		setDefaultMoney();
+	}
+);
+
+var default_money	= '1';
+
+function setDefaultMoney()
+{
+	$('input[type=radio][name=ptype][value=1]').attr('checked', 'checked');
+	$('input[type=radio][name=ptype_1][value=1]').attr('checked', 'checked');
+	$('input[type=radio][name=ptype_2][value=1]').attr('checked', 'checked');
+	if (1==2)
+	{
+		$('input[type=radio][name=ptype][value=3]').attr('checked', 'checked');
+		$('input[type=radio][name=ptype_1][value=3]').attr('checked', 'checked');
+		$('input[type=radio][name=ptype_2][value=3]').attr('checked', 'checked');
+	}
+}
+
+var onscroll_interval	= 0;
+window.onscroll		= function(e) {
+	var vScroll = document.documentElement.scrollTop || document.body.scrollTop;
+	if (vScroll > 200) 
+		$('#path_go_to_top').removeClass('hidden');
+	else
+		$('#path_go_to_top').addClass('hidden');
+	
+	clearTimeout(onscroll_interval);
+	
+	if (vScroll > 900) 
+		onscroll_interval	= setTimeout(function(){ 
+		globalPrepareGoToTop(vScroll)
+	},100);
+}
+
+function globalPrepareGoToTop(vScroll) {
+	var vScroll	= vScroll || 0;
+	var free_width	= $('#content-container').offset().left;
+	var w		= Math.max(free_width + 40,40);
+	
+	if (vScroll > $('#menu').offset().top+200)
+		w	+= 200;
+	
+	if (free_width < 105) {
+		/** маленькое разрешение */
+		$('#path_go_to_top .go_to_top_bgr').addClass('go_to_top_mini');
+		w	= Math.max(free_width - 30,40);
+	} 
+	
+	$('#path_go_to_top').width(w).unbind().click(function(){
+		globalPrepareGoToTop(0);
+		 $('body,html').animate({
+			scrollTop: 0
+		}, 400);
+	});
+}
+</script>
+
+
+
+<div id="opaque" style="display: none;"></div><div id="opaque" style="display: none;"></div><div class="shadow9" style="position: absolute; display: none; " id="tooltip2"><table class="popup_item"><tbody><tr><th colspan="2">Чистюля</th></tr><tr><td class="image"><img src="http://i.botva.ru/images/items/Alchemy_Potion_1s.jpg" alt="" class="item2"></td><td>Зелье, использующееся для чистки котла в процессе варки.<br></td></tr></tbody></table></div></body></html>

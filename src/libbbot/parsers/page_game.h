@@ -88,12 +88,13 @@ extern bool parseTimerSpan (const QWebElement& e, QDateTime *pit=0, int *hms=0);
 
 struct PageResource {
     int     count;
+    int     limit;
     int     id;
     QString href;
     QString title;
-    PageResource() {}
+    PageResource() : limit(-1) {}
     PageResource(const PageResource& v):
-        count(v.count), id(v.id), href(v.href), title(v.title) {}
+        count(v.count), limit(v.limit), id(v.id), href(v.href), title(v.title) {}
 };
 QString toString(const QString& pfx, const PageResource& v);
 
@@ -427,6 +428,8 @@ public:
     virtual QString toString (const QString& pfx = QString ()) const;
 
     static bool fit(const QWebElement& doc);
+
+    bool parse(); // NOT virtual because called from constructor!
 
     bool hasNoJob() const;
 
