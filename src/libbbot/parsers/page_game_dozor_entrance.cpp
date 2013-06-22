@@ -15,7 +15,7 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     Page_Game (doc)
 {
     pagekind = page_Game_Dozor_Entrance;
-    QWebElementCollection groups = document.findAll("DIV#body DIV.grbody");
+    QWebElementCollection groups = document.findAll("TABLE.normal_inputs TD.half ");
 //    QWebElementCollection groups = document.findAll("DIV#body TABLE.default TD.half DIV.inputGroup");
     // groups::
     // [0] - писанина про пятую точку
@@ -24,21 +24,21 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     // [3] - Zorro
     // [4] - Страшилки
 
-    if (groups.count() != 5) {
+    if (groups.count() != 4) {
         qCritical(u8("Page_Game_Dozor_Entrance: groups.size=%1").arg(groups.count()));
         return;
     }
-    _fightForm = groups[1];
-    _dozorForm = groups[2];
-    _zorroForm = groups[3];
-    _scaryForm = groups[4];
+    _fightForm = groups[0];
+    _dozorForm = groups[1];
+    _zorroForm = groups[2];
+    _scaryForm = groups[3];
 
     // обработаем поиск противника
     QWebElement e = _fightForm.findFirst("DIV.watch_no_attack");
     if (e.isNull()) { // нет запрета на бодалку
-        fight_price = dottedInt(
-                    _fightForm.findFirst("P.sub_title_text B")
-                    .toPlainText(), NULL);
+        e = _fightForm.findFirst("DIV.bar_brown P B");
+        qDebug(u8("_fightForm-brown-p-b={%1}").arg(e.toOuterXml()));
+        fight_price = dottedInt(e.toPlainText(), NULL);
     } else { // должен быть откат бодалки
         fight_price = -1;
         e = _fightForm.findFirst("SPAN[timer]");
@@ -51,7 +51,7 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
 
     // обработаем дозор
     dozor_price = dottedInt(
-                _dozorForm.findFirst("SPAN.price_num")
+                _dozorForm.findFirst("DIV.bar_brown B")
                 .toPlainText(), NULL);
     QWebElement selector = _dozorForm.findFirst("SELECT#auto_watch");
     QWebElementCollection options = selector.findAll("OPTION");
@@ -70,7 +70,7 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     e = _zorroForm.findFirst("DIV.watch_no_attack");
     if (e.isNull()) { // нет запрета на Zorro
         zorro_price = dottedInt(
-                    _zorroForm.findFirst("P.sub_title_text B")
+                    _zorroForm.findFirst("DIV.bar_brown B")
                     .toPlainText(), NULL);
     } else { // должен быть откат
         zorro_price = -1;
@@ -86,7 +86,7 @@ Page_Game_Dozor_Entrance::Page_Game_Dozor_Entrance (QWebElement& doc) :
     e = _scaryForm.findFirst("SPAN[timer]");
     if (e.isNull()) {
         scary_auto_price = dottedInt(
-                    _scaryForm.findFirst("P.sub_title_text B")
+                    _scaryForm.findFirst("DIV.bar_brown B")
                     .toPlainText(), NULL);
     } else {
         scary_auto_price = -1;
@@ -129,24 +129,19 @@ QString Page_Game_Dozor_Entrance::toString (const QString& pfx) const
             pfx + "}";
 }
 
+
 //static
 bool Page_Game_Dozor_Entrance::fit(const QWebElement& doc) {
 //    qDebug("* CHECK Page_Game_Dozor_Entrance");
-    QWebElementCollection titles = doc.findAll ("DIV[class=title]");
-    if (!titles.count ()) {
-//        qDebug("Page_Game_Dozor_Entrance doesn't fit: no titles");
+    QWebElement title = doc.findFirst("TABLE.normal_inputs TD.half DIV");
+    if (title.isNull()) return false;
+    QString s = title.toPlainText().trimmed();
+    if (s != u8("БОДАЛКА")) {
         return false;
     }
-    foreach (QWebElement e, titles) {
-        QString title = e.toPlainText ().trimmed ();
-        if (title == u8("Капитан стражи")) {
-//            qDebug("Page_Game_Dozor fit: Капитан Стражи detected");
-            return true;
-        }
-    }
-//    qDebug("Page_Game_Dozor_Entrance doesn't fit");
-    return false;
+    return true;
 }
+
 
 bool Page_Game_Dozor_Entrance::doDozor(int time10) {
     if (dozor_left10 < time10) {
