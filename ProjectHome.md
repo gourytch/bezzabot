@@ -1,0 +1,1 @@
+Automated client for browser-based game
